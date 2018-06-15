@@ -9,19 +9,20 @@ Block construction:
 
 This is not final
 
-Headers:
-Block Number
-EGEM Back Reference block
-Egem Back Reference Block Hash
-Previous Block Hash
-AllConfig
-AllConfigHash
-Data
-Sponsor
-Miner
-Transactions
-Hardware Tx
-Software Tx
-Target Block
-Target Block Data Hash
-Hash of this Block
+| Headers: | Data Format: | Example: |
+| ------------- | ------------- | ------------- |
+| Block Number | tbp | tbp |
+| EGEM Back Reference block | tbp | tbp |
+| Egem Back Reference Block Hash | tbp | tbp |
+| Previous Block Hash | tbp | tbp |
+| AllConfig | tbp | tbp |
+| AllConfigHash | tbp | tbp |
+| Data | tbp | tbp |
+| Sponsor | tbp | tbp |
+| Miner | tbp | tbp |
+| Transactions | tbp | tbp |
+| Hardware Tx | tbp | tbp |
+| Software Tx | tbp | tbp |
+| Target Block | tbp | tbp |
+| Target Block Data Hash | tbp | tbp |
+| Hash of this Block | tbp | tbp |
