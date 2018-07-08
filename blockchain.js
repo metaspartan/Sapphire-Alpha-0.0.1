@@ -12,14 +12,14 @@ var writeArchive = function(blockinfo){
       console.log("this is the contents of the file: "+data+" archive key: "+archive.key) // prints 'world'
     }
   })
-  archive.writeFile('/saphire.json', '["saphire":{"block":0}]'+blockinfo, function (err) {
+  archive.writeFile('/saphire.json', readArchive()+blockinfo, function (err) {//change that write to an append
     if (err) throw err
     archive.readdir('/', function (err, list) {
       if (err) throw err
       console.log(list) // prints ['hello.txt']
       archive.readFile('/saphire.json', 'utf-8', function (err, data) {
         if (err) throw err
-        console.log("this is the contents of the file: "+data) // prints 'world'
+        console.log("this is the contents of the file: "+JSON.stringify(data)) // prints 'world'
       })
     })
   })
@@ -33,9 +33,10 @@ var readArchive = function(){
     archive.readFile('/saphire.json', 'utf-8', function (err, data) {
       if (err) throw err
       archive.download();
-      console.log("this is the contents of the file: "+data) // prints 'world'
+      console.log("this is the contents of the file: "+JSON.stringify(data)) // prints 'world'
     })
   })
+  return archive;
 }
 
 var replicateArchive = function(){

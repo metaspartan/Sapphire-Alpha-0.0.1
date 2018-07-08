@@ -2,13 +2,21 @@
 const app = require('express')();
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
+// print process.argv
+const optionDefinitions = [
+  { name: 'port1', alias: 'c', type: Number },
+  { name: 'port2', alias: 'm', type: Number }
+];
+const commandLineArgs = require('command-line-args');
+const options = commandLineArgs(optionDefinitions);
 //end add the miners
 process.stdin.resume();
 process.stdin.setEncoding('utf8');
 var util = require('util');
 var Peers = require('./peers.js');
 var Blockchain = require('./blockchain.js');
-var port = 10004;
+var port = options["port1"];
+var port2 = options["port2"];
 
 process.stdin.on('data', function (text) {
   console.log('received data:', util.inspect(text));
@@ -38,9 +46,14 @@ function rl() {
   console.log('type message and hit enter to broadcast:');
 }
 
-var archive = Blockchain.bBlocks('["saphire":{"block":1}]');
+//when starting new chain look at the line below
+//var archive = Blockchain.bBlocks('["saphire":{"block":1}]');
+var archive = Blockchain.bBlocks('');
+var archive = Blockchain.bReadBlocks();
+
 Blockchain.bBlockServer(archive.key,port);
-archive = Blockchain.bBlocks('["saphire":{"block":2}]');
+
+//archive = Blockchain.bBlocks('["saphire":{"block":2}]');
 
 //------------------------------------------------------------------------------------------------
 ///this is the original server stuff for the soclet chat
@@ -71,24 +84,25 @@ io.on('connection', function(socket){
     //testing messaging to Peers
     Peers.bPeers(msg);
     //this part probably will change
-    Blockchain.bBlocks('["saphire":{"block":3,"data":'+msg+'}]');
+    Blockchain.bBlocks(Blockchain.bReadBlocks()+msg);
 
   });
   socket.on('broadcast message', function(msg){
     io.emit('broadcast message', msg);
     console.log('broadcasting message: ' + msg);
+    console.log('saving blockchain data in broadcast: '+Blockchain.bReadBlocks()+msg)
 
     //testing messaging to Peers
     Peers.bPeers(msg);
     //this part probably will change
-    Blockchain.bBlocks('["saphire":{"block":3,"data":'+msg+'}]');
+    Blockchain.bBlocks(Blockchain.bReadBlocks()+msg);
 
   });
 });
 
-http.listen(3000, function(){
+http.listen(port2, function(){
   //this will fail on two peers same machine so make dynamic
-  console.log('listening on *:3000');
+  console.log('listening on *:'+port2);
 });
 ///end socket chat
 //-----------------------------------------------------------------------------------------------

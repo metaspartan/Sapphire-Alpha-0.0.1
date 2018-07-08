@@ -93,6 +93,7 @@
           outpt.innerHTML+="Balance of address1 is"+frankieCoin.getBalanceOfAddress('address1')+"\n";
           console.log('\nBalance of address2 is', frankieCoin.getBalanceOfAddress('address2'));
           outpt.innerHTML+="Balance of address2 is"+frankieCoin.getBalanceOfAddress('address2')+"\n";
+          console.log("entire chain: "+frankieCoin.getEntireChain());
         }else{
           var tempit = document.getElementById('input').value;
           //console.log(tempit);
@@ -191,6 +192,10 @@
                 return this.chain[this.chain.length - 1];
             }
 
+            getEntireChain() {
+                return JSON.stringify(this.chain);
+            }
+
             minePendingTransactions(miningRewardAddress){
                 let block = new Block(Date.now(), this.pendingTransactions, this.getLatestBlock().hash);
                 block.mineBlock(this.difficulty);
@@ -243,6 +248,7 @@
         frankieCoin.createTransaction(new Transaction('address1', 'address2', 100));
         frankieCoin.createTransaction(new Transaction('address2', 'address1', 50));
         console.log("get latest block: "+frankieCoin.getLatestBlock().nonce.toString());
+        console.log("entire chain: "+frankieCoin.getEntireChain());
     </script>
   </body>
 </html>
