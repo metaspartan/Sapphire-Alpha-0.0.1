@@ -37,7 +37,7 @@ var Transaction = class Transaction{
 
 var Block = class Block {
 
-    constructor(timestamp, transactions, previousHash = '') {
+    constructor(timestamp, transactions, previousHash = '', sponsor, miner, egemBRBlock, data) {
         this.previousHash = previousHash;
         this.timestamp = timestamp;
         this.transactions = transactions;
@@ -95,7 +95,7 @@ var Block = class Block {
 var Blockchain = class Blockchain{
       constructor() {
           this.chain = [this.createGenesisBlock()];
-          this.difficulty = 0;//can be 1 or more later
+          this.difficulty = 3;//can be 1 or more later
           this.pendingTransactions = [];
           this.miningReward = 100;
           console.log("genesis block created");

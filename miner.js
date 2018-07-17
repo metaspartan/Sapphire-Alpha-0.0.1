@@ -45,7 +45,7 @@ var Miner = class Miner {
     }
     h.update(this.decodeUTF8(msg));
     myDigestVar = h.hexDigest();
-    console.log(myDigestVar.substring(0,2));
+    //console.log(myDigestVar.substring(0,2));
     if(myDigestVar.substring(0,2) == "00" && difc == 0){
       console.log("miner hashed in "+ctr+" passes");
 
