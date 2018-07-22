@@ -1,7 +1,7 @@
 var sapphirechain = require("./block.js")
 var BLAKE2s = require("./public/js/blake2s.js")
 
-let frankieCoin = new sapphirechain.Blockchain();
+//let frankieCoin = new sapphirechain.Blockchain();
 let ctr = 0;
 
 var msg = "genesis message"
@@ -11,12 +11,13 @@ var myDigestVar = "";
 var difc = 0;
 
 var Miner = class Miner {
-  constructor(msg, length, key, address, sponsor){
+  constructor(msg, length, key, address, sponsor, chain){
     this.msg = msg,
     this.length = 32,
     this.key = key,
     this.address = address,
-    this.sponsor = sponsor
+    this.sponsor = sponsor,
+    this.chain = chain
   }
 
   decodeUTF8(s) {
@@ -51,16 +52,19 @@ var Miner = class Miner {
 
       //io().emit("chat message", "miner hashed in "+ctr+" passes");
       //add a block
-      frankieCoin.minePendingTransactions(this.address);
+      this.chain.minePendingTransactions(this.address);
       //io().emit("broadcast message", JSON.stringify(frankieCoin.getLatestBlock()));
-      console.log("\nThe block is now at: "+JSON.stringify(frankieCoin.getLatestBlock()));
-      console.log('\nBalance of '+this.address+' is', frankieCoin.getBalanceOfAddress(this.address));
+      console.log("\nThe block is now at: "+JSON.stringify(this.chain.getLatestBlock()));
+      console.log('\nBalance of '+this.address+' is', this.chain.getBalanceOfAddress(this.address));
 
       //console.log('\nBalance of address1 is', frankieCoin.getBalanceOfAddress('address1'));
 
-      console.log('\nBalance of 0x5c4ae12c853012d355b5ee36a6cb8285708760e6 is', frankieCoin.getBalanceOfAddress('0x5c4ae12c853012d355b5ee36a6cb8285708760e6'));
+      console.log('\nBalance of 0x5c4ae12c853012d355b5ee36a6cb8285708760e6 is', this.chain.getBalanceOfAddress('0x5c4ae12c853012d355b5ee36a6cb8285708760e6'));
       //console.log('\nBalance of '+sponsor+' is', frankieCoin.getBalanceOfAddress(sponsor));
-      console.log("entire chain: "+frankieCoin.getEntireChain());
+      console.log("processed trades SPHR EGEM = "+this.chain.processTrades()["SPHREGEM"]);
+      console.log("processed trades SPHR XSH = "+this.chain.processTrades()["SPHRXSH"]);
+
+      console.log("entire chain: "+this.chain.getEntireChain());
     }else if(myDigestVar.substring(0,2) == "00" && difc >0){
       console.log("miner hashed in "+ctr+" passes and we are doing a difficulty run now");
     }else{

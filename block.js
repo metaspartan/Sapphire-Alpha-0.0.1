@@ -28,19 +28,35 @@ function decodeUTF8(s) {
 
 var Transaction = class Transaction{
     //we can do an address validation and kick back false
-    constructor(fromAddress, toAddress, amount){
+    constructor(fromAddress, toAddress, amount, ticker){
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
         this.amount = amount;
+        this.ticker = ticker;
+    }
+}
+
+//this is code to add DEX orders to the block
+var Order = class Order{
+    //we can do an address validation and kick back false
+    constructor(fromAddress, buyOrSell, pairing, amount, price){
+        this.fromAddress = fromAddress;
+        this.buyOrSell = buyOrSell;
+        this.pairing = pairing;
+        this.amount = amount;
+        this.price = price;
+        this.state = "open"
     }
 }
 
 var Block = class Block {
 
-    constructor(timestamp, transactions, previousHash = '', sponsor, miner, egemBRBlock, data) {
+    constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock, data) {
         this.previousHash = previousHash;
         this.timestamp = timestamp;
         this.transactions = transactions;
+        //adding orders for dex
+        this.orders = orders;
         this.hash = this.calculateHash().toString();
         this.nonce = 0;
         //tie this to the main EGEM chain
@@ -97,6 +113,9 @@ var Blockchain = class Blockchain{
           this.chain = [this.createGenesisBlock()];
           this.difficulty = 3;//can be 1 or more later
           this.pendingTransactions = [];
+          //can add a this.pendingOrders
+          this.pendingOrders = [];
+          //then also add a this.tradePendingTransactions
           this.miningReward = 100;
           console.log("genesis block created");
           console.log("chain is"+JSON.stringify(this.chain));
@@ -116,33 +135,95 @@ var Blockchain = class Blockchain{
       }
 
       minePendingTransactions(miningRewardAddress){
-          let block = new Block(Date.now(), this.pendingTransactions, this.getLatestBlock().hash);
+          let block = new Block(Date.now(), this.pendingTransactions, this.pendingOrders, this.getLatestBlock().hash);
           block.mineBlock(this.difficulty);
           console.log('Block successfully mined!');
           this.chain.push(block);
+          //adding a trading mechanism
+          this.processTrades();
+          //end adding trading mechanism
           this.pendingTransactions = [
-              new Transaction(null, miningRewardAddress, this.miningReward)
+              new Transaction(null, miningRewardAddress, this.miningReward, "SPHR")
           ];
+          this.pendingOrders = [];
       }
 
       createTransaction(transaction){
           this.pendingTransactions.push(transaction);
       }
 
+      createOrder(order){
+          this.pendingOrders.push(order);
+      }
+
       getBalanceOfAddress(address){
-          let balance = 0;
+
+          let balance = [];
+
+          //let balance = 0;
           for(const block of this.chain){
+
               for(const trans of block.transactions){
+
+                  if(balance[trans.ticker] == null && (trans.fromAddress === address || trans.toAddress === address)){
+                      balance[trans.ticker] = 0;
+                  }
+
                   if(trans.fromAddress === address){
-                      balance -= trans.amount;
+                      balance[trans.ticker] -= trans.amount;
                   }
 
                   if(trans.toAddress === address){
-                      balance += trans.amount;
+                      balance[trans.ticker] += trans.amount;
                   }
               }
+
           }
+
           return balance;
+      }
+
+      processTrades(){
+
+          let tradeBalance = [];
+
+          for(const block of this.chain){
+
+              for(const orders of block.orders){
+
+                  //for(const pairings of orders.pairings){
+                      /*******this was the line I created to set the balance to zero****
+                      if(tradeBalance[orders.ticker] == null && (trans.fromAddress === address || trans.toAddress === address)){
+                          tradeBalance[orders.ticker] = 0;
+                      }
+                      ******/
+                      console.log("inside trades "+orders.pairing+orders.state+orders.amount+orders.buyOrSell);
+
+                      if(tradeBalance[orders.pairing] == null){
+                        tradeBalance[orders.pairing] = 0;
+                        console.log("tb["+orders.pairing+"]"+tradeBalance[orders.pairing]);
+                      }
+
+                      if(orders.buyOrSell == "BUY" && orders.state == "open"){
+                          tradeBalance[orders.pairing] -= parseInt(orders.amount);
+                          console.log("tb["+orders.pairing+"]"+tradeBalance[orders.pairing]);
+                      }
+
+                      if(orders.buyOrSell == "SELL" && orders.state == "open"){
+                          tradeBalance[orders.pairing] += parseInt(orders.amount);
+                          console.log("tb["+orders.pairing+"]"+tradeBalance[orders.pairing]);
+                      }
+
+                      //console.log(tradeBalance.toString());
+
+                  //}
+
+              }
+
+          }
+
+          return tradeBalance;
+
       }
 
       isChainValid() {
@@ -164,6 +245,7 @@ var Blockchain = class Blockchain{
 module.exports = {
     genesisBLK:genesisBLK,
     Transaction:Transaction,
+    Order:Order,
     Block:Block,
     Blockchain:Blockchain
 }
