@@ -123,7 +123,7 @@ var Blockchain = class Blockchain{
 
       createGenesisBlock() {
           console.log("This is where I can include this: "+genesisBLK()+" in the genesis block... (but its not there yet)");
-          return new Block(Date.parse("2017-01-01"), [], "0");
+          return new Block(Date.parse("2017-01-01"), [], []);
       }
 
       getLatestBlock() {
@@ -185,7 +185,8 @@ var Blockchain = class Blockchain{
 
       processTrades(){
 
-          let tradeBalance = [];
+          let tradeBalance = [];//will become the tradewallet for now is testing of trade interactions
+          let tradeOrders = [];
 
           for(const block of this.chain){
 
@@ -202,6 +203,36 @@ var Blockchain = class Blockchain{
                       if(tradeBalance[orders.pairing] == null){
                         tradeBalance[orders.pairing] = 0;
                         console.log("tb["+orders.pairing+"]"+tradeBalance[orders.pairing]);
+                      }
+
+                      if(tradeOrders[orders.pairing] == null){
+                        tradeOrders[orders.pairing] = [];
+                      }
+
+                      tradeOrders[orders.pairing]["state"] = orders.state;
+                      tradeOrders[orders.pairing]["buyOrSell"] = orders.buyOrSell;
+                      tradeOrders[orders.pairing]["amount"] = orders.amount;
+                      tradeOrders[orders.pairing]["price"] = orders.price
+                      tradeOrders[orders.pairing]["fromAddress"] = orders.fromAddress;
+
+                      if(tradeOrders[orders.pairing]["buyOrSell"] == "BUY"){
+                        for(const ordersTX of block.orders){
+                          console.log("about to transact if "+ordersTX.buyOrSell+" = sell and "+ordersTX.state+" = open and "+ordersTX.pairing+ " = "+orders.pairing);
+                          if(ordersTX.buyOrSell == "SELL" && ordersTX.state == "open" && ordersTX.pairing == orders.pairing){
+                            if(ordersTX.price <= tradeOrders[orders.pairing]["price"] && ordersTX.amount <= tradeOrders[orders.pairing]["amount"]){
+                              console.log("this is where I would transact some of "+orders.pairing+" and change the status to closed or partial");
+                              //craft the trade transaction
+                              this.createTransaction(new Transaction(ordersTX.fromAddress, tradeOrders[orders.pairing]["fromAddress"], tradeOrders[orders.pairing]["amount"], "EGEM"));
+                              //update the trade order
+                              this.createOrder(new Order(tradeOrders[orders.pairing]["fromAddress"],'BUY',orders.pairing,(tradeOrders[orders.pairing]["amount"]-ordersTX.amount,tradeOrders[orders.pairing]["price"])));
+                            }
+                          }
+                        }
+                      }
+
+                      //this is incorrect information
+                      if(tradeOrders[orders.pairing]["fromAddress"]){
+                        console.log('in trading Balance of '+tradeOrders[orders.pairing]["fromAddress"]+' is'+this.getBalanceOfAddress(tradeOrders[orders.pairing]["fromAddress"]));
                       }
 
                       if(orders.buyOrSell == "BUY" && orders.state == "open"){
