@@ -1,5 +1,5 @@
 var sapphirechain = require("./block.js")
-var BLAKE2s = require("./public/js/blake2s.js")
+var BLAKE2s = require("./blake2s.js")
 var Miner = require("./miner.js")
 
 let frankieCoin = new sapphirechain.Blockchain();
@@ -29,7 +29,11 @@ frankieCoin.createOrder(new sapphirechain.Order('0x5c4ae12c853012d355b5ee36a6cb8
 //calls mining algo with a message
 franks.calculateDigest("second try",10);
 
+
+
 frankieCoin.createOrder(new sapphirechain.Order('0x0666bf13ab1902de7dee4f8193c819118d7e21a6','SELL','SPHRXSH','125.667','0.08'));
 frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 14, "SPHR"));
 franks.calculateDigest("third try",10);
 frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 35, "SPHR"));
+
+sapphirechain.broadcastPeers("Here is my peer broadcast"+frankieCoin.getLatestBlock().transactions.toString());

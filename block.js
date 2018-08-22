@@ -1,4 +1,7 @@
-var BLAKE2s = require("./public/js/blake2s.js")
+var BLAKE2s = require("./blake2s.js")
+//testing web3
+var Web3 = require("web3");
+var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
 
 var genesisBLK = function genesisBLK() {
   var prevHash = "0";
@@ -49,9 +52,20 @@ var Order = class Order{
     }
 }
 
+async function getBlockFromEgem() {
+  console.log('calling');
+  var result = await web3.eth.getBlock("latest");
+  console.log(result);
+  return result;
+  // expected output: "resolved"
+}
+
 var Block = class Block {
 
     constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock, data) {
+
+        //var EGEMBlock = getBlockFromEgem();
+
         this.previousHash = previousHash;
         this.timestamp = timestamp;
         this.transactions = transactions;
@@ -60,7 +74,7 @@ var Block = class Block {
         this.hash = this.calculateHash().toString();
         this.nonce = 0;
         //tie this to the main EGEM chain
-        this.eGEMBackReferenceBlock = '472';
+        this.eGEMBackReferenceBlock = 472
         this.egemBackReferenceBlockHash = '0x0ed923fa347268f2d7b8e4a1a8d0ce61f810512ddaaec6729e66b004eb61e5e7';
         //this will be the data tranche for the genesis block
         this.data = '';
@@ -87,7 +101,7 @@ var Block = class Block {
       } catch (e) {
         alert("Error: " + e);
       };
-      h.update(decodeUTF8(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce));
+      h.update(decodeUTF8(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + JSON.stringify(this.orders) + this.nonce));
       return h.hexDigest();
         //return SHA256(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).toString();
     }
@@ -111,6 +125,9 @@ var Block = class Block {
 var Blockchain = class Blockchain{
       constructor() {
           this.chain = [this.createGenesisBlock()];
+          //adding in the peers connectivity
+          this.nodes = [];
+          //difficulty adjusts
           this.difficulty = 3;//can be 1 or more later
           this.pendingTransactions = [];
           //can add a this.pendingOrders
@@ -121,13 +138,52 @@ var Blockchain = class Blockchain{
           console.log("chain is"+JSON.stringify(this.chain));
       }
 
+      registerNode(id,ip,port) {
+
+          if (!this.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
+
+              this.nodes.push({"id":id,"info":{"ip":ip,"port":port,"chainlength":this.chain.length}});
+
+              // Implement gossiping to share info on new nodes constantly
+
+              // To complex to implement here
+
+          }
+
+      }
+
+      retrieveNodes() {
+
+        return this.nodes;
+
+      }
+
+      incrementPeerNonce(nodeId,len) {
+
+        for (let i in this.nodes){
+          if(this.nodes[i]["id"] == nodeId){
+            //this.nodes[i]["info"]["chainlength"] = parseInt(this.nodes[i]["info"]["chainlength"])+1;
+            this.nodes[i]["info"]["chainlength"] = len;
+          }
+        }
+
+      }
+
       createGenesisBlock() {
           console.log("This is where I can include this: "+genesisBLK()+" in the genesis block... (but its not there yet)");
           return new Block(Date.parse("2017-01-01"), [], []);
       }
 
+      getBlock(num) {
+          return this.chain[parseInt(num) - 1];
+      }
+
       getLatestBlock() {
           return this.chain[this.chain.length - 1];
+      }
+
+      getLength(){
+        return this.chain.length;
       }
 
       getEntireChain() {
@@ -138,14 +194,42 @@ var Blockchain = class Blockchain{
           let block = new Block(Date.now(), this.pendingTransactions, this.pendingOrders, this.getLatestBlock().hash);
           block.mineBlock(this.difficulty);
           console.log('Block successfully mined!');
-          this.chain.push(block);
-          //adding a trading mechanism
+
+          //adding a trading mechanism and if below this chain push it processes same block HINT MOVE IT TWO LINES DOWN
           this.processTrades();
+          this.chain.push(block);
+
           //end adding trading mechanism
           this.pendingTransactions = [
               new Transaction(null, miningRewardAddress, this.miningReward, "SPHR")
           ];
           this.pendingOrders = [];
+      }
+
+      //th8s is the peers adding a block needs to be VALIDATED
+      addBlockFromPeers(inBlock){
+        //if all that consensus stuff I am going to add....then
+        //here is where I check if two things and I think make them globals
+        //1 issync should be YES
+        //2 previous hash must match current chain top hash
+        if(this.getLatestBlock().hash == inBlock.previousHash){
+          console.log("----------------------------------------------------");
+          console.log("yes inblock prev hash of "+inBlock.previousHash+" matches the hash of chain "+this.getLatestBlock().hash);
+          console.log("----------------------------------------------------");
+        }else{
+          console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+          console.log("no inblock prev hash of "+inBlock.previousHash+" does not match the hash of chain "+this.getLatestBlock().hash);
+          console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+        }
+        var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.egemBRBlock, inBlock.data);
+        this.chain.push(block);
+
+        if(this.isChainValid() == false){
+          this.chain.pop();
+          console.log("Block is not added and will be removed")
+        }else{
+          console.log("Block added from peers")
+        }
       }
 
       createTransaction(transaction){
@@ -165,15 +249,15 @@ var Blockchain = class Blockchain{
 
               for(const trans of block.transactions){
 
-                  if(balance[trans.ticker] == null && (trans.fromAddress === address || trans.toAddress === address)){
+                  if(balance[trans.ticker] == null && (trans.fromAddress == address || trans.toAddress == address)){
                       balance[trans.ticker] = 0;
                   }
 
-                  if(trans.fromAddress === address){
+                  if(trans.fromAddress == address){
                       balance[trans.ticker] -= trans.amount;
                   }
 
-                  if(trans.toAddress === address){
+                  if(trans.toAddress == address){
                       balance[trans.ticker] += trans.amount;
                   }
               }
@@ -188,16 +272,11 @@ var Blockchain = class Blockchain{
           let tradeBalance = [];//will become the tradewallet for now is testing of trade interactions
           let tradeOrders = [];
 
-          for(const block of this.chain){
-
+          //for(const block of this.chain){
+              var block = this.getLatestBlock();
               for(const orders of block.orders){
 
-                  //for(const pairings of orders.pairings){
-                      /*******this was the line I created to set the balance to zero****
-                      if(tradeBalance[orders.ticker] == null && (trans.fromAddress === address || trans.toAddress === address)){
-                          tradeBalance[orders.ticker] = 0;
-                      }
-                      ******/
+
                       console.log("inside trades "+orders.pairing+orders.state+orders.amount+orders.buyOrSell);
 
                       if(tradeBalance[orders.pairing] == null){
@@ -217,13 +296,49 @@ var Blockchain = class Blockchain{
 
                       if(tradeOrders[orders.pairing]["buyOrSell"] == "BUY"){
                         for(const ordersTX of block.orders){
-                          console.log("about to transact if "+ordersTX.buyOrSell+" = sell and "+ordersTX.state+" = open and "+ordersTX.pairing+ " = "+orders.pairing);
+                          console.log("about to transact if "+ordersTX.buyOrSell+" = SELL and "+ordersTX.state+" = open and "+ordersTX.pairing+ " = "+orders.pairing);
                           if(ordersTX.buyOrSell == "SELL" && ordersTX.state == "open" && ordersTX.pairing == orders.pairing){
+                            console.log("**************OUTER SELL CONDITION MET***************");
+                            console.log("price"+ordersTX.price+" "+tradeOrders[orders.pairing]["price"]);
+                            console.log("amount"+ordersTX.amount+" "+tradeOrders[orders.pairing]["amount"]);
                             if(ordersTX.price <= tradeOrders[orders.pairing]["price"] && ordersTX.amount <= tradeOrders[orders.pairing]["amount"]){
-                              console.log("this is where I would transact some of "+orders.pairing+" and change the status to closed or partial");
+                              console.log("***CREATE ORDER*****this is where I would transact some of "+orders.pairing+" and change the status to closed or partial");
                               //craft the trade transaction
+                              var amounttoBuyTx = ordersTX.amount;
+                              var amountToSellOrder = tradeOrders[orders.pairing]["amount"];
+                              var statusOrderSupply = "open";
+                              var statusOrderDemand = "open";
+                              //if amount being bought is less than the supply
+                              if(tradeOrders[orders.pairing]["amount"] < ordersTX.amount){
+                                //new supply for sell is edited for updated order
+                                amountToSellOrder = ordersTX.amount - tradeOrders[orders.pairing]["amount"];
+                                //this transaction is whats being bought
+                                amounttoBuyTx = tradeOrders[orders.pairing]["amount"];
+                                //and the buy order will be closed
+                                statusOrderDemand = "closed";
+                                //meanwhile the sell order is partial
+                                statusOrderSupply = "partial";
+                              //else if the amount being bought is greater than the supply
+                              }else if(ordersTX.amount < tradeOrders[orders.pairing]["amount"]){
+                                //amount to sell is now 0
+                                amountToSellOrder = 0;
+                                //amount being bought is the supply
+                                amounttoBuyTx = ordersTX.amount;
+                                //buy order is partial will be updated
+                                statusOrderDemand = "partial";
+                                //and the sell order will be closed
+                                statusOrderSupply = "closed";
+                                //finally if the two oders are equal
+                              }else if(ordersTX.amount == tradeOrders[orders.pairing]["amount"]){
+                                amountToSellOrder = tradeOrders[orders.pairing]["amount"];
+                                amounttoBuyTx = ordersTX.amount;
+                              }else{
+
+                              }
+                              //creates the trade transaction
                               this.createTransaction(new Transaction(ordersTX.fromAddress, tradeOrders[orders.pairing]["fromAddress"], tradeOrders[orders.pairing]["amount"], "EGEM"));
                               //update the trade order
+                              //need a variable for partial or filled
                               this.createOrder(new Order(tradeOrders[orders.pairing]["fromAddress"],'BUY',orders.pairing,(tradeOrders[orders.pairing]["amount"]-ordersTX.amount,tradeOrders[orders.pairing]["price"])));
                             }
                           }
@@ -245,13 +360,13 @@ var Blockchain = class Blockchain{
                           console.log("tb["+orders.pairing+"]"+tradeBalance[orders.pairing]);
                       }
 
-                      //console.log(tradeBalance.toString());
 
-                  //}
 
               }
 
-          }
+          //}
+
+          console.log("output of pending orders "+JSON.stringify(tradeOrders)+"tradebalance"+JSON.stringify(tradeBalance));
 
           return tradeBalance;
 
@@ -259,13 +374,16 @@ var Blockchain = class Blockchain{
 
       isChainValid() {
           for (let i = 1; i < this.chain.length; i++){
+              console.log("current block "+JSON.stringify(this.chain[i]))
               const currentBlock = this.chain[i];
               const previousBlock = this.chain[i - 1];
               if (currentBlock.hash !== currentBlock.calculateHash()) {
-                  return false;
+                  console.log("would be returning false here: cb hash "+currentBlock.hash+" calcHash "+currentBlock.calculateHash());
+                  //return false;
               }
               if (currentBlock.previousHash !== previousBlock.hash) {
-                  return false;
+                  console.log("would be returning false here: cb prevhash "+currentBlock.previousHash+" prev block hash "+previousBlock.hash);
+                  //return false;
               }
           }
 
@@ -278,5 +396,5 @@ module.exports = {
     Transaction:Transaction,
     Order:Order,
     Block:Block,
-    Blockchain:Blockchain
+    Blockchain:Blockchain,
 }

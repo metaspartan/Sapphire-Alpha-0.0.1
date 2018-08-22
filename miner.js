@@ -1,5 +1,5 @@
 var sapphirechain = require("./block.js")
-var BLAKE2s = require("./public/js/blake2s.js")
+var BLAKE2s = require("./blake2s.js")
 
 //let frankieCoin = new sapphirechain.Blockchain();
 let ctr = 0;
@@ -24,6 +24,12 @@ var Miner = class Miner {
     var i, d = unescape(encodeURIComponent(s)), b = new Uint8Array(d.length);
     for (i = 0; i < d.length; i++) b[i] = d.charCodeAt(i);
     return b;
+  }
+
+  getBalanceOfAddress(addr){
+    var getBalance = this.chain.getBalanceOfAddress(addr);
+    console.log('\nMiners Function Balance of '+addr+' is', getBalance);
+    return getBalance;
   }
 
   calculateDigest(word,diff,pass){
@@ -55,14 +61,14 @@ var Miner = class Miner {
       this.chain.minePendingTransactions(this.address);
       //io().emit("broadcast message", JSON.stringify(frankieCoin.getLatestBlock()));
       console.log("\nThe block is now at: "+JSON.stringify(this.chain.getLatestBlock()));
-      console.log('\nBalance of '+this.address+' is', this.chain.getBalanceOfAddress(this.address));
+      console.log('\nwhere I call it in Miner the Balance of '+this.address+' is', this.chain.getBalanceOfAddress(this.address));
 
       //console.log('\nBalance of address1 is', frankieCoin.getBalanceOfAddress('address1'));
 
-      console.log('\nBalance of 0x5c4ae12c853012d355b5ee36a6cb8285708760e6 is', this.chain.getBalanceOfAddress('0x5c4ae12c853012d355b5ee36a6cb8285708760e6'));
+      //console.log('\nBalance of 0x5c4ae12c853012d355b5ee36a6cb8285708760e6 is', this.chain.getBalanceOfAddress('0x5c4ae12c853012d355b5ee36a6cb8285708760e6'));
       //console.log('\nBalance of '+sponsor+' is', frankieCoin.getBalanceOfAddress(sponsor));
-      console.log("processed trades SPHR EGEM = "+this.chain.processTrades()["SPHREGEM"]);
-      console.log("processed trades SPHR XSH = "+this.chain.processTrades()["SPHRXSH"]);
+      //console.log("processed trades SPHR EGEM = "+this.chain.processTrades()["SPHREGEM"]);
+      //console.log("processed trades SPHR XSH = "+this.chain.processTrades()["SPHRXSH"]);
 
       console.log("entire chain: "+this.chain.getEntireChain());
     }else if(myDigestVar.substring(0,2) == "00" && difc >0){
