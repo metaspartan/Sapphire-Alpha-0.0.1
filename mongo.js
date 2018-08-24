@@ -1,11 +1,29 @@
 //this next process starts up mongodb from local bin in project folder
 //"prestart": "/osoese/bin/mongod --dbpath /data/db",
+/***
 var exec = require('child_process').exec;
 exec('/osoese3/bin/mongod --dbpath /data/db', function(error, stdout, stderr) {
     console.log('stdout: ' + stdout);
     console.log('stderr: ' + stderr);
     if (error !== null) {
         console.log('exec error: ' + error);
+    }
+});
+***/
+
+var mongodb_prebuilt = require('mongodb-prebuilt-cross');
+
+mongodb_prebuilt.start_server({
+  args: {
+            port: 27017,
+            quiet: true,
+            dbpath: __dirname + "/data/frankodb"
+        }
+}, function(err) {
+    if (err) {
+        console.log('mongod didnt start:', err);
+    } else {
+        console.log('mongod is started');
     }
 });
 
