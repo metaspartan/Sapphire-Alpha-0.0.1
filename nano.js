@@ -71,12 +71,16 @@ var clearDatabase = function(){
   nSQL("blockchain").query("delete").exec();
 }
 
-var getBlockchain = function(){
+var getBlockchain = function(limit,callBack){
   console.log("ENTIRE BLOCKCHAIN");
+      if(limit){
+        console.log(" LIMITED by "+limit);
+      }
       // DB ready to use.
       nSQL("blockchain").getView('get_blockchain')
       .then(function(result) {
           console.log(result) //  <- single object array containing the row we inserted.
+          callBack(result);
       });
 
 }

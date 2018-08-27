@@ -1,1 +1,5 @@
-2018/08/26-23:54:04.417 38a0 Delete type=3 #1
+2018/08/27-10:35:47.719 ddc Recovering log #51
+2018/08/27-10:35:47.719 ddc Level-0 table #53: started
+2018/08/27-10:35:47.740 ddc Level-0 table #53: 1741 bytes OK
+2018/08/27-10:35:47.794 ddc Delete type=0 #51
+2018/08/27-10:35:47.795 ddc Delete type=3 #50

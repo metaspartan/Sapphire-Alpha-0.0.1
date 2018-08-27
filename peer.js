@@ -1,4 +1,4 @@
-var Mongo = require('./mongo.js');
+//var Mongo = require('./mongo.js');
 var swarm = require('discovery-swarm')
 const crypto = require('crypto')
 const defaults = require('dat-swarm-defaults')
@@ -9,11 +9,21 @@ const getPort = require('get-port')
 var BlockchainDB = require('./nano.js');
 //Mongo.collection("Blockchain");
 
-
-function ChainGrab(blocknum){
-  return Tokens.findOne({name:"btc"});
-  //return "BTC: 0.01";
+//the idea is to sync the chain data before progression so we start with a callback of data store limited by number of blocks
+var myCallback = function(data) {
+  //console.log('got data: '+JSON.stringify(data));
+  for (obj in data){
+    console.log(JSON.stringify(data[obj]["blocknum"]));
+  }
 };
+//a function call for datastore
+function ChainGrab(blocknum){
+  BlockchainDB.getBlockchain(99,myCallback);
+  //maybe some other stuff like .then
+};
+//and finally the actual call to function for synch
+ChainGrab();
+//eand by now we will know if synched or not and enable or disable mining
 
 //okay trying the mining stuff
 var sapphirechain = require("./block.js")
@@ -104,7 +114,7 @@ const sw = swarm(config);
         //update the client database OR reject block and rollback the chain - code is incomplete atm
           var peerblock = {"blockchain":{
             id:null,
-            blocknum:1,
+            blocknum:parseInt(frankieCoin.getLength()+1),
             previousHash:JSON.parse(data)["previousHash"],
             timestamp:JSON.parse(data)["timestamp"],
             transactions:JSON.parse(data)["transactions"],
@@ -189,7 +199,7 @@ function queryr1(){
   rl.question('console action: ', (answer) => {
     // TODO: Log the answer in a database
     console.log(`selected: ${answer}`);
-    if(answer == "M"){//M is for mine
+    if(answer == "M"){//M is for mine and triggers the miner
       console.log("[placeholder] this would be mining stats");
       console.log("get latest block: "+frankieCoin.getLatestBlock().nonce.toString());
       franks.calculateDigest("first try",10);
@@ -224,7 +234,7 @@ function queryr1(){
       //frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 5, "XSH"));
       //frankieCoin.createOrder(new sapphirechain.Order('0x0666bf13ab1902de7dee4f8193c819118d7e21a6','BUY','SPHREGEM',3500,0.25));
       //frankieCoin.createOrder(new sapphirechain.Order('0x5c4ae12c853012d355b5ee36a6cb8285708760e6','SELL','SPHREGEM',200,0.24));
-      BlockchainDB.getBlockchain();
+      //BlockchainDB.getBlockchain();
       BlockchainDB.clearDatabase();
       //Mongo.getitall();
       queryr1();

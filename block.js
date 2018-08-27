@@ -71,6 +71,7 @@ var Block = class Block {
         this.transactions = transactions;
         //adding orders for dex
         this.orders = orders;
+        //this is if mined or peer pushed block and PROBABBLY NEEDS so be much more secure
         if(hash){
           this.hash = hash
         }else{
