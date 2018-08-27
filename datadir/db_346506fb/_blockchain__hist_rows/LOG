@@ -1,5 +1,6 @@
-2018/08/27-10:35:47.719 ddc Recovering log #51
-2018/08/27-10:35:47.719 ddc Level-0 table #53: started
-2018/08/27-10:35:47.740 ddc Level-0 table #53: 1741 bytes OK
-2018/08/27-10:35:47.794 ddc Delete type=0 #51
-2018/08/27-10:35:47.795 ddc Delete type=3 #50
+2018/08/27-17:23:13.212 3cfc Recovering log #74
+2018/08/27-17:23:13.212 3cfc Level-0 table #76: started
+2018/08/27-17:23:13.274 3cfc Level-0 table #76: 1339 bytes OK
+2018/08/27-17:23:13.337 3cfc Delete type=0 #74
+2018/08/27-17:23:13.337 3cfc Delete type=3 #72
+2018/08/27-17:23:13.384 1c70 Moved #53 to level-1 1741 bytes OK: files[ 3 3 0 0 0 0 0 ]

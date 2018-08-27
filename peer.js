@@ -112,29 +112,29 @@ const sw = swarm(config);
           console.log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
         }
         //update the client database OR reject block and rollback the chain - code is incomplete atm
-          var peerblock = {"blockchain":{
-            id:null,
-            blocknum:parseInt(frankieCoin.getLength()+1),
-            previousHash:JSON.parse(data)["previousHash"],
-            timestamp:JSON.parse(data)["timestamp"],
-            transactions:JSON.parse(data)["transactions"],
-            orders:JSON.parse(data)["orders"],
-            hash:JSON.parse(data)["hash"],
-            nonce:JSON.parse(data)["nonce"],
-            eGEMBackReferenceBlock:JSON.parse(data)["eGEMBackReferenceBlock"],
-            egemBackReferenceBlockHash:JSON.parse(data)["egemBackReferenceBlockHash"],
-            data:JSON.parse(data)["data"],
-            sponsor:JSON.parse(data)["sponsor"],
-            miner:JSON.parse(data)["miner"],
-            hardwareTx:JSON.parse(data)["hardwareTx"],
-            softwareTx:JSON.parse(data)["softwareTx"],
-            targetBlock:JSON.parse(data)["targetBlock"],
-            targetBlockDataHash:JSON.parse(data)["targetBlockDataHash"],
-            allConfig:JSON.parse(data)["allConfig"],
-            allConfigHash:JSON.parse(data)["allConfigHash"],
-            hashOfThisBlock:JSON.parse(data)["hashOfThisBlock"]
-          }};
-          console.log("what is being sent"+JSON.stringify(peerblock));
+        var peerblock = {"blockchain":{
+          id:null,
+          blocknum:parseInt(frankieCoin.getLength()+1),
+          previousHash:JSON.parse(data)["previousHash"],
+          timestamp:JSON.parse(data)["timestamp"],
+          transactions:JSON.parse(data)["transactions"],
+          orders:JSON.parse(data)["orders"],
+          hash:JSON.parse(data)["hash"],
+          nonce:JSON.parse(data)["nonce"],
+          eGEMBackReferenceBlock:JSON.parse(data)["eGEMBackReferenceBlock"],
+          egemBackReferenceBlockHash:JSON.parse(data)["egemBackReferenceBlockHash"],
+          data:JSON.parse(data)["data"],
+          sponsor:JSON.parse(data)["sponsor"],
+          miner:JSON.parse(data)["miner"],
+          hardwareTx:JSON.parse(data)["hardwareTx"],
+          softwareTx:JSON.parse(data)["softwareTx"],
+          targetBlock:JSON.parse(data)["targetBlock"],
+          targetBlockDataHash:JSON.parse(data)["targetBlockDataHash"],
+          allConfig:JSON.parse(data)["allConfig"],
+          allConfigHash:JSON.parse(data)["allConfigHash"],
+          hashOfThisBlock:JSON.parse(data)["hashOfThisBlock"]
+        }};
+        console.log("what is being sent"+JSON.stringify(peerblock));
         //BlockchainDB.addBlock(peerblock);
         /***
         var peerblock2 = {blockchain:{
@@ -203,6 +203,31 @@ function queryr1(){
       console.log("[placeholder] this would be mining stats");
       console.log("get latest block: "+frankieCoin.getLatestBlock().nonce.toString());
       franks.calculateDigest("first try",10);
+      //this is the most sensible place to add the block
+      //this would seem to be a function that should be called from miner after meinePendingTx is called but it is better called here
+      var minedblock = {"blockchain":{
+        id:null,
+        blocknum:parseInt(frankieCoin.getLength()),
+        previousHash:frankieCoin.getLatestBlock()["previousHash"],
+        timestamp:frankieCoin.getLatestBlock()["timestamp"],
+        transactions:frankieCoin.getLatestBlock()["transactions"],
+        orders:frankieCoin.getLatestBlock()["orders"],
+        hash:frankieCoin.getLatestBlock()["hash"],
+        nonce:frankieCoin.getLatestBlock()["nonce"],
+        eGEMBackReferenceBlock:frankieCoin.getLatestBlock()["eGEMBackReferenceBlock"],
+        egemBackReferenceBlockHash:frankieCoin.getLatestBlock()["egemBackReferenceBlockHash"],
+        data:frankieCoin.getLatestBlock()["data"],
+        sponsor:frankieCoin.getLatestBlock()["sponsor"],
+        miner:frankieCoin.getLatestBlock()["miner"],
+        hardwareTx:frankieCoin.getLatestBlock()["hardwareTx"],
+        softwareTx:frankieCoin.getLatestBlock()["softwareTx"],
+        targetBlock:frankieCoin.getLatestBlock()["targetBlock"],
+        targetBlockDataHash:frankieCoin.getLatestBlock()["targetBlockDataHash"],
+        allConfig:frankieCoin.getLatestBlock()["allConfig"],
+        allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
+        hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"]
+      }};
+      BlockchainDB.addBlock(minedblock);
       broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
       queryr1();
     }else if(answer == "O"){//O is for order
@@ -281,6 +306,30 @@ var blockchain = function(){
 }
 
 var frankieCoin = blockchain();
+//have to load the first block into local database
+var minedblock = {"blockchain":{
+  id:null,
+  blocknum:parseInt(frankieCoin.getLength()),
+  previousHash:frankieCoin.getLatestBlock()["previousHash"],
+  timestamp:frankieCoin.getLatestBlock()["timestamp"],
+  transactions:frankieCoin.getLatestBlock()["transactions"],
+  orders:frankieCoin.getLatestBlock()["orders"],
+  hash:frankieCoin.getLatestBlock()["hash"],
+  nonce:frankieCoin.getLatestBlock()["nonce"],
+  eGEMBackReferenceBlock:frankieCoin.getLatestBlock()["eGEMBackReferenceBlock"],
+  egemBackReferenceBlockHash:frankieCoin.getLatestBlock()["egemBackReferenceBlockHash"],
+  data:frankieCoin.getLatestBlock()["data"],
+  sponsor:frankieCoin.getLatestBlock()["sponsor"],
+  miner:frankieCoin.getLatestBlock()["miner"],
+  hardwareTx:frankieCoin.getLatestBlock()["hardwareTx"],
+  softwareTx:frankieCoin.getLatestBlock()["softwareTx"],
+  targetBlock:frankieCoin.getLatestBlock()["targetBlock"],
+  targetBlockDataHash:frankieCoin.getLatestBlock()["targetBlockDataHash"],
+  allConfig:frankieCoin.getLatestBlock()["allConfig"],
+  allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
+  hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"]
+}};
+BlockchainDB.addBlock(minedblock);
 console.log("peer chain is"+ frankieCoin.getEntireChain());
 var franks = miner(frankieCoin);
 queryr1();
