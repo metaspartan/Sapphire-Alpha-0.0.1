@@ -1,6 +1,6 @@
 //this next process starts up mongodb from local bin in project folder
 //"prestart": "/osoese/bin/mongod --dbpath /data/db",
-/***
+
 var exec = require('child_process').exec;
 exec('/osoese3/bin/mongod --dbpath /data/db', function(error, stdout, stderr) {
     console.log('stdout: ' + stdout);
@@ -9,8 +9,8 @@ exec('/osoese3/bin/mongod --dbpath /data/db', function(error, stdout, stderr) {
         console.log('exec error: ' + error);
     }
 });
-***/
 
+/***
 var mongodb_prebuilt = require('mongodb-prebuilt-cross');
 
 mongodb_prebuilt.start_server({
@@ -26,6 +26,7 @@ mongodb_prebuilt.start_server({
         console.log('mongod is started');
     }
 });
+****/
 
 // Retrieve
 var MongoClient = require('mongodb').MongoClient;
@@ -61,7 +62,6 @@ var updateCollection = function updateCollection(coll,obj1,obj2,obj3){
         console.log("Collection: "+coll);
       });
       //var myobj = obj1+","+obj2+","+obj3+",";
-      setTimeout(function(){ console.log("Update One"+coll); }, 3000);
       dbo.collection(coll).updateOne(obj1,obj2,obj3,function(err, res) {
       if (err) throw err;
         console.log(coll + obj1 + " document updated");
@@ -119,6 +119,30 @@ var findOne = function findOne(coll, key, value){
   });
 }
 
+var getitall = function(){
+  MongoClient.connect("mongodb://localhost:27017/exampleDb", function(err, db) {
+    if(!err) {
+      console.log("We are connected");
+
+      var dbo = db.db("mydb");
+      dbo.createCollection("Blockchain", function(err, res) {
+      if (err) throw err;
+        console.log("Collection created second time!");
+      });
+      //var myobj = { key: value };
+      dbo.collection("Blockchain").find({}, function(err, res) {
+      if (err) throw err;
+        if (res){
+          console.log("1 document found"+res);
+        }
+        db.close();
+      });
+    }else{
+      console.log("The error is: "+err)
+    }
+  });
+}
+
 
 var trythis = function tryIt(){
   MongoClient.connect("mongodb://localhost:27017/exampleDb", function(err, db) {
@@ -144,6 +168,7 @@ var trythis = function tryIt(){
 
 module.exports = {
   tryit: trythis,
+  getitall: getitall,
   collection: collection,
   updateCollection: updateCollection,
   insertCollection: insertCollection,

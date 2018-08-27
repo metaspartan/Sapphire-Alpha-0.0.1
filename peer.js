@@ -5,7 +5,15 @@ const defaults = require('dat-swarm-defaults')
 const readline = require('readline')
 const getPort = require('get-port')
 
-Mongo.collection("Blockchain");
+//database stuff switching out mongo for nano
+var BlockchainDB = require('./nano.js');
+//Mongo.collection("Blockchain");
+
+
+function ChainGrab(blocknum){
+  return Tokens.findOne({name:"btc"});
+  //return "BTC: 0.01";
+};
 
 //okay trying the mining stuff
 var sapphirechain = require("./block.js")
@@ -42,7 +50,6 @@ const sw = swarm(config);
 ;(async () => {
   const port = await getPort()
 
-
   sw.listen(port)
   sw.join('egem-spn') // can be any id/name/hash
 
@@ -77,11 +84,60 @@ const sw = swarm(config);
 
       console.log("object data: "+JSON.parse(data)["previousHash"]);
       if(JSON.parse(data)["previousHash"]){
+        //storing some variables of current chain
+        var currentChainHash = frankieCoin.getLatestBlock()["hash"];
+        var blocknumber = 0;
+        //first we add the block to the blockchain
         frankieCoin.addBlockFromPeers(JSON.parse(data));
+        //increment the internal peer nonce of sending party to track longest chain
         frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
+        //logging the block added to chain for console
         console.log("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock()));
-        Mongo.findOne("Blockchain","previousHash",frankieCoin.getLatestBlock()["previousHash"]);
-        Mongo.insertCollection("Blockchain",frankieCoin.getLatestBlock());
+        //verfiy the previous hash in the database matches our expectations - code is incomplete atm
+        if(frankieCoin.getLatestBlock()["previousHash"] == currentChainHash){
+          console.log("hash matches and we are good");
+          blocknumber = frankieCoin.getLength();
+          console.log("the database block number is "+blocknumber);
+        }else{
+          console.log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
+        }
+        //update the client database OR reject block and rollback the chain - code is incomplete atm
+          var peerblock = {"blockchain":{
+            id:null,
+            blocknum:1,
+            previousHash:JSON.parse(data)["previousHash"],
+            timestamp:JSON.parse(data)["timestamp"],
+            transactions:JSON.parse(data)["transactions"],
+            orders:JSON.parse(data)["orders"],
+            hash:JSON.parse(data)["hash"],
+            nonce:JSON.parse(data)["nonce"],
+            eGEMBackReferenceBlock:JSON.parse(data)["eGEMBackReferenceBlock"],
+            egemBackReferenceBlockHash:JSON.parse(data)["egemBackReferenceBlockHash"],
+            data:JSON.parse(data)["data"],
+            sponsor:JSON.parse(data)["sponsor"],
+            miner:JSON.parse(data)["miner"],
+            hardwareTx:JSON.parse(data)["hardwareTx"],
+            softwareTx:JSON.parse(data)["softwareTx"],
+            targetBlock:JSON.parse(data)["targetBlock"],
+            targetBlockDataHash:JSON.parse(data)["targetBlockDataHash"],
+            allConfig:JSON.parse(data)["allConfig"],
+            allConfigHash:JSON.parse(data)["allConfigHash"],
+            hashOfThisBlock:JSON.parse(data)["hashOfThisBlock"]
+          }};
+          console.log("what is being sent"+JSON.stringify(peerblock));
+        //BlockchainDB.addBlock(peerblock);
+        /***
+        var peerblock2 = {blockchain:{
+          id:null,blocknum:1,
+          previousHash:"97f2c5c6f5a30cc9d89d24f68e75ac7e12c34e64c65914f74ab89ad9e665e3ab",
+          timestamp:1535292384948,transactions:{},orders:{},hash:"0005c015f465e8ed6a116d3d24136058dc7a6e72fc651acb3ad8120b7c82ae93",
+          nonce:3696,eGEMBackReferenceBlock:472,egemBackReferenceBlockHash:"0x0ed923fa347268f2d7b8e4a1a8d0ce61f810512ddaaec6729e66b004eb61e5e7",
+          data:"",sponsor:"0x2025ed239a8dec4de0034a252d5c5e385b73fcd0",miner:"0x0666bf13ab1902de7dee4f8193c819118d7e21a6",hardwareTx:"",softwareTx:"",
+          targetBlock:"",targetBlockDataHash:"",allConfig:"",allConfigHash:"",hashOfThisBlock:""
+        }};
+        ***/
+        BlockchainDB.addBlock(peerblock);
+        //Mongo.insertCollection("Blockchain",frankieCoin.getLatestBlock());
       }
 
       /***
@@ -163,11 +219,14 @@ function queryr1(){
       queryr2("getBlock");
     }else if(answer == "S"){//N is for Node info
       console.log("Western Union is no longer the fastest way to send money.....");
-      frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 20, "SPHR"));
-      frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 10, "EGEM"));
-      frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 5, "XSH"));
-      frankieCoin.createOrder(new sapphirechain.Order('0x0666bf13ab1902de7dee4f8193c819118d7e21a6','BUY','SPHREGEM',3500,0.25));
-      frankieCoin.createOrder(new sapphirechain.Order('0x5c4ae12c853012d355b5ee36a6cb8285708760e6','SELL','SPHREGEM',200,0.24));
+      //frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 20, "SPHR"));
+      //frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 10, "EGEM"));
+      //frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 5, "XSH"));
+      //frankieCoin.createOrder(new sapphirechain.Order('0x0666bf13ab1902de7dee4f8193c819118d7e21a6','BUY','SPHREGEM',3500,0.25));
+      //frankieCoin.createOrder(new sapphirechain.Order('0x5c4ae12c853012d355b5ee36a6cb8285708760e6','SELL','SPHREGEM',200,0.24));
+      BlockchainDB.getBlockchain();
+      BlockchainDB.clearDatabase();
+      //Mongo.getitall();
       queryr1();
     }else if(answer.includes("Send(")){//adding function capabilioties
       console.log(answer.slice(answer.indexOf("Send(")+5, answer.indexOf(")")));

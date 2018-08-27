@@ -62,7 +62,7 @@ async function getBlockFromEgem() {
 
 var Block = class Block {
 
-    constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock, data) {
+    constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock, data, hash) {
 
         //var EGEMBlock = getBlockFromEgem();
 
@@ -71,7 +71,11 @@ var Block = class Block {
         this.transactions = transactions;
         //adding orders for dex
         this.orders = orders;
-        this.hash = this.calculateHash().toString();
+        if(hash){
+          this.hash = hash
+        }else{
+          this.hash = this.calculateHash().toString();
+        }
         this.nonce = 0;
         //tie this to the main EGEM chain
         this.eGEMBackReferenceBlock = 472
@@ -221,9 +225,10 @@ var Blockchain = class Blockchain{
           console.log("no inblock prev hash of "+inBlock.previousHash+" does not match the hash of chain "+this.getLatestBlock().hash);
           console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         }
-        var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.egemBRBlock, inBlock.data);
+        //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
+        var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.egemBRBlock, inBlock.data, inBlock.hash);
         this.chain.push(block);
-
+        //careful I have the ischain valid returining true on all tries
         if(this.isChainValid() == false){
           this.chain.pop();
           console.log("Block is not added and will be removed")
