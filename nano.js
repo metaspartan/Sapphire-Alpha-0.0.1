@@ -35,8 +35,21 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
         name:'add_block',
         args:['blockchain:map'],
         call:function(args, db) {
+          return db.query('select').where(['hash','=',args.blockchain["hash"]]).exec().then(function(rows) {
+              if(rows.length == 0){
+                console.log("somehow we are inserting and row length = "+rows.length+args.blockchain["hash"])
+                return db.query('upsert',args.blockchain).exec();
+              }else{
+                console.log("block already existed");
+              }
+            }
+          );
+        }
+        /***
+        call:function(args, db) {
             return db.query('upsert',args.blockchain).exec();
         }
+        ***/
     }
 ])
 .views([ // Optional

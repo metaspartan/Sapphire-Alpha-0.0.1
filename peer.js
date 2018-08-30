@@ -9,22 +9,6 @@ const getPort = require('get-port')
 var BlockchainDB = require('./nano.js');
 //Mongo.collection("Blockchain");
 
-//the idea is to sync the chain data before progression so we start with a callback of data store limited by number of blocks
-var myCallback = function(data) {
-  //console.log('got data: '+JSON.stringify(data));
-  for (obj in data){
-    console.log(JSON.stringify(data[obj]["blocknum"]));
-  }
-};
-//a function call for datastore
-function ChainGrab(blocknum){
-  BlockchainDB.getBlockchain(99,myCallback);
-  //maybe some other stuff like .then
-};
-//and finally the actual call to function for synch
-ChainGrab();
-//eand by now we will know if synched or not and enable or disable mining
-
 //okay trying the mining stuff
 var sapphirechain = require("./block.js")
 var BLAKE2s = require("./blake2s.js")
@@ -332,6 +316,33 @@ var minedblock = {"blockchain":{
 BlockchainDB.addBlock(minedblock);
 console.log("peer chain is"+ frankieCoin.getEntireChain());
 var franks = miner(frankieCoin);
+
+////////////////////synch the chain
+
+//the idea is to sync the chain data before progression so we start with a callback of data store limited by number of blocks
+var myCallback = function(data) {
+  //console.log('got data: '+JSON.stringify(data));//test for input
+  for (obj in data){
+    console.log(JSON.stringify(data[obj]["blocknum"]));
+    console.log("fc data for num "+frankieCoin.getBlock(data[obj]["blocknum"]));
+    if(typeof frankieCoin.getBlock(data[obj]["blocknum"]) === "undefined" || frankieCoin.getBlock(data[obj]["blocknum"]) === null){
+      console.log("Block " + data[obj]["blocknum"] + " is not in memory ...will add it");
+      frankieCoin.addBlockFromDatabase(data[obj]);
+    }else{
+      console.log("block exists in chain data "+data[obj]["blocknum"]);
+    }
+  }
+};
+//a function call for datastore
+function ChainGrab(blocknum){
+  BlockchainDB.getBlockchain(99,myCallback);
+  //maybe some other stuff like .then
+};
+//and finally the actual call to function for synch
+ChainGrab();
+//eand by now we will know if synched or not and enable or disable mining
+////////////////////END synch the chain
+
 queryr1();
 
 module.exports = {

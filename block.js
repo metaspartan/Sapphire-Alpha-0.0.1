@@ -238,6 +238,33 @@ var Blockchain = class Blockchain{
         }
       }
 
+      //th8s is the peers adding a block needs to be VALIDATED
+      addBlockFromDatabase(inBlock){
+        //if all that consensus stuff I am going to add....then
+        //here is where I check if two things and I think make them globals
+        //1 issync should be YES
+        //2 previous hash must match current chain top hash
+        if(this.getLatestBlock().hash == inBlock.previousHash){
+          console.log("----------------------------------------------------");
+          console.log("yes inblock prev hash of "+inBlock.previousHash+" matches the hash of chain "+this.getLatestBlock().hash);
+          console.log("----------------------------------------------------");
+        }else{
+          console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+          console.log("no inblock prev hash of "+inBlock.previousHash+" does not match the hash of chain "+this.getLatestBlock().hash);
+          console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+        }
+        //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
+        var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.egemBRBlock, inBlock.data, inBlock.hash);
+        this.chain.push(block);
+        //careful I have the ischain valid returining true on all tries
+        if(this.isChainValid() == false){
+          this.chain.pop();
+          console.log("Block is not added and will be removed")
+        }else{
+          console.log("Block added from peers")
+        }
+      }
+
       createTransaction(transaction){
           this.pendingTransactions.push(transaction);
       }
