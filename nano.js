@@ -61,10 +61,17 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
         }
     },
     {
+        name: 'get_block',
+        args: ['blocknum:int'],
+        call: function(args, db) {
+            return db.query('select',['id','blocknum','previousHash','timestamp','transactions','orders']).where(["blocknum","=",args.blocknum]).exec();
+        }
+    },
+    {
         name: 'get_blockchain',
         args: ['page:int'],
         call: function(args, db) {
-            return db.query('select',['id','blocknum','previousHash','timestamp','transactions','orders']).exec();
+            return db.query('select',['id','blocknum','previousHash','timestamp','transactions','orders']).orderBy({blocknum:"asc"}).exec();
         }
     }
 ]).connect();
@@ -98,8 +105,20 @@ var getBlockchain = function(limit,callBack){
 
 }
 
+var getBlock = function(number,callBack){
+  console.log("BLOCK FROM BLOCKCHAIN");
+      // DB ready to use.
+      nSQL("blockchain").getView('get_block',{blocknum:number})
+      .then(function(result) {
+          console.log(result) //  <- single object array containing the row we inserted.
+          callBack(result);
+      });
+
+}
+
 module.exports = {
     addBlock:addBlock,
     getBlockchain:getBlockchain,
+    getBlock:getBlock,
     clearDatabase:clearDatabase
 }

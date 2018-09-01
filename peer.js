@@ -98,7 +98,7 @@ const sw = swarm(config);
         //update the client database OR reject block and rollback the chain - code is incomplete atm
         var peerblock = {"blockchain":{
           id:null,
-          blocknum:parseInt(frankieCoin.getLength()+1),
+          blocknum:parseInt(frankieCoin.getLength()),
           previousHash:JSON.parse(data)["previousHash"],
           timestamp:JSON.parse(data)["timestamp"],
           transactions:JSON.parse(data)["transactions"],
@@ -185,7 +185,7 @@ function queryr1(){
     console.log(`selected: ${answer}`);
     if(answer == "M"){//M is for mine and triggers the miner
       console.log("[placeholder] this would be mining stats");
-      console.log("get latest block: "+frankieCoin.getLatestBlock().nonce.toString());
+      console.log("Mined BLock Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
       franks.calculateDigest("first try",10);
       //this is the most sensible place to add the block
       //this would seem to be a function that should be called from miner after meinePendingTx is called but it is better called here
@@ -211,6 +211,7 @@ function queryr1(){
         allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
         hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"]
       }};
+      console.log(minedblock);
       BlockchainDB.addBlock(minedblock);
       broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
       queryr1();
@@ -258,6 +259,14 @@ function queryr1(){
       frankieCoin.createTransaction(new sapphirechain.Transaction(from, to, amount, ticker));
       queryr1();
       //queryr2("getBlock");
+    }else if(answer.includes("getBlock(")){//adding function capabilioties
+      console.log(answer.slice(answer.indexOf("getBlock(")+9, answer.indexOf(")")));
+      var blocknum = answer.slice(answer.indexOf("getBlock(")+9, answer.indexOf(")"));
+      console.log(JSON.stringify(frankieCoin.getBlock(parseInt(blocknum))));
+      //frankieCoin.getBlock(blocknum);
+      BlockchainDB.getBlock(blocknum,callback2);
+      queryr1();
+      //queryr2("getBlock");
     }else if(answer.includes("Order(")){//adding function capabilioties
       console.log(answer.slice(answer.indexOf("Order(")+6, answer.indexOf(")")));
       var jsonSend = answer.slice(answer.indexOf("Order(")+6, answer.indexOf(")"));
@@ -291,7 +300,7 @@ var blockchain = function(){
 
 var frankieCoin = blockchain();
 //have to load the first block into local database
-var minedblock = {"blockchain":{
+var genBlock = {"blockchain":{
   id:null,
   blocknum:parseInt(frankieCoin.getLength()),
   previousHash:frankieCoin.getLatestBlock()["previousHash"],
@@ -313,17 +322,21 @@ var minedblock = {"blockchain":{
   allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
   hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"]
 }};
-BlockchainDB.addBlock(minedblock);
+BlockchainDB.addBlock(genBlock);
 console.log("peer chain is"+ frankieCoin.getEntireChain());
 var franks = miner(frankieCoin);
 
 ////////////////////synch the chain
-
+console.log("|-------------CHAIN SYNC---------------|")
+function callback2(data){
+  JSON.stringify(data);
+}
 //the idea is to sync the chain data before progression so we start with a callback of data store limited by number of blocks
 var myCallback = function(data) {
   //console.log('got data: '+JSON.stringify(data));//test for input
   for (obj in data){
-    console.log(JSON.stringify(data[obj]["blocknum"]));
+    console.log("HERE IS THE BLOCK FROM DB IN CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));
+    console.log("AND FROM MEMORY "+JSON.stringify(frankieCoin.getBlock(data[obj]["blocknum"])))
     console.log("fc data for num "+frankieCoin.getBlock(data[obj]["blocknum"]));
     if(typeof frankieCoin.getBlock(data[obj]["blocknum"]) === "undefined" || frankieCoin.getBlock(data[obj]["blocknum"]) === null){
       console.log("Block " + data[obj]["blocknum"] + " is not in memory ...will add it");
@@ -341,6 +354,7 @@ function ChainGrab(blocknum){
 //and finally the actual call to function for synch
 ChainGrab();
 //eand by now we will know if synched or not and enable or disable mining
+console.log("|^------------CHAIN SYNC--------------^|")
 ////////////////////END synch the chain
 
 queryr1();
