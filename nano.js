@@ -71,7 +71,7 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
         name: 'get_blockchain',
         args: ['page:int'],
         call: function(args, db) {
-            return db.query('select',['id','blocknum','previousHash','timestamp','transactions','orders']).orderBy({blocknum:"asc"}).exec();
+            return db.query('select',['id','blocknum','previousHash','hash','timestamp','transactions','orders']).orderBy({blocknum:"asc"}).exec();
         }
     }
 ]).connect();

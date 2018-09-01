@@ -340,6 +340,8 @@ var myCallback = function(data) {
     console.log("fc data for num "+frankieCoin.getBlock(data[obj]["blocknum"]));
     if(typeof frankieCoin.getBlock(data[obj]["blocknum"]) === "undefined" || frankieCoin.getBlock(data[obj]["blocknum"]) === null){
       console.log("Block " + data[obj]["blocknum"] + " is not in memory ...will add it");
+      console.log("***************************this is the block***************************");
+      console.log(JSON.stringify(data[obj]));
       frankieCoin.addBlockFromDatabase(data[obj]);
     }else{
       console.log("block exists in chain data "+data[obj]["blocknum"]);
