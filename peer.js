@@ -148,11 +148,12 @@ const sw = swarm(config);
       //peer gets blockheight from synching peer and returns delta
       if(data.toString().includes("ChainSync(")){
         var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSync(")+10, data.toString().indexOf(")"));
+        peerBlockHeight++;
         //peers[peerId].conn.write("BlockHeight: "+frankieCoin.getLength());
         while(peerBlockHeight < frankieCoin.getLength()){
-          ++peerBlockHeight;
-          peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
-          setTimeout(function(){console.log("just sent block "+peerBlockHeight)},3000);
+          console.log("sending block "+peerBlockHeight);
+          setTimeout(function(){peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));},3000);
+          peerBlockHeight;++
         }
         //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
       }
