@@ -163,7 +163,7 @@ const sw = swarm(config);
       }
 
       if(data.toString().includes("ChainSyncPong(")){
-        //var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSync(")+14, data.toString().indexOf(")"));
+        var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPong(")+14, data.toString().indexOf(")"));
         //peerBlockHeight++;
 
         //peers[peerId].conn.write("BlockHeight: "+frankieCoin.getLength());
@@ -176,7 +176,7 @@ const sw = swarm(config);
         }
         *****/
 
-        //setTimeout(function(){peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
+        setTimeout(function(){peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
         //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
       }
 
