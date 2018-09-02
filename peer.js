@@ -76,7 +76,8 @@ const sw = swarm(config);
         '----> ' + data.toString()
       )
 
-      if(data["previousHash"]){
+
+      try{
         console.log("object data: "+JSON.parse(data)["previousHash"]);
         if(JSON.parse(data)["previousHash"]){
           //storing some variables of current chain
@@ -140,6 +141,8 @@ const sw = swarm(config);
           console.log("the hash matched you would record that now");
         }
         ****/
+      }catch(err) {
+          console.log(err.message);
       }
 
       //peer gets blockheight from synching peer and returns delta
@@ -149,7 +152,7 @@ const sw = swarm(config);
         while(peerBlockHeight < frankieCoin.getLength()){
           ++peerBlockHeight;
           peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
-          setTimeout(console.log("just sent block "+peerBlockHeight),3000);
+          setTimeout(function(){console.log("just sent block "+peerBlockHeight)},3000);
         }
         //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
       }
