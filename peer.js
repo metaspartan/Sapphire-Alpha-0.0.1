@@ -142,13 +142,20 @@ const sw = swarm(config);
         ****/
       }
 
-
-      if(data.toString() == "Blockheight Query"){
+      //peer gets blockheight from synching peer and returns delta
+      if(data.toString().includes("ChainSync(")){
+        var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSync(")+10, answer.indexOf(")"));
         peers[peerId].conn.write("BlockHeight: "+frankieCoin.getLength());
+        while(peerBlockHeight < frankieCoin.getLength()){
+          ++peerBlockHeight;
+          peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
+          setTimeout()
+        }
+        peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
       }
 
       if(data.toString().includes("BlockHeight: ")){
-        console.log("BLockheight is "+data.toString());
+        console.log("Blockheight is "+data.toString());
       }
 
     })
@@ -365,7 +372,7 @@ var myCallback = function(data) {
   console.log("BlocHeightPtr: "+blockHeightPtr);
   //this is where we call a function with the blockHeight pointer that finds out the peerBlockHeight and then download missing data
   for (let id in peers) {
-    peers[id].conn.write("Blockheight Query")
+    peers[id].conn.write("ChainSync("+frankieCoin.getLength()+")");
   }
 
 };
