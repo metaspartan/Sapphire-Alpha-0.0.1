@@ -78,7 +78,7 @@ const sw = swarm(config);
 
 
       try{
-        console.log("object data: "+JSON.parse(data)["previousHash"]);
+        //console.log("object data: "+JSON.parse(data)["previousHash"]);
         if(JSON.parse(data)["previousHash"]){
           //storing some variables of current chain
           var currentChainHash = frankieCoin.getLatestBlock()["hash"];
