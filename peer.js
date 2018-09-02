@@ -148,8 +148,10 @@ const sw = swarm(config);
       //peer gets blockheight from synching peer and returns delta
       if(data.toString().includes("ChainSyncPing(")){
         var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPing(")+14, data.toString().indexOf(")"));
+        //increment it by one to return the next block
         peerBlockHeight++;
         //peers[peerId].conn.write("BlockHeight: "+frankieCoin.getLength());
+        //returning the block
         peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
         /****
         while(peerBlockHeight < frankieCoin.getLength()){
@@ -158,23 +160,16 @@ const sw = swarm(config);
           peerBlockHeight++;
         }
         *****/
+        //setting a delay and pong back
         setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
         //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
       }
 
       if(data.toString().includes("ChainSyncPong(")){
+        //returns blockHeight and parses it
         var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPong(")+14, data.toString().indexOf(")"));
-        //peerBlockHeight++;
-
-        //peers[peerId].conn.write("BlockHeight: "+frankieCoin.getLength());
-        peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
-        /****
-        while(peerBlockHeight < frankieCoin.getLength()){
-          console.log("sending block "+peerBlockHeight);
-          setTimeout(function(){peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));},3000);
-          peerBlockHeight++;
-        }
-        *****/
+        //pong oes not need to do this
+        //peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
 
         setTimeout(function(){peers[peerId].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
         //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
