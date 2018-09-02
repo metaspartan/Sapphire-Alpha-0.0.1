@@ -152,7 +152,12 @@ const sw = swarm(config);
         peerBlockHeight++;
         //peers[peerId].conn.write("BlockHeight: "+frankieCoin.getLength());
         //returning the block
-        peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
+        if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
+          peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
+        }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
+          peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+        }
+
         /****
         while(peerBlockHeight < frankieCoin.getLength()){
           console.log("sending block "+peerBlockHeight);
