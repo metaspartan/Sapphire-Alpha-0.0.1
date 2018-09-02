@@ -271,8 +271,13 @@ function queryr1(){
       //console.log("balance is: "+franks.getBalanceOfAddress("0x0666bf13ab1902de7dee4f8193c819118d7e21a6")+" <---why no money");
       //queryr1();
     }else if(answer == "T"){//T is for talk
-      console.log("had to not just broadcast everything I write to all peers so only sender sees this");
-      broadcastPeers("...but all peers see that this was sent from "+myId);
+      //console.log("had to not just broadcast everything I write to all peers so only sender sees this");
+      //broadcastPeers("...but all peers see that this was sent from "+myId);
+      
+      //snaking this chain synch in here
+      for (let id in peers) {
+        peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
+      }
       queryr1();
     }else if(answer == "N"){//N is for Node info
       console.log("NODEZZZZZZ LULZ: ");
