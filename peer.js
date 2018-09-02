@@ -176,7 +176,7 @@ const sw = swarm(config);
         }
         *****/
 
-        setTimeout(function(){peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
+        setTimeout(function(){peers[peerId].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
         //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
       }
 
