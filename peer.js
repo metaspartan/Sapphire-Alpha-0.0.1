@@ -153,7 +153,7 @@ const sw = swarm(config);
         while(peerBlockHeight < frankieCoin.getLength()){
           console.log("sending block "+peerBlockHeight);
           setTimeout(function(){peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));},3000);
-          peerBlockHeight;++
+          peerBlockHeight++;
         }
         //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
       }
