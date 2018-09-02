@@ -146,15 +146,37 @@ const sw = swarm(config);
       }
 
       //peer gets blockheight from synching peer and returns delta
-      if(data.toString().includes("ChainSync(")){
-        var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSync(")+10, data.toString().indexOf(")"));
+      if(data.toString().includes("ChainSyncPing(")){
+        var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPing(")+14, data.toString().indexOf(")"));
         peerBlockHeight++;
         //peers[peerId].conn.write("BlockHeight: "+frankieCoin.getLength());
+        peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
+        /****
         while(peerBlockHeight < frankieCoin.getLength()){
           console.log("sending block "+peerBlockHeight);
           setTimeout(function(){peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));},3000);
           peerBlockHeight++;
         }
+        *****/
+        setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
+        //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+      }
+
+      if(data.toString().includes("ChainSyncPong(")){
+        //var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSync(")+14, data.toString().indexOf(")"));
+        //peerBlockHeight++;
+
+        //peers[peerId].conn.write("BlockHeight: "+frankieCoin.getLength());
+        peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
+        /****
+        while(peerBlockHeight < frankieCoin.getLength()){
+          console.log("sending block "+peerBlockHeight);
+          setTimeout(function(){peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));},3000);
+          peerBlockHeight++;
+        }
+        *****/
+
+        setTimeout(function(){peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
         //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
       }
 
@@ -376,7 +398,7 @@ var myCallback = function(data) {
   console.log("BlocHeightPtr: "+blockHeightPtr);
   //this is where we call a function with the blockHeight pointer that finds out the peerBlockHeight and then download missing data
   for (let id in peers) {
-    peers[id].conn.write("ChainSync("+frankieCoin.getLength()+")");
+    peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
   }
 
 };
