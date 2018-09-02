@@ -140,6 +140,14 @@ const sw = swarm(config);
       }
       ****/
 
+      if(data.toString() == "Blockheight Query"){
+        peers[peerId].conn.write("BlockHeight: "+frankieCoin.getLength());
+      }
+
+      if(data.toString().contains("BlockHeight: ")){
+        console.log("BLockheight is "+data.toString());
+      }
+
     })
 
     // Save the connection
@@ -328,6 +336,8 @@ var franks = miner(frankieCoin);
 
 ////////////////////synch the chain
 console.log("|-------------CHAIN SYNC---------------|")
+//internal data blockheiht
+var blockHeightPtr = 0;
 function callback2(data){
   JSON.stringify(data);
 }
@@ -335,18 +345,26 @@ function callback2(data){
 var myCallback = function(data) {
   //console.log('got data: '+JSON.stringify(data));//test for input
   for (obj in data){
-    console.log("HERE IS THE BLOCK FROM DB IN CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));
-    console.log("AND FROM MEMORY "+JSON.stringify(frankieCoin.getBlock(data[obj]["blocknum"])))
-    console.log("fc data for num "+frankieCoin.getBlock(data[obj]["blocknum"]));
+    //console.log("HERE IS THE BLOCK FROM DB IN CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));
+    //console.log("AND FROM MEMORY "+JSON.stringify(frankieCoin.getBlock(data[obj]["blocknum"])))
+    //console.log("fc data for num "+frankieCoin.getBlock(data[obj]["blocknum"]));
     if(typeof frankieCoin.getBlock(data[obj]["blocknum"]) === "undefined" || frankieCoin.getBlock(data[obj]["blocknum"]) === null){
-      console.log("Block " + data[obj]["blocknum"] + " is not in memory ...will add it");
-      console.log("***************************this is the block***************************");
-      console.log(JSON.stringify(data[obj]));
+      //console.log("Block " + data[obj]["blocknum"] + " is not in memory ...will add it");
+      //console.log("***************************this is the block***************************");
+      //console.log(JSON.stringify(data[obj]));
       frankieCoin.addBlockFromDatabase(data[obj]);
     }else{
-      console.log("block exists in chain data "+data[obj]["blocknum"]);
+      //console.log("block exists in chain data: "+data[obj]["blocknum"]);
     }
+    blockHeightPtr++;
   }
+
+  console.log("BlocHeightPtr: "+blockHeightPtr);
+  //this is where we call a function with the blockHeight pointer that finds out the peerBlockHeight and then download missing data
+  for (let id in peers) {
+    peers[id].conn.write("Blockheight Query")
+  }
+
 };
 //a function call for datastore
 function ChainGrab(blocknum){
@@ -355,8 +373,10 @@ function ChainGrab(blocknum){
 };
 //and finally the actual call to function for synch
 ChainGrab();
+
 //eand by now we will know if synched or not and enable or disable mining
 console.log("|^------------CHAIN SYNC--------------^|")
+
 ////////////////////END synch the chain
 
 queryr1();
