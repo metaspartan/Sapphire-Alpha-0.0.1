@@ -52,21 +52,32 @@ var Order = class Order{
     }
 }
 
-async function getBlockFromEgem() {
-  console.log('calling');
+async function getBlockFromEgem(callback) {
+  //grab latest EGEM BLock
   var result = await web3.eth.getBlock("latest");
   console.log(result);
-  return result;
+  callback(result);
   // expected output: "resolved"
+}
+
+var currentEgemBlock = 472;
+var currentEgemBlockHash = "0x0ed923fa347268f2d7b8e4a1a8d0ce61f810512ddaaec6729e66b004eb61e5e7";
+var currentEgemBlockCallBack = function(block) {
+  console.log("in callback function")
+  currentEgemBlock = block["number"];
+  currentEgemBlockHash = block["hash"];
 }
 
 var Block = class Block {
 
-    constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock, data, hash) {
+    constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '') {
 
-        console.log("Block Constructure and hash is "+hash+timestamp);
+        console.log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
-        //var EGEMBlock = getBlockFromEgem();
+        if(egemBRHash == ''){
+          getBlockFromEgem(currentEgemBlockCallBack);
+        }
+
 
         this.previousHash = previousHash;
         this.timestamp = timestamp;
@@ -74,15 +85,22 @@ var Block = class Block {
         //adding orders for dex
         this.orders = orders;
         //this is if mined or peer pushed block and PROBABBLY NEEDS so be much more secure
-        if(hash){
+        //if(hash){
+        if(hash)  {
           this.hash = hash
         }else{
           this.hash = this.calculateHash().toString();
         }
         this.nonce = 0;
         //tie this to the main EGEM chain
-        this.eGEMBackReferenceBlock = 472
-        this.egemBackReferenceBlockHash = '0x0ed923fa347268f2d7b8e4a1a8d0ce61f810512ddaaec6729e66b004eb61e5e7';
+        console.log("constructor again : "+egemBRBlock+" "+egemBRHash+" "+currentEgemBlock+" "+currentEgemBlockHash);
+        if(egemBRBlock != '')  {
+          this.eGEMBackReferenceBlock = egemBRBlock;
+          this.egemBackReferenceBlockHash = egemBRHash;
+        }else{
+          this.eGEMBackReferenceBlock = currentEgemBlock;
+          this.egemBackReferenceBlockHash = currentEgemBlockHash;
+        }
         //this will be the data tranche for the genesis block
         this.data = '';
         //sponsor and miner are entagled
@@ -229,7 +247,7 @@ var Blockchain = class Blockchain{
           console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         }
         //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-        var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.egemBRBlock, inBlock.data, inBlock.hash);
+        var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash);
         this.chain.push(block);
         //careful I have the ischain valid returining true on all tries
         if(this.isChainValid() == false){
@@ -256,7 +274,7 @@ var Blockchain = class Blockchain{
           console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         }
         //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-        var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.egemBRBlock, dbBlock.data, dbBlock.hash);
+        var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash);
         this.chain.push(block);
         //careful I have the ischain valid returining true on all tries
         if(this.isChainValid() == false){
