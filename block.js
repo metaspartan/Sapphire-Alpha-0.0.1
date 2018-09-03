@@ -55,7 +55,7 @@ var Order = class Order{
 async function getBlockFromEgem(callback) {
   //grab latest EGEM BLock
   var result = await web3.eth.getBlock("latest");
-  console.log(result);
+  //console.log(result);
   callback(result);
   // expected output: "resolved"
 }
@@ -63,7 +63,7 @@ async function getBlockFromEgem(callback) {
 var currentEgemBlock = 472;
 var currentEgemBlockHash = "0x0ed923fa347268f2d7b8e4a1a8d0ce61f810512ddaaec6729e66b004eb61e5e7";
 var currentEgemBlockCallBack = function(block) {
-  console.log("in callback function")
+  //console.log("in callback function")
   currentEgemBlock = block["number"];
   currentEgemBlockHash = block["hash"];
 }
