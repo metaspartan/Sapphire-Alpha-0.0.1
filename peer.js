@@ -48,6 +48,15 @@ const config = defaults({
 
 const sw = swarm(config);
 
+function isJSON(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
 ;(async () => {
   const port = await getPort()
 
@@ -83,8 +92,8 @@ const sw = swarm(config);
         '----> ' + data.toString()
       )
 
-
-      try{
+      //////////////////////////////////////begin the if block for incoming data
+      if(isJSON(data.toString()){
         //console.log("object data: "+JSON.parse(data)["previousHash"]);
         if(JSON.parse(data)["previousHash"]){
           //storing some variables of current chain
@@ -142,43 +151,45 @@ const sw = swarm(config);
           BlockchainDB.addBlock(peerblock);
           //Mongo.insertCollection("Blockchain",frankieCoin.getLatestBlock());
         }
+
+      }else{
+
         //will repoen the GENESIS HASH NEXT
         /***
         if(data.toString() == "My Genesis Hash is: "+globalGenesisHash){
           console.log("the hash matched you would record that now");
         }
         ****/
-      }catch(err) {
-          console.log(err.message);
-      }
 
-      //peer(s) gets blockheight from synching peer and returns next block
-      if(data.toString().includes("ChainSyncPing(")){
-        var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPing(")+14, data.toString().indexOf(")"));
-        //increment it by one to return the next block
-        peerBlockHeight++;
-        //peers[peerId].conn.write("BlockHeight: "+frankieCoin.getLength());//messaging? perhaps change to JSON
-        //returning the block
-        if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
-          peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
-        }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
-          peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+        //peer(s) gets blockheight from synching peer and returns next block
+        if(data.toString().includes("ChainSyncPing(")){
+          var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPing(")+14, data.toString().indexOf(")"));
+          //increment it by one to return the next block
+          peerBlockHeight++;
+          //peers[peerId].conn.write("BlockHeight: "+frankieCoin.getLength());//messaging? perhaps change to JSON
+          //returning the block
+          if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
+            peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
+          }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
+            peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+          }
+          //setting a delay and pong back
+          setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
+          //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
         }
-        //setting a delay and pong back
-        setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
-        //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-      }
 
-      if(data.toString().includes("ChainSyncPong(")){
-        //returned block from sunched peer and parses it for db
-        var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPong(")+14, data.toString().indexOf(")"));
-        //ping back to synched peer - possibly should open this up as broadcast MUST TEST
-        setTimeout(function(){peers[peerId].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
-      }
+        if(data.toString().includes("ChainSyncPong(")){
+          //returned block from sunched peer and parses it for db
+          var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPong(")+14, data.toString().indexOf(")"));
+          //ping back to synched peer - possibly should open this up as broadcast MUST TEST
+          setTimeout(function(){peers[peerId].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
+        }
 
-      if(data.toString().includes("BlockHeight: ")){
-        console.log("Blockheight is "+data.toString());
-      }
+        if(data.toString().includes("BlockHeight: ")){
+          console.log("Blockheight is "+data.toString());
+        }
+
+      }/////////////////////////////////////////end the if block for data inputs
 
     })
 
@@ -192,13 +203,15 @@ const sw = swarm(config);
   })
 
 })()
-
+//////////////////////////////////////////////////////////////messaging to peers
 var broadcastPeers = function(message){
   for (let id in peers) {
     peers[id].conn.write(message)
   }
 }
+//////////////////////////////////////////////////////////end messaging to peers
 
+///////////////////////////////////////////////////////query 2 will go away soon
 function queryr2(query){
   rl.question(query, (answer) => {
     console.log(`input: ${query} ${answer}`);
@@ -217,7 +230,9 @@ function queryr2(query){
     }
   })
 }
+/////////////////////////////////////////////////////////////////////end query 2
 
+//////////////////////////////////////////////////main console interface query 1
 function queryr1(){
   //command line stuff
   rl.question('console action: ', (answer) => {
@@ -332,18 +347,25 @@ function queryr1(){
     //rl.close();
   });
 }
+///////////////////////////////////////////ending main console interface query 1
 
+////////////////////////////////////////////////////////////miner initialization
+///////////////need to add back in the conmmand line args and make like claymore
 var miner = function(frankieCoin){
   var franks = new Miner.Miner("first try", 32, "tryanewkey", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", "0x5c4ae12c853012d355b5ee36a6cb8285708760e6",frankieCoin)
   return franks;
 }
+///////////////////////////////////////////////////////////////////////end miner
 
+///////////////////////////////////////////////////////////////////my blockchain
 var blockchain = function(){
   var frankieCoin = new sapphirechain.Blockchain();
   return frankieCoin;
 }
 
 var frankieCoin = blockchain();
+///////////////////////////////////////////////////////////////////my blockchain
+
 //have to load the first block into local database
 var genBlock = {"blockchain":{
   id:null,
@@ -371,7 +393,7 @@ BlockchainDB.addBlock(genBlock);
 console.log("peer chain is"+ frankieCoin.getEntireChain());
 var franks = miner(frankieCoin);
 
-////////////////////synch the chain
+/////////////////////////////////////////////////////////////////synch the chain
 console.log("|-------------CHAIN SYNC---------------|")
 //internal data blockheiht
 var blockHeightPtr = 0;
@@ -412,12 +434,25 @@ function ChainGrab(blocknum){
 ChainGrab();
 //eand by now we will know if synched or not and enable or disable mining
 console.log("|^------------CHAIN SYNC--------------^|")
-////////////////////END synch the chain
+/////////////////////////////////////////////////////////////END synch the chain
 
+////////////////////////////////////////////////initialize the console interface
 queryr1();
+//////////////////////////////////////////////////////////command line interface
 
+////////////////////////////////////////////////////////////////export functions
 module.exports = {
   broadcastPeers:broadcastPeers,
   miner:miner,
   blockchain:blockchain
 }
+////////////////////////////////////////////////////////////////export functions
+
+/******************************************************************************/
+//
+//  EGEM Sapphire Peer.js
+//  Currently licensed under MIT
+//  A copy of this license must be included in all copies
+//  Copyright (c) 2018 Frank Triantos aka OSOESE
+//
+/******************************************************************************/
