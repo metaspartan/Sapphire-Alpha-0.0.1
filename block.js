@@ -330,49 +330,49 @@ var Blockchain = class Blockchain{
               for(const orders of block.orders){
 
 
-                      console.log("inside trades "+orders.pairing+orders.state+orders.amount+orders.buyOrSell);
+                      console.log("inside trades "+orders.pairBuy+orders.state+orders.amount+orders.buyOrSell);
 
-                      if(tradeBalance[orders.pairing] == null){
-                        tradeBalance[orders.pairing] = 0;
-                        console.log("tb["+orders.pairing+"]"+tradeBalance[orders.pairing]);
+                      if(tradeBalance[orders.pairBuy] == null){
+                        tradeBalance[orders.pairBuy] = 0;
+                        console.log("tb["+orders.pairBuy+"]"+tradeBalance[orders.pairing]);
                       }
 
-                      if(tradeOrders[orders.pairing] == null){
-                        tradeOrders[orders.pairing] = [];
+                      if(tradeOrders[orders.pairBuy] == null){
+                        tradeOrders[orders.pairBuy] = [];
                       }
 
-                      tradeOrders[orders.pairing]["state"] = orders.state;
-                      tradeOrders[orders.pairing]["buyOrSell"] = orders.buyOrSell;
-                      tradeOrders[orders.pairing]["amount"] = orders.amount;
-                      tradeOrders[orders.pairing]["price"] = orders.price
-                      tradeOrders[orders.pairing]["fromAddress"] = orders.fromAddress;
+                      tradeOrders[orders.pairBuy]["state"] = orders.state;
+                      tradeOrders[orders.pairBuy]["buyOrSell"] = orders.buyOrSell;
+                      tradeOrders[orders.pairBuy]["amount"] = orders.amount;
+                      tradeOrders[orders.pairBuy]["price"] = orders.price
+                      tradeOrders[orders.pairBuy]["fromAddress"] = orders.fromAddress;
 
-                      if(tradeOrders[orders.pairing]["buyOrSell"] == "BUY"){
+                      if(tradeOrders[orders.pairBuy]["buyOrSell"] == "BUY"){
                         for(const ordersTX of block.orders){
-                          console.log("about to transact if "+ordersTX.buyOrSell+" = SELL and "+ordersTX.state+" = open and "+ordersTX.pairing+ " = "+orders.pairing);
-                          if(ordersTX.buyOrSell == "SELL" && ordersTX.state == "open" && ordersTX.pairing == orders.pairing){
+                          console.log("about to transact if "+ordersTX.buyOrSell+" = SELL and "+ordersTX.state+" = open and "+ordersTX.pairBuy+ " = "+orders.pairBuy);
+                          if(ordersTX.buyOrSell == "SELL" && ordersTX.state == "open" && ordersTX.pairBuy == orders.pairBuy){
                             console.log("**************OUTER SELL CONDITION MET***************");
-                            console.log("price"+ordersTX.price+" "+tradeOrders[orders.pairing]["price"]);
-                            console.log("amount"+ordersTX.amount+" "+tradeOrders[orders.pairing]["amount"]);
-                            if(ordersTX.price <= tradeOrders[orders.pairing]["price"] && ordersTX.amount <= tradeOrders[orders.pairing]["amount"]){
-                              console.log("***CREATE ORDER*****this is where I would transact some of "+orders.pairing+" and change the status to closed or partial");
+                            console.log("price"+ordersTX.price+" "+tradeOrders[orders.pairBuy]["price"]);
+                            console.log("amount"+ordersTX.amount+" "+tradeOrders[orders.pairBuy]["amount"]);
+                            if(ordersTX.price <= tradeOrders[orders.pairBuy]["price"] && ordersTX.amount <= tradeOrders[orders.pairBuy]["amount"]){
+                              console.log("***CREATE ORDER*****this is where I would transact some of "+orders.pairBuy+" and change the status to closed or partial");
                               //craft the trade transaction
                               var amounttoBuyTx = ordersTX.amount;
-                              var amountToSellOrder = tradeOrders[orders.pairing]["amount"];
+                              var amountToSellOrder = tradeOrders[orders.pairBuy]["amount"];
                               var statusOrderSupply = "open";
                               var statusOrderDemand = "open";
                               //if amount being bought is less than the supply
-                              if(tradeOrders[orders.pairing]["amount"] < ordersTX.amount){
+                              if(tradeOrders[orders.pairBuy]["amount"] < ordersTX.amount){
                                 //new supply for sell is edited for updated order
-                                amountToSellOrder = ordersTX.amount - tradeOrders[orders.pairing]["amount"];
+                                amountToSellOrder = ordersTX.amount - tradeOrders[orders.pairBuy]["amount"];
                                 //this transaction is whats being bought
-                                amounttoBuyTx = tradeOrders[orders.pairing]["amount"];
+                                amounttoBuyTx = tradeOrders[orders.pairBuy]["amount"];
                                 //and the buy order will be closed
                                 statusOrderDemand = "closed";
                                 //meanwhile the sell order is partial
                                 statusOrderSupply = "partial";
                               //else if the amount being bought is greater than the supply
-                              }else if(ordersTX.amount < tradeOrders[orders.pairing]["amount"]){
+                              }else if(ordersTX.amount < tradeOrders[orders.pairBuy]["amount"]){
                                 //amount to sell is now 0
                                 amountToSellOrder = 0;
                                 //amount being bought is the supply
@@ -382,35 +382,35 @@ var Blockchain = class Blockchain{
                                 //and the sell order will be closed
                                 statusOrderSupply = "closed";
                                 //finally if the two oders are equal
-                              }else if(ordersTX.amount == tradeOrders[orders.pairing]["amount"]){
-                                amountToSellOrder = tradeOrders[orders.pairing]["amount"];
+                              }else if(ordersTX.amount == tradeOrders[orders.pairBuy]["amount"]){
+                                amountToSellOrder = tradeOrders[orders.pairBuy]["amount"];
                                 amounttoBuyTx = ordersTX.amount;
                               }else{
 
                               }
                               //creates the trade transaction
-                              this.createTransaction(new Transaction(ordersTX.fromAddress, tradeOrders[orders.pairing]["fromAddress"], tradeOrders[orders.pairing]["amount"], "EGEM"));
+                              this.createTransaction(new Transaction(ordersTX.fromAddress, tradeOrders[orders.pairBuy]["fromAddress"], tradeOrders[orders.pairBuy]["amount"], orders.pairBuy));
                               //update the trade order
                               //need a variable for partial or filled
-                              this.createOrder(new Order(tradeOrders[orders.pairing]["fromAddress"],'BUY',orders.pairing,(tradeOrders[orders.pairing]["amount"]-ordersTX.amount,tradeOrders[orders.pairing]["price"])));
+                              this.createOrder(new Order(tradeOrders[orders.pairBuy]["fromAddress"],'BUY',orders.pairing,(tradeOrders[orders.pairBuy]["amount"]-ordersTX.amount,tradeOrders[orders.pairBuy]["price"])));
                             }
                           }
                         }
                       }
 
                       //this is incorrect information
-                      if(tradeOrders[orders.pairing]["fromAddress"]){
-                        console.log('in trading Balance of '+tradeOrders[orders.pairing]["fromAddress"]+' is'+this.getBalanceOfAddress(tradeOrders[orders.pairing]["fromAddress"]));
+                      if(tradeOrders[orders.pairBuy]["fromAddress"]){
+                        console.log('in trading Balance of '+tradeOrders[orders.pairBuy]["fromAddress"]+' is'+this.getBalanceOfAddress(tradeOrders[orders.pairBuy]["fromAddress"]));
                       }
 
                       if(orders.buyOrSell == "BUY" && orders.state == "open"){
-                          tradeBalance[orders.pairing] -= parseInt(orders.amount);
-                          console.log("tb["+orders.pairing+"]"+tradeBalance[orders.pairing]);
+                          tradeBalance[orders.pairBuy] -= parseInt(orders.amount);
+                          console.log("tb["+orders.pairBuy+"]"+tradeBalance[orders.pairBuy]);
                       }
 
                       if(orders.buyOrSell == "SELL" && orders.state == "open"){
-                          tradeBalance[orders.pairing] += parseInt(orders.amount);
-                          console.log("tb["+orders.pairing+"]"+tradeBalance[orders.pairing]);
+                          tradeBalance[orders.pairBuy] += parseInt(orders.amount);
+                          console.log("tb["+orders.pairBuy+"]"+tradeBalance[orders.pairBuy]);
                       }
 
 

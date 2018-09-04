@@ -116,9 +116,175 @@ var getBlock = function(number,callBack){
 
 }
 
+//////////////////////////////////////this is the ORDER database now////////////
+// Use an instance table to query and organize existing tables of data.
+var orders = nSQL('orders')// Table/Store Name, required to declare model and attach it to this store.
+.model([ // Data Model, required
+    {key:'id',type:'uuid',props:['pk']}, // This has the primary key value
+    {key:'fromAddress',type:'string'},
+    {key:'buyOrSell',type:'string'},
+    {key:'pairBuy',type:'string'},
+    {key:'pairSell',type:'string'},
+    {key:'amount',type:'string'},//using string for long tail floats and big numbers but convert
+    {key:'price',type:'string'}
+    //{key:'status',type:'string', default:"open"},//open until partial filled and ay just remain open until filled
+    //{key:'nonce',type:'int', default:0, props: ["idx"]}, // secondary index
+])
+.config({
+    mode: "PERM", // With this enabled, the best storage engine will be auttomatically selected and all changes saved to it.  Works in browser AND nodeJS automatically.
+    history: true,  // allow the database to undo/redo changes on the fly.
+    dbPath: "./datadir/"
+})
+.actions([ // Optional
+    {
+        name:'add_new_order',
+        args:['order:map'],
+        call:function(args, db) {
+            return db.query('upsert',args.order).exec();
+        }
+    }
+])
+.views([ // Optional
+    {
+        name: 'get_order_by_pairBuy',
+        args: ['pairBuy:string'],
+        call: function(args, db) {
+            return db.query('select').where([["pairBuy","=",args.pairBuy],"AND",["buyOrSell","=","BUY"]]).orderBy({price:"desc",amount:"desc"}).exec();
+        }
+    },
+    {
+        name: 'get_order_by_pairSell',
+        args: ['pairSell:string'],
+        call: function(args, db) {
+            return db.query('select').where([["pairSell","=",args.pairSell],"AND",["buyOrSell","=","SELL"]]).orderBy({price:"asc",amount:"asc"}).exec();
+        }
+    },
+    {
+        name: 'list_all_orders',
+        args: ['page:int'],
+        call: function(args, db) {
+            return db.query('select',['id',"fromAddress","amount","buyOrSell","pairBuy","pairSell","price"]).exec();
+        }
+    },
+    {
+        name: 'list_all_orders_buy',
+        args: ['page:int'],
+        call: function(args, db) {
+            return db.query('select',['id','fromAddress',"amount" , "buyOrSell","pairBuy","pairSell","price"]).where(["buyOrSell","=","BUY"]).orderBy({price:"desc",amount:"desc"}).exec();
+        }
+    },
+    {
+        name: 'list_all_orders_sell',
+        args: ['page:int'],
+        call: function(args, db) {
+            return db.query('select',['id','fromAddress',"amount" , "buyOrSell","pairBuy","pairSell","price"]).where(["buyOrSell","=","SELL"]).orderBy({price:"asc",amount:"asc"}).exec();
+        }
+    }
+]).connect();
+
+var clearOrderDatabase = function(){
+  nSQL("orders").query("delete").exec();
+}
+
+
+var addOrder = function(order){
+  console.log(JSON.stringify(order));
+  //orders.connect().then(function(result) {
+      // DB ready to use.
+      nSQL("orders").doAction('add_new_order',order
+      ).then(function(result) {
+          console.log(result) //  <- single object array containing the row we inserted.
+      });
+  //});
+}
+
+/***
+var simple = nSQL([
+    {id:null,fromAddress:'0x0666bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'BUY',pairBuy:'EGEM',pairSell:'SPHR',amount:'300',price:'24.5567'},
+    {id:null,fromAddress:'0x0667bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SPHR',amount:'320',price:'24.5567'},
+    {id:null,fromAddress:'0x0668bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'BUY',pairBuy:'EGEM',pairSell:'SPHR',amount:'350',price:'24.5567'},
+    {id:null,fromAddress:'0x5c4ae12c853012d355b5ee36a6cb8285708760e6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SPHR',amount:'450',price:'25.5567'},
+    {id:null,fromAddress:'0x5c4ae12c853012d775b5ee36a6cb8285708760e6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SPHR',amount:'920',price:'26.5567'},
+]);
+***/
+
+var ordersToBuy = [];
+
+var getOrdersBuy = function(callBack){
+  console.log("Open BUY Orders");
+      // DB ready to use.
+      nSQL("orders").getView('list_all_orders_buy')
+      .then(function(result) {
+          //console.log(result) //  <- single object array containing the row we inserted.
+          callBack(result);
+      });
+
+}
+
+var getOrdersPairBuy = function(pair,callback){
+  console.log("Open PAIR BUY Orders");
+      // DB ready to use.
+      nSQL("orders").getView('get_order_by_pairBuy',{pairBuy:pair})
+      .then(function(result) {
+          //console.log(result) //  <- single object array containing the row we inserted.
+          callback(result);
+          //console.log(result);
+      });
+
+}
+
+var getOrdersPairSell = function(pair,callback){
+  console.log("Open PAIR BUY Orders");
+      // DB ready to use.
+      nSQL("orders").getView('get_order_by_pairSell',{pairSell:pair})
+      .then(function(result) {
+          //console.log(result) //  <- single object array containing the row we inserted.
+          callback(result);
+          //console.log(result);
+      });
+
+}
+
+var buildTrade = function(obj,callBack){
+  console.log("Building transactions from sell orders for "+JSON.stringify(obj));
+  nSQL("orders").getView('get_order_by_pairSell',{pairSell:obj["pairSell"]})
+  .then(function(result) {
+      //console.log(result) //  <- single object array containing the row we inserted.
+      callBack(obj,result);
+  });
+}
+
+var getOrdersSell = function(){
+  console.log("Open SELL Orders");
+      // DB ready to use.
+      nSQL("orders").getView('list_all_orders_sell')
+      .then(function(result) {
+          console.log(result) //  <- single object array containing the row we inserted.
+      });
+
+}
+
+var getAllOrders = function(){
+  console.log("ALL Open Orders");
+      // DB ready to use.
+      nSQL("orders").getView('list_all_orders')
+      .then(function(result) {
+          console.log(result) //  <- single object array containing the row we inserted.
+      });
+
+}
+//////////////////////////////////////end order database////////////////////////
+
 module.exports = {
     addBlock:addBlock,
     getBlockchain:getBlockchain,
     getBlock:getBlock,
-    clearDatabase:clearDatabase
+    addOrder:addOrder,
+    getOrdersBuy:getOrdersBuy,
+    getOrdersSell:getOrdersSell,
+    getAllOrders:getAllOrders,
+    buildTrade:buildTrade,
+    getOrdersPairBuy:getOrdersPairBuy,
+    clearDatabase:clearDatabase,
+    clearOrderDatabase:clearOrderDatabase
 }

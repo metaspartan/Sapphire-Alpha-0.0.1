@@ -15,6 +15,41 @@ function isJSON(str) {
     return true;
 }
 
+var myTradeCallback = function(orig,data) {
+  console.log('SELL TRADE ORDERS: '+JSON.stringify(data));//test for input
+  for (obj in data){
+    console.log("this would be the transaction: ");
+    console.log("BUYER "+orig["fromAddress"]+" OF "+orig["pairBuy"]+" QTY "+orig["amount"]+" FOR "+orig["price"]+" OF "+orig["pairBuy"]+" PER "+orig["pairSell"]);
+    console.log("SELLER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairSell"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" OF "+data[obj]["pairBuy"]+" PER "+data[obj]["pairSell"]);
+
+    if(parseInt(orig["amount"]) <= parseInt(data[obj]["amount"])){
+      console.log("TRANSACTION: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "+parseInt(orig["amount"])+ " OF "+orig["pairBuy"]);
+      console.log("UNFILLED REPLACEMENT - SELLER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairSell"]+" QTY "+(parseInt(data[obj]["amount"]) - parseInt(orig["amount"]))+" FOR "+data[obj]["price"]+" OF "+data[obj]["pairBuy"]+" PER "+data[obj]["pairSell"]);
+      //console.log("UNFILLED REPLACEMENT ORDER: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "++ " OF "+orig["pairBuy"]);
+    }else if (orig["amount"] > parseInt(data[obj]["amount"])){
+      console.log("TRANSACTION: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "+parseInt(data[obj]["amount"])+ " OF "+orig["pairBuy"]);
+      console.log("UNFILLED REPLACEMENT - SELLER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairSell"]+" QTY "+(parseInt(orig["amount"]) - parseInt(data[obj]["amount"]))+" FOR "+data[obj]["price"]+" OF "+data[obj]["pairBuy"]+" PER "+data[obj]["pairSell"]);
+    }
+
+  }
+};
+
+var myCallbackBuy = function(data) {
+  console.log('BUY ORDERS: '+JSON.stringify(data));//test for input
+  for (obj in data){
+    console.log("BUYER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairBuy"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" PER "+data[obj]["pairSell"]);
+    Orderdb.buildTrade(data[obj],myTradeCallback);
+  }
+};
+
+var myCallbackSell = function(data) {
+  console.log('BUY ORDERS: '+JSON.stringify(data));//test for input
+  for (obj in data){
+    console.log("BUYER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairBuy"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" PER "+data[obj]["pairSell"]);
+    Orderdb.buildTrade(data[obj],myTradeCallback);
+  }
+};
+
 function queryr1(){
   //command line stuff
   rl.question('console action: ', (answer) => {
@@ -34,11 +69,13 @@ function queryr1(){
         queryr1();
       }
     }else{
+      //Orderdb.clearOrderDatabase();
       //other commands can go Here
       console.log("catchy non json options go here but for now its a select");
-      Orderdb.getOrdersBuy();
-      Orderdb.getOrdersSell();
-      Orderdb.getAllOrders();
+      //Orderdb.getOrdersBuy(myCallback);
+      Orderdb.getOrdersPairBuy("EGEM",myCallbackBuy);
+      //Orderdb.getOrdersSell();
+      //Orderdb.getAllOrders();
       queryr1();
     }
 
@@ -56,7 +93,8 @@ console.log(myorder["order"]["fromAddress"]);
 
 //Orderdb.addOrder(myorder);
 
-//Orderdb.getOrdersBuy();
+//Orderdb.getOrdersPairBuy("EGEM");
+//Orderdb.getOrdersPairBuy("SPHR");
 
 //Orderdb.getOrdersSell();
 

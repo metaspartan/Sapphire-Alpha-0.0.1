@@ -319,10 +319,10 @@ function queryr1(){
       var action = JSON.parse(jsonSend)["action"];
       var amount = JSON.parse(jsonSend)["amount"];
       var price = JSON.parse(jsonSend)["price"];
-      var pair = JSON.parse(jsonSend)["pair"];
-      var ticker = JSON.parse(jsonSend)["ticker"];
-      console.log("Placing order to "+action+" "+amount+" of "+ticker+" for "+price+" by "+maker);
-      frankieCoin.createOrder(new sapphirechain.Order(maker,action,pair,amount,price));
+      var pairBuy = JSON.parse(jsonSend)["pairBuy"];
+      var pairSell = JSON.parse(jsonSend)["pairSell"];
+      console.log("Placing order to "+action+" "+amount+" of "+pairBuy+" for "+price+" by "+maker);
+      frankieCoin.createOrder(new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price));
       queryr1();
       //queryr2("getBlock");
     }else{
