@@ -93,7 +93,7 @@ function isJSON(str) {
       )
 
       //////////////////////////////////////begin the if block for incoming data
-      if(isJSON(data.toString()){
+      if(isJSON(data.toString())){
         //console.log("object data: "+JSON.parse(data)["previousHash"]);
         if(JSON.parse(data)["previousHash"]){
           //storing some variables of current chain
