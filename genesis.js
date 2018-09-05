@@ -15,7 +15,8 @@ const hash = md5File.sync(filename);
 var getFiseHash = function(){
   fs.readFile(filename, 'utf8', function(err, data) {
       if (err) throw err;
-      tbh=data;
+      //tbh=data;
+      tbh = data.slice(data.indexOf("const fs ="), data.indexOf("fileHash:getFiseHash"));
       //console.log("output is"+tbh);
       fileHash = sha256(tbh).toString();
       console.log("filehash is "+fileHash);
