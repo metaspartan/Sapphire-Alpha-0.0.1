@@ -36,6 +36,7 @@ var myDigestVar = "";
 var globalGenesisHash = "";
 var filename = "genesis.js";
 var tbh = "";
+
 var output = fs.readFile(filename, 'utf8', function(err, data) {
     if (err) throw err;
     tbh=data;
