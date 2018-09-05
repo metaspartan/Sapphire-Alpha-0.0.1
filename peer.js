@@ -39,7 +39,7 @@ var tbh = "";
 
 var output = fs.readFile(filename, 'utf8', function(err, data) {
     if (err) throw err;
-    tbh=data;
+    tbh=data.replace(/(\r\n|\n|\r)/gm,"");//removes ALL line breaks
     if (Genesis.genesisGlobalHash == "This is the Genesis GLobal Hash for the EtherGem Sapphire Integrated Subchain TeamEGEM"){
       console.log("it validated and just to check tbh is"+tbh)
       globalGenesisHash = sha256(tbh).toString();
