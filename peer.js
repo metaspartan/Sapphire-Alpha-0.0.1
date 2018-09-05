@@ -11,12 +11,15 @@ const crypto = require('crypto')
 const defaults = require('dat-swarm-defaults')
 const readline = require('readline')
 const getPort = require('get-port')
+//genesis hash variables
+var Genesis = require('./genesis')
+const fs = require('fs');
+const sha256 = require('crypto-js/sha256');
 
-//database stuff switching out mongo for nano
+////////////////////////////////////calls the nano-sql data interface to leveldb
 var BlockchainDB = require('./nano.js');
-//Mongo.collection("Blockchain");
 
-//okay trying the mining stuff
+///////////////////////Mining stuff : blockchain algo and mining initializations
 var sapphirechain = require("./block.js")
 var BLAKE2s = require("./blake2s.js")
 var Miner = require("./miner.js")
@@ -27,13 +30,36 @@ var msg = "genesis message"
 var length = 32;
 var key = "ax8906hg4c";
 var myDigestVar = "";
-//end the mining stuff
+////////////////////////////////////////////////////////////end the mining stuff
 
+////////////////////////////////////////////////////////////////////genesis hash
+var globalGenesisHash = "";
+var filename = "genesis.js";
+var tbh = "";
+var output = fs.readFile(filename, 'utf8', function(err, data) {
+    if (err) throw err;
+    tbh=data;
+    console.log("output is"+tbh);
+    if (Genesis.genesisGlobalHash == "right now its nothing"){
+      console.log("it validated and just to check tbh is"+tbh)
+      globalGenesisHash = sha256(tbh).toString();
+      console.log("now its global gen hash "+globalGenesisHash)
+    }else{
+      console.log("it did not validate")
+    }
+});
+
+console.log("THE HASH IS:"+globalGenesisHash);
+////////////////////////////////////////////////////////////////end genesis hash
+
+/////////////////////////////////////////////////initialize the CLI query system
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 });
+//////////////////////////////////////////////////////////////end CLI query init
 
+/////////////////////////////////////////////asynchronous peer connection engine
 const myId = crypto.randomBytes(32);
 
 const peers = {}
@@ -92,9 +118,10 @@ function isJSON(str) {
         '----> ' + data.toString()
       )
 
-      //////////////////////////////////////begin the if block for incoming data
+////////////////////////////////////////////begin the if block for incoming data
       if(isJSON(data.toString())){
         //console.log("object data: "+JSON.parse(data)["previousHash"]);
+////////////////////////////////////////////////////////////incomeing peer block
         if(JSON.parse(data)["previousHash"]){
           //storing some variables of current chain
           var currentChainHash = frankieCoin.getLatestBlock()["hash"];
@@ -113,7 +140,7 @@ function isJSON(str) {
           }else{
             console.log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
           }
-          //update the client database OR reject block and rollback the chain - code is incomplete atm
+///////////////update the client database OR reject block and rollback the chain - code is incomplete atm
           var peerblock = {"blockchain":{
             id:null,
             blocknum:parseInt(frankieCoin.getLength()),
@@ -137,8 +164,7 @@ function isJSON(str) {
             hashOfThisBlock:JSON.parse(data)["hashOfThisBlock"]
           }};
           console.log("what is being sent"+JSON.stringify(peerblock));
-          //BlockchainDB.addBlock(peerblock);
-          /***
+          /***this is the format of the JSON thta works with nano-sql for input
           var peerblock2 = {blockchain:{
             id:null,blocknum:1,
             previousHash:"97f2c5c6f5a30cc9d89d24f68e75ac7e12c34e64c65914f74ab89ad9e665e3ab",
@@ -155,11 +181,11 @@ function isJSON(str) {
       }else{
 
         //will repoen the GENESIS HASH NEXT
-        /***
+
         if(data.toString() == "My Genesis Hash is: "+globalGenesisHash){
           console.log("the hash matched you would record that now");
         }
-        ****/
+
 
         //peer(s) gets blockheight from synching peer and returns next block
         if(data.toString().includes("ChainSyncPing(")){
@@ -203,6 +229,8 @@ function isJSON(str) {
   })
 
 })()
+/////////////////////////////////////ending asynchronous peers connection engine
+
 //////////////////////////////////////////////////////////////messaging to peers
 var broadcastPeers = function(message){
   for (let id in peers) {
@@ -268,14 +296,17 @@ function queryr1(){
       }};
       console.log(minedblock);
       BlockchainDB.addBlock(minedblock);
+      //sending the block to the peers
       broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
       queryr1();
     }else if(answer == "O"){//O is for order
-      //Orderdb.clearOrderDatabase();
       //other commands can go Here
-      console.log("catchy non json options go here but for now its a select");
-      //Orderdb.getOrdersBuy(myCallback);
+      console.log("Order is processing from the database not chain");
+      //this function calls buy order from database and...
+      //mycallcakbuy calls the sells to match them up
+      //the logic may update itself as we move forward from loop to event
       BlockchainDB.getOrdersPairBuy("EGEM",myCallbackBuy);
+      //just a reminder I have other order functions coded
       //Orderdb.getOrdersSell();
       //Orderdb.getAllOrders();
       queryr1();
@@ -286,23 +317,23 @@ function queryr1(){
       //console.log("balance is: "+frankieCoin.getBalanceOfAddress("0x0666bf13ab1902de7dee4f8193c819118d7e21a6")+" <---why no money");
       //console.log("balance is: "+franks.getBalanceOfAddress("0x0666bf13ab1902de7dee4f8193c819118d7e21a6")+" <---why no money");
       //queryr1();
-    }else if(answer == "T"){//T is for talk
+    }else if(answer == "T"){//T is for talk but using it to initiate chain sync
       //console.log("had to not just broadcast everything I write to all peers so only sender sees this");
       //broadcastPeers("...but all peers see that this was sent from "+myId);
 
-      //snaking this chain synch in here
+      //sneaking this chain synch in here...that is a "talk"
       for (let id in peers) {
         peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
       }
       queryr1();
     }else if(answer == "N"){//N is for Node info
-      console.log("NODEZZZZZZ LULZ: ");
+      console.log("NODEZZZZZZ LULZ: ");//had to BCASH LOL
       console.log(JSON.stringify(frankieCoin.retrieveNodes()));
       queryr1();
-    }else if(answer == "G"){//N is for Node info
+    }else if(answer == "G"){//G currently is for getBlock which is also a function
       console.log("BLOCK NUMBER: 1");
       queryr2("getBlock");
-    }else if(answer == "S"){//N is for Node info
+    }else if(answer == "S"){//S is currently cleaning the databases was "Send" so leaving commented out transactions and orders for testing
       console.log("Western Union is no longer the fastest way to send money.....");
       //frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 20, "SPHR"));
       //frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 10, "EGEM"));
@@ -312,9 +343,8 @@ function queryr1(){
       //BlockchainDB.getBlockchain();
       BlockchainDB.clearDatabase();
       BlockchainDB.clearOrderDatabase();
-      //Mongo.getitall();
       queryr1();
-    }else if(answer.includes("Send(")){//adding function capabilioties
+    }else if(answer.includes("Send(")){//SEND function Send ( json tx )
       console.log(answer.slice(answer.indexOf("Send(")+5, answer.indexOf(")")));
       var jsonSend = answer.slice(answer.indexOf("Send(")+5, answer.indexOf(")"));
       var from = JSON.parse(jsonSend)["from"];
@@ -325,15 +355,13 @@ function queryr1(){
       frankieCoin.createTransaction(new sapphirechain.Transaction(from, to, amount, ticker));
       queryr1();
       //queryr2("getBlock");
-    }else if(answer.includes("getBlock(")){//adding function capabilioties
+    }else if(answer.includes("getBlock(")){//GETBLOCK function
       console.log(answer.slice(answer.indexOf("getBlock(")+9, answer.indexOf(")")));
       var blocknum = answer.slice(answer.indexOf("getBlock(")+9, answer.indexOf(")"));
       console.log(JSON.stringify(frankieCoin.getBlock(parseInt(blocknum))));
-      //frankieCoin.getBlock(blocknum);
-      BlockchainDB.getBlock(blocknum,callback2);
+      BlockchainDB.getBlock(blocknum,callback2);//change name from callback 2 to something meaningful
       queryr1();
-      //queryr2("getBlock");
-    }else if(answer.includes("Order(")){//adding function capabilioties
+    }else if(answer.includes("Order(")){//ORDER function merging with below \/ \/
       console.log(answer.slice(answer.indexOf("Order(")+6, answer.indexOf(")")));
       var jsonSend = answer.slice(answer.indexOf("Order(")+6, answer.indexOf(")"));
       var maker = JSON.parse(jsonSend)["maker"];
@@ -345,8 +373,7 @@ function queryr1(){
       console.log("Placing order to "+action+" "+amount+" of "+pairBuy+" for "+price+" by "+maker);
       frankieCoin.createOrder(new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price));
       queryr1();
-      //queryr2("getBlock");
-    }else if(isJSON(answer)){
+    }else if(isJSON(answer)){//ORDER JSON style strait to order DB ^^ merging with above
       if(RegExp("^0x[a-fA-F0-9]{40}$").test(JSON.parse(answer)["fromAddress"])){//adding function capabilioties
         console.log("Valid EGEM Sapphire Address")
         //create the order
@@ -500,7 +527,7 @@ var myCallbackSell = function(data) {
     BlockchainDB.buildTrade(data[obj],myTradeCallback);
   }
 };
-////////////////////////////////////////////////////////und functions for orders
+////////////////////////////////////////////////////////end functions for orders
 
 ////////////////////////////////////////////////initialize the console interface
 queryr1();
