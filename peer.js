@@ -40,16 +40,17 @@ var output = fs.readFile(filename, 'utf8', function(err, data) {
     if (err) throw err;
     tbh=data;
     console.log("output is"+tbh);
-    if (Genesis.genesisGlobalHash == "right now its nothing"){
+    if (Genesis.genesisGlobalHash == "This is the Genesis GLobal Hash for the EtherGem Sapphire Integrated Subchain TeamEGEM"){
       console.log("it validated and just to check tbh is"+tbh)
       globalGenesisHash = sha256(tbh).toString();
-      console.log("now its global gen hash "+globalGenesisHash)
+      console.log("now its global gen hash "+globalGenesisHash);
+      //console.log("the peer hash is "+Genesis.fileHash);//doesn't read this line
     }else{
       console.log("it did not validate")
     }
 });
 
-console.log("THE HASH IS:"+globalGenesisHash);
+console.log("PEER.JS REPORTING THAT THE HASH IS:"+globalGenesisHash);
 ////////////////////////////////////////////////////////////////end genesis hash
 
 /////////////////////////////////////////////////initialize the CLI query system
@@ -327,6 +328,7 @@ function queryr1(){
       }
       queryr1();
     }else if(answer == "N"){//N is for Node info
+      Genesis.fileHash();
       console.log("NODEZZZZZZ LULZ: ");//had to BCASH LOL
       console.log(JSON.stringify(frankieCoin.retrieveNodes()));
       queryr1();
