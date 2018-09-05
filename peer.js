@@ -271,8 +271,13 @@ function queryr1(){
       broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
       queryr1();
     }else if(answer == "O"){//O is for order
-      console.log("maybe can do logic for an order at the console line but for now...");
-      frankieCoin.createOrder(new sapphirechain.Order('0x5c4ae12c853012d355b5ee36a6cb8285708760e6','SELL','SPHREGEM',200,0.24));
+      //Orderdb.clearOrderDatabase();
+      //other commands can go Here
+      console.log("catchy non json options go here but for now its a select");
+      //Orderdb.getOrdersBuy(myCallback);
+      BlockchainDB.getOrdersPairBuy("EGEM",myCallbackBuy);
+      //Orderdb.getOrdersSell();
+      //Orderdb.getAllOrders();
       queryr1();
     }else if(answer == "B"){//B is for balance
       console.log("maybe can do logic for BALANCE of ADDRESS at the console line but for now...");
@@ -306,6 +311,7 @@ function queryr1(){
       //frankieCoin.createOrder(new sapphirechain.Order('0x5c4ae12c853012d355b5ee36a6cb8285708760e6','SELL','SPHREGEM',200,0.24));
       //BlockchainDB.getBlockchain();
       BlockchainDB.clearDatabase();
+      BlockchainDB.clearOrderDatabase();
       //Mongo.getitall();
       queryr1();
     }else if(answer.includes("Send(")){//adding function capabilioties
@@ -340,6 +346,29 @@ function queryr1(){
       frankieCoin.createOrder(new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price));
       queryr1();
       //queryr2("getBlock");
+    }else if(isJSON(answer)){
+      if(RegExp("^0x[a-fA-F0-9]{40}$").test(JSON.parse(answer)["fromAddress"])){//adding function capabilioties
+        console.log("Valid EGEM Sapphire Address")
+        //create the order
+        var myorder = {'order':{id:null,"fromAddress":JSON.parse(answer)["fromAddress"],buyOrSell:JSON.parse(answer)["buyOrSell"],pairBuy:JSON.parse(answer)["pairBuy"],pairSell:JSON.parse(answer)["pairSell"],amount:JSON.parse(answer)["amount"],price:JSON.parse(answer)["price"]}};
+        //var myorder = {order:JSON.parse(answer)};
+        console.log("order is "+myorder)
+
+        //putting it on the chain first
+        var maker = JSON.parse(answer)["maker"];
+        var action = JSON.parse(answer)["action"];
+        var amount = JSON.parse(answer)["amount"];
+        var price = JSON.parse(answer)["price"];
+        var pairBuy = JSON.parse(answer)["pairBuy"];
+        var pairSell = JSON.parse(answer)["pairSell"];
+        console.log("Placing order to "+action+" "+amount+" of "+pairBuy+" for "+price+" by "+maker);
+        frankieCoin.createOrder(new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price));
+        //end putting it on the chain
+
+        BlockchainDB.addOrder(myorder);
+
+        queryr1();
+      }
     }else{
       console.log("[placeholder] that selection is not valid atm");
       queryr1();
@@ -435,6 +464,43 @@ ChainGrab();
 //eand by now we will know if synched or not and enable or disable mining
 console.log("|^------------CHAIN SYNC--------------^|")
 /////////////////////////////////////////////////////////////END synch the chain
+
+////////////////////////////////////////////////this is the functions for orders
+var myTradeCallback = function(orig,data) {
+  console.log('SELL TRADE ORDERS: '+JSON.stringify(data));//test for input
+  for (obj in data){
+    console.log("this would be the transaction: ");
+    console.log("BUYER "+orig["fromAddress"]+" OF "+orig["pairBuy"]+" QTY "+orig["amount"]+" FOR "+orig["price"]+" OF "+orig["pairBuy"]+" PER "+orig["pairSell"]);
+    console.log("SELLER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairSell"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" OF "+data[obj]["pairBuy"]+" PER "+data[obj]["pairSell"]);
+
+    if(parseInt(orig["amount"]) <= parseInt(data[obj]["amount"])){
+      console.log("TRANSACTION: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "+parseInt(orig["amount"])+ " OF "+orig["pairBuy"]);
+      console.log("UNFILLED REPLACEMENT - SELLER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairSell"]+" QTY "+(parseInt(data[obj]["amount"]) - parseInt(orig["amount"]))+" FOR "+data[obj]["price"]+" OF "+data[obj]["pairBuy"]+" PER "+data[obj]["pairSell"]);
+      //console.log("UNFILLED REPLACEMENT ORDER: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "++ " OF "+orig["pairBuy"]);
+    }else if (orig["amount"] > parseInt(data[obj]["amount"])){
+      console.log("TRANSACTION: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "+parseInt(data[obj]["amount"])+ " OF "+orig["pairBuy"]);
+      console.log("UNFILLED REPLACEMENT - SELLER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairSell"]+" QTY "+(parseInt(orig["amount"]) - parseInt(data[obj]["amount"]))+" FOR "+data[obj]["price"]+" OF "+data[obj]["pairBuy"]+" PER "+data[obj]["pairSell"]);
+    }
+
+  }
+};
+
+var myCallbackBuy = function(data) {
+  console.log('BUY ORDERS: '+JSON.stringify(data));//test for input
+  for (obj in data){
+    console.log("BUYER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairBuy"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" PER "+data[obj]["pairSell"]);
+    BlockchainDB.buildTrade(data[obj],myTradeCallback);
+  }
+};
+
+var myCallbackSell = function(data) {
+  console.log('BUY ORDERS: '+JSON.stringify(data));//test for input
+  for (obj in data){
+    console.log("BUYER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairBuy"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" PER "+data[obj]["pairSell"]);
+    BlockchainDB.buildTrade(data[obj],myTradeCallback);
+  }
+};
+////////////////////////////////////////////////////////und functions for orders
 
 ////////////////////////////////////////////////initialize the console interface
 queryr1();
