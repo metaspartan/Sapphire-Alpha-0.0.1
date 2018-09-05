@@ -16,7 +16,7 @@ var getFiseHash = function(){
   fs.readFile(filename, 'utf8', function(err, data) {
       if (err) throw err;
       //tbh=data;
-      tbh = data.slice(data.indexOf("const fs ="), data.indexOf("fileHash:getFiseHash"));
+      tbh = data.slice(data.indexOf("const fs ="), data.indexOf("fileHash:getFiseHash")).replace(/(\r\n|\n|\r)/gm,"");;
       //console.log("output is"+tbh);
       fileHash = sha256(tbh).toString();
       console.log("filehash is "+fileHash);
