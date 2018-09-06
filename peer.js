@@ -194,12 +194,26 @@ function isJSON(str) {
               peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
             }
             //setting a delay and pong back
-            setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
+            //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
+            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,GlobalHash:globalGenesisHash}}));},3000);
             //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
           }else{
             console.log("Did not match this hash and this peer is an imposter")
           }
 
+        }else if(JSON.parse(data)["ChainSyncPong"]){
+          //returned block from sunched peer and parses it for db
+          console.log(JSON.parse(data)["ChainSyncPong"]);
+          if(JSON.parse(data)["ChainSyncPong"]["GlobalHash"] == globalGenesisHash){
+            console.log("Hash Matched good pong")
+            var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
+            //var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPong(")+14, data.toString().indexOf(")"));
+            //ping back to synched peer - possibly should open this up as broadcast MUST TEST
+            //setTimeout(function(){peers[peerId].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
+            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+          }else{
+            console.log("you are communicating with a bad actor and we must stop this connection");
+          }
         }
 
       }else{
