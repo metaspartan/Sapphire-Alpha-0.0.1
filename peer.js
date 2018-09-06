@@ -197,7 +197,7 @@ function isJSON(str) {
             setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
             //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
           }else{
-            console.log("did not match this hash")
+            console.log("Did not match this hash and this peer is an imposter")
           }
 
         }
@@ -232,7 +232,8 @@ function isJSON(str) {
           //returned block from sunched peer and parses it for db
           var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPong(")+14, data.toString().indexOf(")"));
           //ping back to synched peer - possibly should open this up as broadcast MUST TEST
-          setTimeout(function(){peers[peerId].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
+          //setTimeout(function(){peers[peerId].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
+          setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
         }
 
         if(data.toString().includes("BlockHeight: ")){
