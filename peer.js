@@ -520,7 +520,8 @@ var myCallback = function(data) {
   console.log("BlocHeightPtr: "+blockHeightPtr);
   //this is where we call a function with the blockHeight pointer that finds out the peerBlockHeight and then download missing data
   for (let id in peers) {
-    peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
+    //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
+    peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
   }
 
 };
