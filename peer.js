@@ -180,7 +180,7 @@ function isJSON(str) {
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
           console.log(JSON.parse(data)["ChainSyncPing"]);
-          if(JSON.parse(data)["ChainSyncPing"]["globalGenesisHash"] == globalGenesisHash){
+          if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
 
             console.log("global hashes matched");
 
@@ -196,6 +196,8 @@ function isJSON(str) {
             //setting a delay and pong back
             setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
             //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+          }else{
+            console.log("did not match this hash")
           }
 
         }
@@ -345,6 +347,7 @@ function queryr1(){
 
       //sneaking this chain synch in here...that is a "talk"
       for (let id in peers) {
+        console.log("sending the ping");
         //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
         peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
       }
