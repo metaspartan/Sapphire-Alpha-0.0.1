@@ -224,7 +224,7 @@ function isJSON(str) {
           console.log("the hash matched you would record that now");
         }
 
-
+        /******this code moved to JSON and genesis global hashing above
         //peer(s) gets blockheight from synching peer and returns next block
         if(data.toString().includes("ChainSyncPing(")){
           var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPing(")+14, data.toString().indexOf(")"));
@@ -249,6 +249,7 @@ function isJSON(str) {
           //setTimeout(function(){peers[peerId].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
           setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
         }
+        *****/
 
         if(data.toString().includes("BlockHeight: ")){
           console.log("Blockheight is "+data.toString());
