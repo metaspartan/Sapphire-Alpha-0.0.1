@@ -128,16 +128,20 @@ function isJSON(str) {
           var currentChainHash = frankieCoin.getLatestBlock()["hash"];
           var blocknumber = 0;
           //first we add the block to the blockchain
-          frankieCoin.addBlockFromPeers(JSON.parse(data));
+          var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data));
           //increment the internal peer nonce of sending party to track longest chain
           frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
           //logging the block added to chain for console
           console.log("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock()));
           //verfiy the previous hash in the database matches our expectations - code is incomplete atm
-          if(frankieCoin.getLatestBlock()["previousHash"] == currentChainHash){
+          if(frankieCoin.getLatestBlock()["previousHash"] == currentChainHash && successfulBlockAdd == true){
             console.log("hash matches and we are good");
             blocknumber = frankieCoin.getLength();
             console.log("the database block number is "+blocknumber);
+            console.log("88888888888888888888888888888888888888888888888888888888888888888888");
+            console.log("THERE NEEDS TO BE ANOTHER SOMETHING SET HERE FOR THE DATASE SYNCHING");
+            console.log("         BUT WE DID JUST GET A SUCESSFUL BLOCK FROM PEER            ");
+            console.log("88888888888888888888888888888888888888888888888888888888888888888888");
           }else{
             console.log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
           }
@@ -176,7 +180,7 @@ function isJSON(str) {
           }};
           ***/
           BlockchainDB.addBlock(peerblock);
-          //Mongo.insertCollection("Blockchain",frankieCoin.getLatestBlock());
+
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
           console.log(JSON.parse(data)["ChainSyncPing"]);
