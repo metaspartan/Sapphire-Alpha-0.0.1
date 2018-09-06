@@ -177,6 +177,8 @@ function isJSON(str) {
           ***/
           BlockchainDB.addBlock(peerblock);
           //Mongo.insertCollection("Blockchain",frankieCoin.getLatestBlock());
+        }else if(JSON.parse(data)["ChainSyncPing"]){
+          console.log(JSON.parse(data)["ChainSyncPing"]);
         }
 
       }else{
@@ -325,6 +327,7 @@ function queryr1(){
       //sneaking this chain synch in here...that is a "talk"
       for (let id in peers) {
         peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
+        peers[id].conn.write({ChainSyncPing:{Length:frankieCoin.getLength(),GlobalHash:globalGenesisHash}})
       }
       queryr1();
     }else if(answer == "N"){//N is for Node info
