@@ -178,7 +178,26 @@ function isJSON(str) {
           BlockchainDB.addBlock(peerblock);
           //Mongo.insertCollection("Blockchain",frankieCoin.getLatestBlock());
         }else if(JSON.parse(data)["ChainSyncPing"]){
+
           console.log(JSON.parse(data)["ChainSyncPing"]);
+          if(JSON.parse(data)["ChainSyncPing"]["globalGenesisHash"] == globalGenesisHash){
+
+            console.log("global hashes matched");
+
+            var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
+            //increment it by one to return the next block
+            peerBlockHeight++;
+            //returning the block
+            if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
+              peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
+            }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
+              peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+            }
+            //setting a delay and pong back
+            setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
+            //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+          }
+
         }
 
       }else{
@@ -326,8 +345,8 @@ function queryr1(){
 
       //sneaking this chain synch in here...that is a "talk"
       for (let id in peers) {
-        peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
-        peers[id].conn.write({"ChainSyncPing":{Length:frankieCoin.getLength(),GlobalHash:globalGenesisHash}})
+        //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
+        peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
       }
       queryr1();
     }else if(answer == "N"){//N is for Node info
