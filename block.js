@@ -446,10 +446,11 @@ var Blockchain = class Blockchain{
       isChainValid() {
           for (let i = 1; i < this.chain.length; i++){
               console.log("current block "+JSON.stringify(this.chain[i]))
+              console.log("current block "+JSON.stringify(this.getBlock(i+1)));
               const currentBlock = this.chain[i];
               if (currentBlock.hash !== currentBlock.calculateHash()) {
-                  console.log("would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i).calculateHash());
-                  console.log("double check calc is same"+this.getBlock(i).calculateHash());
+                  console.log("would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i+1).calculateHash());
+                  console.log("double check calc is same"+this.getBlock(i+1).calculateHash());
                   ///triple check
                   try {
                     var h = new BLAKE2s(32, decodeUTF8(""));
