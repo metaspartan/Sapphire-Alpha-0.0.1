@@ -126,7 +126,8 @@ var Block = class Block {
       } catch (e) {
         alert("Error: " + e);
       };
-      h.update(decodeUTF8(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + JSON.stringify(this.orders) + this.nonce));
+      //h.update(decodeUTF8(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + JSON.stringify(this.orders) + this.nonce));
+      h.update(decodeUTF8(this.previousHash + this.timestamp + this.nonce));
       return h.hexDigest();
         //return SHA256(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).toString();
     }
@@ -216,9 +217,21 @@ var Blockchain = class Blockchain{
       }
 
       minePendingTransactions(miningRewardAddress){
-          let block = new Block(Date.now(), this.pendingTransactions, this.pendingOrders, this.getLatestBlock().hash);
+          var blockTimeStamp = Date.now();
+
+          let block = new Block(blockTimeStamp, this.pendingTransactions, this.pendingOrders, this.getLatestBlock().hash);
           block.mineBlock(this.difficulty);
-          console.log('Block successfully mined!');
+          console.log('Block successfully mined! '+blockTimeStamp);
+          ////extra check
+          try {
+            var h = new BLAKE2s(32, decodeUTF8(""));
+          } catch (e) {
+            alert("Error: " + e);
+          };
+          //h.update(decodeUTF8(block.previousHash + block.timestamp + JSON.stringify(block.transactions) + JSON.stringify(block.orders) + block.nonce));
+          h.update(decodeUTF8(block.previousHash + block.timestamp + block.nonce));
+          console.log("should match the block hash "+h.hexDigest());
+          ////extra check
 
           //adding a trading mechanism and if below this chain push it processes same block HINT MOVE IT TWO LINES DOWN
           this.processTrades();
@@ -443,7 +456,8 @@ var Blockchain = class Blockchain{
                   } catch (e) {
                     alert("Error: " + e);
                   };
-                  h.update(decodeUTF8(this.chain[i].previousHash + this.chain[i].timestamp + JSON.stringify(this.chain[i].transactions) + JSON.stringify(this.chain[i].orders) + this.chain[i].nonce));
+                  //h.update(decodeUTF8(this.chain[i].previousHash + this.chain[i].timestamp + JSON.stringify(this.chain[i].transactions) + JSON.stringify(this.chain[i].orders) + this.chain[i].nonce));
+                  h.update(decodeUTF8(this.chain[i].previousHash + this.chain[i].timestamp + this.chain[i].nonce));
                   console.log(h.hexDigest());
                   //return false;
               }
