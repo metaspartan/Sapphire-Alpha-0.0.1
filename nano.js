@@ -64,14 +64,14 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
         name: 'get_block',
         args: ['blocknum:int'],
         call: function(args, db) {
-            return db.query('select',['id','blocknum','previousHash','hash','timestamp','transactions','orders','eGEMBackReferenceBlock','egemBackReferenceBlockHash']).where(["blocknum","=",args.blocknum]).exec();
+            return db.query('select',['id','blocknum','previousHash','hash','timestamp','transactions','orders','eGEMBackReferenceBlock','egemBackReferenceBlockHash','nonce']).where(["blocknum","=",args.blocknum]).exec();
         }
     },
     {
         name: 'get_blockchain',
         args: ['page:int'],
         call: function(args, db) {
-            return db.query('select',['id','blocknum','previousHash','hash','timestamp','transactions','orders','eGEMBackReferenceBlock','egemBackReferenceBlockHash']).orderBy({blocknum:"asc"}).exec();
+            return db.query('select',['id','blocknum','previousHash','hash','timestamp','transactions','orders','eGEMBackReferenceBlock','egemBackReferenceBlockHash','nonce']).orderBy({blocknum:"asc"}).exec();
         }
     }
 ]).connect();
