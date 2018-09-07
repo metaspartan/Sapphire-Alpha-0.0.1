@@ -32,6 +32,10 @@ var Miner = class Miner {
     return getBalance;
   }
 
+  mpt2(){
+    this.chain.minePendingTransactions(this.address);
+  }
+
   calculateDigest(word,diff,pass){
     // Get message converting to Unix line breaks.
     //console.log("calculating"+word+"diff"+diff+"pass"+pass);

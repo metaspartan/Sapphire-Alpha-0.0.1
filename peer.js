@@ -117,7 +117,6 @@ function isJSON(str) {
 
 ////////////////////////////////////////////begin the if block for incoming data
       if(isJSON(data.toString())){
-        //console.log("object data: "+JSON.parse(data)["previousHash"]);
 ////////////////////////////////////////////////////////////incomeing peer block
         if(JSON.parse(data)["previousHash"]){
           //storing some variables of current chain
@@ -216,33 +215,6 @@ function isJSON(str) {
           console.log("the hash matched you would record that now");
         }
 
-        /******this code moved to JSON and genesis global hashing above
-        //peer(s) gets blockheight from synching peer and returns next block
-        if(data.toString().includes("ChainSyncPing(")){
-          var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPing(")+14, data.toString().indexOf(")"));
-          //increment it by one to return the next block
-          peerBlockHeight++;
-          //peers[peerId].conn.write("BlockHeight: "+frankieCoin.getLength());//messaging? perhaps change to JSON
-          //returning the block
-          if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
-            peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
-          }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
-            peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-          }
-          //setting a delay and pong back
-          setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
-          //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-        }
-
-        if(data.toString().includes("ChainSyncPong(")){
-          //returned block from sunched peer and parses it for db
-          var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPong(")+14, data.toString().indexOf(")"));
-          //ping back to synched peer - possibly should open this up as broadcast MUST TEST
-          //setTimeout(function(){peers[peerId].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
-          setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
-        }
-        *****/
-
         if(data.toString().includes("BlockHeight: ")){
           console.log("Blockheight is "+data.toString());
         }
@@ -301,7 +273,8 @@ function queryr1(){
     if(answer == "M"){//M is for mine and triggers the miner
       console.log("[placeholder] this would be mining stats");
       console.log("Mined BLock Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
-      franks.calculateDigest("first try",10);
+      //franks.calculateDigest("first try",10);
+      franks.mpt2();
       //this is the most sensible place to add the block
       //this would seem to be a function that should be called from miner after meinePendingTx is called but it is better called here
       var minedblock = {"blockchain":{

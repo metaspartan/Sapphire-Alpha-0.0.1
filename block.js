@@ -153,7 +153,7 @@ var Blockchain = class Blockchain{
           //adding in the peers connectivity
           this.nodes = [];
           //difficulty adjusts
-          this.difficulty = 3;//can be 1 or more later
+          this.difficulty = 4;//can be 1 or more later
           this.pendingTransactions = [];
           //can add a this.pendingOrders
           this.pendingOrders = [];
@@ -434,11 +434,11 @@ var Blockchain = class Blockchain{
           for (let i = 1; i < this.chain.length; i++){
               console.log("current block "+JSON.stringify(this.chain[i]))
               const currentBlock = this.chain[i];
-              const previousBlock = this.chain[i - 1];
               if (currentBlock.hash !== currentBlock.calculateHash()) {
-                  console.log("would be returning false here: cb hash "+currentBlock.hash+" calcHash "+currentBlock.calculateHash());
+                  console.log("would be returning false here: cb hash "+currentBlock.hash+" calcHash "+this.getBlock(i).calculateHash());
                   //return false;
               }
+              const previousBlock = this.chain[i - 1];
               if (currentBlock.previousHash !== previousBlock.hash) {
                   console.log("would be returning false here: cb prevhash "+currentBlock.previousHash+" prev block hash "+previousBlock.hash);
                   //return false;
