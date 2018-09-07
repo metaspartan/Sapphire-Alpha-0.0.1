@@ -363,6 +363,14 @@ function queryr1(){
       frankieCoin.createTransaction(new sapphirechain.Transaction(from, to, amount, ticker));
       queryr1();
       //queryr2("getBlock");
+    }else if(answer.includes("Hash(")){//SEND function Send ( json tx )
+      console.log(answer.slice(answer.indexOf("Hash(")+5, answer.indexOf(")")));
+      var hashText = answer.slice(answer.indexOf("Hash(")+5, answer.indexOf(")"));
+
+      console.log(hashText);
+      sapphirechain.Hash(hashText);
+      queryr1();
+      //queryr2("getBlock");
     }else if(answer.includes("getBlock(")){//GETBLOCK function
       console.log(answer.slice(answer.indexOf("getBlock(")+9, answer.indexOf(")")));
       var blocknum = answer.slice(answer.indexOf("getBlock(")+9, answer.indexOf(")"));

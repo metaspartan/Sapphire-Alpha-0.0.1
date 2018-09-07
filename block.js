@@ -68,6 +68,18 @@ var currentEgemBlockCallBack = function(block) {
   currentEgemBlockHash = block["hash"];
 }
 
+var Hash = function(inputs) {
+  try {
+    var h = new BLAKE2s(32, decodeUTF8(""));
+  } catch (e) {
+    alert("Error: " + e);
+  };
+  //h.update(decodeUTF8(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + JSON.stringify(this.orders) + this.nonce));
+  h.update(decodeUTF8(inputs));
+  console.log(h.hexDigest().toString());
+    //return SHA256(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).toString();
+}
+
 var Block = class Block {
 
     constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '') {
@@ -154,7 +166,7 @@ var Blockchain = class Blockchain{
           //adding in the peers connectivity
           this.nodes = [];
           //difficulty adjusts
-          this.difficulty = 5;//can be 1 or more later
+          this.difficulty = 4;//can be 1 or more later
           this.pendingTransactions = [];
           //can add a this.pendingOrders
           this.pendingOrders = [];
@@ -480,4 +492,5 @@ module.exports = {
     Order:Order,
     Block:Block,
     Blockchain:Blockchain,
+    Hash,Hash
 }
