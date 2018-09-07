@@ -154,7 +154,7 @@ var Blockchain = class Blockchain{
           //adding in the peers connectivity
           this.nodes = [];
           //difficulty adjusts
-          this.difficulty = 4;//can be 1 or more later
+          this.difficulty = 5;//can be 1 or more later
           this.pendingTransactions = [];
           //can add a this.pendingOrders
           this.pendingOrders = [];
