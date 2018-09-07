@@ -36,21 +36,17 @@ var myDigestVar = "";
 var globalGenesisHash = "";
 var filename = "genesis.js";
 var tbh = "";
-
+//////pulls genesis.js file and sha256 hashes it into globalGenesisHash variable
 var output = fs.readFile(filename, 'utf8', function(err, data) {
     if (err) throw err;
     tbh=data.replace(/(\r\n|\n|\r)/gm,"");//removes ALL line breaks
     if (Genesis.genesisGlobalHash == "This is the Genesis GLobal Hash for the EtherGem Sapphire Integrated Subchain TeamEGEM"){
-      console.log("it validated and just to check tbh is"+tbh)
       globalGenesisHash = sha256(tbh).toString();
-      console.log("now its global gen hash "+globalGenesisHash);
-      //console.log("the peer hash is "+Genesis.fileHash);//doesn't read this line
+      console.log("Global Genesis Hash: "+globalGenesisHash);
     }else{
       console.log("it did not validate")
     }
 });
-
-console.log("PEER.JS REPORTING THAT THE HASH IS:"+globalGenesisHash);
 ////////////////////////////////////////////////////////////////end genesis hash
 
 /////////////////////////////////////////////////initialize the CLI query system
@@ -142,50 +138,42 @@ function isJSON(str) {
             console.log("THERE NEEDS TO BE ANOTHER SOMETHING SET HERE FOR THE DATASE SYNCHING");
             console.log("         BUT WE DID JUST GET A SUCESSFUL BLOCK FROM PEER            ");
             console.log("88888888888888888888888888888888888888888888888888888888888888888888");
+
+            //////update the client database OR reject block and rollback the chain - code is incomplete atm
+            var peerblock = {"blockchain":{
+              id:null,
+              blocknum:parseInt(frankieCoin.getLength()),
+              previousHash:JSON.parse(data)["previousHash"],
+              timestamp:JSON.parse(data)["timestamp"],
+              transactions:JSON.parse(data)["transactions"],
+              orders:JSON.parse(data)["orders"],
+              hash:JSON.parse(data)["hash"],
+              nonce:JSON.parse(data)["nonce"],
+              eGEMBackReferenceBlock:JSON.parse(data)["eGEMBackReferenceBlock"],
+              egemBackReferenceBlockHash:JSON.parse(data)["egemBackReferenceBlockHash"],
+              data:JSON.parse(data)["data"],
+              sponsor:JSON.parse(data)["sponsor"],
+              miner:JSON.parse(data)["miner"],
+              hardwareTx:JSON.parse(data)["hardwareTx"],
+              softwareTx:JSON.parse(data)["softwareTx"],
+              targetBlock:JSON.parse(data)["targetBlock"],
+              targetBlockDataHash:JSON.parse(data)["targetBlockDataHash"],
+              allConfig:JSON.parse(data)["allConfig"],
+              allConfigHash:JSON.parse(data)["allConfigHash"],
+              hashOfThisBlock:JSON.parse(data)["hashOfThisBlock"]
+            }};
+            //add it to the database
+            BlockchainDB.addBlock(peerblock);
+
           }else{
             console.log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
           }
-///////////////update the client database OR reject block and rollback the chain - code is incomplete atm
-          var peerblock = {"blockchain":{
-            id:null,
-            blocknum:parseInt(frankieCoin.getLength()),
-            previousHash:JSON.parse(data)["previousHash"],
-            timestamp:JSON.parse(data)["timestamp"],
-            transactions:JSON.parse(data)["transactions"],
-            orders:JSON.parse(data)["orders"],
-            hash:JSON.parse(data)["hash"],
-            nonce:JSON.parse(data)["nonce"],
-            eGEMBackReferenceBlock:JSON.parse(data)["eGEMBackReferenceBlock"],
-            egemBackReferenceBlockHash:JSON.parse(data)["egemBackReferenceBlockHash"],
-            data:JSON.parse(data)["data"],
-            sponsor:JSON.parse(data)["sponsor"],
-            miner:JSON.parse(data)["miner"],
-            hardwareTx:JSON.parse(data)["hardwareTx"],
-            softwareTx:JSON.parse(data)["softwareTx"],
-            targetBlock:JSON.parse(data)["targetBlock"],
-            targetBlockDataHash:JSON.parse(data)["targetBlockDataHash"],
-            allConfig:JSON.parse(data)["allConfig"],
-            allConfigHash:JSON.parse(data)["allConfigHash"],
-            hashOfThisBlock:JSON.parse(data)["hashOfThisBlock"]
-          }};
-          console.log("what is being sent"+JSON.stringify(peerblock));
-          /***this is the format of the JSON thta works with nano-sql for input
-          var peerblock2 = {blockchain:{
-            id:null,blocknum:1,
-            previousHash:"97f2c5c6f5a30cc9d89d24f68e75ac7e12c34e64c65914f74ab89ad9e665e3ab",
-            timestamp:1535292384948,transactions:{},orders:{},hash:"0005c015f465e8ed6a116d3d24136058dc7a6e72fc651acb3ad8120b7c82ae93",
-            nonce:3696,eGEMBackReferenceBlock:472,egemBackReferenceBlockHash:"0x0ed923fa347268f2d7b8e4a1a8d0ce61f810512ddaaec6729e66b004eb61e5e7",
-            data:"",sponsor:"0x2025ed239a8dec4de0034a252d5c5e385b73fcd0",miner:"0x0666bf13ab1902de7dee4f8193c819118d7e21a6",hardwareTx:"",softwareTx:"",
-            targetBlock:"",targetBlockDataHash:"",allConfig:"",allConfigHash:"",hashOfThisBlock:""
-          }};
-          ***/
-          BlockchainDB.addBlock(peerblock);
+
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
           console.log(JSON.parse(data)["ChainSyncPing"]);
           if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
-
             console.log("global hashes matched");
 
             var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
@@ -199,7 +187,7 @@ function isJSON(str) {
             }
             //setting a delay and pong back
             //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
-            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,GlobalHash:globalGenesisHash}}));},3000);
+            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,GlobalHash:globalGenesisHash}}));},1000);
             //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
           }else{
             console.log("Did not match this hash and this peer is an imposter")
@@ -214,7 +202,7 @@ function isJSON(str) {
             //var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPong(")+14, data.toString().indexOf(")"));
             //ping back to synched peer - possibly should open this up as broadcast MUST TEST
             //setTimeout(function(){peers[peerId].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
-            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},1000);
           }else{
             console.log("you are communicating with a bad actor and we must stop this connection");
           }
@@ -362,9 +350,6 @@ function queryr1(){
       //console.log("balance is: "+franks.getBalanceOfAddress("0x0666bf13ab1902de7dee4f8193c819118d7e21a6")+" <---why no money");
       //queryr1();
     }else if(answer == "T"){//T is for talk but using it to initiate chain sync
-      //console.log("had to not just broadcast everything I write to all peers so only sender sees this");
-      //broadcastPeers("...but all peers see that this was sent from "+myId);
-
       //sneaking this chain synch in here...that is a "talk"
       for (let id in peers) {
         console.log("sending the ping");
