@@ -271,10 +271,13 @@ function queryr1(){
     // TODO: Log the answer in a database
     console.log(`selected: ${answer}`);
     if(answer == "M"){//M is for mine and triggers the miner
+
+      franks.mpt2();
+
       console.log("[placeholder] this would be mining stats");
       console.log("Mined BLock Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
       //franks.calculateDigest("first try",10);
-      franks.mpt2();
+
       //this is the most sensible place to add the block
       //this would seem to be a function that should be called from miner after meinePendingTx is called but it is better called here
       var minedblock = {"blockchain":{

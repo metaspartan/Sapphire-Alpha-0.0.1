@@ -435,7 +435,16 @@ var Blockchain = class Blockchain{
               console.log("current block "+JSON.stringify(this.chain[i]))
               const currentBlock = this.chain[i];
               if (currentBlock.hash !== currentBlock.calculateHash()) {
-                  console.log("would be returning false here: cb hash "+currentBlock.hash+" calcHash "+this.getBlock(i).calculateHash());
+                  console.log("would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i).calculateHash());
+                  console.log("double check calc is same"+this.getBlock(i).calculateHash());
+                  ///triple check
+                  try {
+                    var h = new BLAKE2s(32, decodeUTF8(""));
+                  } catch (e) {
+                    alert("Error: " + e);
+                  };
+                  h.update(decodeUTF8(this.chain[i].previousHash + this.chain[i].timestamp + JSON.stringify(this.chain[i].transactions) + JSON.stringify(this.chain[i].orders) + this.chain[i].nonce));
+                  console.log(h.hexDigest());
                   //return false;
               }
               const previousBlock = this.chain[i - 1];
