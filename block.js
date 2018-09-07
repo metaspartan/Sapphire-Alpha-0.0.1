@@ -82,7 +82,7 @@ var Hash = function(inputs) {
 
 var Block = class Block {
 
-    constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '') {
+    constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0) {
 
         console.log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
@@ -103,7 +103,12 @@ var Block = class Block {
         }else{
           this.hash = this.calculateHash().toString();
         }
-        this.nonce = 0;
+
+        if(nonce != 0){
+          this.nonce = nonce;
+        }else{
+          this.nonce = 0;
+        }
         //tie this to the main EGEM chain
         console.log("constructor again : "+egemBRBlock+" "+egemBRHash+" "+currentEgemBlock+" "+currentEgemBlockHash);
         if(egemBRBlock != '')  {
@@ -268,7 +273,7 @@ var Blockchain = class Blockchain{
           console.log("----------------------------------------------------");
 
           //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-          var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash);
+          var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce);
           this.chain.push(block);
           //careful I have the ischain valid returining true on all tries
 
@@ -304,7 +309,7 @@ var Blockchain = class Blockchain{
           console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         }
         //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-        var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash);
+        var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce);
         this.chain.push(block);
         //careful I have the ischain valid returining true on all tries
         if(this.isChainValid() == false){
