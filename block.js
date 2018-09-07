@@ -448,7 +448,7 @@ var Blockchain = class Blockchain{
               console.log("current block "+JSON.stringify(this.chain[i]))
               console.log("current block "+JSON.stringify(this.getBlock(i+1)));
               const currentBlock = this.chain[i];
-              if (currentBlock.hash !== currentBlock.calculateHash()) {
+              if (this.chain[i].hash !== this.chain[i].calculateHash()) {
                   console.log("would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i+1).calculateHash());
                   console.log("double check calc is same"+this.getBlock(i+1).calculateHash());
                   ///triple check
@@ -463,7 +463,7 @@ var Blockchain = class Blockchain{
                   //return false;
               }
               const previousBlock = this.chain[i - 1];
-              if (currentBlock.previousHash !== previousBlock.hash) {
+              if (this.chain[i].previousHash !== this.chain[i-1].hash) {
                   console.log("would be returning false here: cb prevhash "+currentBlock.previousHash+" prev block hash "+previousBlock.hash);
                   //return false;
               }
