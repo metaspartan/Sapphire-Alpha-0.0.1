@@ -286,6 +286,7 @@ module.exports = {
     getAllOrders:getAllOrders,
     buildTrade:buildTrade,
     getOrdersPairBuy:getOrdersPairBuy,
+    getOrdersPairSell:getOrdersPairSell,
     clearDatabase:clearDatabase,
     clearOrderDatabase:clearOrderDatabase
 }

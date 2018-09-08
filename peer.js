@@ -274,6 +274,28 @@ function queryr1(){
     console.log(`selected: ${answer}`);
     if(answer == "M"){//M is for mine and triggers the miner
 
+      console.log("need to pull orders matching pairbuy orders from database and add to pending orders");
+      console.log('at least within a certain range...');
+      console.log(JSON.stringify(frankieCoin.pendingOrders));
+
+      for(odr in frankieCoin.pendingOrders){
+        if(frankieCoin.pendingOrders[odr]["buyOrSell"] == "BUY"){
+          console.log(frankieCoin.pendingOrders[odr]["pairBuy"]);
+          console.log(frankieCoin.pendingOrders[odr]["buyOrSell"]);
+          console.log(frankieCoin.pendingOrders[odr]["price"]);
+          console.log(frankieCoin.pendingOrders[odr]["amount"]);
+          console.log("Any Sell Orders with pricing less tha or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity requested");
+          BlockchainDB.getOrdersPairBuy(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackBuyMiner);
+        }else if (frankieCoin.pendingOrders[odr]["buyOrSell"] == "SELL"){
+          console.log(frankieCoin.pendingOrders[odr]["pairBuy"]);
+          console.log(frankieCoin.pendingOrders[odr]["buyOrSell"]);
+          console.log(frankieCoin.pendingOrders[odr]["price"]);
+          console.log(frankieCoin.pendingOrders[odr]["amount"]);
+          console.log("Any BUY Orders with pricing greater than or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity offered");
+          BlockchainDB.getOrdersPairSell(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackSellMiner);
+        }
+      }
+
       franks.mpt2();
 
       console.log("[placeholder] this would be mining stats");
@@ -539,6 +561,26 @@ var myTradeCallback = function(orig,data) {
   }
 };
 
+//this callback is for processing trades to database and may be eliminated to new process
+var myCallbackBuyMiner = function(data) {
+  console.log('BUY ORDERS: '+JSON.stringify(data));//test for input
+  for (obj in data){
+    console.log("BUYER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairBuy"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" PER "+data[obj]["pairSell"]);
+    frankieCoin.createOrder(new sapphirechain.Order(data[obj]["fromAddress"],data[obj]["action"],data[obj]["pairBuy"],data[obj]["pairSell"],data[obj]["amount"],data[obj]["price"]));
+    //BlockchainDB.buildTrade(data[obj],myTradeCallback);
+  }
+};
+//this callback is for processing trades to database and may be eliminated to new process
+var myCallbackSellMiner = function(data) {
+  console.log('BUY ORDERS: '+JSON.stringify(data));//test for input
+  for (obj in data){
+    console.log("BUYER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairBuy"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" PER "+data[obj]["pairSell"]);
+    frankieCoin.createOrder(new sapphirechain.Order(data[obj]["fromAddress"],data[obj]["action"],data[obj]["pairBuy"],data[obj]["pairSell"],data[obj]["amount"],data[obj]["price"]));
+    //BlockchainDB.buildTrade(data[obj],myTradeCallback);
+  }
+};
+
+//this callback is for processing trades to database and may be eliminated to new process
 var myCallbackBuy = function(data) {
   console.log('BUY ORDERS: '+JSON.stringify(data));//test for input
   for (obj in data){
@@ -546,7 +588,7 @@ var myCallbackBuy = function(data) {
     BlockchainDB.buildTrade(data[obj],myTradeCallback);
   }
 };
-
+//this callback is for processing trades to database and may be eliminated to new process
 var myCallbackSell = function(data) {
   console.log('BUY ORDERS: '+JSON.stringify(data));//test for input
   for (obj in data){
