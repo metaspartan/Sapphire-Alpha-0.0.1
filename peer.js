@@ -189,7 +189,9 @@ function isJSON(str) {
             setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,GlobalHash:globalGenesisHash}}));},1000);
             //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
           }else{
-            console.log("Did not match this hash and this peer is an imposter")
+            console.log("Did not match this hash and this peer is an imposter");
+            peers[peerId].write("Don't hack me bro");
+            //peers[peerId].connection.close()//?;
           }
 
         }else if(JSON.parse(data)["ChainSyncPong"]){
@@ -198,12 +200,12 @@ function isJSON(str) {
           if(JSON.parse(data)["ChainSyncPong"]["GlobalHash"] == globalGenesisHash){
             console.log("Hash Matched good pong")
             var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
-            //var peerBlockHeight = data.toString().slice(data.toString().indexOf("ChainSyncPong(")+14, data.toString().indexOf(")"));
-            //ping back to synched peer - possibly should open this up as broadcast MUST TEST
-            //setTimeout(function(){peers[peerId].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");},3000)
+            //ping back to synched peer
             setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},1000);
           }else{
-            console.log("you are communicating with a bad actor and we must stop this connection");
+            console.log("You are communicating with a bad actor and we must stop this connection");
+            peers[peerId].write("Stop hacking me bro");
+            //peers[peerId].connection.close()//?;
           }
         }
 
@@ -378,8 +380,14 @@ function queryr1(){
       BlockchainDB.getBlock(blocknum,callback2);//change name from callback 2 to something meaningful
       queryr1();
     }else if(answer.includes("Order(")){//ORDER function merging with below \/ \/
+      ////frankieCoin.createOrder(new sapphirechain.Order('0x0666bf13ab1902de7dee4f8193c819118d7e21a6','BUY','SPHREGEM',3500,0.25));
+      ////Order({"maker":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","action":"BUY","amount":24,"pair":"SPHREGEM","price":1.38,"ticker":"EGEM"});
       console.log(answer.slice(answer.indexOf("Order(")+6, answer.indexOf(")")));
+      //extract the JSON
       var jsonSend = answer.slice(answer.indexOf("Order(")+6, answer.indexOf(")"));
+      //set upi order for database add
+      var myorder = {"order":{id:null,"fromAddress":JSON.parse(jsonSend)["maker"],"buyOrSell":JSON.parse(jsonSend)["action"],"pairBuy":JSON.parse(jsonSend)["pairBuy"],"pairSell":JSON.parse(jsonSend)["pairSell"],"amount":JSON.parse(jsonSend)["amount"],"price":JSON.parse(jsonSend)["price"]}};
+      //create the order
       var maker = JSON.parse(jsonSend)["maker"];
       var action = JSON.parse(jsonSend)["action"];
       var amount = JSON.parse(jsonSend)["amount"];
@@ -388,12 +396,14 @@ function queryr1(){
       var pairSell = JSON.parse(jsonSend)["pairSell"];
       console.log("Placing order to "+action+" "+amount+" of "+pairBuy+" for "+price+" by "+maker);
       frankieCoin.createOrder(new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price));
+      BlockchainDB.addOrder(myorder);
       queryr1();
     }else if(isJSON(answer)){//ORDER JSON style strait to order DB ^^ merging with above
       if(RegExp("^0x[a-fA-F0-9]{40}$").test(JSON.parse(answer)["fromAddress"])){//adding function capabilioties
+        //Order({"maker":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","action":"BUY","amount":24,"pairBuy":"EGEM","price":1.38,"pairSell":"SPHR"});
         console.log("Valid EGEM Sapphire Address")
         //create the order
-        var myorder = {'order':{id:null,"fromAddress":JSON.parse(answer)["fromAddress"],buyOrSell:JSON.parse(answer)["buyOrSell"],pairBuy:JSON.parse(answer)["pairBuy"],pairSell:JSON.parse(answer)["pairSell"],amount:JSON.parse(answer)["amount"],price:JSON.parse(answer)["price"]}};
+        var myorder = {"order":{"id":null,"fromAddress":JSON.parse(answer)["fromAddress"],"buyOrSell":JSON.parse(answer)["buyOrSell"],"pairBuy":JSON.parse(answer)["pairBuy"],"pairSell":JSON.parse(answer)["pairSell"],"amount":JSON.parse(answer)["amount"],"price":JSON.parse(answer)["price"]}};
         //var myorder = {order:JSON.parse(answer)};
         console.log("order is "+myorder)
 
@@ -407,7 +417,7 @@ function queryr1(){
         console.log("Placing order to "+action+" "+amount+" of "+pairBuy+" for "+price+" by "+maker);
         frankieCoin.createOrder(new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price));
         //end putting it on the chain
-
+        //{"order":{"id":null,"fromAddress":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","buyOrSell":"SELL","pairBuy":"EGEM","pairSell":"SPHR","amount":"300","price":"26.00"}}
         BlockchainDB.addOrder(myorder);
 
         queryr1();

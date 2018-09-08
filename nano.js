@@ -191,6 +191,7 @@ var addOrder = function(order){
   console.log(JSON.stringify(order));
   //orders.connect().then(function(result) {
       // DB ready to use.
+      console.log("we are placing this order "+order);
       nSQL("orders").doAction('add_new_order',order
       ).then(function(result) {
           console.log(result) //  <- single object array containing the row we inserted.

@@ -42,10 +42,12 @@ var Transaction = class Transaction{
 //this is code to add DEX orders to the block
 var Order = class Order{
     //we can do an address validation and kick back false
-    constructor(fromAddress, buyOrSell, pairing, amount, price){
+    constructor(fromAddress, buyOrSell, pairBuy, pairSell, amount, price){
         this.fromAddress = fromAddress;
         this.buyOrSell = buyOrSell;
-        this.pairing = pairing;
+        this.pairing = pairBuy+pairSell;
+        this.pairBuy = pairBuy,
+        this.pairSell = pairSell,
         this.amount = amount;
         this.price = price;
         this.state = "open"
@@ -74,10 +76,8 @@ var Hash = function(inputs) {
   } catch (e) {
     alert("Error: " + e);
   };
-  //h.update(decodeUTF8(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + JSON.stringify(this.orders) + this.nonce));
   h.update(decodeUTF8(inputs));
   console.log(h.hexDigest().toString());
-    //return SHA256(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).toString();
 }
 
 var Block = class Block {
@@ -143,8 +143,8 @@ var Block = class Block {
       } catch (e) {
         alert("Error: " + e);
       };
-      //h.update(decodeUTF8(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + JSON.stringify(this.orders) + this.nonce));
-      h.update(decodeUTF8(this.previousHash + this.timestamp + this.nonce));
+      h.update(decodeUTF8(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + JSON.stringify(this.orders) + this.nonce));
+      //h.update(decodeUTF8(this.previousHash + this.timestamp + this.nonce));
       return h.hexDigest();
         //return SHA256(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).toString();
     }
@@ -245,8 +245,8 @@ var Blockchain = class Blockchain{
           } catch (e) {
             alert("Error: " + e);
           };
-          //h.update(decodeUTF8(block.previousHash + block.timestamp + JSON.stringify(block.transactions) + JSON.stringify(block.orders) + block.nonce));
-          h.update(decodeUTF8(block.previousHash + block.timestamp + block.nonce));
+          h.update(decodeUTF8(block.previousHash + block.timestamp + JSON.stringify(block.transactions) + JSON.stringify(block.orders) + block.nonce));
+          //h.update(decodeUTF8(block.previousHash + block.timestamp + block.nonce));
           console.log("should match the block hash "+h.hexDigest());
           ////extra check
 
@@ -475,8 +475,8 @@ var Blockchain = class Blockchain{
                   } catch (e) {
                     alert("Error: " + e);
                   };
-                  //h.update(decodeUTF8(this.chain[i].previousHash + this.chain[i].timestamp + JSON.stringify(this.chain[i].transactions) + JSON.stringify(this.chain[i].orders) + this.chain[i].nonce));
-                  h.update(decodeUTF8(this.getBlock(i+1).previousHash + this.getBlock(i+1).timestamp + this.getBlock(i+1).nonce));
+                  h.update(decodeUTF8(this.chain[i+1].previousHash + this.chain[i+1].timestamp + JSON.stringify(this.chain[i+1].transactions) + JSON.stringify(this.chain[i+1].orders) + this.chain[i+1].nonce));
+                  //h.update(decodeUTF8(this.getBlock(i+1).previousHash + this.getBlock(i+1).timestamp + this.getBlock(i+1).nonce));
                   console.log(h.hexDigest());
                   //return false;
               }else{
