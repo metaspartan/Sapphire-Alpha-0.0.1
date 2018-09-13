@@ -126,7 +126,11 @@ var orders = nSQL('orders')// Table/Store Name, required to declare model and at
     {key:'pairBuy',type:'string'},
     {key:'pairSell',type:'string'},
     {key:'amount',type:'string'},//using string for long tail floats and big numbers but convert
-    {key:'price',type:'string'}
+    {key:'price',type:'string'},
+    {key:'state',type:'string'},
+    {key:'timestamp',type:'string'},
+    {key:'transactionID',type:'string'},
+    {key:'originationID',type:'string'}
     //{key:'status',type:'string', default:"open"},//open until partial filled and ay just remain open until filled
     //{key:'nonce',type:'int', default:0, props: ["idx"]}, // secondary index
 ])
@@ -163,24 +167,29 @@ var orders = nSQL('orders')// Table/Store Name, required to declare model and at
         name: 'list_all_orders',
         args: ['page:int'],
         call: function(args, db) {
-            return db.query('select',['id',"fromAddress","amount","buyOrSell","pairBuy","pairSell","price"]).exec();
+            //return db.query('select',['id',"fromAddress","amount","buyOrSell","pairBuy","pairSell","price","transactionID"]).exec();
+            return db.query('select').exec();
         }
     },
     {
         name: 'list_all_orders_buy',
         args: ['page:int'],
         call: function(args, db) {
-            return db.query('select',['id','fromAddress',"amount" , "buyOrSell","pairBuy","pairSell","price"]).where(["buyOrSell","=","BUY"]).orderBy({price:"desc",amount:"desc"}).exec();
+            return db.query('select').where(["buyOrSell","=","BUY"]).orderBy({price:"desc",amount:"desc"}).exec();
         }
     },
     {
         name: 'list_all_orders_sell',
         args: ['page:int'],
         call: function(args, db) {
-            return db.query('select',['id','fromAddress',"amount" , "buyOrSell","pairBuy","pairSell","price"]).where(["buyOrSell","=","SELL"]).orderBy({price:"asc",amount:"asc"}).exec();
+            return db.query('select').where(["buyOrSell","=","SELL"]).orderBy({price:"asc",amount:"asc"}).exec();
         }
     }
 ]).connect();
+
+var clearOrderById = function(id){
+  nSQL("orders").query("delete").where(["id","=",id]).exec()
+}
 
 var clearOrderDatabase = function(){
   nSQL("orders").query("delete").exec();
@@ -188,10 +197,11 @@ var clearOrderDatabase = function(){
 
 
 var addOrder = function(order){
-  console.log(JSON.stringify(order));
+  console.log("okay at least we are trying to add this order in db"+JSON.stringify(order));
   //orders.connect().then(function(result) {
       // DB ready to use.
       console.log("we are placing this order "+order);
+
       nSQL("orders").doAction('add_new_order',order
       ).then(function(result) {
           console.log(result) //  <- single object array containing the row we inserted.
@@ -222,6 +232,7 @@ var getOrdersBuy = function(callBack){
 
 }
 
+////////////////////////////////////////////////////////////////////////////first call
 var getOrdersPairBuy = function(pair,callback){
   console.log("Open PAIR BUY Orders");
       // DB ready to use.
@@ -233,7 +244,7 @@ var getOrdersPairBuy = function(pair,callback){
       });
 
 }
-
+////////////////////////////////////////////////////////////////////////////first call
 var getOrdersPairSell = function(pair,callback){
   console.log("Open PAIR BUY Orders");
       // DB ready to use.
@@ -288,5 +299,6 @@ module.exports = {
     getOrdersPairBuy:getOrdersPairBuy,
     getOrdersPairSell:getOrdersPairSell,
     clearDatabase:clearDatabase,
-    clearOrderDatabase:clearOrderDatabase
+    clearOrderDatabase:clearOrderDatabase,
+    clearOrderById:clearOrderById
 }

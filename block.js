@@ -1,7 +1,11 @@
+
 var BLAKE2s = require("./blake2s.js")
 //testing web3
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
+
+//adds a link to one module function for database
+var addOrder = module.parent.children[5].exports.addOrder;
 
 var genesisBLK = function genesisBLK() {
   var prevHash = "0";
@@ -42,7 +46,7 @@ var Transaction = class Transaction{
 //this is code to add DEX orders to the block
 var Order = class Order{
     //we can do an address validation and kick back false
-    constructor(fromAddress, buyOrSell, pairBuy, pairSell, amount, price){
+    constructor(fromAddress, buyOrSell, pairBuy, pairSell, amount, price, transactionID, originationID, state=''){
         this.fromAddress = fromAddress;
         this.buyOrSell = buyOrSell;
         this.pairing = pairBuy+pairSell;
@@ -50,7 +54,13 @@ var Order = class Order{
         this.pairSell = pairSell,
         this.amount = amount;
         this.price = price;
-        this.state = "open"
+        if(state == ""){
+          this.state = "open";
+        }else{
+          this.state = state;
+        }
+        this.transactionID = transactionID;
+        this.originationID = originationID
     }
 }
 
@@ -77,7 +87,9 @@ var Hash = function(inputs) {
     alert("Error: " + e);
   };
   h.update(decodeUTF8(inputs));
-  console.log(h.hexDigest().toString());
+  var thishash = h.hexDigest().toString();
+  console.log(thishash);
+  return thishash;
 }
 
 var Block = class Block {
@@ -176,7 +188,7 @@ var Blockchain = class Blockchain{
           //can add a this.pendingOrders
           this.pendingOrders = [];
           //then also add a this.tradePendingTransactions
-          this.miningReward = 100;
+          this.miningReward = 9;
           console.log("genesis block created");
           console.log("chain is"+JSON.stringify(this.chain));
       }
@@ -324,7 +336,16 @@ var Blockchain = class Blockchain{
           this.pendingTransactions.push(transaction);
       }
 
-      createOrder(order){
+      createOrder(order,originationID = ''){
+          order["timestamp"] = Date.now();
+          order["transactionID"] = Hash(order["fromAddress"]+order["pairBuy"]+order["timestamp"]);
+          //need to create a transaction ID and return it
+          if(originationID != ''){
+            order["originationID"] = originationID;
+          }else{
+            order["originationID"] = order["transactionID"];
+          }
+          console.log("Order just placed is "+JSON.stringify(order));
           this.pendingOrders.push(order);
       }
 
@@ -359,11 +380,137 @@ var Blockchain = class Blockchain{
 
           let tradeBalance = [];//will become the tradewallet for now is testing of trade interactions
           let tradeOrders = [];
+          var myblock = this.getLatestBlock().orders;
+          console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+          console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+          console.log(JSON.stringify(myblock));
+
+
+          var allbuys = myblock.filter(
+            function(myblock){ return ( myblock.buyOrSell=="BUY" ); }
+          );
+
+          /***
+          for (odr in myblock){
+            getOrdersFromBlockBuy(myblock,myblock[odr]["pairBuy"],myCallbackBuy,this);//myCallbackBuyMiner
+          }
+          ***/
+
+          //console.log("here is the BUYS log"+JSON.stringify(allbuys));
+          console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+          console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+
+          /***
+          var allbuys = allbuys1.filter(
+            function(allbuys1){ return ( allbuys1.status=="OPEN" ); }
+          );
+          ***/
+
+          ////////////////////////////////////////////////////////BUYS AND SELLS
+          for(var ordersofbuy in allbuys){
+
+            var allsells = myblock.filter(
+              //function(myblock){ return ( myblock.buyOrSell=="SELL" && myblock.pairSell==ordersofbuy["pairSell"]); }
+              function(myblock){ return ( myblock.buyOrSell=="SELL" ); }
+            );
+
+            console.log("88888888888888888888 here is the SELLS log"+JSON.stringify(allsells));
+            for(var transactions in allsells){
+              if(allbuys[ordersofbuy]["pairBuy"] == allsells[transactions]["pairBuy"] && allbuys[ordersofbuy]["pairSell"] == allsells[transactions]["pairSell"]){
+                console.log("99999999999999999 are we transacting? "+allbuys[ordersofbuy]["pairSell"]+allbuys[ordersofbuy]["price"]+" and "+allsells[transactions]["pairSell"]+allsells[transactions]["price"]);
+                if(allbuys[ordersofbuy]["price"] >= allsells[transactions]["price"]){
+                    if(allbuys[ordersofbuy].amount < allsells[transactions].amount){
+                      console.log("transaction created is "+allsells[transactions]["fromAddress"]+allbuys[ordersofbuy]["fromAddress"]+allbuys[ordersofbuy]["amount"]+allbuys[ordersofbuy]["pairBuy"]);
+                      this.createTransaction(new Transaction(allsells[transactions]["fromAddress"], allbuys[ordersofbuy]["fromAddress"], allbuys[ordersofbuy]["amount"], allbuys[ordersofbuy]["pairBuy"]));
+                      var newOrderAmpount = allsells[transactions]["amount"]-allbuys[ordersofbuy]["amount"];
+                      //constructor(fromAddress, buyOrSell, pairBuy, pairSell, amount, price, transactionID, originationID){
+                      //and a new one gets open
+                      var replacementOrder = new Order(
+                        allsells[transactions]["fromAddress"],
+                        'SELL',
+                        allsells[transactions]["pairBuy"],
+                        allsells[transactions]["pairSell"],
+                        newOrderAmpount,
+                        allsells[transactions]["price"],
+                        '',
+                        ''
+                      );
+                      this.createOrder(replacementOrder,allsells[transactions]["originationID"]);
+                      addOrder({order:replacementOrder});
+                      /*****
+                      //one order gets closed
+                      this.createOrder(
+                        new Order(
+                          allbuys[ordersofbuy]["fromAddress"],
+                          allbuys[ordersofbuy]["buyOrSell"],
+                          allbuys[ordersofbuy]["pairBuy"],
+                          allbuys[ordersofbuy]["pairSell"],
+                          allbuys[ordersofbuy]["amount"],
+                          allbuys[ordersofbuy]["price"],
+                          allbuys[ordersofbuy]["transactionID"],//may want to get the txidof of closing order here
+                          allbuys[ordersofbuy]["originationID"],
+                          "closed"
+                        ),allbuys[ordersofbuy]["originationID"]
+                      );
+                      //one gets partisl
+                      this.createOrder(
+                        new Order(
+                          allsells[transactions]["fromAddress"],
+                          allsells[transactions]["buyOrSell"],
+                          allsells[transactions]["pairBuy"],
+                          allsells[transactions]["pairSell"],
+                          allsells[transactions]["amount"],
+                          allsells[transactions]["price"],
+                          allsells[transactions]["transactionID"],//may want to get the txidof of closing order here
+                          allsells[transactions]["originationID"],
+                          "partial"
+                        ),allbuys[ordersofbuy]["originationID"]
+                      );
+                      //ending buy < sell
+                      *****/
+                    }else if(allbuys[ordersofbuy].amount > allsells[transactions].amount){
+                      this.createTransaction(new Transaction(allsells[transactions]["fromAddress"], allbuys[ordersofbuy]["fromAddress"], allsells[transactions]["amount"], allbuys[ordersofbuy]["pairBuy"]));
+                      var newOrderAmpount = allbuys[ordersofbuy]["amount"]-allsells[transactions]["amount"];
+                      //constructor(fromAddress, buyOrSell, pairBuy, pairSell, amount, price, transactionID, originationID){
+                      var replacementOrder = new Order(
+                        allbuys[ordersofbuy]["fromAddress"],
+                        'BUY',
+                        allbuys[ordersofbuy]["pairBuy"],
+                        allbuys[ordersofbuy]["pairSell"],
+                        newOrderAmpount,
+                        allbuys[ordersofbuy]["price"],
+                        '',
+                        ''
+                      );
+                      this.createOrder(replacementOrder,allbuys[ordersofbuy]["originationID"]);
+                      addOrder({order:replacementOrder});
+                      //one order gets closed
+                      //one gets partisl
+                      //and a new one gets open
+                    }else{
+                      console.log("&&&&&&&&&& EXACT MATCH &&&&&&&&&&&&&");
+                      //this.createTransaction(new Transaction(allsells[transactions]["fromAddress"], allbuys[ordersofbuy]["fromAddress"], allsells[transactions]["amount"], allbuys[ordersofbuy].pairBuy));
+                      //close two orders
+                    }
+                  }
+              }
+
+
+            }//end transactions in allsells loop
+          }///end ordersofbuy loop
+          ////////////////////////////////////////////////////////BUYS AND SELLS
+
+          console.log("here is the BUYS log"+JSON.stringify(allbuys));
+
+
+          /****
 
           //for(const block of this.chain){
+
               var block = this.getLatestBlock();
               for(const orders of block.orders){
-
+                console.log("this is inside the loop");
+                console.log(JSON.stringify(orders));
 
                       console.log("inside trades "+orders.pairBuy+orders.state+orders.amount+orders.buyOrSell);
 
@@ -389,13 +536,14 @@ var Blockchain = class Blockchain{
                             console.log("**************OUTER SELL CONDITION MET***************");
                             console.log("price"+ordersTX.price+" "+tradeOrders[orders.pairBuy]["price"]);
                             console.log("amount"+ordersTX.amount+" "+tradeOrders[orders.pairBuy]["amount"]);
-                            if(ordersTX.price <= tradeOrders[orders.pairBuy]["price"] && ordersTX.amount <= tradeOrders[orders.pairBuy]["amount"]){
+                            if(ordersTX.price <= tradeOrders[orders.pairBuy]["price"]){//this will transact or we move to next higher order price
                               console.log("***CREATE ORDER*****this is where I would transact some of "+orders.pairBuy+" and change the status to closed or partial");
                               //craft the trade transaction
                               var amounttoBuyTx = ordersTX.amount;
                               var amountToSellOrder = tradeOrders[orders.pairBuy]["amount"];
                               var statusOrderSupply = "open";
                               var statusOrderDemand = "open";
+                              var originationID = '';
                               //if amount being bought is less than the supply
                               if(tradeOrders[orders.pairBuy]["amount"] < ordersTX.amount){
                                 //new supply for sell is edited for updated order
@@ -406,6 +554,8 @@ var Blockchain = class Blockchain{
                                 statusOrderDemand = "closed";
                                 //meanwhile the sell order is partial
                                 statusOrderSupply = "partial";
+                                //originationID goes with supply
+                                originationID = ordersTX.transactionID;
                               //else if the amount being bought is greater than the supply
                               }else if(ordersTX.amount < tradeOrders[orders.pairBuy]["amount"]){
                                 //amount to sell is now 0
@@ -416,18 +566,33 @@ var Blockchain = class Blockchain{
                                 statusOrderDemand = "partial";
                                 //and the sell order will be closed
                                 statusOrderSupply = "closed";
-                                //finally if the two oders are equal
+                                //originationID goes with demand
+                                originationID = tradeOrders[orders.pairBuy]["transactionID"]
+                              //finally if the two oders are equal
                               }else if(ordersTX.amount == tradeOrders[orders.pairBuy]["amount"]){
                                 amountToSellOrder = tradeOrders[orders.pairBuy]["amount"];
                                 amounttoBuyTx = ordersTX.amount;
+                                //in this case there will not be a new order placed so both orders will be closed
+                              //}else if(ordersTX.amount > tradeOrders[orders.pairBuy]["amount"]){//already done up top case 1
                               }else{
-
+                                console.log("IS THIS AN ERROR BECAUSE NO BUY OR SELL ORDERS MATCHED")
                               }
                               //creates the trade transaction
                               this.createTransaction(new Transaction(ordersTX.fromAddress, tradeOrders[orders.pairBuy]["fromAddress"], tradeOrders[orders.pairBuy]["amount"], orders.pairBuy));
+                              console.log(ordersTX.fromAddress+tradeOrders[orders.pairBuy]["fromAddress"]+tradeOrders[orders.pairBuy]["amount"]+orders.pairBuy);
                               //update the trade order
                               //need a variable for partial or filled
-                              this.createOrder(new Order(tradeOrders[orders.pairBuy]["fromAddress"],'BUY',orders.pairing,(tradeOrders[orders.pairBuy]["amount"]-ordersTX.amount,tradeOrders[orders.pairBuy]["price"])));
+                              console.log("about to create order and origID is"+originationID);
+                              this.createOrder(
+                                new Order(
+                                  tradeOrders[orders.pairBuy]["fromAddress"],
+                                  'BUY',
+                                  orders.pairing,
+                                  (tradeOrders[orders.pairBuy]["amount"]-ordersTX.amount),
+                                  tradeOrders[orders.pairBuy]["price"]
+                                ),
+                                originationID
+                              );
                             }
                           }
                         }
@@ -457,6 +622,8 @@ var Blockchain = class Blockchain{
           console.log("output of pending orders "+JSON.stringify(tradeOrders)+"tradebalance"+JSON.stringify(tradeBalance));
 
           return tradeBalance;
+
+          ***/
 
       }
 
@@ -491,7 +658,11 @@ var Blockchain = class Blockchain{
 
           return true;
       }
-  }
+
+      /////////functions for pulling blocks and processingTrades
+      /////////end functons calling blocks and processingTrades
+
+}
 
 module.exports = {
     genesisBLK:genesisBLK,

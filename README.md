@@ -30,6 +30,8 @@ This is not final
 
 Tasking:
 
+A) ALL TIMESTAMPS date.now need to be in UTC time 
+
 1) when blocks are given by peer in synch need to verify chain hashing to previous blocks and reject
 test this with address balances
 is chain synch to database yet?
