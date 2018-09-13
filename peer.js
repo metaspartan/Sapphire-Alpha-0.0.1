@@ -189,7 +189,7 @@ function isJSON(str) {
             }
             //setting a delay and pong back
             //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
-            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,GlobalHash:globalGenesisHash}}));},1000);
+            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,GlobalHash:globalGenesisHash}}));},3000);
             //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
           }else{
             console.log("Did not match this hash and this peer is an imposter");
@@ -204,7 +204,7 @@ function isJSON(str) {
             console.log("Hash Matched good pong")
             var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
             //ping back to synched peer
-            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},1000);
+            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
           }else{
             console.log("You are communicating with a bad actor and we must stop this connection");
             peers[peerId].write("Stop hacking me bro");
