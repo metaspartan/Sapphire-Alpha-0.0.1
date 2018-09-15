@@ -260,7 +260,7 @@ var Blockchain = class Blockchain{
           ////extra check
 
           //adding a trading mechanism and if below this chain push it processes same block HINT MOVE IT TWO LINES DOWN
-          this.processTrades();
+          //this.processTrades();
           this.chain.push(block);
 
           //end adding trading mechanism

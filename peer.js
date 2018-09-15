@@ -594,12 +594,44 @@ var myTradeCallback = function(orig,data) {
     console.log("SELLER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairSell"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" OF "+data[obj]["pairBuy"]+" PER "+data[obj]["pairSell"]+" txID "+data[obj]["transactionID"]+" ORIGTX "+data[obj]["originationID"]);
 
     if(parseInt(orig["amount"]) <= parseInt(data[obj]["amount"])){
-      console.log("TRANSACTION: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "+parseInt(orig["amount"])+ " OF "+orig["pairBuy"]);
-      console.log("UNFILLED REPLACEMENT - SELLER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairSell"]+" QTY "+(parseInt(data[obj]["amount"]) - parseInt(orig["amount"]))+" FOR "+data[obj]["price"]+" OF "+data[obj]["pairBuy"]+" PER "+data[obj]["pairSell"]);
+      ///////////////////////////////////if the buy amount is less than the sell
+      console.log("TRANSACTION: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "+parseFloat(orig["amount"])+ " OF "+orig["pairBuy"]);
+      frankieCoin.createTransaction(new sapphirechain.Transaction(data[obj]["fromAddress"], orig["fromAddress"], parseFloat(orig["amount"]), orig["pairBuy"]));
+      console.log("UNFILLED REPLACEMENT - SELLER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairSell"]+" QTY "+(parseFloat(data[obj]["amount"]) - parseFloat(orig["amount"]))+" FOR "+data[obj]["price"]+" OF "+data[obj]["pairBuy"]+" PER "+data[obj]["pairSell"]);
       //console.log("UNFILLED REPLACEMENT ORDER: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "++ " OF "+orig["pairBuy"]);
+      var newOrderAmpount = parseFloat(parseFloat(data[obj]["amount"]) - parseFloat(orig["amount"]));
+      //constructor(fromAddress, buyOrSell, pairBuy, pairSell, amount, price, transactionID, originationID){
+      //and a new one gets open
+      var replacementOrder = new sapphirechain.Order(
+        data[obj]["fromAddress"],
+        'SELL',
+        data[obj]["pairBuy"],
+        data[obj]["pairSell"],
+        newOrderAmpount,
+        data[obj]["price"],
+        '',
+        ''
+      );
+      frankieCoin.createOrder(replacementOrder,data[obj]["originationID"]);
+      BlockchainDB.addOrder({order:replacementOrder});
     }else if (orig["amount"] > parseInt(data[obj]["amount"])){
-      console.log("TRANSACTION: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "+parseInt(data[obj]["amount"])+ " OF "+orig["pairBuy"]);
-      console.log("UNFILLED REPLACEMENT - SELLER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairSell"]+" QTY "+(parseInt(orig["amount"]) - parseInt(data[obj]["amount"]))+" FOR "+data[obj]["price"]+" OF "+data[obj]["pairBuy"]+" PER "+data[obj]["pairSell"]);
+      console.log("TRANSACTION: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "+parseFloat(data[obj]["amount"])+ " OF "+orig["pairBuy"]);
+      frankieCoin.createTransaction(new sapphirechain.Transaction(data[obj]["fromAddress"], orig["fromAddress"], parseFloat(orig["amount"]), orig["pairBuy"]));
+      console.log("UNFILLED REPLACEMENT - SELLER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairSell"]+" QTY "+(parseFloat(orig["amount"]) - parseFloat(data[obj]["amount"]))+" FOR "+data[obj]["price"]+" OF "+data[obj]["pairBuy"]+" PER "+data[obj]["pairSell"]);
+      var newOrderAmpount = parseFloat(parseFloat(orig["amount"])-parseFloat(data[obj]["amount"]));
+      //constructor(fromAddress, buyOrSell, pairBuy, pairSell, amount, price, transactionID, originationID){
+      var replacementOrder = new sapphirechain.Order(
+        orig["fromAddress"],
+        'BUY',
+        orig["pairBuy"],
+        orig["pairSell"],
+        newOrderAmpount,
+        orig[ordersofbuy]["price"],
+        '',
+        ''
+      );
+      this.createOrder(replacementOrder,orig["originationID"]);
+      BlockchainDB.addOrder({order:replacementOrder});
     }
 
   }
@@ -631,7 +663,9 @@ var myCallbackBuyMiner = function(data) {
   console.log('BUY ORDERS: '+JSON.stringify(data));//test for input
   for (obj in data){
     console.log("BUYER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairBuy"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" PER "+data[obj]["pairSell"]);
-    frankieCoin.createOrder(new sapphirechain.Order(data[obj]["fromAddress"],data[obj]["action"],data[obj]["pairBuy"],data[obj]["pairSell"],data[obj]["amount"],data[obj]["price"]));
+    //frankieCoin.createOrder(new sapphirechain.Order(data[obj]["fromAddress"],data[obj]["action"],data[obj]["pairBuy"],data[obj]["pairSell"],data[obj]["amount"],data[obj]["price"]));
+    //frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', data[obj]["fromAddress"], 20, "SPHR"));
+    BlockchainDB.buildTrade(data[obj],myTradeCallback);
     BlockchainDB.clearOrderById(data[obj]["id"]);
     //since the order needs to be on the blockchain here we really need to just delete it but the order processing below is not necessary
     //however I am keeping it here in comments in case I want to move this function to the block
@@ -645,6 +679,7 @@ var myCallbackSellMiner = function(data) {
   for (obj in data){
     console.log("SELLER[BUYER] "+data[obj]["fromAddress"]+" OF "+data[obj]["pairBuy"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" PER "+data[obj]["pairSell"]);
     frankieCoin.createOrder(new sapphirechain.Order(data[obj]["fromAddress"],data[obj]["action"],data[obj]["pairBuy"],data[obj]["pairSell"],data[obj]["amount"],data[obj]["price"]));
+    BlockchainDB.buildTrade(data[obj],myTradeCallback);
     BlockchainDB.clearOrderById(data[obj]["id"]);
     //since the order needs to be on the blockchain here we really need to just delete it but the order processing below is not necessary
     //however I am keeping it here in comments in case I want to move this function to the block
