@@ -19,6 +19,9 @@ const sha256 = require('crypto-js/sha256');
 ////////////////////////////////////calls the nano-sql data interface to leveldb
 var BlockchainDB = require('./nano.js');
 
+//////////////////////////////////////////////////////////////////////rpc sercer
+var rpcserver = require('./rpc_server.js');
+
 ///////////////////////Mining stuff : blockchain algo and mining initializations
 var sapphirechain = require("./block.js")
 var BLAKE2s = require("./blake2s.js")
@@ -118,7 +121,7 @@ function isJSON(str) {
 ////////////////////////////////////////////begin the if block for incoming data
       if(isJSON(data.toString())){
 ////////////////////////////////////////////////////////////incomeing peer block
-        if(JSON.parse(data)["previousHash"]){
+        if(JSON.parse(data)["previousHash"]){///////////////need more refinement
           //storing some variables of current chain
           var currentChainHash = frankieCoin.getLatestBlock()["hash"];
           var blocknumber = 0;

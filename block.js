@@ -6,7 +6,7 @@ var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/cus
 
 //adds a link to one module function for database
 var addOrder = module.parent.children[5].exports.addOrder;
-
+///////////////////////////////////////when fired this creates the genesis block
 var genesisBLK = function genesisBLK() {
   var prevHash = "0";
   var txtData = "Blake2s Genesis for EtherGem Opal Coin 25 Feb 2018";
