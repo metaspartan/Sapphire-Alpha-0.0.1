@@ -96,7 +96,7 @@ let methods = {
         }
     },
 
-    fetcMiner: {
+    fetchMiner: {
         description: `fetches the miner of the given id`,
         params: ['id:the id of the user were looking for'],
         returns: ['miner'],
@@ -114,7 +114,39 @@ let methods = {
         }
     },
 
-     fetchAllUsers: {
+    fetchMinerByKey: {
+        description: `fetches the miner of the given id`,
+        params: ['address:the address of the user were looking for'],
+        returns: ['miner'],
+        exec(minerObj) {
+            return new Promise((resolve) => {
+                if (typeof (minerObj) !== 'object') {
+                    throw new Error('was expecting an object!');
+                }
+                // you would usually do some validations here
+                // and check for required fields
+
+                // fetch
+                resolve(db.miners.fetchKey(minerObj.address.toString()) || {});
+                //resolve(db.miners.fetch(minerObj.id) || {});
+            });
+        }
+    },
+
+    getWorkForMiner: {
+      description: `fetches the work for miner of the given address`,
+      params: ['address:the address of the miner'],
+      returns: ['work'],
+      exec() {
+          return new Promise((resolve) => {
+              // fetch
+              resolve(db.blocks.fetchAll() || {});
+              //resolve(db.work.fetchAll() || {});
+          });
+      }
+    },
+
+     fetchAllMiners: {
         description: `fetches the entire list of miners`,
         params: [],
         returns: ['minerscollection'],
@@ -125,6 +157,42 @@ let methods = {
             });
         }
     },
+
+    createBlock: {
+        description: `creates a block of submitted work, and returns to validation`,
+        params: ['block:the block object'],
+        returns: ['block'],
+        exec(blockObj) {
+            return new Promise((resolve) => {
+                if (typeof (blockObj) !== 'object') {
+                    throw new Error('was expecting an object!');
+                }
+                // you would usually do some validations here
+                // and check for required fields
+
+                //going to delete all first
+                resolve(db.blocks.unsetAll());
+
+                // attach an id the save to db
+                let _blockObj = JSON.parse(JSON.stringify(blockObj));
+                _blockObj.id = (Math.random() * 10000000) | 0;
+                resolve(db.blocks.save(blockObj));
+            });
+        }
+    },
+
+    fetchAllBlocks: {
+       description: `fetches the entire list of blocks`,
+       params: [],
+       returns: ['blockscollection'],
+       exec() {
+           return new Promise((resolve) => {
+               // fetch
+               resolve(db.blocks.fetchAll() || {});
+           });
+       }
+   },
+
 };
 
 module.exports = methods;

@@ -12,6 +12,16 @@ const PORT = process.env.NODE_PORT || 9090;
 // don't do something like this in production, ok technically you can...
 // probably could even be faster than using a routing library :-D
 
+
+///////////////////////////////////////////////inter module parent communication
+var impcparent;
+//callback fuction used to set a caller to the parent called by parent on load
+var globalParentCom = function(callback){
+  //sets the impcparent with the function from parent
+  impcparent = callback;
+}
+///////////////////////////////////////////end inter module parent communication
+
 let routes = {
     // this is the rpc endpoint
     // every operation request will come through here
@@ -64,16 +74,16 @@ let routes = {
         return new Promise(resolve => {
             let type = {};
             let method = {};
-            
+
             // set types
             type = types;
-            
+
             //set methods
             for(let m in methods) {
                 let _m = JSON.parse(JSON.stringify(methods[m]));
                 method[m] = _m;
             }
-            
+
             resolve({
                 types: type,
                 methods: method
@@ -88,7 +98,7 @@ function requestListener(request, response) {
     let reqUrl = `http://${request.headers.host}${request.url}`;
     let parseUrl = url.parse(reqUrl, true);
     let pathname = parseUrl.pathname;
-    
+
     // we're doing everything json
     response.setHeader('Content-Type', 'application/json');
 
@@ -102,12 +112,14 @@ function requestListener(request, response) {
         } else {
             buf = buf + data;
         }
+        console.log(buf.toString());
+        impcparent(buf.toString());
     });
 
     // on end proceed with compute
     request.on('end', () => {
         let body = buf !== null ? buf.toString() : null;
-        
+
         if (routes[pathname]) {
             let compute = routes[pathname].call(null, body);
 
@@ -137,3 +149,7 @@ function requestListener(request, response) {
 
 console.log(`starting the server on port ${PORT}`);
 server.listen(PORT);
+
+module.exports = {
+  globalParentCom:globalParentCom
+}

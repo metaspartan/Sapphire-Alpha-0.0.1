@@ -36,6 +36,11 @@ var Miner = class Miner {
     this.chain.minePendingTransactions(this.address);
   }
 
+  mpt3(minerAddress,minedBlock){
+    console.log(minerAddress+" mined block "+minedBlock)
+    this.chain.addPendingTransactionsToMinedBLock(minerAddress,minedBlock);
+  }
+
   calculateDigest(word,diff,pass){
     // Get message converting to Unix line breaks.
     //console.log("calculating"+word+"diff"+diff+"pass"+pass);

@@ -24,6 +24,26 @@ let types = {
             address: ['string', 'required'],
             port: ['string', 'required']
         }
+    },
+    block: {
+      description:'a block submission of work from miner',
+      props: {
+          perviousHash: ['string', 'required'],
+          timestamp: ['date', 'required'],
+          nonce: ['number', 'required'],
+          hash: ['string', 'required'],
+          difficulty: ['number', 'required']
+      }
+    },
+    work: {
+      description:'a work request from miner',
+      props: {
+          perviousHash: ['string', 'required'],
+          timestamp: ['date', 'required'],
+          nonce: ['number', 'required'],
+          hash: ['string', 'required'],
+          difficulty: ['number', 'required']
+      }
     }
 }
 

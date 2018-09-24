@@ -5,7 +5,7 @@ var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
 
 //adds a link to one module function for database
-var addOrder = module.parent.children[5].exports.addOrder;
+var addOrder = module.parent.children[6].exports.addOrder;
 ///////////////////////////////////////when fired this creates the genesis block
 var genesisBLK = function genesisBLK() {
   var prevHash = "0";
@@ -180,7 +180,7 @@ var Blockchain = class Blockchain{
           //adding in the peers connectivity
           this.nodes = [];
           //difficulty adjusts
-          this.difficulty = 4;//can be 1 or more later
+          this.difficulty = 5;//can be 1 or more later
           this.pendingTransactions = [];
           //can add a this.pendingOrders
           this.pendingOrders = [];
@@ -242,12 +242,43 @@ var Blockchain = class Blockchain{
           return JSON.stringify(this.chain);
       }
 
+      ///for mining transactions from internal miner
       minePendingTransactions(miningRewardAddress){
           var blockTimeStamp = Date.now();
 
           let block = new Block(blockTimeStamp, this.pendingTransactions, this.pendingOrders, this.getLatestBlock().hash);
           block.mineBlock(this.difficulty);
           console.log('Block successfully mined! '+blockTimeStamp);
+          ////extra check
+          try {
+            var h = new BLAKE2s(32, decodeUTF8(""));
+          } catch (e) {
+            alert("Error: " + e);
+          };
+          //h.update(decodeUTF8(block.previousHash + block.timestamp + JSON.stringify(block.transactions) + JSON.stringify(block.orders) + block.nonce));
+          h.update(decodeUTF8(block.previousHash + block.timestamp + block.nonce));
+          console.log("should match the block hash "+h.hexDigest());
+          ////extra check
+
+          //adding a trading mechanism and if below this chain push it processes same block HINT MOVE IT TWO LINES DOWN
+          //this.processTrades();
+          this.chain.push(block);
+
+          //end adding trading mechanism
+          this.pendingTransactions = [
+              new Transaction(null, miningRewardAddress, this.miningReward, "SPHR")
+          ];
+          this.pendingOrders = [];
+      }
+
+      ///for mining transactions from outside miner
+      addPendingTransactionsToMinedBLock(miningRewardAddress, minedBlock){
+          var blockTimeStamp = minedBlock["timestamp"];
+
+          let block = new Block(minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"]);
+          //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0) {
+          //block.mineBlock(this.difficulty);
+          console.log('Block successfully added by outside miner '+blockTimeStamp);
           ////extra check
           try {
             var h = new BLAKE2s(32, decodeUTF8(""));

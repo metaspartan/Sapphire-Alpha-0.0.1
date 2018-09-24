@@ -22,6 +22,9 @@ var BlockchainDB = require('./nano.js');
 //////////////////////////////////////////////////////////////////////rpc sercer
 var rpcserver = require('./rpc_server.js');
 
+/////////////////////////////////////////////////////////////////requests to rpc
+var request = require('request');
+
 ///////////////////////Mining stuff : blockchain algo and mining initializations
 var sapphirechain = require("./block.js")
 var BLAKE2s = require("./blake2s.js")
@@ -243,6 +246,13 @@ function isJSON(str) {
 })()
 /////////////////////////////////////ending asynchronous peers connection engine
 
+/////sampling some homemade ipc
+var tryingAgain = function(){
+  console.log("tried again and it worked")
+}
+/////end th homemade ipc
+
+
 //////////////////////////////////////////////////////////////messaging to peers
 var broadcastPeers = function(message){
   for (let id in peers) {
@@ -336,6 +346,25 @@ function queryr1(){
       BlockchainDB.addBlock(minedblock);
       //sending the block to the peers
       broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
+
+      //post to rpcserver
+      //this is where we SUBMIT WORK leaving it to eeror right now
+      var options = {
+        uri: 'http://localhost:9090/rpc',
+        method: 'POST',
+        json: {createBlock:{block:frankieCoin.getLatestBlock()}}
+      };
+
+      request(options, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+          console.log(body.id) // Print the shortened url.
+        }
+      });
+
+      queryr1();
+    }else if(answer == "MM"){
+      //var silly = rpcserver.db.miners.fetchKey(key,value);
+      //console.log("got it and its "+silly);
       queryr1();
     }else if(answer == "O"){//O is for order
       //other commands can go Here
@@ -708,6 +737,74 @@ var myCallbackSell = function(data) {
 };
 ////////////////////////////////////////////////////////end functions for orders
 
+//////////////////////////////////////////inter module parent child communicator
+//parent communicator callback function sent to child below
+var impcchild = function(childData){
+  console.log("incoming data from child"+childData);
+  if(isJSON(childData) && JSON.parse(childData)["createBlock"]){
+    console.log("current prev hash is "+frankieCoin.getLatestBlock().hash+" incoming block previous hash is: "+JSON.parse(childData)["createBlock"]["block"]["previousHash"]);
+
+    if(frankieCoin.getLatestBlock().hash == JSON.parse(childData)["createBlock"]["block"]["previousHash"]){
+      franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
+      ////////here is the database update and peers broadcast
+      console.log("[placeholder] mining stats from outside miner");
+      console.log("Outside Miner Mined BLock Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
+      //franks.calculateDigest("first try",10);
+
+      //this is the most sensible place to add the block
+      //this would seem to be a function that should be called from miner after meinePendingTx is called but it is better called here
+      var minedblock = {"blockchain":{
+        id:null,
+        blocknum:parseInt(frankieCoin.getLength()),
+        previousHash:frankieCoin.getLatestBlock()["previousHash"],
+        timestamp:frankieCoin.getLatestBlock()["timestamp"],
+        transactions:frankieCoin.getLatestBlock()["transactions"],
+        orders:frankieCoin.getLatestBlock()["orders"],
+        hash:frankieCoin.getLatestBlock()["hash"],
+        nonce:frankieCoin.getLatestBlock()["nonce"],
+        eGEMBackReferenceBlock:frankieCoin.getLatestBlock()["eGEMBackReferenceBlock"],
+        egemBackReferenceBlockHash:frankieCoin.getLatestBlock()["egemBackReferenceBlockHash"],
+        data:frankieCoin.getLatestBlock()["data"],
+        sponsor:frankieCoin.getLatestBlock()["sponsor"],
+        miner:frankieCoin.getLatestBlock()["miner"],
+        hardwareTx:frankieCoin.getLatestBlock()["hardwareTx"],
+        softwareTx:frankieCoin.getLatestBlock()["softwareTx"],
+        targetBlock:frankieCoin.getLatestBlock()["targetBlock"],
+        targetBlockDataHash:frankieCoin.getLatestBlock()["targetBlockDataHash"],
+        allConfig:frankieCoin.getLatestBlock()["allConfig"],
+        allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
+        hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"]
+      }};
+      console.log(minedblock);
+      BlockchainDB.addBlock(minedblock);
+      //sending the block to the peers
+      broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
+      ////////end database update and peers broadcast
+      //post to rpcserver
+      //this is where we SUBMIT WORK leaving it to eeror right now
+      var options = {
+        uri: 'http://localhost:9090/rpc',
+        method: 'POST',
+        json: {createBlock:{block:frankieCoin.getLatestBlock()}}
+      };
+
+      request(options, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+          console.log(body.id) // Print the shortened url.
+        }
+      });
+    }
+
+  }else if(isJSON(childData) && JSON.parse(childData)["getWorkForMiner"]){
+    console.log(JSON.parse(childData)["getWorkForMiner"])
+  }else{
+    console.log("Miner did not submit properly formatted work");
+  }
+}
+//initialize the child with the parent communcator call back function
+rpcserver.globalParentCom(impcchild);
+//////////////////////////////////////end inter module parent child communicator
+
 ////////////////////////////////////////////////initialize the console interface
 queryr1();
 //////////////////////////////////////////////////////////command line interface
@@ -716,7 +813,7 @@ queryr1();
 module.exports = {
   broadcastPeers:broadcastPeers,
   miner:miner,
-  blockchain:blockchain
+  blockchain:blockchain,
 }
 ////////////////////////////////////////////////////////////////export functions
 

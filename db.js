@@ -3,12 +3,14 @@
 let users = {};
 let tasks = {};
 let miners = {};
+let blocks = {};
 
 // we are saving everything inmemory for now
 let db = {
     users: proc(users),
     tasks: proc(tasks),
-    miners: proc(miners)
+    miners: proc(miners),
+    blocks: proc(blocks)
 }
 
 function clone(obj) {
@@ -37,6 +39,18 @@ function proc(container) {
             // deep clone this so that nobody modifies the db by mistake from outside
             return clone(container[id.toString()]);
         },
+        fetchKey(address) {
+          console.log(address);
+          //searching for ky value
+          let _bunch = [];
+          for (let item in container) {
+            console.log(JSON.stringify(item));
+            if(container[item]["address"] == address){
+              _bunch.push(clone(container[item]));
+            }
+            return _bunch;
+          }
+        },
         fetchAll() {
             let _bunch = [];
             for (let item in container) {
@@ -46,6 +60,11 @@ function proc(container) {
         },
         unset(id) {
             delete container[id];
+        },
+        unsetAll() {
+          for (let item in container) {
+              delete container[item];
+          }
         }
     }
 }
