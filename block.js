@@ -94,7 +94,7 @@ var Hash = function(inputs) {
 
 var Block = class Block {
 
-    constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0) {
+    constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
 
         console.log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
@@ -180,7 +180,7 @@ var Blockchain = class Blockchain{
           //adding in the peers connectivity
           this.nodes = [];
           //difficulty adjusts
-          this.difficulty = 5;//can be 1 or more later
+          this.difficulty = 4;//can be 1 or more later
           this.pendingTransactions = [];
           //can add a this.pendingOrders
           this.pendingOrders = [];
@@ -246,9 +246,24 @@ var Blockchain = class Blockchain{
       minePendingTransactions(miningRewardAddress){
           var blockTimeStamp = Date.now();
 
+          //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
           let block = new Block(blockTimeStamp, this.pendingTransactions, this.pendingOrders, this.getLatestBlock().hash);
+          //not sure we do this here yet might be removed
+          //block.difficulty = this.difficulty;
+          if(this.getLatestBlock().difficulty){
+            this.difficulty = this.getLatestBlock().difficulty;
+          }
+
           block.mineBlock(this.difficulty);
           console.log('Block successfully mined! '+blockTimeStamp);
+          console.log('Previous Block Timestamp was '+this.getLatestBlock().timestamp);
+          var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
+          if(blockTimeDiff < 6){
+            block.difficulty = parseFloat(this.difficulty+1);
+          }else{
+            block.difficulty = parseFloat(this.difficulty-1);
+          }
+          console.log('Differential is '+blockTimeDiff)
           ////extra check
           try {
             var h = new BLAKE2s(32, decodeUTF8(""));
