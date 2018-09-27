@@ -587,7 +587,7 @@ var ChainSynchHashCheck = function(peerLength){
   var longestPeer = 0;
   for(node in nodesInChain){
     if(parseInt(JSON.parse(node)["chainlength"]) > longestPeer){
-      longestPeer = parseInt(JSON.parse(node)["chainlength"]);
+      longestPeer = parseInt(JSON.parse(node)["info"]["chainlength"]);
     }
   }
   console.log("66666666666666666666666666666666666666666666       HERE IS DATA       666666666666666666666666666666666");
