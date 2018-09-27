@@ -572,7 +572,7 @@ var genBlock = {"blockchain":{
   hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"]
 }};
 BlockchainDB.addBlock(genBlock);
-console.log("peer chain is"+ frankieCoin.getEntireChain());
+//console.log("peer chain is"+ frankieCoin.getEntireChain());
 var franks = miner(frankieCoin);
 
 /////////////////////////////////////////////////////////////////synch the chain

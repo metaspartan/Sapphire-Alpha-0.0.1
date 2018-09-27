@@ -685,8 +685,8 @@ var Blockchain = class Blockchain{
 
       isChainValid() {
           for (let i = 1; i < this.chain.length; i++){
-              console.log("current block "+JSON.stringify(this.chain[i]))
-              console.log("current block "+JSON.stringify(this.getBlock(i+1)));
+              //console.log("current block "+JSON.stringify(this.chain[i]))
+              //console.log("current block "+JSON.stringify(this.getBlock(i+1)));
               const currentBlock = this.chain[i];
               if (this.chain[i].hash !== this.chain[i].calculateHash()) {
                   console.log("would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i+1).calculateHash());
