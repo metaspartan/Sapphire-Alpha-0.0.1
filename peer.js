@@ -597,6 +597,10 @@ var myCallback = function(data) {
     blockHeightPtr++;
   }
 
+  var nodesInChain = frankieCoin.retrieveNodes();
+  console.log(JSON.stringify(nodesInChain));
+  //this.chain.inSynch = frankieCoin.isChainSynch()
+
   console.log("BlocHeightPtr: "+blockHeightPtr);
   //this is where we call a function with the blockHeight pointer that finds out the peerBlockHeight and then download missing data
   for (let id in peers) {

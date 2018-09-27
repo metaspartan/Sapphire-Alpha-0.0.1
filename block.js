@@ -186,6 +186,8 @@ var Blockchain = class Blockchain{
           this.pendingOrders = [];
           //then also add a this.tradePendingTransactions
           this.miningReward = 9;
+          //is the chain synched and mine and assist others? when true yes
+          this.inSynch = false;
           console.log("genesis block created");
           console.log("chain is"+JSON.stringify(this.chain));
       }
@@ -668,6 +670,16 @@ var Blockchain = class Blockchain{
 
           ***/
 
+      }
+
+      isChainSynch(length) {
+        if(isChainValid() && this.chain.length == length){
+          //this.chain.inSynch = true;
+          return true;
+        }else{
+          console.log("55555555555555555     CHAIN IS NOT SYNCH     5555555555555555555");
+          return false;
+        }
       }
 
       isChainValid() {
