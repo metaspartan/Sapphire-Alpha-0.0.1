@@ -148,7 +148,7 @@ function requestListener(request, response) {
 }
 
 console.log(`starting the server on port ${PORT}`);
-server.listen(PORT);
+//server.listen(PORT);
 
 module.exports = {
   globalParentCom:globalParentCom
