@@ -591,7 +591,8 @@ var ChainSynchHashCheck = function(peerLength){
     }
   }
   console.log("66666666666666666666666666666666666666666666       HERE IS DATA       666666666666666666666666666666666");
-  console.log(longestPeer+" <<lp      pl>> "+peerLength)
+  console.log(longestPeer+" <<lp   pl>> "+peerLength)
+  frankieCoin.incrementPeerNonce(nodesInChain[node]["id"],peerLength);
   console.log(JSON.stringify(nodesInChain));
   //this.chain.inSynch = frankieCoin.isChainSynch()
 }
