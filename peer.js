@@ -597,6 +597,7 @@ var myCallback = function(data) {
     blockHeightPtr++;
   }
 
+  console.log("777777777777777777777777777777777777777777777     NEED TO FLAG CHAIN SYNC      7777777777777777777777777777777777777777")
   var nodesInChain = frankieCoin.retrieveNodes();
   console.log(JSON.stringify(nodesInChain));
   //this.chain.inSynch = frankieCoin.isChainSynch()
