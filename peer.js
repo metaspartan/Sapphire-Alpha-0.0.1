@@ -195,7 +195,7 @@ function isJSON(str) {
             }
             //setting a delay and pong back
             //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
-            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,GlobalHash:globalGenesisHash}}));},3000);
+            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
             //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
           }else{
             console.log("Did not match this hash and this peer is an imposter");
@@ -209,7 +209,7 @@ function isJSON(str) {
           if(JSON.parse(data)["ChainSyncPong"]["GlobalHash"] == globalGenesisHash){
             console.log("Hash Matched good pong")
             var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
-            ChainSynchHashCheck(peerBlockHeight);
+            ChainSynchHashCheck(peerBlockHeight,JSON.parse(data)["ChainSyncPong"]["MaxHeight"]);
             //if chain is not synched ping back to synched peer
             setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
           }else{
@@ -581,7 +581,7 @@ function callback2(data){
   JSON.stringify(data);
 }
 
-var ChainSynchHashCheck = function(peerLength){
+var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   console.log("777777777777777777777777777777777777777777777     NEED TO FLAG CHAIN SYNC      7777777777777777777777777777777777777777")
   var nodesInChain = frankieCoin.retrieveNodes();
   var longestPeer = 0;
@@ -591,7 +591,7 @@ var ChainSynchHashCheck = function(peerLength){
     }
   }
   console.log("66666666666666666666666666666666666666666666       HERE IS DATA       666666666666666666666666666666666");
-  console.log(longestPeer+" <<lp   pl>> "+peerLength)
+  console.log(longestPeer+" <<lp   mh>>"+peerMaxHeight+"<<mh    pl>> "+peerLength)
   frankieCoin.incrementPeerNonce(nodesInChain[node]["id"],peerLength);
   console.log(JSON.stringify(nodesInChain));
   console.log("are you synched UP? "+frankieCoin.isChainSynch(longestPeer).toString())
