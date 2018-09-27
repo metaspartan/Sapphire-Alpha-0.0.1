@@ -586,7 +586,7 @@ var ChainSynchHashCheck = function(peerLength){
   var nodesInChain = frankieCoin.retrieveNodes();
   var longestPeer = 0;
   for(node in nodesInChain){
-    if(parseInt(nodesInChain[node]["info"]["chainlength"]){
+    if(parseInt(nodesInChain[node]["info"]["chainlength"]) > longestPeer){
       longestPeer = parseInt(nodesInChain[node]["info"]["chainlength"]);
     }
   }
