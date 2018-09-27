@@ -192,6 +192,8 @@ function isJSON(str) {
               peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
             }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
               peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+            }else{
+              peerBlockHeight--;
             }
             //setting a delay and pong back
             //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
@@ -582,6 +584,7 @@ function callback2(data){
 }
 
 var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
+
   console.log("777777777777777777777777777777777777777777777     NEED TO FLAG CHAIN SYNC      7777777777777777777777777777777777777777")
   var nodesInChain = frankieCoin.retrieveNodes();
   var longestPeer = 0;
@@ -603,7 +606,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   console.log("3333333333    "+longestPeer+""+peerMaxHeight+""+frankieCoin.getLength()+"    333333333");
   if(longestPeer == peerMaxHeight && peerMaxHeight == frankieCoin.getLength()){
     console.log("33333333333333333333333333333333333333333       MOST COMPLETE SYNCH      33333333333333333333333333333333333");
-    this.chain.inSynch = frankieCoin.isChainSynch(peerMaxHeight);
+    frankieCoin.inSynch = frankieCoin.isChainSynch(peerMaxHeight);
   }
 
   //this.chain.inSynch = frankieCoin.isChainSynch()
