@@ -594,6 +594,7 @@ var ChainSynchHashCheck = function(peerLength){
   console.log(longestPeer+" <<lp   pl>> "+peerLength)
   frankieCoin.incrementPeerNonce(nodesInChain[node]["id"],peerLength);
   console.log(JSON.stringify(nodesInChain));
+  console.log("are you synched UP? "+frankieCoin.isChainSynch(longestPeer).toString())
   //this.chain.inSynch = frankieCoin.isChainSynch()
 }
 

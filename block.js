@@ -675,6 +675,7 @@ var Blockchain = class Blockchain{
       isChainSynch(length) {
         if(isChainValid() && this.chain.length == length){
           //this.chain.inSynch = true;
+          console.log("4444444444444444     CHAIN IS SYNCH     4444444444444444444");
           return true;
         }else{
           console.log("55555555555555555     CHAIN IS NOT SYNCH     5555555555555555555");
