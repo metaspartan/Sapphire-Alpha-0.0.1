@@ -594,10 +594,16 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   console.log(longestPeer+" <<lp   mh>>"+peerMaxHeight+"<<mh    pl>> "+peerLength)
   frankieCoin.incrementPeerNonce(nodesInChain[node]["id"],peerLength);
   console.log(JSON.stringify(nodesInChain));
+  //the pong us set to be one higher from the ping and is above the chain length
   if(longestPeer <= peerMaxHeight){
     console.log("are you synched UP? "+frankieCoin.isChainSynch(longestPeer).toString())
   }else{
     console.log("are you synched UP? "+frankieCoin.isChainSynch(peerMaxHeight).toString())
+  }
+
+  if(longestPeer == peerMaxHeight == this.chain.length){
+    console.log("33333333333333333333333333333333333333333       MOST COMPLETE SYNCH      33333333333333333333333333333333333");
+    this.chain.inSynch = frankieCoin.isChainSynch(this.chain.length);
   }
 
   //this.chain.inSynch = frankieCoin.isChainSynch()
