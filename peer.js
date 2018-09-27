@@ -600,7 +600,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   }else{
     console.log("are you synched UP? "+frankieCoin.isChainSynch(peerMaxHeight).toString())
   }
-
+  console.log("3333333333    "+longestPeer+""+peerMaxHeight+""+frankieCoin.getLength()+"    333333333");
   if(longestPeer == peerMaxHeight == frankieCoin.getLength()){
     console.log("33333333333333333333333333333333333333333       MOST COMPLETE SYNCH      33333333333333333333333333333333333");
     this.chain.inSynch = frankieCoin.isChainSynch(peerMaxHeight);
