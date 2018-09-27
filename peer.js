@@ -209,7 +209,8 @@ function isJSON(str) {
           if(JSON.parse(data)["ChainSyncPong"]["GlobalHash"] == globalGenesisHash){
             console.log("Hash Matched good pong")
             var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
-            //ping back to synched peer
+            ChainSynchHashCheck(peerBlockHeight);
+            //if chain is not synched ping back to synched peer
             setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
           }else{
             console.log("You are communicating with a bad actor and we must stop this connection");
@@ -579,6 +580,22 @@ var blockHeightPtr = 0;
 function callback2(data){
   JSON.stringify(data);
 }
+
+var ChainSynchHashCheck = function(peerLength){
+  console.log("777777777777777777777777777777777777777777777     NEED TO FLAG CHAIN SYNC      7777777777777777777777777777777777777777")
+  var nodesInChain = frankieCoin.retrieveNodes();
+  var longestPeer = 0;
+  for(node in nodesInChain){
+    if(parseInt(JSON.parse(node)["chainlength"]) > longestPeer){
+      longestPeer = parseInt(JSON.parse(node)["chainlength"]);
+    }
+  }
+  console.log("66666666666666666666666666666666666666666666       HERE IS DATA       666666666666666666666666666666666");
+  console.log(longestPeer+" <<lp      pl>> "+peerLength)
+  console.log(JSON.stringify(nodesInChain));
+  //this.chain.inSynch = frankieCoin.isChainSynch()
+}
+
 //the idea is to sync the chain data before progression so we start with a callback of data store limited by number of blocks
 var myCallback = function(data) {
   //console.log('got data: '+JSON.stringify(data));//test for input
@@ -596,11 +613,6 @@ var myCallback = function(data) {
     }
     blockHeightPtr++;
   }
-
-  console.log("777777777777777777777777777777777777777777777     NEED TO FLAG CHAIN SYNC      7777777777777777777777777777777777777777")
-  var nodesInChain = frankieCoin.retrieveNodes();
-  console.log(JSON.stringify(nodesInChain));
-  //this.chain.inSynch = frankieCoin.isChainSynch()
 
   console.log("BlocHeightPtr: "+blockHeightPtr);
   //this is where we call a function with the blockHeight pointer that finds out the peerBlockHeight and then download missing data
