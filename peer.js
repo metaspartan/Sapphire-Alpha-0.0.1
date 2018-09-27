@@ -594,7 +594,12 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   console.log(longestPeer+" <<lp   mh>>"+peerMaxHeight+"<<mh    pl>> "+peerLength)
   frankieCoin.incrementPeerNonce(nodesInChain[node]["id"],peerLength);
   console.log(JSON.stringify(nodesInChain));
-  console.log("are you synched UP? "+frankieCoin.isChainSynch(longestPeer).toString())
+  if(longestPeer <= peerMaxHeight){
+    console.log("are you synched UP? "+frankieCoin.isChainSynch(longestPeer).toString())
+  }else{
+    console.log("are you synched UP? "+frankieCoin.isChainSynch(peerMaxHeight).toString())
+  }
+
   //this.chain.inSynch = frankieCoin.isChainSynch()
 }
 
