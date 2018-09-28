@@ -185,16 +185,26 @@ function isJSON(str) {
             console.log("global hashes matched");
 
             var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
-            //increment it by one to return the next block
-            peerBlockHeight++;
-            //returning the block
-            if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
-              peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
-            }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
-              peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+            if(frankieCoin.inSynch == true){
+              //increment it by one to return the next block
+              peerBlockHeight++;
+              //returning the block
+              if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
+                peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
+              }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
+                peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+              }else{
+                peerBlockHeight--;
+              }
             }else{
-              peerBlockHeight--;
+              //we probably need to call a ping in reverse
+              console.log("8888777766665555       THIS PEER IS NOT SYNCHED     5555666677778888");
+              if(peerBlockHeight > frankieCoin.getLength()){
+                setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+              }
             }
+
+
             //setting a delay and pong back
             //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
             setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
@@ -292,77 +302,81 @@ function queryr1(){
     // TODO: Log the answer in a database
     console.log(`selected: ${answer}`);
     if(answer == "M"){//M is for mine and triggers the miner
+      if(frankieCoin.inSynch == true){
+        console.log("need to pull orders matching pairbuy orders from database and add to pending orders");
+        console.log('at least within a certain range...');
+        console.log(JSON.stringify(frankieCoin.pendingOrders));
 
-      console.log("need to pull orders matching pairbuy orders from database and add to pending orders");
-      console.log('at least within a certain range...');
-      console.log(JSON.stringify(frankieCoin.pendingOrders));
-
-      for(odr in frankieCoin.pendingOrders){
-        if(frankieCoin.pendingOrders[odr]["buyOrSell"] == "BUY"){
-          console.log(frankieCoin.pendingOrders[odr]["pairBuy"]);
-          console.log(frankieCoin.pendingOrders[odr]["buyOrSell"]);
-          console.log(frankieCoin.pendingOrders[odr]["price"]);
-          console.log(frankieCoin.pendingOrders[odr]["amount"]);
-          console.log("Any Sell Orders with pricing less tha or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity requested");
-          BlockchainDB.getOrdersPairBuy(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackBuyMiner);
-        }else if (frankieCoin.pendingOrders[odr]["buyOrSell"] == "SELL"){
-          console.log(frankieCoin.pendingOrders[odr]["pairBuy"]);
-          console.log(frankieCoin.pendingOrders[odr]["buyOrSell"]);
-          console.log(frankieCoin.pendingOrders[odr]["price"]);
-          console.log(frankieCoin.pendingOrders[odr]["amount"]);
-          console.log("Any BUY Orders with pricing greater than or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity offered");
-          BlockchainDB.getOrdersPairSell(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackSellMiner);
+        for(odr in frankieCoin.pendingOrders){
+          if(frankieCoin.pendingOrders[odr]["buyOrSell"] == "BUY"){
+            console.log(frankieCoin.pendingOrders[odr]["pairBuy"]);
+            console.log(frankieCoin.pendingOrders[odr]["buyOrSell"]);
+            console.log(frankieCoin.pendingOrders[odr]["price"]);
+            console.log(frankieCoin.pendingOrders[odr]["amount"]);
+            console.log("Any Sell Orders with pricing less tha or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity requested");
+            BlockchainDB.getOrdersPairBuy(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackBuyMiner);
+          }else if (frankieCoin.pendingOrders[odr]["buyOrSell"] == "SELL"){
+            console.log(frankieCoin.pendingOrders[odr]["pairBuy"]);
+            console.log(frankieCoin.pendingOrders[odr]["buyOrSell"]);
+            console.log(frankieCoin.pendingOrders[odr]["price"]);
+            console.log(frankieCoin.pendingOrders[odr]["amount"]);
+            console.log("Any BUY Orders with pricing greater than or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity offered");
+            BlockchainDB.getOrdersPairSell(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackSellMiner);
+          }
         }
+
+        franks.mpt2();
+
+        console.log("[placeholder] this would be mining stats");
+        console.log("Mined BLock Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
+        //franks.calculateDigest("first try",10);
+
+        //this is the most sensible place to add the block
+        //this would seem to be a function that should be called from miner after meinePendingTx is called but it is better called here
+        var minedblock = {"blockchain":{
+          id:null,
+          blocknum:parseInt(frankieCoin.getLength()),
+          previousHash:frankieCoin.getLatestBlock()["previousHash"],
+          timestamp:frankieCoin.getLatestBlock()["timestamp"],
+          transactions:frankieCoin.getLatestBlock()["transactions"],
+          orders:frankieCoin.getLatestBlock()["orders"],
+          hash:frankieCoin.getLatestBlock()["hash"],
+          nonce:frankieCoin.getLatestBlock()["nonce"],
+          eGEMBackReferenceBlock:frankieCoin.getLatestBlock()["eGEMBackReferenceBlock"],
+          egemBackReferenceBlockHash:frankieCoin.getLatestBlock()["egemBackReferenceBlockHash"],
+          data:frankieCoin.getLatestBlock()["data"],
+          sponsor:frankieCoin.getLatestBlock()["sponsor"],
+          miner:frankieCoin.getLatestBlock()["miner"],
+          hardwareTx:frankieCoin.getLatestBlock()["hardwareTx"],
+          softwareTx:frankieCoin.getLatestBlock()["softwareTx"],
+          targetBlock:frankieCoin.getLatestBlock()["targetBlock"],
+          targetBlockDataHash:frankieCoin.getLatestBlock()["targetBlockDataHash"],
+          allConfig:frankieCoin.getLatestBlock()["allConfig"],
+          allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
+          hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"]
+        }};
+        console.log(minedblock);
+        BlockchainDB.addBlock(minedblock);
+        //sending the block to the peers
+        broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
+
+        //post to rpcserver
+        //this is where we SUBMIT WORK leaving it to eeror right now
+        var options = {
+          uri: 'http://localhost:9090/rpc',
+          method: 'POST',
+          json: {createBlock:{block:frankieCoin.getLatestBlock()}}
+        };
+
+        request(options, function (error, response, body) {
+          if (!error && response.statusCode == 200) {
+            console.log(body.id) // Print the shortened url.
+          }
+        });
+      }else{
+        console.log("CHAIN IS NOT SYNCHED FOR MINING PLEASE WAIT");
       }
 
-      franks.mpt2();
-
-      console.log("[placeholder] this would be mining stats");
-      console.log("Mined BLock Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
-      //franks.calculateDigest("first try",10);
-
-      //this is the most sensible place to add the block
-      //this would seem to be a function that should be called from miner after meinePendingTx is called but it is better called here
-      var minedblock = {"blockchain":{
-        id:null,
-        blocknum:parseInt(frankieCoin.getLength()),
-        previousHash:frankieCoin.getLatestBlock()["previousHash"],
-        timestamp:frankieCoin.getLatestBlock()["timestamp"],
-        transactions:frankieCoin.getLatestBlock()["transactions"],
-        orders:frankieCoin.getLatestBlock()["orders"],
-        hash:frankieCoin.getLatestBlock()["hash"],
-        nonce:frankieCoin.getLatestBlock()["nonce"],
-        eGEMBackReferenceBlock:frankieCoin.getLatestBlock()["eGEMBackReferenceBlock"],
-        egemBackReferenceBlockHash:frankieCoin.getLatestBlock()["egemBackReferenceBlockHash"],
-        data:frankieCoin.getLatestBlock()["data"],
-        sponsor:frankieCoin.getLatestBlock()["sponsor"],
-        miner:frankieCoin.getLatestBlock()["miner"],
-        hardwareTx:frankieCoin.getLatestBlock()["hardwareTx"],
-        softwareTx:frankieCoin.getLatestBlock()["softwareTx"],
-        targetBlock:frankieCoin.getLatestBlock()["targetBlock"],
-        targetBlockDataHash:frankieCoin.getLatestBlock()["targetBlockDataHash"],
-        allConfig:frankieCoin.getLatestBlock()["allConfig"],
-        allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
-        hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"]
-      }};
-      console.log(minedblock);
-      BlockchainDB.addBlock(minedblock);
-      //sending the block to the peers
-      broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
-
-      //post to rpcserver
-      //this is where we SUBMIT WORK leaving it to eeror right now
-      var options = {
-        uri: 'http://localhost:9090/rpc',
-        method: 'POST',
-        json: {createBlock:{block:frankieCoin.getLatestBlock()}}
-      };
-
-      request(options, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-          console.log(body.id) // Print the shortened url.
-        }
-      });
 
       queryr1();
     }else if(answer == "MM"){
