@@ -193,13 +193,15 @@ function isJSON(str) {
                 peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
               }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
                 peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-              }else if(peerBlockHeight > frankieCoin.getLength() && frankieCoin.inSynch == true){
+              }else if(peerBlockHeight > frankieCoin.getLength()){
                 peerBlockHeight--;
+              }
+              /****
               }else if(peerBlockHeight > frankieCoin.getLength() && frankieCoin.inSynch == false){
                 setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
                 console.log("8888777766665555       THIS PEER IS NOT SYNCHED     5555666677778888");
               }
-
+              ****/
             //setting a delay and pong back
             //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
             setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
