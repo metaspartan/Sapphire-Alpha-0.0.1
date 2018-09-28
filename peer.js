@@ -194,7 +194,7 @@ function isJSON(str) {
               }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
                 peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
               }else if(peerBlockHeight > frankieCoin.getLength()){
-                setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+                //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
                 peerBlockHeight--;
               }
               /****
@@ -300,7 +300,7 @@ function queryr1(){
     // TODO: Log the answer in a database
     console.log(`selected: ${answer}`);
     if(answer == "M"){//M is for mine and triggers the miner
-      if(frankieCoin.inSynch == true){
+      if(frankieCoin.inSynch == true || (frankieCoin.getLength() < 100 && peers[0] == undefined)){
         console.log("need to pull orders matching pairbuy orders from database and add to pending orders");
         console.log('at least within a certain range...');
         console.log(JSON.stringify(frankieCoin.pendingOrders));
@@ -372,7 +372,7 @@ function queryr1(){
           }
         });
       }else{
-        console.log("CHAIN IS NOT SYNCHED FOR MINING PLEASE WAIT");
+        console.log("CHAIN IS NOT SYNCHED FOR MINING PLEASE WAIT"+frankieCoin.getLength()+peers[0]);
       }
 
 
