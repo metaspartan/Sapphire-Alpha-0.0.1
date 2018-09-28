@@ -185,7 +185,7 @@ function isJSON(str) {
             console.log("global hashes matched");
 
             var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
-            if(frankieCoin.inSynch == true){
+
               //increment it by one to return the next block
               peerBlockHeight++;
               //returning the block
@@ -193,17 +193,12 @@ function isJSON(str) {
                 peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
               }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
                 peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-              }else{
+              }else if(peerBlockHeight > frankieCoin.getLength() && frankieCoin.inSynch == true){
                 peerBlockHeight--;
-              }
-            }else{
-              //we probably need to call a ping in reverse
-              console.log("8888777766665555       THIS PEER IS NOT SYNCHED     5555666677778888");
-              if(peerBlockHeight > frankieCoin.getLength()){
+              }else if(peerBlockHeight > frankieCoin.getLength() && frankieCoin.inSynch == false){
                 setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+                console.log("8888777766665555       THIS PEER IS NOT SYNCHED     5555666677778888");
               }
-            }
-
 
             //setting a delay and pong back
             //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
