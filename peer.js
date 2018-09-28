@@ -194,6 +194,7 @@ function isJSON(str) {
               }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
                 peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
               }else if(peerBlockHeight > frankieCoin.getLength()){
+                setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
                 peerBlockHeight--;
               }
               /****
