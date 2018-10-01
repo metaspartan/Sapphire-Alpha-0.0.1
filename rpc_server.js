@@ -100,7 +100,9 @@ function requestListener(request, response) {
     let pathname = parseUrl.pathname;
 
     // we're doing everything json
-    response.setHeader('Content-Type', 'application/json');
+    //response.setHeader('Content-Type', 'application/json');
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    response.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
 
     // buffer for incoming data
     let buf = null;
@@ -148,7 +150,7 @@ function requestListener(request, response) {
 }
 
 console.log(`starting the server on port ${PORT}`);
-//server.listen(PORT);
+server.listen(PORT);
 
 module.exports = {
   globalParentCom:globalParentCom

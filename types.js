@@ -44,6 +44,13 @@ let types = {
           hash: ['string', 'required'],
           difficulty: ['number', 'required']
       }
+    },
+    balance: {
+      description:'balance for address provided',
+      props: {
+        address: ['string', 'required'],
+        balance: ['number', 'required']
+      }
     }
 }
 

@@ -4,13 +4,15 @@ let users = {};
 let tasks = {};
 let miners = {};
 let blocks = {};
+let balances = {};
 
 // we are saving everything inmemory for now
 let db = {
     users: proc(users),
     tasks: proc(tasks),
     miners: proc(miners),
-    blocks: proc(blocks)
+    blocks: proc(blocks),
+    balances: proc(balances),
 }
 
 function clone(obj) {

@@ -193,6 +193,41 @@ let methods = {
        }
    },
 
+   getBalance: {
+     description: `retrieves balance at address provided`,
+     params: ['address'],
+     returns: ['balance'],
+     exec(tryit) {
+         return new Promise((resolve) => {
+             // fetch
+             setTimeout( function() {resolve(db.balances.fetchAll() || {});},200);
+         });
+     }
+   },
+
+   balance: {
+     description: `balance return object`,
+     params: ['balance:the balance object'],
+     returns: ['balance'],
+     exec(blockObj) {
+         return new Promise((resolve) => {
+             if (typeof (blockObj) !== 'object') {
+                 throw new Error('was expecting an object!');
+             }
+             // you would usually do some validations here
+             // and check for required fields
+
+             //going to delete all first
+             resolve(db.balances.unsetAll());
+
+             // attach an id the save to db
+             let _blockObj = JSON.parse(JSON.stringify(blockObj));
+             _blockObj.id = (Math.random() * 10000000) | 0;
+             resolve(db.balances.save(blockObj));
+         });
+     }
+   },
+
 };
 
 module.exports = methods;

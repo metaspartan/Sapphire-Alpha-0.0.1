@@ -842,8 +842,27 @@ var impcchild = function(childData){
 
   }else if(isJSON(childData) && JSON.parse(childData)["getWorkForMiner"]){
     console.log(JSON.parse(childData)["getWorkForMiner"])
+  }else if(isJSON(childData) && JSON.parse(childData)["getBalance"]){
+    console.log("retrieving a balance for address provided...");
+    console.log(JSON.parse(childData)["getBalance"]);
+    console.log(JSON.parse(childData)["getBalance"]["address"]);
+    var getBalance3 = frankieCoin.getBalanceOfAddress(JSON.parse(childData)["getBalance"]["address"]);
+    console.log('\nMiners Function Balance of '+JSON.parse(childData)["getBalance"]["address"]+' is', getBalance3);
+    console.log(getBalance3["SPHR"]);
+    //this is where I would return that data
+    var options = {
+      uri: 'http://localhost:9090/rpc',
+      method: 'POST',
+      json: {balance:{address:JSON.parse(childData)["getBalance"]["address"],balance:getBalance3["SPHR"]}}
+    };
+
+    request(options, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        console.log(body.id) // Print the shortened url.
+      }
+    });
   }else{
-    console.log("Miner did not submit properly formatted work");
+    console.log("RCP commands were not properly formatted");
   }
 }
 //initialize the child with the parent communcator call back function
