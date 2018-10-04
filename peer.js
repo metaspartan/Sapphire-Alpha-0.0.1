@@ -272,27 +272,6 @@ var broadcastPeers = function(message){
 }
 //////////////////////////////////////////////////////////end messaging to peers
 
-///////////////////////////////////////////////////////query 2 will go away soon
-function queryr2(query){
-  rl.question(query, (answer) => {
-    console.log(`input: ${query} ${answer}`);
-    if(query == "getBlock"){
-      console.log(JSON.stringify(frankieCoin.getBlock(parseInt(answer))));
-      queryr1();
-    }else if(query == "getBalance"){
-      franks.getBalanceOfAddress(answer);
-      //note I did not need to use the miner function for balances
-      var getBalance2 = frankieCoin.getBalanceOfAddress(answer);
-      console.log('\nMiners Function Balance of '+answer+' is', getBalance2);
-      queryr1();
-    }else{
-      console.log("not a valid query at this time");
-      queryr1();
-    }
-  })
-}
-/////////////////////////////////////////////////////////////////////end query 2
-
 //////////////////////////////////////////////////main console interface query 1
 function queryr1(){
   //command line stuff
@@ -403,9 +382,14 @@ function queryr1(){
       //Orderdb.getOrdersSell();
       //Orderdb.getAllOrders();
       queryr1();
-    }else if(answer == "B"){//B is for balance
-      console.log("maybe can do logic for BALANCE of ADDRESS at the console line but for now...");
-      queryr2("getBalance");
+	}else if(answer.includes("getBalance(")){
+	  var address_to_getBalance = answer.slice(answer.indexOf("getBalance(")+11, answer.indexOf(")"));
+	  console.log("Getting balance of "+address_to_getBalance);
+	  var balance_of_address = frankieCoin.getBalanceOfAddress(address_to_getBalance)
+	  console.log('\nBalance of address '+address_to_getBalance+' is:',balance_of_address);
+	  // leaving this one here, incase we need it again
+	  // franks.getBalanceOfAddress(answer);
+	  queryr1();
       //console.log("chain is now: "+JSON.stringify(frankieCoin));
       //console.log("balance is: "+frankieCoin.getBalanceOfAddress("0x0666bf13ab1902de7dee4f8193c819118d7e21a6")+" <---why no money");
       //console.log("balance is: "+franks.getBalanceOfAddress("0x0666bf13ab1902de7dee4f8193c819118d7e21a6")+" <---why no money");
@@ -423,9 +407,6 @@ function queryr1(){
       console.log("NODEZZZZZZ LULZ: ");//had to BCASH LOL
       console.log(JSON.stringify(frankieCoin.retrieveNodes()));
       queryr1();
-    }else if(answer == "G"){//G currently is for getBlock which is also a function
-      console.log("BLOCK NUMBER: 1");
-      queryr2("getBlock");
     }else if(answer == "S"){//S is currently cleaning the databases was "Send" so leaving commented out transactions and orders for testing
       console.log("Western Union is no longer the fastest way to send money.....");
       //frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 20, "SPHR"));
@@ -447,7 +428,6 @@ function queryr1(){
       console.log("Sending "+amount+" "+ticker+" from "+from+" to "+to);
       frankieCoin.createTransaction(new sapphirechain.Transaction(from, to, amount, ticker));
       queryr1();
-      //queryr2("getBlock");
     }else if(answer.includes("Hash(")){//SEND function Send ( json tx )
       console.log(answer.slice(answer.indexOf("Hash(")+5, answer.indexOf(")")));
       var hashText = answer.slice(answer.indexOf("Hash(")+5, answer.indexOf(")"));
@@ -455,7 +435,6 @@ function queryr1(){
       console.log(hashText);
       sapphirechain.Hash(hashText);
       queryr1();
-      //queryr2("getBlock");
     }else if(answer.includes("getBlock(")){//GETBLOCK function
       console.log(answer.slice(answer.indexOf("getBlock(")+9, answer.indexOf(")")));
       var blocknum = answer.slice(answer.indexOf("getBlock(")+9, answer.indexOf(")"));
