@@ -439,6 +439,9 @@ function queryr1(){
       BlockchainDB.clearDatabase();
       BlockchainDB.clearOrderDatabase();
       queryr1();
+    }else if(answer == "SS"){
+      BlockchainDB.getBlockchain();
+      queryr1();
     }else if(answer.includes("Send(")){//SEND function Send ( json tx )
       console.log(answer.slice(answer.indexOf("Send(")+5, answer.indexOf(")")));
       var jsonSend = answer.slice(answer.indexOf("Send(")+5, answer.indexOf(")"));
