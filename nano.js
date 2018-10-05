@@ -24,6 +24,7 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
     {key:'allConfig',type:'string'},
     {key:'allConfigHash',type:'string'},
     {key:'hashOfThisBlock',type:'string'},
+    {key:'difficulty',type:'int'},
 ])
 .config({
     mode: "PERM", // With this enabled, the best storage engine will be auttomatically selected and all changes saved to it.  Works in browser AND nodeJS automatically.
