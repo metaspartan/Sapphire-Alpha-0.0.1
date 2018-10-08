@@ -184,7 +184,7 @@ function isJSON(str) {
           console.log(JSON.parse(data)["ChainSyncPing"]);
           if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
             console.log("global hashes matched");
-            frankieCoin.incrementPeerMaxHeight(nodeId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"])
+            frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"])
             var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
 
               //increment it by one to return the next block
