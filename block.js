@@ -196,7 +196,7 @@ var Blockchain = class Blockchain{
 
           if (!this.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
 
-              this.nodes.push({"id":id,"info":{"ip":ip,"port":port,"chainlength":this.chain.length}});
+              this.nodes.push({"id":id,"info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length}});
 
               // Implement gossiping to share info on new nodes constantly
 
@@ -218,6 +218,17 @@ var Blockchain = class Blockchain{
           if(this.nodes[i]["id"] == nodeId){
             //this.nodes[i]["info"]["chainlength"] = parseInt(this.nodes[i]["info"]["chainlength"])+1;
             this.nodes[i]["info"]["chainlength"] = len;
+          }
+        }
+
+      }
+
+      incrementPeerMaxHeight(nodeId,max) {
+
+        for (let i in this.nodes){
+          if(this.nodes[i]["id"] == nodeId){
+            //this.nodes[i]["info"]["chainlength"] = parseInt(this.nodes[i]["info"]["chainlength"])+1;
+            this.nodes[i]["info"]["maxHeight"] = max;
           }
         }
 
@@ -334,10 +345,16 @@ var Blockchain = class Blockchain{
           this.chain.push(block);
           //careful I have the ischain valid returining true on all tries
 
+        }else if(this.chain[this.chain.length - 2].hash == inBlock.previousHash && this.getLatestBlock().previousHash == inBlock.previousHash){//uncle block
+          console.log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
+          console.log("UNCLE previous hash matches"+inBlock.previousHash+" current prev hash "+this.getLatestBlock().previousHash);
+          console.log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
+          //need to return a message that returns the uncle info and uncle block reward to sending peer
         }else{
           console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
           console.log("no inblock prev hash of "+inBlock.previousHash+" does not match the hash of chain "+this.getLatestBlock().hash);
           console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+          //this case represents a problem because it is just a bad block
         }
 
         if(this.isChainValid() == false){

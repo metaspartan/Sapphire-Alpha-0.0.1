@@ -184,7 +184,7 @@ function isJSON(str) {
           console.log(JSON.parse(data)["ChainSyncPing"]);
           if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
             console.log("global hashes matched");
-
+            frankieCoin.incrementPeerMaxHeight(nodeId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"])
             var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
 
               //increment it by one to return the next block
@@ -222,7 +222,7 @@ function isJSON(str) {
             var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
             ChainSynchHashCheck(peerBlockHeight,JSON.parse(data)["ChainSyncPong"]["MaxHeight"]);
             //if chain is not synched ping back to synched peer
-            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
           }else{
             console.log("You are communicating with a bad actor and we must stop this connection");
             peers[peerId].write("Stop hacking me bro");
@@ -417,7 +417,7 @@ function queryr1(){
       for (let id in peers) {
         console.log("sending the ping");
         //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
-        peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
+        peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
       }
       queryr1();
     }else if(answer == "N"){//N is for Node info
