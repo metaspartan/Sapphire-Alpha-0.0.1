@@ -196,7 +196,7 @@ var Blockchain = class Blockchain{
 
           if (!this.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
 
-              this.nodes.push({"id":id,"info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length}});
+              this.nodes.push({"id":id,"info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length,"synchBlock":0}});
 
               // Implement gossiping to share info on new nodes constantly
 
@@ -229,6 +229,17 @@ var Blockchain = class Blockchain{
           if(this.nodes[i]["id"] == nodeId){
             //this.nodes[i]["info"]["chainlength"] = parseInt(this.nodes[i]["info"]["chainlength"])+1;
             this.nodes[i]["info"]["maxHeight"] = max;
+          }
+        }
+
+      }
+
+      incrementPeerSynch(nodeId,synch) {
+
+        for (let i in this.nodes){
+          if(this.nodes[i]["id"] == nodeId){
+            //this.nodes[i]["info"]["chainlength"] = parseInt(this.nodes[i]["info"]["chainlength"])+1;
+            this.nodes[i]["info"]["synchBlock"] = synch;
           }
         }
 
