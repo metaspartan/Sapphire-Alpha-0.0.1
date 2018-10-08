@@ -718,7 +718,7 @@ var Blockchain = class Blockchain{
                   //h.update(decodeUTF8(this.chain[i+1].previousHash + this.chain[i+1].timestamp + JSON.stringify(this.chain[i+1].transactions) + JSON.stringify(this.chain[i+1].orders) + this.chain[i+1].nonce));
                   h.update(decodeUTF8(this.getBlock(i+1).previousHash + this.getBlock(i+1).timestamp + this.getBlock(i+1).nonce));
                   console.log(h.hexDigest());
-                  //return false;
+                  return false;
               }else{
                 console.log("8888888888888888WE FIX IT**************");
               }
