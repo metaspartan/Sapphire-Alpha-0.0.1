@@ -725,7 +725,7 @@ var Blockchain = class Blockchain{
               const previousBlock = this.chain[i - 1];
               if (this.chain[i].previousHash !== this.chain[i-1].hash) {
                   console.log("would be returning false here: cb prevhash "+currentBlock.previousHash+" prev block hash "+previousBlock.hash);
-                  //return false;
+                  return false;
               }
           }
 
