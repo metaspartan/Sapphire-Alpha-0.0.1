@@ -130,6 +130,7 @@ function isJSON(str) {
           var blocknumber = 0;
           //first we add the block to the blockchain
           var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data));
+          //special note we do NOT have to check the chain because it was just checked
           //increment the internal peer nonce of sending party to track longest chain
           frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
           //increment the internal peer maxheight of sending party to track longest chain
@@ -235,7 +236,12 @@ function isJSON(str) {
             var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
             ChainSynchHashCheck(peerBlockHeight,JSON.parse(data)["ChainSyncPong"]["MaxHeight"]);
             //if chain is not synched ping back to synched peer
-            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+            if(frankieCoin.inSynch == true && frankieCoin.isChainSynch(peerBlockHeight)){//right now always true
+              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+            }else{//something did not synch so lets lower the chain ping and find the last synch block
+              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(frankieCoin.getLength()-1),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+            }
+
           }else{
             console.log("You are communicating with a bad actor and we must stop this connection");
             peers[peerId].write("Stop hacking me bro");
@@ -630,9 +636,9 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   console.log(JSON.stringify(nodesInChain));
   //the pong us set to be one higher from the ping and is above the chain length
   if(longestPeer <= peerMaxHeight){
-    console.log("are you synched UP? "+frankieCoin.isChainSynch(longestPeer).toString())
+    console.log("this is a peer thast is longer than this one... but is longest peer synched? "+frankieCoin.isChainSynch(longestPeer).toString())
   }else{
-    console.log("are you synched UP? "+frankieCoin.isChainSynch(peerMaxHeight).toString())
+    console.log("peer Max height should not be synched? "+frankieCoin.isChainSynch(peerMaxHeight).toString())
   }
   console.log("3333333333    "+longestPeer+""+peerMaxHeight+""+frankieCoin.getLength()+"    333333333");
   if(longestPeer == peerMaxHeight && peerMaxHeight == frankieCoin.getLength()){
