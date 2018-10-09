@@ -191,7 +191,7 @@ function isJSON(str) {
             console.log("global hashes matched");
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"])
             var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
-            var peerSynchHeight = frankieCoin.nodes[peerid]["info"]["synchBlock"];
+            var peerSynchHeight = frankieCoin.nodes[peerId]["info"]["synchBlock"];
             //need to make sure they match otherwise need to fix connecting peer to longest chain
             if(peerBlockHeight == peerSynchHeight){
               console.log("><><><><><<><><>><<><<><><><><><><>  THIS PEER MATCHED SYNCH AND HEIGHT  <><><><><><><><><><><><><<><><><><>><><><");
