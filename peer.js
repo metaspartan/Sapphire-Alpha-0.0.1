@@ -191,15 +191,15 @@ function isJSON(str) {
             console.log("global hashes matched");
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"])
             var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
-            var peerSynchHeight = frankieCoin.nodes[peerId]["info"]["synchBlock"];
+            //var peerSynchHeight = frankieCoin.nodes[peerId]["info"]["synchBlock"];
             //need to make sure they match otherwise need to fix connecting peer to longest chain
-            if(peerBlockHeight == peerSynchHeight){
-              console.log("><><><><><<><><>><<><<><><><><><><>  THIS PEER MATCHED SYNCH AND HEIGHT  <><><><><><><><><><><><><<><><><><>><><><");
+            //if(peerBlockHeight == peerSynchHeight){
+            //  console.log("><><><><><<><><>><<><<><><><><><><>  THIS PEER MATCHED SYNCH AND HEIGHT  <><><><><><><><><><><><><<><><><><>><><><");
               //probably proceed with lower code block
-            }else{
-              console.log(">>>>>XXXXXXXXXXXXXX>>>>>>  THIS PEER DOES NOT MATCH SYNCH AND HEIGHT  <<<<<<<<<<<<XXXXXXXXXXXXXX<<<<<<<<<<<<<");
+            //}else{
+            //  console.log(">>>>>XXXXXXXXXXXXXX>>>>>>  THIS PEER DOES NOT MATCH SYNCH AND HEIGHT  <<<<<<<<<<<<XXXXXXXXXXXXXX<<<<<<<<<<<<<");
               //di something to delete blocks and synch up - saem as uncle tests
-            }
+            //}
 
               //increment it by one to return the next block
               peerBlockHeight++;
