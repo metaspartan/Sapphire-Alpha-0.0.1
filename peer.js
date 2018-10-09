@@ -222,7 +222,12 @@ function isJSON(str) {
             var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
             ChainSynchHashCheck(peerBlockHeight,JSON.parse(data)["ChainSyncPong"]["MaxHeight"]);
             //if chain is not synched ping back to synched peer
-            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+            if(frankieCoin.inSynch==true && frankieCoin.inSynchBlockHeight == frankieCoin.longestPeerBlockHeight){
+              peers[peerId].conn.write("YYYYYYYYYYEEEEEEEEEEEEEEAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHH THIS PEER IS SYNCHED YYYYYYYYYYYYYEEEEEEEEEEEEEEEEAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHH");
+            }else{
+              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+            }
+
           }else{
             console.log("You are communicating with a bad actor and we must stop this connection");
             peers[peerId].write("Stop hacking me bro");
@@ -609,6 +614,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   for(node in nodesInChain){
     if(parseInt(nodesInChain[node]["info"]["chainlength"]) > longestPeer){
       longestPeer = parseInt(nodesInChain[node]["info"]["chainlength"]);
+      frankieCoin.longestPeerBlockHeight = longestPeer;
     }
   }
   console.log("66666666666666666666666666666666666666666666       HERE IS DATA       666666666666666666666666666666666");
@@ -625,6 +631,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   if(longestPeer == peerMaxHeight && peerMaxHeight == frankieCoin.getLength()){
     console.log("33333333333333333333333333333333333333333       MOST COMPLETE SYNCH      33333333333333333333333333333333333");
     frankieCoin.inSynch = frankieCoin.isChainSynch(peerMaxHeight);
+    frankieCoin.inSynchBlockHeight = peerMaxHeight;
   }
 
   //this.chain.inSynch = frankieCoin.isChainSynch()

@@ -188,6 +188,8 @@ var Blockchain = class Blockchain{
           this.miningReward = 9;
           //is the chain synched and mine and assist others? when true yes
           this.inSynch = false;
+          this.inSynchBlockHeight = 0;
+          this.longestPeerBlockHeight = 0;
           console.log("genesis block created");
           console.log("chain is"+JSON.stringify(this.chain));
       }
@@ -359,7 +361,7 @@ var Blockchain = class Blockchain{
 
         if(this.isChainValid() == false){
           this.chain.pop();
-          console.log("Block is not added and will be removed");
+          console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXX Block NOT added XXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
           return false;
         }else{
           console.log("Block added from peers");
