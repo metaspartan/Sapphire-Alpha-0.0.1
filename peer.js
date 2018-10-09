@@ -181,7 +181,7 @@ function isJSON(str) {
             console.log("which means we are REMOVING BLOCK");
             //remove the block from the chain and db
             frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
-            frankieCoin.pop();
+            frankieCoin.chain.pop();
             BlockchainDB.clearBlock(frankieCoin.getLength());
             //okay do we need a return?
           }
