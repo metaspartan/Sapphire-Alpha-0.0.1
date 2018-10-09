@@ -92,6 +92,10 @@ var clearDatabase = function(){
   nSQL("blockchain").query("delete").exec();
 }
 
+var clearBlock = function(blocknum){
+  nSQL("blockchain").query("delete").where(['blocknum','=',blocknum]).exec();
+}
+
 var getBlockchain = function(limit,callBack){
   console.log("ENTIRE BLOCKCHAIN");
       if(limit){
@@ -300,6 +304,7 @@ module.exports = {
     getOrdersPairBuy:getOrdersPairBuy,
     getOrdersPairSell:getOrdersPairSell,
     clearDatabase:clearDatabase,
+    clearBlock:clearBlock,
     clearOrderDatabase:clearOrderDatabase,
     clearOrderById:clearOrderById
 }

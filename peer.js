@@ -130,12 +130,15 @@ function isJSON(str) {
           var blocknumber = 0;
           //first we add the block to the blockchain
           var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data));
-          //increment the internal peer nonce of sending party to track longest chain
-          frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
-          //logging the block added to chain for console
-          console.log("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock()));
+
           //verfiy the previous hash in the database matches our expectations - code is incomplete atm
           if(frankieCoin.getLatestBlock()["previousHash"] == currentChainHash && successfulBlockAdd == true){
+
+            //increment the internal peer nonce of sending party to track longest chain
+            frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
+            //logging the block added to chain for console
+            console.log("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock()));
+
             console.log("hash matches and we are good");
             blocknumber = frankieCoin.getLength();
             console.log("the database block number is "+blocknumber);
@@ -173,6 +176,14 @@ function isJSON(str) {
 
           }else{
             console.log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
+            //for now I am going to remove the next block down....until I scrape to a match
+            //DEFINITELY need some logic here to verify peer synch height and chain
+            console.log("which means we are REMOVING BLOCK");
+            //remove the block from the chain and db
+            frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
+            frankieCoin.pop();
+            BlockchainDB.clearBlock(frankieCoin.getLength());
+            //okay do we need a return?
           }
 
         }else if(JSON.parse(data)["fromAddress"]){
