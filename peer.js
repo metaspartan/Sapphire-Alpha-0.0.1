@@ -180,9 +180,22 @@ function isJSON(str) {
             //DEFINITELY need some logic here to verify peer synch height and chain
             console.log("which means we are REMOVING BLOCK");
             //remove the block from the chain and db
-            frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
-            frankieCoin.chain.pop();
-            BlockchainDB.clearBlock(frankieCoin.getLength());
+
+            var lastSynchBlock;
+            for (let i in frankieCoin.chain.nodes){
+              if(frankieCoin.chain.nodes[i]["id"] == peerId){
+                lastSynchBlock = frankieCoin.chain.nodes[i]["info"]["chainlength"];
+              }
+            }
+
+            if(parseInt(frankieCoin.getLength() - 1) != lastSynchBlock){
+              frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
+              frankieCoin.chain.pop();
+              BlockchainDB.clearBlock(frankieCoin.getLength());
+            }else{
+              console.log("TTTTTTTTTTTHHHHHHHHHHHIIIIIIIIIISSSSSSSSSSS IS WHERE THE SYNCH IS STUCK")
+            }
+
             //okay do we need a return?
           }
 
