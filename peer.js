@@ -189,12 +189,14 @@ function isJSON(str) {
             }
 
             if(parseInt(frankieCoin.getLength() - 1) != lastSynchBlock){
-              frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
-              frankieCoin.chain.pop();
-              BlockchainDB.clearBlock(frankieCoin.getLength());
+              console.log("TTTTTTTTTTTHHHHHHHHHHHIIIIIIIIIISSSSSSSSSSS IS A GOOD BLOCK REMOVAL");
             }else{
-              console.log("TTTTTTTTTTTHHHHHHHHHHHIIIIIIIIIISSSSSSSSSSS IS WHERE THE SYNCH IS STUCK")
+              console.log("TTTTTTTTTTTHHHHHHHHHHHIIIIIIIIIISSSSSSSSSSS IS WHERE THE SYNCH IS STUCK");
             }
+
+            frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
+            frankieCoin.chain.pop();
+            BlockchainDB.clearBlock(frankieCoin.getLength());
 
             //okay do we need a return?
           }
