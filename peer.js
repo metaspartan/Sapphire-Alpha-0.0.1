@@ -355,6 +355,7 @@ function queryr1(){
           }
         }
 
+        //console.log("pending transactions are"+frankieCoin.pendingTransactions);
         franks.mpt2();
 
         console.log("[placeholder] this would be mining stats");
@@ -413,6 +414,7 @@ function queryr1(){
     }else if(answer == "MM"){
       //var silly = rpcserver.db.miners.fetchKey(key,value);
       //console.log("got it and its "+silly);
+      impceventcaller("passing data","this my peer");
       queryr1();
     }else if(answer == "O"){//O is for order
       //other commands can go Here
@@ -882,6 +884,9 @@ var impcchild = function(childData){
 
   }else if(isJSON(childData) && JSON.parse(childData)["getWorkForMiner"]){
     console.log(JSON.parse(childData)["getWorkForMiner"])
+  }else if(isJSON(childData) && JSON.parse(childData)["getOrderBook"]){
+    console.log("now we are gonna have some fun")
+    impceventcaller("returning from function","maybe the calling peer is not necessary");
   }else if(isJSON(childData) && JSON.parse(childData)["getBalance"]){
     console.log("retrieving a balance for address provided...");
     console.log(JSON.parse(childData)["getBalance"]);
@@ -889,11 +894,19 @@ var impcchild = function(childData){
     var getBalance3 = frankieCoin.getBalanceOfAddress(JSON.parse(childData)["getBalance"]["address"]);
     console.log('\nMiners Function Balance of '+JSON.parse(childData)["getBalance"]["address"]+' is', getBalance3);
     console.log(getBalance3["SPHR"]);
+
+    var getBalance4 = [];
+    //var Keys = Object.keys(getBalance3);
+    for(account in getBalance3){
+      //var tempkey = Keys[account];
+      var tempbalance = {[account]:getBalance3[account]}
+      getBalance4.push(tempbalance);
+    }
     //this is where I would return that data
     var options = {
       uri: 'http://localhost:9090/rpc',
       method: 'POST',
-      json: {balance:{address:JSON.parse(childData)["getBalance"]["address"],balance:getBalance3["SPHR"]}}
+      json: {balance:{address:JSON.parse(childData)["getBalance"]["address"],balance:{getBalance4}}}
     };
 
     request(options, function (error, response, body) {
@@ -905,8 +918,36 @@ var impcchild = function(childData){
     console.log("RCP commands were not properly formatted");
   }
 }
+
+var impcMethods = function(datacall){
+  return new Promise((resolve)=> {
+    console.log("calling in peer");
+    console.log(JSON.stringify(datacall));
+    var dataBuySell = [];
+    var myCallbackOrderBuy = function(data) {
+      console.log('BUY ORDERS: '+JSON.stringify(data));//test for input
+      //resolve(data);
+      dataBuySell.push({"buy":data});
+      BlockchainDB.getOrdersPairSell(datacall["tickerBuy"],myCallbackOrderSell);
+    };
+    var myCallbackOrderSell = function(data) {
+      console.log('SELL ORDERS: '+JSON.stringify(data));//test for input
+      dataBuySell.push({"sell":data});
+      resolve(dataBuySell);
+    };
+    BlockchainDB.getOrdersPairBuy(datacall["tickerBuy"],myCallbackOrderBuy);
+  })
+}
+
+var impceventcaller;
+var impcevent = function(callback){
+    //sets the impcparent with the function from parent
+    impceventcaller = callback;
+}
 //initialize the child with the parent communcator call back function
 rpcserver.globalParentCom(impcchild);
+rpcserver.globalParentEvent(impcevent);
+rpcserver.globalParentComMethods(impcMethods);
 //////////////////////////////////////end inter module parent child communicator
 
 ////////////////////////////////////////////////initialize the console interface
