@@ -90,7 +90,7 @@ function isJSON(str) {
   const port = await getPort()
 
   sw.listen(port)
-  sw.join('egem-spn') // can be any id/name/hash
+  sw.join('egem-sfrx') // can be any id/name/hash
 
   sw.on('connection', (conn, info) => {
 
@@ -231,8 +231,9 @@ function isJSON(str) {
               }
               ****/
             //setting a delay and pong back
-            peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
-            //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+            //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
+            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+            //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
           }else{
             console.log("Did not match this hash and this peer is an imposter");
             peers[peerId].write("Don't hack me bro");
@@ -250,8 +251,7 @@ function isJSON(str) {
             if(frankieCoin.inSynch==true && frankieCoin.inSynchBlockHeight == frankieCoin.longestPeerBlockHeight){
               peers[peerId].conn.write("YYYYYYYYYYEEEEEEEEEEEEEEAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHH THIS PEER IS SYNCHED YYYYYYYYYYYYYEEEEEEEEEEEEEEEEAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHH");
             }else{
-              //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
-              peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
+              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
             }
 
           }else{
