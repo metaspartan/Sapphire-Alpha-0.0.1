@@ -231,9 +231,8 @@ function isJSON(str) {
               }
               ****/
             //setting a delay and pong back
-            //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
-            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
-            //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+            peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
+            //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
           }else{
             console.log("Did not match this hash and this peer is an imposter");
             peers[peerId].write("Don't hack me bro");
@@ -251,7 +250,8 @@ function isJSON(str) {
             if(frankieCoin.inSynch==true && frankieCoin.inSynchBlockHeight == frankieCoin.longestPeerBlockHeight){
               peers[peerId].conn.write("YYYYYYYYYYEEEEEEEEEEEEEEAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHH THIS PEER IS SYNCHED YYYYYYYYYYYYYEEEEEEEEEEEEEEEEAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHH");
             }else{
-              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+              //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+              peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
             }
 
           }else{
