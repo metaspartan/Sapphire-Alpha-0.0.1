@@ -37,7 +37,7 @@ var Miner = class Miner {
   }
 
   mpt3(minerAddress,minedBlock){
-    console.log(minerAddress+" mined block "+minedBlock)
+    console.log(minerAddress+" aha this is my mined block "+JSON.stringify(minedBlock))
     this.chain.addPendingTransactionsToMinedBLock(minerAddress,minedBlock);
   }
 

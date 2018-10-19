@@ -305,9 +305,10 @@ var Blockchain = class Blockchain{
       addPendingTransactionsToMinedBLock(miningRewardAddress, minedBlock){
           var blockTimeStamp = minedBlock["timestamp"];
 
-          let block = new Block(minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"]);
+          let block = new Block(minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
           //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0) {
           //block.mineBlock(this.difficulty);
+          block.difficulty = minedBlock["difficulty"];
           console.log('Block successfully added by outside miner '+blockTimeStamp);
           ////extra check
           try {
