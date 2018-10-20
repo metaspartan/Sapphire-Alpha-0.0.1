@@ -620,7 +620,7 @@ var genBlock = {"blockchain":{
   allConfig:frankieCoin.getLatestBlock()["allConfig"],
   allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
   hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"],
-  difficulty:frankieCoin.getLatestBlock()["difficulty"]
+  difficulty:4
 }};
 BlockchainDB.addBlock(genBlock);
 //console.log("peer chain is"+ frankieCoin.getEntireChain());
@@ -689,6 +689,21 @@ var myCallback = function(data) {
     //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
     peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
   }
+
+  //finally we se the RPC block which is updated by peer synch processes
+  //this is where we SUBMIT WORK leaving it to eeror right now
+  console.log("00000000000000 CALLING THE SUBMIT BLOCK 00000000000000");
+  var options = {
+    uri: 'http://localhost:9090/rpc',
+    method: 'POST',
+    json: {createBlock:{block:frankieCoin.getLatestBlock()}}
+  };
+
+  request(options, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      console.log(body.id) // Print the shortened url.
+    }
+  });
 
 };
 //a function call for datastore
