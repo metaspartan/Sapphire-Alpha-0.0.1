@@ -882,6 +882,7 @@ var impcchild = function(childData){
       //sending the block to the peers
       console.log("BBBBBBBBBBBBBBBBBBBBBBB BRADCASTING QUARRY MINED BLOCK TO PEERS BBBBBBBBBBBBBBBBBBBBBBBBB");
       broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
+      console.log("BBBBBBBBBBBBBBBBBBBBBBB BRADCASTING QUARRY MINED BLOCK TO PEERS BBBBBBBBBBBBBBBBBBBBBBBBB");
       ////////end database update and peers broadcast
       //post to rpcserver
       //this is where we SUBMIT WORK leaving it to eeror right now
