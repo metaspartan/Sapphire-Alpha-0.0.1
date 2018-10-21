@@ -212,15 +212,6 @@ function isJSON(str) {
             console.log("global hashes matched");
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"])
             var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
-            //var peerSynchHeight = frankieCoin.nodes[peerId]["info"]["synchBlock"];
-            //need to make sure they match otherwise need to fix connecting peer to longest chain
-            //if(peerBlockHeight == peerSynchHeight){
-            //  console.log("><><><><><<><><>><<><<><><><><><><>  THIS PEER MATCHED SYNCH AND HEIGHT  <><><><><><><><><><><><><<><><><><>><><><");
-              //probably proceed with lower code block
-            //}else{
-            //  console.log(">>>>>XXXXXXXXXXXXXX>>>>>>  THIS PEER DOES NOT MATCH SYNCH AND HEIGHT  <<<<<<<<<<<<XXXXXXXXXXXXXX<<<<<<<<<<<<<");
-              //di something to delete blocks and synch up - saem as uncle tests
-            //}
 
               //increment it by one to return the next block
               peerBlockHeight++;
@@ -660,9 +651,9 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   console.log(JSON.stringify(nodesInChain));
   //the pong us set to be one higher from the ping and is above the chain length
   if(longestPeer <= peerMaxHeight){
-    console.log("this is a peer thast is longer than this one... but is longest peer synched? "+frankieCoin.isChainSynch(longestPeer).toString())
+    console.log("are you synched UP? "+frankieCoin.isChainSynch(longestPeer).toString())
   }else{
-    console.log("peer Max height should not be synched? "+frankieCoin.isChainSynch(peerMaxHeight).toString())
+    console.log("are you synched UP? "+frankieCoin.isChainSynch(peerMaxHeight).toString())
   }
   console.log("3333333333    "+longestPeer+""+peerMaxHeight+""+frankieCoin.getLength()+"    333333333");
   if(longestPeer == peerMaxHeight && peerMaxHeight == frankieCoin.getLength()){
@@ -848,8 +839,15 @@ var myCallbackSell = function(data) {
 ////////////////////////////////////////////////////////end functions for orders
 
 //////////////////////////////////////////inter module parent child communicator
+var broadcastPeersBlock = function(){
+  //sending the block to the peers
+  console.log("BBBBBBBBBBBBBBBBBBBBBBB BRADCASTING QUARRY MINED BLOCK TO PEERS BBBBBBBBBBBBBBBBBBBBBBBBB");
+  broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
+  console.log("BBBBBBBBBBBBBBBBBBBBBBB BRADCASTING QUARRY MINED BLOCK TO PEERS BBBBBBBBBBBBBBBBBBBBBBBBB");
+}
+
 //parent communicator callback function sent to child below
-var impcchild = function(childData){
+var impcchild = function(childData,functionName){
   console.log("incoming data from child"+childData);
   if(isJSON(childData) && JSON.parse(childData)["createBlock"]){
     console.log("current prev hash is "+frankieCoin.getLatestBlock().hash+" incoming block previous hash is: "+JSON.parse(childData)["createBlock"]["block"]["previousHash"]);
@@ -888,10 +886,9 @@ var impcchild = function(childData){
       }};
       console.log(minedblock);
       BlockchainDB.addBlock(minedblock);
-      //sending the block to the peers
-      console.log("BBBBBBBBBBBBBBBBBBBBBBB BRADCASTING QUARRY MINED BLOCK TO PEERS BBBBBBBBBBBBBBBBBBBBBBBBB");
-      broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
-      console.log("BBBBBBBBBBBBBBBBBBBBBBB BRADCASTING QUARRY MINED BLOCK TO PEERS BBBBBBBBBBBBBBBBBBBBBBBBB");
+
+
+      functionName();
       ////////end database update and peers broadcast
       //post to rpcserver
       //this is where we SUBMIT WORK leaving it to eeror right now
@@ -971,7 +968,7 @@ var impcevent = function(callback){
     impceventcaller = callback;
 }
 //initialize the child with the parent communcator call back function
-rpcserver.globalParentCom(impcchild);
+rpcserver.globalParentCom(impcchild,broadcastPeersBlock);
 rpcserver.globalParentEvent(impcevent);
 rpcserver.globalParentComMethods(impcMethods);
 //////////////////////////////////////end inter module parent child communicator

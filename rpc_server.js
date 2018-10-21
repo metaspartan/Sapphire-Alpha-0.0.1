@@ -15,10 +15,12 @@ const PORT = process.env.NODE_PORT || 9090;
 
 ///////////////////////////////////////////////inter module parent communication
 var impcparent;
+var parentBroadcastPeersFunction;
 //callback fuction used to set a caller to the parent called by parent on load
-var globalParentCom = function(callback){
+var globalParentCom = function(callback,callback2){
   //sets the impcparent with the function from parent
   impcparent = callback;
+  parentBroadcastPeersFunction = callback2;
 }
 
 var impcParentMethods;
@@ -28,6 +30,8 @@ var globalParentComMethods = function(callback){
   impcParentMethods = callback;
 }
 ///////////////////////////////////////////end inter module parent communication
+
+;
 
 var methodEvent = function(datacall){
   return new Promise((resolve)=> {
@@ -139,7 +143,7 @@ function requestListener(request, response) {
             buf = buf + data;
         }
         console.log("just doble check it here"+buf.toString());
-        impcparent(buf.toString());
+        impcparent(buf.toString(),parentBroadcastPeersFunction);
     });
 
     // on end proceed with compute
