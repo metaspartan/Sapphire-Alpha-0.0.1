@@ -1,4 +1,6 @@
 node_modules/
 sapphire-block-data/
 pub-sapphire-block-data/
-datadir/
+datadir/*.*
+datadir/*
+package-lock.json
