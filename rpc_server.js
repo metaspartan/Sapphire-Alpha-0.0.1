@@ -143,7 +143,7 @@ function requestListener(request, response) {
             buf = buf + data;
         }
         console.log("just doble check it here"+buf.toString());
-        impcparent(buf.toString());
+        impcparent(buf.toString(),parentBroadcastPeersFunction);
     });
 
     // on end proceed with compute

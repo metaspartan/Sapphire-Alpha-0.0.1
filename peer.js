@@ -839,7 +839,7 @@ var myCallbackSell = function(data) {
 ////////////////////////////////////////////////////////end functions for orders
 
 //////////////////////////////////////////inter module parent child communicator
-var broadcastpeersBlock = function(){
+var broadcastPeersBlock = function(){
   //sending the block to the peers
   console.log("BBBBBBBBBBBBBBBBBBBBBBB BRADCASTING QUARRY MINED BLOCK TO PEERS BBBBBBBBBBBBBBBBBBBBBBBBB");
   broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
@@ -847,7 +847,7 @@ var broadcastpeersBlock = function(){
 }
 
 //parent communicator callback function sent to child below
-var impcchild = function(childData){
+var impcchild = function(childData,functionName){
   console.log("incoming data from child"+childData);
   if(isJSON(childData) && JSON.parse(childData)["createBlock"]){
     console.log("current prev hash is "+frankieCoin.getLatestBlock().hash+" incoming block previous hash is: "+JSON.parse(childData)["createBlock"]["block"]["previousHash"]);
@@ -888,7 +888,7 @@ var impcchild = function(childData){
       BlockchainDB.addBlock(minedblock);
 
 
-      parentBroadcastPeersFunction();
+      functionName();
       ////////end database update and peers broadcast
       //post to rpcserver
       //this is where we SUBMIT WORK leaving it to eeror right now
@@ -968,7 +968,7 @@ var impcevent = function(callback){
     impceventcaller = callback;
 }
 //initialize the child with the parent communcator call back function
-rpcserver.globalParentCom(impcchild,broadcastpeersBlock);
+rpcserver.globalParentCom(impcchild,broadcastPeersBlock);
 rpcserver.globalParentEvent(impcevent);
 rpcserver.globalParentComMethods(impcMethods);
 //////////////////////////////////////end inter module parent child communicator
