@@ -276,6 +276,7 @@ var Blockchain = class Blockchain{
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
           if(blockTimeDiff < 6){
             if(this.difficulty < 5){
+              console.log("WHHHHHHHHATTTTT THEEEEEEEE FFUUUUUCCKKKKKK"+this.difficulty)
               block.difficulty = parseFloat(this.difficulty+1);
             }
           }else{
@@ -306,6 +307,11 @@ var Blockchain = class Blockchain{
 
       ///for mining transactions from outside miner
       addPendingTransactionsToMinedBLock(miningRewardAddress, minedBlock){
+
+          //need to add the mining reward HERE
+          var minedReward = new Transaction(null, minedBlock["miner"], this.miningReward, "SPHR");
+          this.createTransaction(minedReward);
+
           var blockTimeStamp = minedBlock["timestamp"];
           console.log("BBBBBBBBBBBBBBBBB block time stamp"+minedBlock["timestamp"]+" LAST BLOCK TIME STAMPING "+this.getLatestBlock().timestamp+"MINED  BLOCK PREV HASH "+minedBlock["previousHash"]+" LAST BLOCK HASH "+this.getLatestBlock().hash);
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
@@ -316,11 +322,11 @@ var Blockchain = class Blockchain{
 
           if(blockTimeDiff < 6){
             //temporary difficulty setting stopped at 6
-            if(block.difficulty < 5){
-              block.difficulty = parseFloat(this.difficulty+1);
+            if(minedBlock["difficulty"] < 5){
+              block.difficulty = parseFloat(block.difficulty+1);
             }
           }else{
-            block.difficulty = parseFloat(this.difficulty-1);
+            block.difficulty = parseFloat(block.difficulty-1);
           }
           console.log('Differential is '+blockTimeDiff)
           console.log('Block successfully added by outside miner '+blockTimeStamp);
