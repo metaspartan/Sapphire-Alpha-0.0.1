@@ -274,8 +274,10 @@ var Blockchain = class Blockchain{
           console.log('Block successfully mined! '+blockTimeStamp);
           console.log('Previous Block Timestamp was '+this.getLatestBlock().timestamp);
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
-          if(blockTimeDiff < 5){
-            block.difficulty = parseFloat(this.difficulty+1);
+          if(blockTimeDiff < 6){
+            if(this.difficulty < 5){
+              block.difficulty = parseFloat(this.difficulty+1);
+            }
           }else{
             block.difficulty = parseFloat(this.difficulty-1);
           }
