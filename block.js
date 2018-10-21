@@ -199,7 +199,7 @@ var Blockchain = class Blockchain{
 
           if (!this.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
 
-              this.nodes.push({"id":id,"info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length}});
+              this.nodes.push({"id":id,"info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length,"synchBlock":0}});
 
               // Implement gossiping to share info on new nodes constantly
 
@@ -232,6 +232,17 @@ var Blockchain = class Blockchain{
           if(this.nodes[i]["id"] == nodeId){
             //this.nodes[i]["info"]["chainlength"] = parseInt(this.nodes[i]["info"]["chainlength"])+1;
             this.nodes[i]["info"]["maxHeight"] = max;
+          }
+        }
+
+      }
+
+      incrementPeerSynch(nodeId,synch) {
+
+        for (let i in this.nodes){
+          if(this.nodes[i]["id"] == nodeId){
+            //this.nodes[i]["info"]["chainlength"] = parseInt(this.nodes[i]["info"]["chainlength"])+1;
+            this.nodes[i]["info"]["synchBlock"] = synch;
           }
         }
 
@@ -741,14 +752,14 @@ var Blockchain = class Blockchain{
                   //h.update(decodeUTF8(this.chain[i+1].previousHash + this.chain[i+1].timestamp + JSON.stringify(this.chain[i+1].transactions) + JSON.stringify(this.chain[i+1].orders) + this.chain[i+1].nonce));
                   h.update(decodeUTF8(this.getBlock(i+1).previousHash + this.getBlock(i+1).timestamp + this.getBlock(i+1).nonce));
                   console.log(h.hexDigest());
-                  //return false;
+                  return false;
               }else{
                 console.log("8888888888888888WE FIX IT**************");
               }
               const previousBlock = this.chain[i - 1];
               if (this.chain[i].previousHash !== this.chain[i-1].hash) {
                   console.log("would be returning false here: cb prevhash "+currentBlock.previousHash+" prev block hash "+previousBlock.hash);
-                  //return false;
+                  return false;
               }
           }
 
