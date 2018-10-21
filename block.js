@@ -146,6 +146,7 @@ var Block = class Block {
         this.allConfigHash = '';
         //total Hash for sequencing
         this.hashOfThisBlock = '';
+        this.difficulty = difficulty;
       }
 
     calculateHash() {
