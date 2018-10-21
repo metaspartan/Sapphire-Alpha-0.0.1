@@ -880,6 +880,7 @@ var impcchild = function(childData){
       console.log(minedblock);
       BlockchainDB.addBlock(minedblock);
       //sending the block to the peers
+      console.log("BBBBBBBBBBBBBBBBBBBBBBB BRADCASTING QUARRY MINED BLOCK TO PEERS BBBBBBBBBBBBBBBBBBBBBBBBB");
       broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
       ////////end database update and peers broadcast
       //post to rpcserver
