@@ -90,7 +90,7 @@ function isJSON(str) {
   const port = await getPort()
 
   sw.listen(port)
-  sw.join('egem-spn') // can be any id/name/hash
+  sw.join('egem-sfrx') // can be any id/name/hash
 
   sw.on('connection', (conn, info) => {
 
@@ -130,17 +130,15 @@ function isJSON(str) {
           var blocknumber = 0;
           //first we add the block to the blockchain
           var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data));
-          //special note we do NOT have to check the chain because it was just checked
-          //increment the internal peer nonce of sending party to track longest chain
-          frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
-          //increment the internal peer maxheight of sending party to track longest chain
-          frankieCoin.incrementPeerMaxHeight(peerId,frankieCoin.getLength());
-          //increment the internal peer synchBlock of sending party to track longest chain
-          frankieCoin.incrementPeerSynch(peerId,frankieCoin.getLength());
-          //logging the block added to chain for console
-          console.log("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock()));
+
           //verfiy the previous hash in the database matches our expectations - code is incomplete atm
           if(frankieCoin.getLatestBlock()["previousHash"] == currentChainHash && successfulBlockAdd == true){
+
+            //increment the internal peer nonce of sending party to track longest chain
+            frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
+            //logging the block added to chain for console
+            console.log("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock()));
+
             console.log("hash matches and we are good");
             blocknumber = frankieCoin.getLength();
             console.log("the database block number is "+blocknumber);
@@ -178,6 +176,29 @@ function isJSON(str) {
 
           }else{
             console.log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
+            //for now I am going to remove the next block down....until I scrape to a match
+            //DEFINITELY need some logic here to verify peer synch height and chain
+            console.log("which means we are REMOVING BLOCK");
+            //remove the block from the chain and db
+
+            var lastSynchBlock;
+            for (let i in frankieCoin.chain.nodes){
+              if(frankieCoin.chain.nodes[i]["id"] == peerId){
+                lastSynchBlock = frankieCoin.chain.nodes[i]["info"]["chainlength"];
+              }
+            }
+
+            if(parseInt(frankieCoin.getLength() - 1) != lastSynchBlock){
+              console.log("TTTTTTTTTTTHHHHHHHHHHHIIIIIIIIIISSSSSSSSSSS IS A GOOD BLOCK REMOVAL");
+            }else{
+              console.log("TTTTTTTTTTTHHHHHHHHHHHIIIIIIIIIISSSSSSSSSSS IS WHERE THE SYNCH IS STUCK");
+            }
+
+            frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
+            frankieCoin.chain.pop();
+            BlockchainDB.clearBlock(frankieCoin.getLength());
+
+            //okay do we need a return?
           }
 
         }else if(JSON.parse(data)["fromAddress"]){
@@ -220,7 +241,7 @@ function isJSON(str) {
               ****/
             //setting a delay and pong back
             //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
-            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},300);
             //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
           }else{
             console.log("Did not match this hash and this peer is an imposter");
@@ -236,10 +257,10 @@ function isJSON(str) {
             var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
             ChainSynchHashCheck(peerBlockHeight,JSON.parse(data)["ChainSyncPong"]["MaxHeight"]);
             //if chain is not synched ping back to synched peer
-            if(frankieCoin.inSynch == true && frankieCoin.isChainSynch(peerBlockHeight)){//right now always true
-              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
-            }else{//something did not synch so lets lower the chain ping and find the last synch block
-              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(frankieCoin.getLength()-1),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+            if(frankieCoin.inSynch==true && frankieCoin.inSynchBlockHeight == frankieCoin.longestPeerBlockHeight){
+              peers[peerId].conn.write("YYYYYYYYYYEEEEEEEEEEEEEEAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHH THIS PEER IS SYNCHED YYYYYYYYYYYYYEEEEEEEEEEEEEEEEAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHH");
+            }else{
+              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},300);
             }
 
           }else{
@@ -343,6 +364,7 @@ function queryr1(){
           }
         }
 
+        //console.log("pending transactions are"+frankieCoin.pendingTransactions);
         franks.mpt2();
 
         console.log("[placeholder] this would be mining stats");
@@ -401,6 +423,7 @@ function queryr1(){
     }else if(answer == "MM"){
       //var silly = rpcserver.db.miners.fetchKey(key,value);
       //console.log("got it and its "+silly);
+      impceventcaller("passing data","this my peer");
       queryr1();
     }else if(answer == "O"){//O is for order
       //other commands can go Here
@@ -606,7 +629,7 @@ var genBlock = {"blockchain":{
   allConfig:frankieCoin.getLatestBlock()["allConfig"],
   allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
   hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"],
-  difficulty:frankieCoin.getLatestBlock()["difficulty"]
+  difficulty:4
 }};
 BlockchainDB.addBlock(genBlock);
 //console.log("peer chain is"+ frankieCoin.getEntireChain());
@@ -628,6 +651,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   for(node in nodesInChain){
     if(parseInt(nodesInChain[node]["info"]["chainlength"]) > longestPeer){
       longestPeer = parseInt(nodesInChain[node]["info"]["chainlength"]);
+      frankieCoin.longestPeerBlockHeight = longestPeer;
     }
   }
   console.log("66666666666666666666666666666666666666666666       HERE IS DATA       666666666666666666666666666666666");
@@ -644,6 +668,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   if(longestPeer == peerMaxHeight && peerMaxHeight == frankieCoin.getLength()){
     console.log("33333333333333333333333333333333333333333       MOST COMPLETE SYNCH      33333333333333333333333333333333333");
     frankieCoin.inSynch = frankieCoin.isChainSynch(peerMaxHeight);
+    frankieCoin.inSynchBlockHeight = peerMaxHeight;
   }
 
   //this.chain.inSynch = frankieCoin.isChainSynch()
@@ -673,6 +698,21 @@ var myCallback = function(data) {
     //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
     peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
   }
+
+  //finally we se the RPC block which is updated by peer synch processes
+  //this is where we SUBMIT WORK leaving it to eeror right now
+  console.log("00000000000000 CALLING THE SUBMIT BLOCK 00000000000000");
+  var options = {
+    uri: 'http://localhost:9090/rpc',
+    method: 'POST',
+    json: {createBlock:{block:frankieCoin.getLatestBlock()}}
+  };
+
+  request(options, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      console.log(body.id) // Print the shortened url.
+    }
+  });
 
 };
 //a function call for datastore
@@ -849,7 +889,9 @@ var impcchild = function(childData){
       console.log(minedblock);
       BlockchainDB.addBlock(minedblock);
       //sending the block to the peers
+      console.log("BBBBBBBBBBBBBBBBBBBBBBB BRADCASTING QUARRY MINED BLOCK TO PEERS BBBBBBBBBBBBBBBBBBBBBBBBB");
       broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
+      console.log("BBBBBBBBBBBBBBBBBBBBBBB BRADCASTING QUARRY MINED BLOCK TO PEERS BBBBBBBBBBBBBBBBBBBBBBBBB");
       ////////end database update and peers broadcast
       //post to rpcserver
       //this is where we SUBMIT WORK leaving it to eeror right now
@@ -868,6 +910,9 @@ var impcchild = function(childData){
 
   }else if(isJSON(childData) && JSON.parse(childData)["getWorkForMiner"]){
     console.log(JSON.parse(childData)["getWorkForMiner"])
+  }else if(isJSON(childData) && JSON.parse(childData)["getOrderBook"]){
+    console.log("now we are gonna have some fun")
+    impceventcaller("returning from function","maybe the calling peer is not necessary");
   }else if(isJSON(childData) && JSON.parse(childData)["getBalance"]){
     console.log("retrieving a balance for address provided...");
     console.log(JSON.parse(childData)["getBalance"]);
@@ -875,11 +920,19 @@ var impcchild = function(childData){
     var getBalance3 = frankieCoin.getBalanceOfAddress(JSON.parse(childData)["getBalance"]["address"]);
     console.log('\nMiners Function Balance of '+JSON.parse(childData)["getBalance"]["address"]+' is', getBalance3);
     console.log(getBalance3["SPHR"]);
+
+    var getBalance4 = [];
+    //var Keys = Object.keys(getBalance3);
+    for(account in getBalance3){
+      //var tempkey = Keys[account];
+      var tempbalance = {[account]:getBalance3[account]}
+      getBalance4.push(tempbalance);
+    }
     //this is where I would return that data
     var options = {
       uri: 'http://localhost:9090/rpc',
       method: 'POST',
-      json: {balance:{address:JSON.parse(childData)["getBalance"]["address"],balance:getBalance3["SPHR"]}}
+      json: {balance:{address:JSON.parse(childData)["getBalance"]["address"],balance:{getBalance4}}}
     };
 
     request(options, function (error, response, body) {
@@ -891,8 +944,36 @@ var impcchild = function(childData){
     console.log("RCP commands were not properly formatted");
   }
 }
+
+var impcMethods = function(datacall){
+  return new Promise((resolve)=> {
+    console.log("calling in peer");
+    console.log(JSON.stringify(datacall));
+    var dataBuySell = [];
+    var myCallbackOrderBuy = function(data) {
+      console.log('BUY ORDERS: '+JSON.stringify(data));//test for input
+      //resolve(data);
+      dataBuySell.push({"buy":data});
+      BlockchainDB.getOrdersPairSell(datacall["tickerBuy"],myCallbackOrderSell);
+    };
+    var myCallbackOrderSell = function(data) {
+      console.log('SELL ORDERS: '+JSON.stringify(data));//test for input
+      dataBuySell.push({"sell":data});
+      resolve(dataBuySell);
+    };
+    BlockchainDB.getOrdersPairBuy(datacall["tickerBuy"],myCallbackOrderBuy);
+  })
+}
+
+var impceventcaller;
+var impcevent = function(callback){
+    //sets the impcparent with the function from parent
+    impceventcaller = callback;
+}
 //initialize the child with the parent communcator call back function
 rpcserver.globalParentCom(impcchild);
+rpcserver.globalParentEvent(impcevent);
+rpcserver.globalParentComMethods(impcMethods);
 //////////////////////////////////////end inter module parent child communicator
 
 ////////////////////////////////////////////////initialize the console interface

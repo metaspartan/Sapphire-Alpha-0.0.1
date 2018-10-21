@@ -146,6 +146,7 @@ var Block = class Block {
         this.allConfigHash = '';
         //total Hash for sequencing
         this.hashOfThisBlock = '';
+        this.difficulty = difficulty;
       }
 
     calculateHash() {
@@ -188,6 +189,8 @@ var Blockchain = class Blockchain{
           this.miningReward = 9;
           //is the chain synched and mine and assist others? when true yes
           this.inSynch = false;
+          this.inSynchBlockHeight = 0;
+          this.longestPeerBlockHeight = 0;
           console.log("genesis block created");
           console.log("chain is"+JSON.stringify(this.chain));
       }
@@ -283,7 +286,10 @@ var Blockchain = class Blockchain{
           console.log('Previous Block Timestamp was '+this.getLatestBlock().timestamp);
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
           if(blockTimeDiff < 6){
-            block.difficulty = parseFloat(this.difficulty+1);
+            if(this.difficulty < 5){
+              console.log("WHHHHHHHHATTTTT THEEEEEEEE FFUUUUUCCKKKKKK"+this.difficulty)
+              block.difficulty = parseFloat(this.difficulty+1);
+            }
           }else{
             block.difficulty = parseFloat(this.difficulty-1);
           }
@@ -312,11 +318,28 @@ var Blockchain = class Blockchain{
 
       ///for mining transactions from outside miner
       addPendingTransactionsToMinedBLock(miningRewardAddress, minedBlock){
-          var blockTimeStamp = minedBlock["timestamp"];
 
-          let block = new Block(minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"]);
+          //need to add the mining reward HERE
+          var minedReward = new Transaction(null, minedBlock["miner"], this.miningReward, "SPHR");
+          this.createTransaction(minedReward);
+
+          var blockTimeStamp = minedBlock["timestamp"];
+          console.log("BBBBBBBBBBBBBBBBB block time stamp"+minedBlock["timestamp"]+" LAST BLOCK TIME STAMPING "+this.getLatestBlock().timestamp+"MINED  BLOCK PREV HASH "+minedBlock["previousHash"]+" LAST BLOCK HASH "+this.getLatestBlock().hash);
+          var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
+          let block = new Block(minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
           //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0) {
           //block.mineBlock(this.difficulty);
+          block.difficulty = minedBlock["difficulty"];
+
+          if(blockTimeDiff < 6){
+            //temporary difficulty setting stopped at 6
+            if(minedBlock["difficulty"] < 5){
+              block.difficulty = parseFloat(block.difficulty+1);
+            }
+          }else{
+            block.difficulty = parseFloat(block.difficulty-1);
+          }
+          console.log('Differential is '+blockTimeDiff)
           console.log('Block successfully added by outside miner '+blockTimeStamp);
           ////extra check
           try {
@@ -370,7 +393,7 @@ var Blockchain = class Blockchain{
 
         if(this.isChainValid() == false){
           this.chain.pop();
-          console.log("Block is not added and will be removed");
+          console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXX Block NOT added XXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
           return false;
         }else{
           console.log("Block added from peers");
@@ -394,7 +417,7 @@ var Blockchain = class Blockchain{
           console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         }
         //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-        var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce);
+        var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce, dbBlock.difficulty);
         this.chain.push(block);
         //careful I have the ischain valid returining true on all tries
         if(this.isChainValid() == false){

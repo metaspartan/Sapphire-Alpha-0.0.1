@@ -20,7 +20,31 @@ var globalParentCom = function(callback){
   //sets the impcparent with the function from parent
   impcparent = callback;
 }
+
+var impcParentMethods;
+//callback fuction used to set a caller to the parent called by parent on load
+var globalParentComMethods = function(callback){
+  //sets the impcparent with the function from parent
+  impcParentMethods = callback;
+}
 ///////////////////////////////////////////end inter module parent communication
+
+var methodEvent = function(datacall){
+  return new Promise((resolve)=> {
+    console.log("and here I am in rpc server");
+    resolve(impcParentMethods(datacall));
+  })
+}
+
+//another impc event cycle for parent messages
+var impcevent = function(mydata,mypeer){
+  console.log("SURELY AS SHIT IT FIRED BRO"+mydata+mypeer);
+}
+//callback gonna push a callback to parent
+var globalParentEvent = function(callback){
+  callback(impcevent);
+}
+//end impx event cycle
 
 let routes = {
     // this is the rpc endpoint
@@ -114,7 +138,7 @@ function requestListener(request, response) {
         } else {
             buf = buf + data;
         }
-        console.log(buf.toString());
+        console.log("just doble check it here"+buf.toString());
         impcparent(buf.toString());
     });
 
@@ -149,9 +173,13 @@ function requestListener(request, response) {
     })
 }
 
+methods.parentComEvent(methodEvent);
+
 console.log(`starting the server on port ${PORT}`);
 server.listen(PORT);
 
 module.exports = {
-  globalParentCom:globalParentCom
+  globalParentCom:globalParentCom,
+  globalParentEvent:globalParentEvent,
+  globalParentComMethods:globalParentComMethods
 }

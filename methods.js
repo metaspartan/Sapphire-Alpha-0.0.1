@@ -2,6 +2,12 @@
 
 let db = require('./db');
 
+var callerEvent;
+var parentComEvent = function(callback){
+  //sets the callerEvent with the function from parent
+  callerEvent = callback;
+}
+
 let methods = {
     createUser: {
         description: `creates a new user, and returns the details of the new user`,
@@ -228,6 +234,29 @@ let methods = {
      }
    },
 
+   getOrderBook: {
+     description: 'buy sell order book for ticker',
+     params: ['balance:the balance object'],
+     returns: ['balance'],
+     exec(blockObj) {
+         return new Promise((resolve) => {
+             if (typeof (blockObj) !== 'object') {
+                 throw new Error('was expecting an object!');
+             }
+             // you would usually do some validations here
+             // and check for required fields
+
+             //can I return a function?
+             console.log("called the order book");
+             let _blockObj = JSON.parse(JSON.stringify(blockObj));
+             console.log("called the order book"+_blockObj);
+             resolve(callerEvent(_blockObj));
+         });
+     }
+   },
+   parentComEvent:parentComEvent
 };
 
-module.exports = methods;
+//module.exports = methods;
+
+module.exports = methods

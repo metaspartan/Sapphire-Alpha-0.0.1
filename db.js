@@ -28,7 +28,7 @@ function proc(container) {
             // so to avoid interfering with the original data
             // we deep clone the object, to get our own reference
             let _obj = clone(obj);
-            console.log('savig', _obj);
+            console.log('saving', _obj);
             if (!_obj.id) {
                 // assign a random number as ID if none exists
                 _obj.id = (Math.random() * 10000000) | 0;
