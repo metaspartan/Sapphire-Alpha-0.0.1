@@ -241,7 +241,7 @@ function isJSON(str) {
           }else{
             console.log("Did not match this hash and this peer is an imposter");
             peers[peerId].conn.write("Don't hack me bro");
-            console.log(peers[peerId].toString());//?;
+            console.log(JSON.stringify(peers[peerId].toString()));//?;
           }
 
         }else if(JSON.parse(data)["ChainSyncPong"]){
