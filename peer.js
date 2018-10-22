@@ -241,13 +241,13 @@ function isJSON(str) {
             setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},300);
             //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
           }else{
-            console.log("Did not match this hash and this peer is an imposter");
+            log("Did not match this hash and this peer is an imposter");
             //peers[peerId].conn.write("Don't hack me bro");
             peers[peerId].conn.write(JSON.stringify({"BadPeer":{Height:1337}}));
           }
 
         }else if(JSON.parse(data)["BadPeer"]){
-          console.log("You modified your code base please update and try again");
+          log("You modified your code base please update and try again");
           process.exit();
           exit();
         }else if(JSON.parse(data)["ChainSyncPong"]){
