@@ -4,6 +4,7 @@ let http = require('http');
 let url = require('url');
 let methods = require('./methods');
 let types = require('./types');
+const chalk = require('chalk');
 
 let server = http.createServer(requestListener);
 const PORT = process.env.NODE_PORT || 9090;
@@ -179,7 +180,7 @@ function requestListener(request, response) {
 
 methods.parentComEvent(methodEvent);
 
-console.log(`starting the server on port ${PORT}`);
+console.log(chalk.blue("Started and Listening on "+chalk.green(": "+PORT)));
 server.listen(PORT);
 
 module.exports = {

@@ -1,6 +1,6 @@
 //const express = require('express');
 const nSQL = require("nano-sql").nSQL;
-
+const chalk = require('chalk');
 // Use an instance table to query and organize existing tables of data.
 var blockchain = nSQL('blockchain')// Table/Store Name, required to declare model and attach it to this store.
 .model([ // Data Model, required
@@ -38,10 +38,10 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
         call:function(args, db) {
           return db.query('select').where(['hash','=',args.blockchain["hash"]]).exec().then(function(rows) {
               if(rows.length == 0){
-                console.log("somehow we are inserting and row length = "+rows.length+args.blockchain["hash"])
+                console.log(chalk.blue("We are inserting: "+ chalk.green(rows.length+args.blockchain["hash"])))
                 return db.query('upsert',args.blockchain).exec();
               }else{
-                console.log("block already existed");
+                console.log(chalk.red("Block already existed"));
               }
             }
           );
@@ -111,11 +111,11 @@ var getBlockchain = function(limit,callBack){
 }
 
 var getBlock = function(number,callBack){
-  console.log("BLOCK FROM BLOCKCHAIN");
+  console.log(chalk.blue("BLOCK FROM BLOCKCHAIN"));
       // DB ready to use.
       nSQL("blockchain").getView('get_block',{blocknum:number})
       .then(function(result) {
-          console.log(result) //  <- single object array containing the row we inserted.
+          console.log(chalk.green(result)) //  <- single object array containing the row we inserted.
           callBack(result);
       });
 

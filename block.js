@@ -3,6 +3,7 @@ var BLAKE2s = require("./blake2s.js")
 //testing web3
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
+const chalk = require('chalk');
 
 //adds a link to one module function for database
 var addOrder = module.parent.children[6].exports.addOrder;
@@ -191,8 +192,8 @@ var Blockchain = class Blockchain{
           this.inSynch = false;
           this.inSynchBlockHeight = 0;
           this.longestPeerBlockHeight = 0;
-          console.log("genesis block created");
-          console.log("chain is"+JSON.stringify(this.chain));
+          console.log(chalk.cyan("Genesis block created!"));
+          console.log(chalk.blue("Chain is"+chalk.green(JSON.stringify(this.chain))));
       }
 
       registerNode(id,ip,port) {

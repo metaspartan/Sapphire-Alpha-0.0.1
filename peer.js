@@ -6,13 +6,14 @@
 //  Copyright (c) 2018 Frank Triantos aka OSOESE
 //
 /******************************************************************************/
-var swarm = require('discovery-swarm')
-const crypto = require('crypto')
-const defaults = require('dat-swarm-defaults')
-const readline = require('readline')
-const getPort = require('get-port')
+var swarm = require('discovery-swarm');
+const crypto = require('crypto');
+const defaults = require('dat-swarm-defaults');
+const readline = require('readline');
+const getPort = require('get-port');
+const chalk = require('chalk');
 //genesis hash variables
-var Genesis = require('./genesis')
+var Genesis = require('./genesis');
 const fs = require('fs');
 const sha256 = require('crypto-js/sha256');
 
@@ -26,13 +27,13 @@ var rpcserver = require('./rpc_server.js');
 var request = require('request');
 
 ///////////////////////Mining stuff : blockchain algo and mining initializations
-var sapphirechain = require("./block.js")
-var BLAKE2s = require("./blake2s.js")
-var Miner = require("./miner.js")
+var sapphirechain = require("./block.js");
+var BLAKE2s = require("./blake2s.js");
+var Miner = require("./miner.js");
 
 let ctr = 0;
 
-var msg = "genesis message"
+var msg = "genesis message";
 var length = 32;
 var key = "ax8906hg4c";
 var myDigestVar = "";
@@ -46,11 +47,11 @@ var tbh = "";
 var output = fs.readFile(filename, 'utf8', function(err, data) {
     if (err) throw err;
     tbh=data.replace(/(\r\n|\n|\r)/gm,"");//removes ALL line breaks
-    if (Genesis.genesisGlobalHash == "This is the Genesis GLobal Hash for the EtherGem Sapphire Integrated Subchain TeamEGEM"){
+    if (Genesis.genesisGlobalHash == "This is the Genesis Global Hash for the EtherGem Sapphire Integrated Subchain TeamEGEM"){
       globalGenesisHash = sha256(tbh).toString();
-      console.log("Global Genesis Hash: "+globalGenesisHash);
+      console.log(chalk.blue("Global Genesis Hash: "+ chalk.green(globalGenesisHash)));
     }else{
-      console.log("it did not validate")
+      console.log(chalk.red("It did not validate"));
     }
 });
 ////////////////////////////////////////////////////////////////end genesis hash
@@ -90,18 +91,18 @@ function isJSON(str) {
   const port = await getPort()
 
   sw.listen(port)
-  sw.join('egem-sfrx') // can be any id/name/hash
+  sw.join('egem-sfrx2') // can be any id/name/hash
 
   sw.on('connection', (conn, info) => {
 
-    console.log(JSON.stringify(info));
+    console.log(chalk.blue(JSON.stringify(info)));
     const seq = connSeq
     const peerId = info.id.toString('hex');
 
     if(info.id != myId){
       frankieCoin.registerNode(peerId,info.host,info.port,frankieCoin.length);
-      console.log("here is what we have in info "+JSON.stringify(info));
-      console.log('found + connected to peer with id '+peerId);
+      console.log(chalk.green("Here is what we have in info: "+ chalk.red(JSON.stringify(info))));
+      console.log(chalk.green('Found & connected to peer with id: '+ chalk.blue(peerId)));
     }
 
     conn.on('close', () => {
@@ -137,15 +138,15 @@ function isJSON(str) {
             //increment the internal peer nonce of sending party to track longest chain
             frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
             //logging the block added to chain for console
-            console.log("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock()));
+            console.log(chalk.green("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock())));
 
-            console.log("hash matches and we are good");
+            console.log(chalk.green("hash matches and we are good"));
             blocknumber = frankieCoin.getLength();
-            console.log("the database block number is "+blocknumber);
-            console.log("88888888888888888888888888888888888888888888888888888888888888888888");
-            console.log("THERE NEEDS TO BE ANOTHER SOMETHING SET HERE FOR THE DATASE SYNCHING");
-            console.log("         BUT WE DID JUST GET A SUCESSFUL BLOCK FROM PEER            ");
-            console.log("88888888888888888888888888888888888888888888888888888888888888888888");
+            console.log(chalk.red("the database block number is "+blocknumber));
+            console.log(chalk.red("--------------------------------------------------------------------"));
+            console.log(chalk.red("THERE NEEDS TO BE ANOTHER SOMETHING SET HERE FOR THE DATASE SYNCHING"));
+            console.log(chalk.red("         BUT WE DID JUST GET A SUCESSFUL BLOCK FROM PEER            "));
+            console.log(chalk.red("88888888888888888888888888888888888888888888888888888888888888888888"));
 
             //////update the client database OR reject block and rollback the chain - code is incomplete atm
             var peerblock = {"blockchain":{
