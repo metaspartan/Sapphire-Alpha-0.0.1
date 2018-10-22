@@ -1,7 +1,7 @@
 const fs = require('fs');
 const sha256 = require('crypto-js/sha256');
 /////////////////////////////////////////////////////////////////welcome message
-console.log("EtherGem Sapphire Integrated Subchain with DEX circa 2018");
+console.log("EtherGem Sapphire Integrated Subchain with DEX circa 2018 ");
 ////////////////////////////////////////////////////////////////////////tag line
 console.log("We do not want your money - we want to be your money")
 /////////////////////////////////////////////////hash peer.js and soon all files
