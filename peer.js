@@ -79,6 +79,7 @@ const config = defaults({
 
 const sw = swarm(config);
 
+/////////////////////////////simple function to test JSON input and avoid errors
 function isJSON(str) {
     try {
         JSON.parse(str);
@@ -87,7 +88,10 @@ function isJSON(str) {
     }
     return true;
 }
+/////////////////////////end simple function to test JSON input and avoid errors
 
+
+//////////////////////////////////////////////////////core function asynchronous
 ;(async () => {
   const port = await getPort()
 
@@ -237,11 +241,15 @@ function isJSON(str) {
             setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},300);
             //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
           }else{
-            log(chalk.red("Did not match this hash and this peer is an imposter"));
-            peers[peerId].write("Don't hack me bro");
-            //peers[peerId].connection.close()//?;
+            console.log("Did not match this hash and this peer is an imposter");
+            //peers[peerId].conn.write("Don't hack me bro");
+            peers[peerId].conn.write(JSON.stringify({"BadPeer":{Height:1337}}));
           }
 
+        }else if(JSON.parse(data)["BadPeer"]){
+          console.log("You modified your code base please update and try again");
+          process.exit();
+          exit();
         }else if(JSON.parse(data)["ChainSyncPong"]){
           //returned block from sunched peer and parses it for db
           log(JSON.parse(data)["ChainSyncPong"]);
