@@ -241,12 +241,13 @@ function isJSON(str) {
           }else{
             console.log("Did not match this hash and this peer is an imposter");
             peers[peerId].conn.write("Don't hack me bro");
-            peers[peerId].conn.write({"BadPeer":{}});
+            peers[peerId].conn.write({"BadPeer":{Height:1337}});
           }
 
         }else if(JSON.parse(data)["BadPeer"]){
           console.log("You modified your code base please update and try again");
           process.exit();
+          exit();
         }else if(JSON.parse(data)["ChainSyncPong"]){
           //returned block from sunched peer and parses it for db
           console.log(JSON.parse(data)["ChainSyncPong"]);
