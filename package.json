@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/osoese/Sapphire-Alpha-0.0.1#readme",
   "dependencies": {
+    "chalk": "^2.4.1",
     "crypto-js": "^3.1.9-1",
     "dat-swarm-defaults": "^1.0.1",
     "discovery-swarm": "^5.1.2",
@@ -33,7 +34,7 @@
     "mongodb-prebuilt-cross": "^5.0.7",
     "nano-sql": "^1.7.6",
     "node-ipc": "^9.1.1",
-    "web3": "^1.0.0-beta.35",
-    "request": "latest"
+    "request": "^2.88.0",
+    "web3": "^1.0.0-beta.35"
   }
 }
