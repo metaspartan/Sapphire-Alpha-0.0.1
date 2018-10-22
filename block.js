@@ -3,7 +3,9 @@ var BLAKE2s = require("./blake2s.js")
 //testing web3
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
+
 const chalk = require('chalk');
+const log = console.log;
 
 //adds a link to one module function for database
 var addOrder = module.parent.children[6].exports.addOrder;
@@ -13,15 +15,15 @@ var genesisBLK = function genesisBLK() {
   var txtData = "Blake2s Genesis for EtherGem Opal Coin 25 Feb 2018";
   var timestamp = Date.now();
   var hash = "";
-  console.log("here I am creating genesis block");
-  //console.log(powHash);
+  log(chalk.green("Creating genesis block:"));
+  //log(powHash);
   try {
     var h = new BLAKE2s(32, decodeUTF8(""));
   } catch (e) {
-    console.log("Error: " + e);
+    log("Error: " + e);
   };
 
-  console.log(prevHash+timestamp+hash+txtData);
+  log(prevHash+timestamp+hash+txtData);
 
   h.update(decodeUTF8(prevHash+timestamp+hash+txtData));
 
@@ -68,7 +70,7 @@ var Order = class Order{
 async function getBlockFromEgem(callback) {
   //grab latest EGEM BLock
   var result = await web3.eth.getBlock("latest");
-  //console.log(result);
+  //log(result);
   callback(result);
   // expected output: "resolved"
 }
@@ -76,7 +78,7 @@ async function getBlockFromEgem(callback) {
 var currentEgemBlock = 472;
 var currentEgemBlockHash = "0x0ed923fa347268f2d7b8e4a1a8d0ce61f810512ddaaec6729e66b004eb61e5e7";
 var currentEgemBlockCallBack = function(block) {
-  //console.log("in callback function")
+  //log("in callback function")
   currentEgemBlock = block["number"];
   currentEgemBlockHash = block["hash"];
 }
@@ -89,7 +91,7 @@ var Hash = function(inputs) {
   };
   h.update(decodeUTF8(inputs));
   var thishash = h.hexDigest().toString();
-  console.log(thishash);
+  log(thishash);
   return thishash;
 }
 
@@ -97,7 +99,7 @@ var Block = class Block {
 
     constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
 
-        console.log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
+        log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
         if(egemBRHash == ''){
           getBlockFromEgem(currentEgemBlockCallBack);
@@ -122,7 +124,7 @@ var Block = class Block {
           this.nonce = 0;
         }
         //tie this to the main EGEM chain
-        console.log("constructor again : "+egemBRBlock+" "+egemBRHash+" "+currentEgemBlock+" "+currentEgemBlockHash);
+        log("constructor again : "+egemBRBlock+" "+egemBRHash+" "+currentEgemBlock+" "+currentEgemBlockHash);
         if(egemBRBlock != '')  {
           this.eGEMBackReferenceBlock = egemBRBlock;
           this.egemBackReferenceBlockHash = egemBRHash;
@@ -166,12 +168,12 @@ var Block = class Block {
         while (this.hash.substring(0, difficulty) !== Array(difficulty + 1).join("0")) {
             this.nonce++;
             if(this.nonce%1500 == 0){
-              console.log("BLOCK NOT MINED: " + this.nonce);
+              log("BLOCK NOT MINED: " + this.nonce);
             }
 
             this.hash = this.calculateHash();
         }
-        console.log("BLOCK MINED: " + this.hash);
+        log("BLOCK MINED: " + this.hash);
     }
 
 }
@@ -192,8 +194,8 @@ var Blockchain = class Blockchain{
           this.inSynch = false;
           this.inSynchBlockHeight = 0;
           this.longestPeerBlockHeight = 0;
-          console.log(chalk.cyan("Genesis block created!"));
-          console.log(chalk.blue("Chain is"+chalk.green(JSON.stringify(this.chain))));
+          log(chalk.cyan("Genesis block created!"));
+          log(chalk.blue("Chain is: "+chalk.green(JSON.stringify(this.chain))));
       }
 
       registerNode(id,ip,port) {
@@ -250,7 +252,7 @@ var Blockchain = class Blockchain{
       }
 
       createGenesisBlock() {
-          console.log("This is where I can include this: "+genesisBLK()+" in the genesis block... (but its not there yet)");
+          log("This is where I can include this: "+genesisBLK()+" in the genesis block... (but its not there yet)");
           return new Block(Date.parse("2017-01-01"), [], []);
       }
 
@@ -283,18 +285,18 @@ var Blockchain = class Blockchain{
           }
 
           block.mineBlock(this.difficulty);
-          console.log('Block successfully mined! '+blockTimeStamp);
-          console.log('Previous Block Timestamp was '+this.getLatestBlock().timestamp);
+          log('Block successfully mined! '+blockTimeStamp);
+          log('Previous Block Timestamp was '+this.getLatestBlock().timestamp);
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
           if(blockTimeDiff < 6){
             if(this.difficulty < 5){
-              console.log("WHHHHHHHHATTTTT THEEEEEEEE FFUUUUUCCKKKKKK"+this.difficulty)
+              log("WHHHHHHHHATTTTT THEEEEEEEE FFUUUUUCCKKKKKK"+this.difficulty)
               block.difficulty = parseFloat(this.difficulty+1);
             }
           }else{
             block.difficulty = parseFloat(this.difficulty-1);
           }
-          console.log('Differential is '+blockTimeDiff)
+          log('Differential is '+blockTimeDiff)
           ////extra check
           try {
             var h = new BLAKE2s(32, decodeUTF8(""));
@@ -303,7 +305,7 @@ var Blockchain = class Blockchain{
           };
           //h.update(decodeUTF8(block.previousHash + block.timestamp + JSON.stringify(block.transactions) + JSON.stringify(block.orders) + block.nonce));
           h.update(decodeUTF8(block.previousHash + block.timestamp + block.nonce));
-          console.log("should match the block hash "+h.hexDigest());
+          log("should match the block hash "+h.hexDigest());
           ////extra check
 
           //adding a trading mechanism and if below this chain push it processes same block HINT MOVE IT TWO LINES DOWN
@@ -325,7 +327,7 @@ var Blockchain = class Blockchain{
           this.createTransaction(minedReward);
 
           var blockTimeStamp = minedBlock["timestamp"];
-          console.log("BBBBBBBBBBBBBBBBB block time stamp"+minedBlock["timestamp"]+" LAST BLOCK TIME STAMPING "+this.getLatestBlock().timestamp+"MINED  BLOCK PREV HASH "+minedBlock["previousHash"]+" LAST BLOCK HASH "+this.getLatestBlock().hash);
+          log("BBBBBBBBBBBBBBBBB block time stamp"+minedBlock["timestamp"]+" LAST BLOCK TIME STAMPING "+this.getLatestBlock().timestamp+"MINED  BLOCK PREV HASH "+minedBlock["previousHash"]+" LAST BLOCK HASH "+this.getLatestBlock().hash);
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
           let block = new Block(minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
           //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0) {
@@ -340,8 +342,8 @@ var Blockchain = class Blockchain{
           }else{
             block.difficulty = parseFloat(block.difficulty-1);
           }
-          console.log('Differential is '+blockTimeDiff)
-          console.log('Block successfully added by outside miner '+blockTimeStamp);
+          log('Differential is '+blockTimeDiff)
+          log('Block successfully added by outside miner '+blockTimeStamp);
           ////extra check
           try {
             var h = new BLAKE2s(32, decodeUTF8(""));
@@ -350,7 +352,7 @@ var Blockchain = class Blockchain{
           };
           //h.update(decodeUTF8(block.previousHash + block.timestamp + JSON.stringify(block.transactions) + JSON.stringify(block.orders) + block.nonce));
           h.update(decodeUTF8(block.previousHash + block.timestamp + block.nonce));
-          console.log("should match the block hash "+h.hexDigest());
+          log("should match the block hash "+h.hexDigest());
           ////extra check
 
           //adding a trading mechanism and if below this chain push it processes same block HINT MOVE IT TWO LINES DOWN
@@ -371,9 +373,9 @@ var Blockchain = class Blockchain{
         //1 issync should be YES
         //2 previous hash must match current chain top hash
         if(this.getLatestBlock().hash == inBlock.previousHash){
-          console.log("----------------------------------------------------");
-          console.log("yes inblock prev hash of "+inBlock.previousHash+" matches the hash of chain "+this.getLatestBlock().hash);
-          console.log("----------------------------------------------------");
+          log("----------------------------------------------------");
+          log("yes inblock prev hash of "+inBlock.previousHash+" matches the hash of chain "+this.getLatestBlock().hash);
+          log("----------------------------------------------------");
 
           //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
           var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce);
@@ -381,23 +383,23 @@ var Blockchain = class Blockchain{
           //careful I have the ischain valid returining true on all tries
 
         }else if(this.chain[this.chain.length - 2].hash == inBlock.previousHash && this.getLatestBlock().previousHash == inBlock.previousHash){//uncle block
-          console.log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
-          console.log("UNCLE previous hash matches"+inBlock.previousHash+" current prev hash "+this.getLatestBlock().previousHash);
-          console.log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
+          log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
+          log("UNCLE previous hash matches"+inBlock.previousHash+" current prev hash "+this.getLatestBlock().previousHash);
+          log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
           //need to return a message that returns the uncle info and uncle block reward to sending peer
         }else{
-          console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-          console.log("no inblock prev hash of "+inBlock.previousHash+" does not match the hash of chain "+this.getLatestBlock().hash);
-          console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+          log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+          log("no inblock prev hash of "+inBlock.previousHash+" does not match the hash of chain "+this.getLatestBlock().hash);
+          log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
           //this case represents a problem because it is just a bad block
         }
 
         if(this.isChainValid() == false){
           this.chain.pop();
-          console.log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXX Block NOT added XXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+          log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXX Block NOT added XXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
           return false;
         }else{
-          console.log("Block added from peers");
+          log("Block added from peers");
           return true;
         }
       }
@@ -409,13 +411,13 @@ var Blockchain = class Blockchain{
         //1 issync should be YES
         //2 previous hash must match current chain top hash
         if(this.getLatestBlock().hash == dbBlock.previousHash){
-          console.log("----------------------------------------------------");
-          console.log("yes DB BLOCK prev hash of "+dbBlock.previousHash+" matches the hash of chain "+this.getLatestBlock().hash);
-          console.log("----------------------------------------------------");
+          log("----------------------------------------------------");
+          log("yes DB BLOCK prev hash of "+dbBlock.previousHash+" matches the hash of chain "+this.getLatestBlock().hash);
+          log("----------------------------------------------------");
         }else{
-          console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-          console.log("no DB BLOCK prev hash of "+dbBlock.previousHash+" does not match the hash of chain "+this.getLatestBlock().hash);
-          console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+          log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+          log("no DB BLOCK prev hash of "+dbBlock.previousHash+" does not match the hash of chain "+this.getLatestBlock().hash);
+          log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         }
         //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
         var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce, dbBlock.difficulty);
@@ -423,9 +425,9 @@ var Blockchain = class Blockchain{
         //careful I have the ischain valid returining true on all tries
         if(this.isChainValid() == false){
           this.chain.pop();
-          console.log("Block is not added and will be removed")
+          log("Block is not added and will be removed")
         }else{
-          console.log("Block added from DATABASE")
+          log("Block added from DATABASE")
         }
       }
 
@@ -442,7 +444,7 @@ var Blockchain = class Blockchain{
           }else{
             order["originationID"] = order["transactionID"];
           }
-          console.log("Order just placed is "+JSON.stringify(order));
+          log("Order just placed is "+JSON.stringify(order));
           this.pendingOrders.push(order);
       }
 
@@ -478,9 +480,9 @@ var Blockchain = class Blockchain{
           let tradeBalance = [];//will become the tradewallet for now is testing of trade interactions
           let tradeOrders = [];
           var myblock = this.getLatestBlock().orders;
-          console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-          console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-          console.log(JSON.stringify(myblock));
+          log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+          log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+          log(JSON.stringify(myblock));
 
 
           var allbuys = myblock.filter(
@@ -493,9 +495,9 @@ var Blockchain = class Blockchain{
           }
           ***/
 
-          //console.log("here is the BUYS log"+JSON.stringify(allbuys));
-          console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
-          console.log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+          //log("here is the BUYS log"+JSON.stringify(allbuys));
+          log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
+          log("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH");
 
           /***
           var allbuys = allbuys1.filter(
@@ -511,13 +513,13 @@ var Blockchain = class Blockchain{
               function(myblock){ return ( myblock.buyOrSell=="SELL" ); }
             );
 
-            console.log("88888888888888888888 here is the SELLS log"+JSON.stringify(allsells));
+            log("88888888888888888888 here is the SELLS log"+JSON.stringify(allsells));
             for(var transactions in allsells){
               if(allbuys[ordersofbuy]["pairBuy"] == allsells[transactions]["pairBuy"] && allbuys[ordersofbuy]["pairSell"] == allsells[transactions]["pairSell"]){
-                console.log("99999999999999999 are we transacting? "+allbuys[ordersofbuy]["pairSell"]+allbuys[ordersofbuy]["price"]+" and "+allsells[transactions]["pairSell"]+allsells[transactions]["price"]);
+                log("99999999999999999 are we transacting? "+allbuys[ordersofbuy]["pairSell"]+allbuys[ordersofbuy]["price"]+" and "+allsells[transactions]["pairSell"]+allsells[transactions]["price"]);
                 if(allbuys[ordersofbuy]["price"] >= allsells[transactions]["price"]){
                     if(allbuys[ordersofbuy].amount < allsells[transactions].amount){
-                      console.log("transaction created is "+allsells[transactions]["fromAddress"]+allbuys[ordersofbuy]["fromAddress"]+allbuys[ordersofbuy]["amount"]+allbuys[ordersofbuy]["pairBuy"]);
+                      log("transaction created is "+allsells[transactions]["fromAddress"]+allbuys[ordersofbuy]["fromAddress"]+allbuys[ordersofbuy]["amount"]+allbuys[ordersofbuy]["pairBuy"]);
                       this.createTransaction(new Transaction(allsells[transactions]["fromAddress"], allbuys[ordersofbuy]["fromAddress"], allbuys[ordersofbuy]["amount"], allbuys[ordersofbuy]["pairBuy"]));
                       var newOrderAmpount = allsells[transactions]["amount"]-allbuys[ordersofbuy]["amount"];
                       //constructor(fromAddress, buyOrSell, pairBuy, pairSell, amount, price, transactionID, originationID){
@@ -585,7 +587,7 @@ var Blockchain = class Blockchain{
                       //one gets partisl
                       //and a new one gets open
                     }else{
-                      console.log("&&&&&&&&&& EXACT MATCH &&&&&&&&&&&&&");
+                      log("&&&&&&&&&& EXACT MATCH &&&&&&&&&&&&&");
                       //this.createTransaction(new Transaction(allsells[transactions]["fromAddress"], allbuys[ordersofbuy]["fromAddress"], allsells[transactions]["amount"], allbuys[ordersofbuy].pairBuy));
                       //close two orders
                     }
@@ -597,7 +599,7 @@ var Blockchain = class Blockchain{
           }///end ordersofbuy loop
           ////////////////////////////////////////////////////////BUYS AND SELLS
 
-          console.log("here is the BUYS log"+JSON.stringify(allbuys));
+          log("here is the BUYS log"+JSON.stringify(allbuys));
 
 
           /****
@@ -606,14 +608,14 @@ var Blockchain = class Blockchain{
 
               var block = this.getLatestBlock();
               for(const orders of block.orders){
-                console.log("this is inside the loop");
-                console.log(JSON.stringify(orders));
+                log("this is inside the loop");
+                log(JSON.stringify(orders));
 
-                      console.log("inside trades "+orders.pairBuy+orders.state+orders.amount+orders.buyOrSell);
+                      log("inside trades "+orders.pairBuy+orders.state+orders.amount+orders.buyOrSell);
 
                       if(tradeBalance[orders.pairBuy] == null){
                         tradeBalance[orders.pairBuy] = 0;
-                        console.log("tb["+orders.pairBuy+"]"+tradeBalance[orders.pairing]);
+                        log("tb["+orders.pairBuy+"]"+tradeBalance[orders.pairing]);
                       }
 
                       if(tradeOrders[orders.pairBuy] == null){
@@ -628,13 +630,13 @@ var Blockchain = class Blockchain{
 
                       if(tradeOrders[orders.pairBuy]["buyOrSell"] == "BUY"){
                         for(const ordersTX of block.orders){
-                          console.log("about to transact if "+ordersTX.buyOrSell+" = SELL and "+ordersTX.state+" = open and "+ordersTX.pairBuy+ " = "+orders.pairBuy);
+                          log("about to transact if "+ordersTX.buyOrSell+" = SELL and "+ordersTX.state+" = open and "+ordersTX.pairBuy+ " = "+orders.pairBuy);
                           if(ordersTX.buyOrSell == "SELL" && ordersTX.state == "open" && ordersTX.pairBuy == orders.pairBuy){
-                            console.log("**************OUTER SELL CONDITION MET***************");
-                            console.log("price"+ordersTX.price+" "+tradeOrders[orders.pairBuy]["price"]);
-                            console.log("amount"+ordersTX.amount+" "+tradeOrders[orders.pairBuy]["amount"]);
+                            log("**************OUTER SELL CONDITION MET***************");
+                            log("price"+ordersTX.price+" "+tradeOrders[orders.pairBuy]["price"]);
+                            log("amount"+ordersTX.amount+" "+tradeOrders[orders.pairBuy]["amount"]);
                             if(ordersTX.price <= tradeOrders[orders.pairBuy]["price"]){//this will transact or we move to next higher order price
-                              console.log("***CREATE ORDER*****this is where I would transact some of "+orders.pairBuy+" and change the status to closed or partial");
+                              log("***CREATE ORDER*****this is where I would transact some of "+orders.pairBuy+" and change the status to closed or partial");
                               //craft the trade transaction
                               var amounttoBuyTx = ordersTX.amount;
                               var amountToSellOrder = tradeOrders[orders.pairBuy]["amount"];
@@ -672,14 +674,14 @@ var Blockchain = class Blockchain{
                                 //in this case there will not be a new order placed so both orders will be closed
                               //}else if(ordersTX.amount > tradeOrders[orders.pairBuy]["amount"]){//already done up top case 1
                               }else{
-                                console.log("IS THIS AN ERROR BECAUSE NO BUY OR SELL ORDERS MATCHED")
+                                log("IS THIS AN ERROR BECAUSE NO BUY OR SELL ORDERS MATCHED")
                               }
                               //creates the trade transaction
                               this.createTransaction(new Transaction(ordersTX.fromAddress, tradeOrders[orders.pairBuy]["fromAddress"], tradeOrders[orders.pairBuy]["amount"], orders.pairBuy));
-                              console.log(ordersTX.fromAddress+tradeOrders[orders.pairBuy]["fromAddress"]+tradeOrders[orders.pairBuy]["amount"]+orders.pairBuy);
+                              log(ordersTX.fromAddress+tradeOrders[orders.pairBuy]["fromAddress"]+tradeOrders[orders.pairBuy]["amount"]+orders.pairBuy);
                               //update the trade order
                               //need a variable for partial or filled
-                              console.log("about to create order and origID is"+originationID);
+                              log("about to create order and origID is"+originationID);
                               this.createOrder(
                                 new Order(
                                   tradeOrders[orders.pairBuy]["fromAddress"],
@@ -697,17 +699,17 @@ var Blockchain = class Blockchain{
 
                       //this is incorrect information
                       if(tradeOrders[orders.pairBuy]["fromAddress"]){
-                        console.log('in trading Balance of '+tradeOrders[orders.pairBuy]["fromAddress"]+' is'+this.getBalanceOfAddress(tradeOrders[orders.pairBuy]["fromAddress"]));
+                        log('in trading Balance of '+tradeOrders[orders.pairBuy]["fromAddress"]+' is'+this.getBalanceOfAddress(tradeOrders[orders.pairBuy]["fromAddress"]));
                       }
 
                       if(orders.buyOrSell == "BUY" && orders.state == "open"){
                           tradeBalance[orders.pairBuy] -= parseInt(orders.amount);
-                          console.log("tb["+orders.pairBuy+"]"+tradeBalance[orders.pairBuy]);
+                          log("tb["+orders.pairBuy+"]"+tradeBalance[orders.pairBuy]);
                       }
 
                       if(orders.buyOrSell == "SELL" && orders.state == "open"){
                           tradeBalance[orders.pairBuy] += parseInt(orders.amount);
-                          console.log("tb["+orders.pairBuy+"]"+tradeBalance[orders.pairBuy]);
+                          log("tb["+orders.pairBuy+"]"+tradeBalance[orders.pairBuy]);
                       }
 
 
@@ -716,7 +718,7 @@ var Blockchain = class Blockchain{
 
           //}
 
-          console.log("output of pending orders "+JSON.stringify(tradeOrders)+"tradebalance"+JSON.stringify(tradeBalance));
+          log("output of pending orders "+JSON.stringify(tradeOrders)+"tradebalance"+JSON.stringify(tradeBalance));
 
           return tradeBalance;
 
@@ -727,23 +729,23 @@ var Blockchain = class Blockchain{
       isChainSynch(length) {
         if(this.isChainValid() && this.chain.length == length){
           //this.chain.inSynch = true;
-          console.log("4444444444444444     CHAIN IS SYNCH at block "+this.chain.length+"    4444444444444444444");
+          log("4444444444444444     CHAIN IS SYNCH at block "+this.chain.length+"    4444444444444444444");
           return true;
         }else{
-          console.log("55555555555555555     CHAIN IS NOT SYNCH at block "+this.chain.length+"     5555555555555555555");
+          log("55555555555555555     CHAIN IS NOT SYNCH at block "+this.chain.length+"     5555555555555555555");
           return false;
         }
       }
 
       isChainValid() {
           for (let i = 1; i < this.chain.length; i++){
-              //console.log("current block "+JSON.stringify(this.chain[i]))
-              //console.log("current block "+JSON.stringify(this.getBlock(i+1)));
+              //log("current block "+JSON.stringify(this.chain[i]))
+              //log("current block "+JSON.stringify(this.getBlock(i+1)));
               const currentBlock = this.chain[i];
               if (this.chain[i].hash !== this.chain[i].calculateHash()) {
-                  console.log("would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i+1).calculateHash());
-                  console.log("previoushash"+this.getBlock(i+1).previousHash+"timestamp"+this.getBlock(i+1).timestamp+"nonce"+this.getBlock(i+1).nonce);
-                  console.log("double check calc is same"+this.getBlock(i+1).calculateHash());
+                  log("would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i+1).calculateHash());
+                  log("previoushash"+this.getBlock(i+1).previousHash+"timestamp"+this.getBlock(i+1).timestamp+"nonce"+this.getBlock(i+1).nonce);
+                  log("double check calc is same"+this.getBlock(i+1).calculateHash());
                   ///triple check
                   try {
                     var h = new BLAKE2s(32, decodeUTF8(""));
@@ -752,14 +754,14 @@ var Blockchain = class Blockchain{
                   };
                   //h.update(decodeUTF8(this.chain[i+1].previousHash + this.chain[i+1].timestamp + JSON.stringify(this.chain[i+1].transactions) + JSON.stringify(this.chain[i+1].orders) + this.chain[i+1].nonce));
                   h.update(decodeUTF8(this.getBlock(i+1).previousHash + this.getBlock(i+1).timestamp + this.getBlock(i+1).nonce));
-                  console.log(h.hexDigest());
+                  log(h.hexDigest());
                   return false;
               }else{
-                console.log("8888888888888888WE FIX IT**************");
+                log("8888888888888888WE FIX IT**************");
               }
               const previousBlock = this.chain[i - 1];
               if (this.chain[i].previousHash !== this.chain[i-1].hash) {
-                  console.log("would be returning false here: cb prevhash "+currentBlock.previousHash+" prev block hash "+previousBlock.hash);
+                  log("would be returning false here: cb prevhash "+currentBlock.previousHash+" prev block hash "+previousBlock.hash);
                   return false;
               }
           }

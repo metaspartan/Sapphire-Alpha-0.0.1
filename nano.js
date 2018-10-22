@@ -1,6 +1,7 @@
 //const express = require('express');
 const nSQL = require("nano-sql").nSQL;
 const chalk = require('chalk');
+const log = console.log;
 // Use an instance table to query and organize existing tables of data.
 var blockchain = nSQL('blockchain')// Table/Store Name, required to declare model and attach it to this store.
 .model([ // Data Model, required
@@ -38,10 +39,10 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
         call:function(args, db) {
           return db.query('select').where(['hash','=',args.blockchain["hash"]]).exec().then(function(rows) {
               if(rows.length == 0){
-                console.log(chalk.blue("We are inserting: "+ chalk.green(rows.length+args.blockchain["hash"])))
+                log(chalk.blue("We are inserting: "+ chalk.green(rows.length+args.blockchain["hash"])))
                 return db.query('upsert',args.blockchain).exec();
               }else{
-                console.log(chalk.red("Block already existed"));
+                log(chalk.red("Block already existed"));
               }
             }
           );
@@ -78,12 +79,12 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
 ]).connect();
 
 var addBlock = function(order){
-  console.log(JSON.stringify(order));
+  log(JSON.stringify(order));
   //orders.connect().then(function(result) {
       // DB ready to use.
       nSQL("blockchain").doAction('add_block',order
       ).then(function(result) {
-          console.log(result) //  <- single object array containing the row we inserted.
+          log(result) //  <- single object array containing the row we inserted.
       });
   //});
 }
@@ -97,25 +98,25 @@ var clearBlock = function(blocknum){
 }
 
 var getBlockchain = function(limit,callBack){
-  console.log("ENTIRE BLOCKCHAIN");
+  log("ENTIRE BLOCKCHAIN");
       if(limit){
-        console.log(" LIMITED by "+limit);
+        log(" LIMITED by "+limit);
       }
       // DB ready to use.
       nSQL("blockchain").getView('get_blockchain')
       .then(function(result) {
-          console.log(result) //  <- single object array containing the row we inserted.
+          log(result) //  <- single object array containing the row we inserted.
           callBack(result);
       });
 
 }
 
 var getBlock = function(number,callBack){
-  console.log(chalk.blue("BLOCK FROM BLOCKCHAIN"));
+  log(chalk.blue("BLOCK FROM BLOCKCHAIN"));
       // DB ready to use.
       nSQL("blockchain").getView('get_block',{blocknum:number})
       .then(function(result) {
-          console.log(chalk.green(result)) //  <- single object array containing the row we inserted.
+          log(chalk.green(result)) //  <- single object array containing the row we inserted.
           callBack(result);
       });
 
@@ -202,14 +203,14 @@ var clearOrderDatabase = function(){
 
 
 var addOrder = function(order){
-  console.log("okay at least we are trying to add this order in db"+JSON.stringify(order));
+  log("okay at least we are trying to add this order in db"+JSON.stringify(order));
   //orders.connect().then(function(result) {
       // DB ready to use.
-      console.log("we are placing this order "+order);
+      log("we are placing this order "+order);
 
       nSQL("orders").doAction('add_new_order',order
       ).then(function(result) {
-          console.log(result) //  <- single object array containing the row we inserted.
+          log(result) //  <- single object array containing the row we inserted.
       });
   //});
 }
@@ -227,11 +228,11 @@ var simple = nSQL([
 var ordersToBuy = [];
 
 var getOrdersBuy = function(callBack){
-  console.log("Open BUY Orders");
+  log("Open BUY Orders");
       // DB ready to use.
       nSQL("orders").getView('list_all_orders_buy')
       .then(function(result) {
-          //console.log(result) //  <- single object array containing the row we inserted.
+          //log(result) //  <- single object array containing the row we inserted.
           callBack(result);
       });
 
@@ -239,54 +240,54 @@ var getOrdersBuy = function(callBack){
 
 ////////////////////////////////////////////////////////////////////////////first call
 var getOrdersPairBuy = function(pair,callback){
-  console.log("Open PAIR BUY Orders");
+  log("Open PAIR BUY Orders");
       // DB ready to use.
       nSQL("orders").getView('get_order_by_pairBuy',{pairBuy:pair})
       .then(function(result) {
-          //console.log(result) //  <- single object array containing the row we inserted.
+          //log(result) //  <- single object array containing the row we inserted.
           callback(result);
-          //console.log(result);
+          //log(result);
       });
 
 }
 ////////////////////////////////////////////////////////////////////////////first call
 var getOrdersPairSell = function(pair,callback){
-  console.log("Open PAIR BUY Orders");
+  log("Open PAIR BUY Orders");
       // DB ready to use.
       nSQL("orders").getView('get_order_by_pairSell',{pairSell:pair})
       .then(function(result) {
-          //console.log(result) //  <- single object array containing the row we inserted.
+          //log(result) //  <- single object array containing the row we inserted.
           callback(result);
-          //console.log(result);
+          //log(result);
       });
 
 }
 
 var buildTrade = function(obj,callBack){
-  console.log("Building transactions from sell orders for "+JSON.stringify(obj));
+  log("Building transactions from sell orders for "+JSON.stringify(obj));
   nSQL("orders").getView('get_order_by_pairSell',{pairSell:obj["pairSell"]})
   .then(function(result) {
-      //console.log(result) //  <- single object array containing the row we inserted.
+      //log(result) //  <- single object array containing the row we inserted.
       callBack(obj,result);
   });
 }
 
 var getOrdersSell = function(){
-  console.log("Open SELL Orders");
+  log("Open SELL Orders");
       // DB ready to use.
       nSQL("orders").getView('list_all_orders_sell')
       .then(function(result) {
-          console.log(result) //  <- single object array containing the row we inserted.
+          log(result) //  <- single object array containing the row we inserted.
       });
 
 }
 
 var getAllOrders = function(){
-  console.log("ALL Open Orders");
+  log("ALL Open Orders");
       // DB ready to use.
       nSQL("orders").getView('list_all_orders')
       .then(function(result) {
-          console.log(result) //  <- single object array containing the row we inserted.
+          log(result) //  <- single object array containing the row we inserted.
       });
 
 }

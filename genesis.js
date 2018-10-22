@@ -1,13 +1,14 @@
 const fs = require('fs');
 const sha256 = require('crypto-js/sha256');
 const chalk = require('chalk');
+const log = console.log;
 /////////////////////////////////////////////////////////////////welcome message
-console.log(" ");
-console.log(chalk.green("EtherGem Sapphire Integrated Subchain with DEX circa 2018"));
-console.log(" ");
+log(" ");
+log(chalk.green("EtherGem Sapphire Integrated Subchain with DEX circa 2018"));
+log(" ");
 ////////////////////////////////////////////////////////////////////////tag line
-console.log(chalk.green("We do not want your money - we want to be your money"));
-console.log(" ");
+log(chalk.green("We do not want your money - we want to be your money"));
+log(" ");
 /////////////////////////////////////////////////hash peer.js and soon all files
 var fileHash = "";
 var filename = "peer.js";
@@ -18,7 +19,7 @@ var getFiseHash = function(){
       if (err) throw err;
       tbh=data.replace(/(\r\n|\n|\r)/gm,"");
       fileHash = sha256(tbh).toString();
-      console.log(chalk.cyan("Filehash is: "+ chalk.green(fileHash)));
+      log(chalk.cyan("Filehash is: "+ chalk.green(fileHash)));
   });
 }
 //////////////////////////////////////////////////////////////////end hash files

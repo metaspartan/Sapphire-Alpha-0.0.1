@@ -1,5 +1,8 @@
 'use strict';
 
+const chalk = require('chalk');
+const log = console.log;
+
 let users = {};
 let tasks = {};
 let miners = {};
@@ -28,7 +31,7 @@ function proc(container) {
             // so to avoid interfering with the original data
             // we deep clone the object, to get our own reference
             let _obj = clone(obj);
-            console.log('saving', _obj);
+            log('Saving: ', _obj);
             if (!_obj.id) {
                 // assign a random number as ID if none exists
                 _obj.id = (Math.random() * 10000000) | 0;
@@ -42,11 +45,11 @@ function proc(container) {
             return clone(container[id.toString()]);
         },
         fetchKey(address) {
-          console.log(address);
+          log(address);
           //searching for ky value
           let _bunch = [];
           for (let item in container) {
-            console.log(JSON.stringify(item));
+            log(JSON.stringify(item));
             if(container[item]["address"] == address){
               _bunch.push(clone(container[item]));
             }

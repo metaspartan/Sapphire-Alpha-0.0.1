@@ -5,6 +5,7 @@ let url = require('url');
 let methods = require('./methods');
 let types = require('./types');
 const chalk = require('chalk');
+const log = console.log;
 
 let server = http.createServer(requestListener);
 const PORT = process.env.NODE_PORT || 9090;
@@ -36,14 +37,14 @@ var globalParentComMethods = function(callback){
 
 var methodEvent = function(datacall){
   return new Promise((resolve)=> {
-    console.log("and here I am in rpc server");
+    log("and here I am in rpc server");
     resolve(impcParentMethods(datacall));
   })
 }
 
 //another impc event cycle for parent messages
 var impcevent = function(mydata,mypeer){
-  console.log("SURELY AS SHIT IT FIRED BRO"+mydata+mypeer);
+  log("SURELY AS SHIT IT FIRED BRO"+mydata+mypeer);
 }
 //callback gonna push a callback to parent
 var globalParentEvent = function(callback){
@@ -82,7 +83,7 @@ let routes = {
             }
 
             Promise.all(promiseArr).then(iter => {
-                console.log(iter);
+                log(iter);
                 let response = {};
                 iter.forEach((val, index) => {
                     response[keys[index]] = val;
@@ -143,7 +144,7 @@ function requestListener(request, response) {
         } else {
             buf = buf + data;
         }
-        console.log("just doble check it here"+buf.toString());
+        log(chalk.blue("Reference Check: "+ chalk.green(buf.toString())));
         impcparent(buf.toString(),parentBroadcastPeersFunction);
     });
 
@@ -180,7 +181,7 @@ function requestListener(request, response) {
 
 methods.parentComEvent(methodEvent);
 
-console.log(chalk.blue("Started and Listening on "+chalk.green(": "+PORT)));
+log(chalk.blue("Started and Listening on "+chalk.green(": "+PORT)));
 server.listen(PORT);
 
 module.exports = {
