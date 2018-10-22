@@ -240,8 +240,8 @@ function isJSON(str) {
             //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
           }else{
             console.log("Did not match this hash and this peer is an imposter");
-            peers[peerId].conn.write("Don't hack me bro");
-            peers[peerId].conn.write({"BadPeer":{Height:1337}});
+            //peers[peerId].conn.write("Don't hack me bro");
+            peers[peerId].conn.write(JSON.stringify({"BadPeer":{Height:1337}}));
           }
 
         }else if(JSON.parse(data)["BadPeer"]){
