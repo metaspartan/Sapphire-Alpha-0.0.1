@@ -92,7 +92,7 @@ function isJSON(str) {
   const port = await getPort()
 
   sw.listen(port)
-  sw.join('egem-sfrx2') // can be any id/name/hash
+  sw.join('egem-sfrx') // can be any id/name/hash
 
   sw.on('connection', (conn, info) => {
 

@@ -1,5 +1,6 @@
 var sapphirechain = require("./block.js")
 var BLAKE2s = require("./blake2s.js")
+const log = console.log;
 
 //let frankieCoin = new sapphirechain.Blockchain();
 let ctr = 0;
@@ -28,7 +29,7 @@ var Miner = class Miner {
 
   getBalanceOfAddress(addr){
     var getBalance = this.chain.getBalanceOfAddress(addr);
-    console.log('\nMiners Function Balance of '+addr+' is', getBalance);
+    log('\nMiners Function Balance of '+addr+' is', getBalance);
     return getBalance;
   }
 
@@ -37,13 +38,13 @@ var Miner = class Miner {
   }
 
   mpt3(minerAddress,minedBlock){
-    console.log(minerAddress+" aha this is my mined block "+JSON.stringify(minedBlock))
+    log(minerAddress+" aha this is my mined block "+JSON.stringify(minedBlock))
     this.chain.addPendingTransactionsToMinedBLock(minerAddress,minedBlock);
   }
 
   calculateDigest(word,diff,pass){
     // Get message converting to Unix line breaks.
-    //console.log("calculating"+word+"diff"+diff+"pass"+pass);
+    //log("calculating"+word+"diff"+diff+"pass"+pass);
     if(word){
       msg = word;
     }else{
@@ -53,50 +54,50 @@ var Miner = class Miner {
       difc = diff;
     }
     ctr = ctr+1;
-    //console.log("in function"+ctr);
+    //log("in function"+ctr);
     try {
       var h = new BLAKE2s(length, this.decodeUTF8(key));
     } catch (e) {
-      console.log("Error: " + e);
+      log("Error: " + e);
     }
     h.update(this.decodeUTF8(msg));
     myDigestVar = h.hexDigest();
-    //console.log(myDigestVar.substring(0,2));
+    //log(myDigestVar.substring(0,2));
     if(myDigestVar.substring(0,2) == "00" && difc == 0){
-      console.log("miner hashed in "+ctr+" passes");
+      log("miner hashed in "+ctr+" passes");
 
       //io().emit("chat message", "miner hashed in "+ctr+" passes");
       //add a block
       this.chain.minePendingTransactions(this.address);
       //io().emit("broadcast message", JSON.stringify(frankieCoin.getLatestBlock()));
-      console.log("\nThe block is now at: "+JSON.stringify(this.chain.getLatestBlock()));
-      console.log('\nwhere I call it in Miner the Balance of '+this.address+' is', this.chain.getBalanceOfAddress(this.address));
+      log("\nThe block is now at: "+JSON.stringify(this.chain.getLatestBlock()));
+      log('\nwhere I call it in Miner the Balance of '+this.address+' is', this.chain.getBalanceOfAddress(this.address));
 
-      //console.log('\nBalance of address1 is', frankieCoin.getBalanceOfAddress('address1'));
+      //log('\nBalance of address1 is', frankieCoin.getBalanceOfAddress('address1'));
 
-      //console.log('\nBalance of 0x5c4ae12c853012d355b5ee36a6cb8285708760e6 is', this.chain.getBalanceOfAddress('0x5c4ae12c853012d355b5ee36a6cb8285708760e6'));
-      //console.log('\nBalance of '+sponsor+' is', frankieCoin.getBalanceOfAddress(sponsor));
-      //console.log("processed trades SPHR EGEM = "+this.chain.processTrades()["SPHREGEM"]);
-      //console.log("processed trades SPHR XSH = "+this.chain.processTrades()["SPHRXSH"]);
+      //log('\nBalance of 0x5c4ae12c853012d355b5ee36a6cb8285708760e6 is', this.chain.getBalanceOfAddress('0x5c4ae12c853012d355b5ee36a6cb8285708760e6'));
+      //log('\nBalance of '+sponsor+' is', frankieCoin.getBalanceOfAddress(sponsor));
+      //log("processed trades SPHR EGEM = "+this.chain.processTrades()["SPHREGEM"]);
+      //log("processed trades SPHR XSH = "+this.chain.processTrades()["SPHRXSH"]);
 
-      console.log("entire chain: "+this.chain.getEntireChain());
+      log("entire chain: "+this.chain.getEntireChain());
     }else if(myDigestVar.substring(0,2) == "00" && difc >0){
-      console.log("miner hashed in "+ctr+" passes and we are doing a difficulty run now");
+      log("miner hashed in "+ctr+" passes and we are doing a difficulty run now");
     }else{
       var tempit = msg;
-      //console.log(tempit);
+      //log(tempit);
       tempit = tempit.substring(0,(tempit.length-ctr.toString().length))+ctr;
       msg = tempit;
-      //console.log(tempit);
-      //console.log(tempit.substring(0,(tempit.length-ctr.toString().length)));
-      if (ctr%250 == 0){console.log(ctr);}
+      //log(tempit);
+      //log(tempit.substring(0,(tempit.length-ctr.toString().length)));
+      if (ctr%250 == 0){log(ctr);}
       if(ctr % 2000 != 0){
         this.calculateDigest();
       }
     }
     if(difc > 0){
       difc--;
-      console.log("difficulty level"+difc);
+      log("difficulty level"+difc);
       this.calculateDigest("difficulty level"+difc);
     }
   }

@@ -4,22 +4,24 @@ var archive = hyperdrive('./pub-sapphire-block-data')
 var socket;
 var server;
 
+const log = console.log;
+
 var writeArchive = function(blockinfo){
   archive.readFile('/saphire.json', 'utf-8', function (err, data) {
     if (err){
-      console.log(err);
+      log(err);
     }else{
-      console.log("this is the contents of the file: "+data+" archive key: "+archive.key) // prints 'world'
+      log("this is the contents of the file: "+data+" archive key: "+archive.key) // prints 'world'
     }
   })
   archive.writeFile('/saphire.json', readArchive()+blockinfo, function (err) {//change that write to an append
     if (err) throw err
     archive.readdir('/', function (err, list) {
       if (err) throw err
-      console.log(list) // prints ['hello.txt']
+      log(list) // prints ['hello.txt']
       archive.readFile('/saphire.json', 'utf-8', function (err, data) {
         if (err) throw err
-        console.log("this is the contents of the file: "+JSON.stringify(data)) // prints 'world'
+        log("this is the contents of the file: "+JSON.stringify(data)) // prints 'world'
       })
     })
   })
@@ -29,11 +31,11 @@ var writeArchive = function(blockinfo){
 var readArchive = function(){
   archive.readdir('/', function (err, list) {
     if (err) throw err
-    console.log(list) // prints ['hello.txt']
+    log(list) // prints ['hello.txt']
     archive.readFile('/saphire.json', 'utf-8', function (err, data) {
       if (err) throw err
       archive.download();
-      console.log("this is the contents of the file: "+JSON.stringify(data)) // prints 'world'
+      log("this is the contents of the file: "+JSON.stringify(data)) // prints 'world'
     })
   })
   return archive;
@@ -50,7 +52,7 @@ var replicateArchive = function(){
 var publicSapphire = function pubSapphire(origKey,port){
   if(server){
     server.close();
-    console.log("we are indeed closing the server")
+    log("we are indeed closing the server")
   }
   var clonedArchive = hyperdrive('./pub-sapphire-block-data', origKey)
   socket = net.connect(port)
