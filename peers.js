@@ -6,6 +6,8 @@ const getPort = require('get-port')
 const readline = require('readline')
 var Genesis = require('./genesis')
 const fs = require('fs');
+
+const chalk = require('chalk');
 const log = console.log;
 
 /**

@@ -1,5 +1,7 @@
 var Orderdb = require('./nano.js');
 const readline = require('readline');
+
+const chalk = require('chalk');
 const log = console.log;
 
 const rl = readline.createInterface({

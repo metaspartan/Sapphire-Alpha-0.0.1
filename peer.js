@@ -249,7 +249,9 @@ function isJSON(str) {
           }
 
         }else if(JSON.parse(data)["BadPeer"]){
-          log("You modified your code base please update and try again");
+          log("------------------------------------------------------");
+          log(chalk.red("You modified your code base please update and try again"));
+          log("------------------------------------------------------");
           process.exit();
           exit();
         }else if(JSON.parse(data)["ChainSyncPong"]){
@@ -269,7 +271,9 @@ function isJSON(str) {
             }
 
           }else{
+            log("------------------------------------------------------");
             log(chalk.red("You are communicating with a bad actor and we must stop this connection"));
+            log("------------------------------------------------------");
             peers[peerId].write("Stop hacking me bro");
             //peers[peerId].connection.close()//?;
           }

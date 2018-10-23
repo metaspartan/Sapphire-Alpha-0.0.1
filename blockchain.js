@@ -4,6 +4,7 @@ var archive = hyperdrive('./pub-sapphire-block-data')
 var socket;
 var server;
 
+const chalk = require('chalk');
 const log = console.log;
 
 var writeArchive = function(blockinfo){

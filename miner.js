@@ -1,5 +1,6 @@
-var sapphirechain = require("./block.js")
-var BLAKE2s = require("./blake2s.js")
+var sapphirechain = require("./block.js");
+var BLAKE2s = require("./blake2s.js");
+const chalk = require('chalk');
 const log = console.log;
 
 //let frankieCoin = new sapphirechain.Blockchain();

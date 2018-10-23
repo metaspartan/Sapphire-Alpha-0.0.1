@@ -2,6 +2,7 @@ var Trie = require('merkle-patricia-tree'),
 levelup = require('levelup'),
 leveldown = require('leveldown')
 
+const chalk = require('chalk');
 const log = console.log;
 
 db = levelup(leveldown('./testdb'));

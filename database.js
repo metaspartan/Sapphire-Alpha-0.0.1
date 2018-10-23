@@ -1,3 +1,4 @@
+const chalk = require('chalk');
 const log = console.log;
 // Retrieve
 var MongoClient = require('mongodb').MongoClient;

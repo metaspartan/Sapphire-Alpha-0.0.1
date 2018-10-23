@@ -1,6 +1,7 @@
 'use strict';
 
 let db = require('./db');
+const chalk = require('chalk');
 const log = console.log;
 
 var callerEvent;

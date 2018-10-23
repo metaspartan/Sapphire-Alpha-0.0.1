@@ -1,3 +1,4 @@
+const chalk = require('chalk');
 const log = console.log;
 
 //this next process starts up mongodb from local bin in project folder
