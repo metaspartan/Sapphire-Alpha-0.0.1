@@ -1,3 +1,6 @@
+const chalk = require('chalk');
+const log = console.log;
+
 const puretext = require('puretext');
   require('request');
 
@@ -13,6 +16,6 @@ const puretext = require('puretext');
   };
 
   puretext.send(text, function (err, response) {
-    if(err) console.log(err);
-    else console.log(response)
+    if(err) log(err);
+    else log(response)
   })

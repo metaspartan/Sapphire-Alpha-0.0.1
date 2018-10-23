@@ -1,3 +1,4 @@
+const log = console.log;
 var sapphirechain = require("./block.js")
 var BLAKE2s = require("./blake2s.js")
 var Miner = require("./miner.js")
@@ -14,10 +15,10 @@ var myDigestVar = "";
 //here is the miner name we need to make this a variable that comes into this coee
 var franks = new Miner.Miner("first try", 32, "tryanewkey", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", "0x5c4ae12c853012d355b5ee36a6cb8285708760e6",frankieCoin)
 //spits out the latest block
-console.log("get latest block: "+frankieCoin.getLatestBlock().nonce.toString());
-console.log("get latest block transactions: "+frankieCoin.getLatestBlock().transactions.toString());
+log("get latest block: "+frankieCoin.getLatestBlock().nonce.toString());
+log("get latest block transactions: "+frankieCoin.getLatestBlock().transactions.toString());
 //spits out the entire chain
-console.log("entire chain: "+frankieCoin.getEntireChain());
+log("entire chain: "+frankieCoin.getEntireChain());
 //this is calling the mining algo without a message TBD might need to grab one from a peer internally
 franks.calculateDigest("first try",10);
 //I dont have a need to pass transactions but its kind of cool

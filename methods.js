@@ -1,6 +1,8 @@
 'use strict';
 
 let db = require('./db');
+const chalk = require('chalk');
+const log = console.log;
 
 var callerEvent;
 var parentComEvent = function(callback){
@@ -247,9 +249,9 @@ let methods = {
              // and check for required fields
 
              //can I return a function?
-             console.log("called the order book");
+             log("called the order book");
              let _blockObj = JSON.parse(JSON.stringify(blockObj));
-             console.log("called the order book"+_blockObj);
+             log("called the order book"+_blockObj);
              resolve(callerEvent(_blockObj));
          });
      }

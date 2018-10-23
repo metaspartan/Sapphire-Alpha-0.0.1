@@ -7,6 +7,9 @@ const readline = require('readline')
 var Genesis = require('./genesis')
 const fs = require('fs');
 
+const chalk = require('chalk');
+const log = console.log;
+
 /**
  * Here we will save our TCP peer connections
  * using the peer id as key: { peer_id: TCP_Connection }
@@ -17,29 +20,29 @@ let connSeq = 0
 
 // Peer Identity, a random hash for identify your peer
 const myId = crypto.randomBytes(32)
-console.log('Your identity: ' + myId.toString('hex'))
+log('Your identity: ' + myId.toString('hex'))
 var globalGenesisHash = "";
 var filename = "genesis.js";
 var tbh = "";
 var output = fs.readFile(filename, 'utf8', function(err, data) {
     if (err) throw err;
     tbh=data;
-    console.log("output is"+tbh);
+    log("output is"+tbh);
     if (Genesis.genesisGlobalHash == "right now its nothing"){
-      console.log("it validated and just to check tbh is"+tbh)
+      log("it validated and just to check tbh is"+tbh)
       globalGenesisHash = sha256(tbh).toString();
-      console.log("now its global gen hash "+globalGenesisHash)
+      log("now its global gen hash "+globalGenesisHash)
     }else{
-      console.log("it did not validate")
+      log("it did not validate")
     }
 });
 
-console.log("THE HASH IS:"+globalGenesisHash);
+log("THE HASH IS:"+globalGenesisHash);
 
 // reference to redline interface
 let rl
 /**
- * Function for safely call console.log with readline interface active
+ * Function for safely call log with readline interface active
  */
 function log () {
   if (rl) {
@@ -51,7 +54,7 @@ function log () {
   for (let i = 0, len = arguments.length; i < len; i++) {
     outmsg+=arguments[i];
   }
-  console.log(outmsg)
+  log(outmsg)
   //askUser()
 }
 
@@ -104,7 +107,7 @@ const sw = Swarm(config)
   const port = await getPort()
 
   sw.listen(port)
-  console.log('Listening to port: ' + port)
+  log('Listening to port: ' + port)
 
   /**
    * The channel we are connecting to.
@@ -137,7 +140,7 @@ const sw = Swarm(config)
       )
 
       if(data.toString() == "My Genesis Hash is: "+globalGenesisHash){
-        console.log("the hash matched you would record that now");
+        log("the hash matched you would record that now");
       }
 
     })
