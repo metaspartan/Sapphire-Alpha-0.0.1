@@ -11,11 +11,13 @@ const crypto = require('crypto');
 const defaults = require('dat-swarm-defaults');
 const readline = require('readline');
 const getPort = require('get-port');
-const chalk = require('chalk');
+
 //genesis hash variables
 var Genesis = require('./genesis');
 const fs = require('fs');
 const sha256 = require('crypto-js/sha256');
+
+const chalk = require('chalk');
 const log = console.log;
 
 ////////////////////////////////////calls the nano-sql data interface to leveldb
@@ -96,7 +98,7 @@ function isJSON(str) {
   const port = await getPort()
 
   sw.listen(port)
-  sw.join('egem-sfrx') // can be any id/name/hash
+  sw.join('egem-sfrx2') // can be any id/name/hash
 
   sw.on('connection', (conn, info) => {
 
@@ -371,7 +373,7 @@ function queryr1(){
         franks.mpt2();
 
         log("[placeholder] this would be mining stats");
-        log("Mined BLock Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
+        log("Mined Block Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
         //franks.calculateDigest("first try",10);
 
         //this is the most sensible place to add the block
@@ -418,7 +420,9 @@ function queryr1(){
           }
         });
       }else{
-        log("CHAIN IS NOT SYNCHED FOR MINING PLEASE WAIT"+frankieCoin.getLength()+peers[0]);
+        log("------------------------------------------------------");
+        log(chalk.green("CHAIN IS NOT SYNCHED FOR MINING PLEASE WAIT"+frankieCoin.getLength()+peers[0]));
+        log("------------------------------------------------------");
       }
 
 
@@ -467,14 +471,18 @@ function queryr1(){
       queryr1();
     }else if(answer == "N"){//N is for Node info
       Genesis.fileHash();
-      log("NODEZZZZZZ LULZ: ");//had to BCASH LOL
+      log("------------------------------------------------------");
+      log(chalk.green("List of Nodes: "));//had to BCASH LOL
+      log("------------------------------------------------------");
       log(JSON.stringify(frankieCoin.retrieveNodes()));
       queryr1();
     }else if(answer == "G"){//G currently is for getBlock which is also a function
       log("BLOCK NUMBER: 1");
       queryr2("getBlock");
     }else if(answer == "S"){//S is currently cleaning the databases was "Send" so leaving commented out transactions and orders for testing
-      log("Western Union is no longer the fastest way to send money.....");
+      log("------------------------------------------------------");
+      log(chalk.red("Database has been deleted please close and reopen. (Crtl + c)"));
+      log("------------------------------------------------------");
       //frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 20, "SPHR"));
       //frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 10, "EGEM"));
       //frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', '0x5c4ae12c853012d355b5ee36a6cb8285708760e6', 5, "XSH"));
@@ -640,7 +648,7 @@ var franks = miner(frankieCoin);
 
 /////////////////////////////////////////////////////////////////synch the chain
 log("------------------------------------------------------")
-log(chalk.green("CHAIN SYNCING"))
+log(chalk.green("CHAIN SYNC (Press T to sync.)"))
 log("------------------------------------------------------")
 //internal data blockheiht
 var blockHeightPtr = 0;
@@ -650,7 +658,9 @@ function callback2(data){
 
 var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
 
-  log("777777777777777777777777777777777777777777777     NEED TO FLAG CHAIN SYNC      7777777777777777777777777777777777777777")
+  log("------------------------------------------------------")
+  log(chalk.green("CHAIN SYNCING"))
+  log("------------------------------------------------------")
   var nodesInChain = frankieCoin.retrieveNodes();
   var longestPeer = 0;
   for(node in nodesInChain){
@@ -659,7 +669,9 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
       frankieCoin.longestPeerBlockHeight = longestPeer;
     }
   }
-  log("66666666666666666666666666666666666666666666       HERE IS DATA       666666666666666666666666666666666");
+  log("------------------------------------------------------")
+  log(chalk.green("CHAIN DATA"))
+  log("------------------------------------------------------")
   log(longestPeer+" <<lp   mh>>"+peerMaxHeight+"<<mh    pl>> "+peerLength)
   frankieCoin.incrementPeerNonce(nodesInChain[node]["id"],peerLength);
   log(JSON.stringify(nodesInChain));
@@ -671,7 +683,9 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   }
   log("3333333333    "+longestPeer+""+peerMaxHeight+""+frankieCoin.getLength()+"    333333333");
   if(longestPeer == peerMaxHeight && peerMaxHeight == frankieCoin.getLength()){
-    log("33333333333333333333333333333333333333333       MOST COMPLETE SYNCH      33333333333333333333333333333333333");
+    log("------------------------------------------------------")
+    log(chalk.green("MOST COMPLETE SYNC"))
+    log("------------------------------------------------------")
     frankieCoin.inSynch = frankieCoin.isChainSynch(peerMaxHeight);
     frankieCoin.inSynchBlockHeight = peerMaxHeight;
   }
@@ -707,7 +721,7 @@ var myCallback = function(data) {
   //finally we se the RPC block which is updated by peer synch processes
   //this is where we SUBMIT WORK leaving it to eeror right now
   log("------------------------------------------------------");
-  log(chalk.green("CALLING THE SUBMIT BLOCK"));
+  log(chalk.green("CALLING SUBMIT BLOCK"));
   log("------------------------------------------------------");
   var options = {
     uri: 'http://localhost:9090/rpc',
@@ -859,9 +873,10 @@ var myCallbackSell = function(data) {
 //////////////////////////////////////////inter module parent child communicator
 var broadcastPeersBlock = function(){
   //sending the block to the peers
-  log("BBBBBBBBBBBBBBBBBBBBBBB BRADCASTING QUARRY MINED BLOCK TO PEERS BBBBBBBBBBBBBBBBBBBBBBBBB");
+  log("------------------------------------------------------")
+  log(chalk.green("BRADCASTING QUARRY MINED BLOCK TO PEERS"))
+  log("------------------------------------------------------")
   broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
-  log("BBBBBBBBBBBBBBBBBBBBBBB BRADCASTING QUARRY MINED BLOCK TO PEERS BBBBBBBBBBBBBBBBBBBBBBBBB");
 }
 
 //parent communicator callback function sent to child below
