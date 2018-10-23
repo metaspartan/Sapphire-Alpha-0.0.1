@@ -236,7 +236,9 @@ function isJSON(str) {
               ****/
             //setting a delay and pong back
             //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
-            setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},300);
+            if(peers[peerId].conn){
+              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},300);
+            }
             //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
           }else{
             console.log("Did not match this hash and this peer is an imposter");
