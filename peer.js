@@ -346,7 +346,7 @@ function queryr2(query){
 //////////////////////////////////////////////////main console interface query 1
 function queryr1(){
   //command line stuff
-  rl.question('console action: ', (answer) => {
+  rl.question('Enter a command: ', (answer) => {
     // TODO: Log the answer in a database
     log(`selected: ${answer}`);
     if(answer == "M"){//M is for mine and triggers the miner
@@ -468,7 +468,9 @@ function queryr1(){
     }else if(answer == "T"){//T is for talk but using it to initiate chain sync
       //sneaking this chain synch in here...that is a "talk"
       for (let id in peers) {
-        log("sending the ping");
+        log("------------------------------------------------------");
+        log(chalk.green("Sending ping for chain sync."));
+        log("------------------------------------------------------");
         //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
         peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
       }

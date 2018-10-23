@@ -55,7 +55,7 @@ var myCallbackSell = function(data) {
 
 function queryr1(){
   //command line stuff
-  rl.question('console action: ', (answer) => {
+  rl.question('Enter a command: ', (answer) => {
     log(`input: ${answer}`);
     if(isJSON(answer)){
       if(RegExp("^0x[a-fA-F0-9]{40}$").test(JSON.parse(answer)["fromAddress"])){//adding function capabilioties
