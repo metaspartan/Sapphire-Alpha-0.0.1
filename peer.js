@@ -140,7 +140,7 @@ function isJSON(str) {
           //first we add the block to the blockchain
           var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data));
 
-          log(chaks.bgGreen("SUCCEFSSFUL BLOCK ADD?"+successfulBlockAdd));
+          log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD?"+successfulBlockAdd));
 
           //verfiy the previous hash in the database matches our expectations - code is incomplete atm
           if(frankieCoin.getLatestBlock()["previousHash"] == currentChainHash && successfulBlockAdd == true){
