@@ -32,7 +32,8 @@ var genesisBLK = function genesisBLK() {
   var sampleTX = new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SPHR");
   log(chalk.blue(JSON.stringify(sampleTX)));
 
-  var genBlockTimestamp = Date.parse("2018-2-18 02:18:18")/1000;
+  var datum = new Date(Date.UTC('2018','02','18','02','18','18'));
+  var genBlockTimestamp = datum.getTime()/1000;
   var genBlockPreviousHash = "";
   log(chalk.green("Creating genesis block:"));
   //log(powHash);
@@ -278,6 +279,7 @@ var Blockchain = class Blockchain{
       createGenesisBlock() {
           log("Generation of Genesis Block "+genesisBLK()+" Processing Complete");
           //genBlock.hash = genesisBLK();
+          log(chalk.bgGreen(genBlock.timestamp));
           return genBlock;
           //return new Block(Date.parse("2018-02-18 02:18:18"), [], []);//original block creation
       }
