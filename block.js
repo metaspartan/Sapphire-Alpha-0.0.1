@@ -33,7 +33,7 @@ var genesisBLK = function genesisBLK() {
   log(chalk.blue(JSON.stringify(sampleTX)));
 
   var genBlockTimestamp = Date.parse("2018-2-18 02:18:18")/1000;
-  var getBlockPreviousHash = "";
+  var genBlockPreviousHash = "";
   log(chalk.green("Creating genesis block:"));
   //log(powHash);
   try {
@@ -42,11 +42,13 @@ var genesisBLK = function genesisBLK() {
     log("Error: " + e);
   };
 
-  log(prevHash+genBlockTimestamp+getBlockPreviousHash+txtData);
+  log(prevHash+genBlockTimestamp+genBlockPreviousHash+txtData);
 
-  h.update(decodeUTF8(prevHash+genBlockTimestamp+getBlockPreviousHash+txtData));
+  h.update(decodeUTF8(prevHash+genBlockTimestamp+genBlockPreviousHash+txtData));
 
-  genBlock = new Block(genBlockTimestamp, genesisTx, [], getBlockPreviousHash);
+  genBlock = new Block(genBlockTimestamp, genesisTx, [], genBlockPreviousHash,"","","",txtData,h.hexDigest());
+  //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
+
   //this.chain.push(genBlock);
 
   return h.hexDigest();
@@ -275,7 +277,7 @@ var Blockchain = class Blockchain{
 
       createGenesisBlock() {
           log("Generation of Genesis Block "+genesisBLK()+" Processing Complete");
-          genBlock.hash = genesisBLK();
+          //genBlock.hash = genesisBLK();
           return genBlock;
           //return new Block(Date.parse("2018-02-18 02:18:18"), [], []);//original block creation
       }
