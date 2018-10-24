@@ -184,6 +184,18 @@ function isJSON(str) {
             }};
             //add it to the database
             BlockchainDB.addBlock(peerblock);
+            //add it to the RPC for miner
+            var options = {
+              uri: 'http://localhost:9090/rpc',
+              method: 'POST',
+              json: {createBlock:{block:frankieCoin.getLatestBlock()}}
+            };
+
+            request(options, function (error, response, body) {
+              if (!error && response.statusCode == 200) {
+                log(body.id) // Print the shortened url.
+              }
+            });
 
           }else{
             log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
