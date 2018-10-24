@@ -17,11 +17,23 @@ const log = console.log;
 //adds a link to one module function for database
 var addOrder = module.parent.children[6].exports.addOrder;
 ///////////////////////////////////////when fired this creates the genesis block
+var genBlock;
 var genesisBLK = function genesisBLK() {
   var prevHash = "0";
-  var txtData = "Blake2s Genesis for EtherGem Opal Coin 25 Feb 2018";
-  var timestamp = Date.now();
-  var hash = "";
+  var txtData = "Blake2s Genesis for EtherGem Opal Coin 18 Feb 2018 at 02:18:18 AM";
+  var genesisTx = [
+    new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SPHR"),//oso
+    new Transaction(null, "0x5080fb28d8cf96c320e1a2e56a901abb7391b4ce", 500000, "SPHR")//ridz
+    //new Transaction(null, miningRewardAddress, this.miningReward, "SPHR"),
+    //new Transaction(null, miningRewardAddress, this.miningReward, "SPHR"),
+    //new Transaction(null, miningRewardAddress, this.miningReward, "SPHR")
+  ];
+
+  var sampleTX = new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SPHR");
+  log(chalk.blue(JSON.stringify(sampleTX)));
+
+  var genBlockTimestamp = Date.parse("2018-2-18 02:18:18")/1000;
+  var getBlockPreviousHash = "";
   log(chalk.green("Creating genesis block:"));
   //log(powHash);
   try {
@@ -30,9 +42,12 @@ var genesisBLK = function genesisBLK() {
     log("Error: " + e);
   };
 
-  log(prevHash+timestamp+hash+txtData);
+  log(prevHash+genBlockTimestamp+getBlockPreviousHash+txtData);
 
-  h.update(decodeUTF8(prevHash+timestamp+hash+txtData));
+  h.update(decodeUTF8(prevHash+genBlockTimestamp+getBlockPreviousHash+txtData));
+
+  genBlock = new Block(genBlockTimestamp, genesisTx, [], getBlockPreviousHash);
+  //this.chain.push(genBlock);
 
   return h.hexDigest();
 }
@@ -259,8 +274,10 @@ var Blockchain = class Blockchain{
       }
 
       createGenesisBlock() {
-          log("This is where I can include this: "+genesisBLK()+" in the genesis block... (but its not there yet)");
-          return new Block(Date.parse("2017-01-01"), [], []);
+          log("Generation of Genesis Block "+genesisBLK()+" Processing Complete");
+          genBlock.hash = genesisBLK();
+          return genBlock;
+          //return new Block(Date.parse("2018-02-18 02:18:18"), [], []);//original block creation
       }
 
       getBlock(num) {
@@ -295,15 +312,16 @@ var Blockchain = class Blockchain{
           log('Block successfully mined! '+blockTimeStamp);
           log('Previous Block Timestamp was '+this.getLatestBlock().timestamp);
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
-          if(blockTimeDiff < 6){
+          if(blockTimeDiff < 4){//if less than 6 seconds lets bump up the difficulty **temporarily 4
+            //temporarilty keping difficulty below 5 for testing
             if(this.difficulty < 5){
-              log("WHHHHHHHHATTTTT THEEEEEEEE FFUUUUUCCKKKKKK"+this.difficulty)
+              log("DIFFICULTY: "+this.difficulty)
               block.difficulty = parseFloat(this.difficulty+1);
             }
           }else{
             block.difficulty = parseFloat(this.difficulty-1);
           }
-          log('Differential is '+blockTimeDiff)
+          log(chalk.bgGreen('Differential is '+blockTimeDiff));
           ////extra check
           try {
             var h = new BLAKE2s(32, decodeUTF8(""));
@@ -341,7 +359,7 @@ var Blockchain = class Blockchain{
           //block.mineBlock(this.difficulty);
           block.difficulty = minedBlock["difficulty"];
 
-          if(blockTimeDiff < 6){
+          if(blockTimeDiff < 4){
             //temporary difficulty setting stopped at 6
             if(minedBlock["difficulty"] < 5){
               block.difficulty = parseFloat(block.difficulty+1);
@@ -349,7 +367,7 @@ var Blockchain = class Blockchain{
           }else{
             block.difficulty = parseFloat(block.difficulty-1);
           }
-          log('Differential is '+blockTimeDiff)
+          log(chalk.bgGreen('Differential is '+blockTimeDiff));
           log('Block successfully added by outside miner '+blockTimeStamp);
           ////extra check
           try {

@@ -883,7 +883,7 @@ var myCallbackSell = function(data) {
 var broadcastPeersBlock = function(){
   //sending the block to the peers
   log("------------------------------------------------------")
-  log(chalk.green("BRADCASTING QUARRY MINED BLOCK TO PEERS"))
+  log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
   log("------------------------------------------------------")
   broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 }
