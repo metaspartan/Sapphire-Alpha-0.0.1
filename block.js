@@ -160,8 +160,8 @@ var Block = class Block {
         //this will be the data tranche for the genesis block
         this.data = '';
         //sponsor and miner are entagled
-        this.sponsor = '0x2025ed239a8dec4de0034a252d5c5e385b73fcd0';//osoese contract address
-        this.miner = '0x0666bf13ab1902de7dee4f8193c819118d7e21a6';//osoese original wallet
+        this.sponsor = sponsor;//osoese contract address
+        this.miner = miner;//osoese original wallet
         //logic gates to be executed or broadcast format TBD
         this.hardwareTx = '';
         //processing on logic gates to be executed or broadcast format TBD
