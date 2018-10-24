@@ -17,6 +17,7 @@ var Genesis = require('./genesis');
 const fs = require('fs');
 const sha256 = require('crypto-js/sha256');
 
+//adding color to console
 const chalk = require('chalk');
 const log = console.log;
 
@@ -108,7 +109,7 @@ function isJSON(str) {
 
     if(info.id != myId){
       frankieCoin.registerNode(peerId,info.host,info.port,frankieCoin.length);
-      log(chalk.green("Here is what we have in info: "+ chalk.red(JSON.stringify(info))));
+      log(chalk.green("Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
       log(chalk.green('Found & connected to peer with id: '+ chalk.blue(peerId)));
     }
 
@@ -151,8 +152,8 @@ function isJSON(str) {
             blocknumber = frankieCoin.getLength();
             log(chalk.red("the database block number is "+blocknumber));
             log(chalk.red("--------------------------------------------------------------------"));
-            log(chalk.red("THERE NEEDS TO BE ANOTHER SOMETHING SET HERE FOR THE DATASE SYNCHING"));
-            log(chalk.red("         BUT WE DID JUST GET A SUCESSFUL BLOCK FROM PEER            "));
+            log(chalk.yellow("THERE NEEDS TO BE ANOTHER SOMETHING SET HERE FOR THE DATASE SYNCHING"));
+            log(chalk.yellow("         BUT WE DID JUST GET A SUCESSFUL BLOCK FROM PEER            "));
             log(chalk.red("--------------------------------------------------------------------"));
 
             //////update the client database OR reject block and rollback the chain - code is incomplete atm
