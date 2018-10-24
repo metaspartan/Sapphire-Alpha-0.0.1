@@ -140,6 +140,8 @@ function isJSON(str) {
           //first we add the block to the blockchain
           var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data));
 
+          log(chaks.bgGreen("SUCCEFSSFUL BLOCK ADD?"+successfulBlockAdd));
+
           //verfiy the previous hash in the database matches our expectations - code is incomplete atm
           if(frankieCoin.getLatestBlock()["previousHash"] == currentChainHash && successfulBlockAdd == true){
 
@@ -205,7 +207,10 @@ function isJSON(str) {
 
             frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
             frankieCoin.chain.pop();
-            BlockchainDB.clearBlock(frankieCoin.getLength());
+            //we would never get the block to this point
+            //BlockchainDB.clearBlock(frankieCoin.getLength());
+
+
 
             //okay do we need a return?
           }
