@@ -1,4 +1,11 @@
-
+/******************************************************************************/
+//
+//  EGEM Sapphire Block.js
+//  Currently licensed under MIT
+//  A copy of this license must be included in all copies
+//  Copyright (c) 2018 Frank Triantos aka OSOESE
+//
+/******************************************************************************/
 var BLAKE2s = require("./blake2s.js")
 //testing web3
 var Web3 = require("web3");
@@ -757,7 +764,9 @@ var Blockchain = class Blockchain{
                   log(h.hexDigest());
                   return false;
               }else{
-                log("8888888888888888WE FIX IT**************");
+                process.stdout.clearLine();
+                process.stdout.cursorTo(0);
+                process.stdout.write(chalk.green('Block Valid: ')+i+chalk.green(' Hash: ') + chalk.yellow(this.chain[i].hash));
               }
               const previousBlock = this.chain[i - 1];
               if (this.chain[i].previousHash !== this.chain[i-1].hash) {
