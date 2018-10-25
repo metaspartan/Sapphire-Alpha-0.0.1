@@ -63,9 +63,13 @@ function decodeUTF8(s) {
 
 var Ommer = class Ommer{
     //we can do an address validation and kick back false
-    constructor(timestamp, previousHash, hash, minerAddress, sponsorAddress){
+    constructor(timestamp, previousHash, nonce, hash, minerAddress, sponsorAddress){
+
+        log(chalk.bgRed("OMMER IS BEING CREATED ")+this.timestamp+this.previousHash+this.nonce);
+
         this.timestamp = timestamp;
         this.previousHash = previousHash;
+        this.nonce = nonce;
         this.hash = hash;
         this.amount = minerAddress;
         this.ticker = sponsorAddress;
@@ -312,6 +316,10 @@ var Blockchain = class Blockchain{
           return this.chain[this.chain.length - 1];
       }
 
+      getOmmersAtBlock(num) {
+          return this.chain[parseInt(num) - 1]["ommers"];
+      }
+
       getLength(){
         return this.chain.length;
       }
@@ -438,7 +446,7 @@ var Blockchain = class Blockchain{
           log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
           //need to return a message that returns the uncle info and uncle block reward to sending peer
           log(chalk.bgRed("ADDING OMMER TO CHAIN "+inBlock.timestamp+" PREV HASH "+inBlock.previousHash));
-          this.addOmmer(inBlock.timestamp,inBlock.previousHash,inBlock.hash,inBlock.miner,inBlock.sponsor);
+          this.addOmmer(inBlock.timestamp,inBlock.previousHash,inBlock.nonce,inBlock.hash,inBlock.miner,inBlock.sponsor);
           //how to handle an uncle is to make the sending peer self report it but can we record it now
 
         }else{

@@ -557,6 +557,12 @@ function queryr1(){
       log(JSON.stringify(frankieCoin.getBlock(parseInt(blocknum))));
       BlockchainDB.getBlock(blocknum,callback2);//change name from callback 2 to something meaningful
       queryr1();
+    }else if(answer.includes("getOmmer(")){//GETBLOCK function
+      log(answer.slice(answer.indexOf("getOmmer(")+9, answer.indexOf(")")));
+      var blocknum = answer.slice(answer.indexOf("getOmmer(")+9, answer.indexOf(")"));
+      log(JSON.stringify(frankieCoin.getOmmersAtBlock(parseInt(blocknum))));
+      BlockchainDB.getBlock(blocknum,callback2);//change name from callback 2 to something meaningful
+      queryr1();
     }else if(answer.includes("Order(")){//ORDER function merging with below \/ \/
       ////frankieCoin.createOrder(new sapphirechain.Order('0x0666bf13ab1902de7dee4f8193c819118d7e21a6','BUY','SPHREGEM',3500,0.25));
       ////Order({"maker":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","action":"BUY","amount":24,"pair":"SPHREGEM","price":1.38,"ticker":"EGEM"});
