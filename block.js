@@ -47,8 +47,8 @@ var genesisBLK = function genesisBLK() {
 
   h.update(decodeUTF8(prevHash+genBlockTimestamp+genBlockPreviousHash+txtData));
 
-  genBlock = new Block(genBlockTimestamp, genesisTx, [], genBlockPreviousHash,"","","",txtData,h.hexDigest());
-  //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
+  genBlock = new Block(genBlockTimestamp, genesisTx, [], [], genBlockPreviousHash,"","","",txtData,h.hexDigest());
+  //constructor(timestamp, transactions, orders, ommers, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
 
   //this.chain.push(genBlock);
 
@@ -59,6 +59,17 @@ function decodeUTF8(s) {
   var i, d = unescape(encodeURIComponent(s)), b = new Uint8Array(d.length);
   for (i = 0; i < d.length; i++) b[i] = d.charCodeAt(i);
   return b;
+}
+
+var Ommer = class Ommer{
+    //we can do an address validation and kick back false
+    constructor(timestamp, previousHash, hash, minerAddress, sponsorAddress){
+        this.timestamp = timestamp;
+        this.previousHash = previousHash;
+        this.hash = hash;
+        this.amount = minerAddress;
+        this.ticker = sponsorAddress;
+    }
 }
 
 var Transaction = class Transaction{
@@ -122,7 +133,7 @@ var Hash = function(inputs) {
 
 var Block = class Block {
 
-    constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
+    constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2, ommers) {
 
         log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
@@ -175,6 +186,7 @@ var Block = class Block {
         //total Hash for sequencing
         this.hashOfThisBlock = '';
         this.difficulty = difficulty;
+        this.ommers = ommers;
       }
 
     calculateHash() {
@@ -211,14 +223,21 @@ var Blockchain = class Blockchain{
           //difficulty adjusts
           this.difficulty = 4;//can be 1 or more later
           this.pendingTransactions = [];
-          //can add a this.pendingOrders
           this.pendingOrders = [];
-          //then also add a this.tradePendingTransactions
-          this.miningReward = 9;
+          //ommers
+          this.pendingOmmers = [];
+          //need to set the block rewards
+          this.miningReward = 8;
+          this.sponsorReward = 0.5;
+          this.devReward = 0.5;
+          this.communityDevReward = 0.5;
+          this.nodeReward = 0.25;
+          this.quarryNodeReward = 0.25;
           //is the chain synched and mine and assist others? when true yes
           this.inSynch = false;
           this.inSynchBlockHeight = 0;
           this.longestPeerBlockHeight = 0;
+          //just logging the chain creation
           log(chalk.cyan("Genesis block created!"));
           log(chalk.blue("Chain is: "+chalk.green(JSON.stringify(this.chain))));
       }
@@ -305,7 +324,7 @@ var Blockchain = class Blockchain{
           var blockTimeStamp = Date.now();
 
           //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
-          let block = new Block(blockTimeStamp, this.pendingTransactions, this.pendingOrders, this.getLatestBlock().hash);
+          let block = new Block(blockTimeStamp, this.pendingTransactions, this.pendingOrders, this.pendingOmmers, this.getLatestBlock().hash);
           //not sure we do this here yet might be removed
           //block.difficulty = this.difficulty;
           if(this.getLatestBlock().difficulty){
@@ -358,7 +377,7 @@ var Blockchain = class Blockchain{
           var blockTimeStamp = minedBlock["timestamp"];
           log("BBBBBBBBBBBBBBBBB block time stamp"+minedBlock["timestamp"]+" LAST BLOCK TIME STAMPING "+this.getLatestBlock().timestamp+"MINED  BLOCK PREV HASH "+minedBlock["previousHash"]+" LAST BLOCK HASH "+this.getLatestBlock().hash);
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
-          let block = new Block(minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
+          let block = new Block(minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, this.pendingOmmers, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
           //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0) {
           //block.mineBlock(this.difficulty);
           block.difficulty = minedBlock["difficulty"];
@@ -407,7 +426,7 @@ var Blockchain = class Blockchain{
           log("----------------------------------------------------");
 
           //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-          var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce);
+          var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.pendingOmmers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty, inBlock.ommers);
           this.chain.push(block);
           //careful I have the ischain valid returining true on all tries
 
@@ -416,6 +435,9 @@ var Blockchain = class Blockchain{
           log("UNCLE previous hash matches"+inBlock.previousHash+" current prev hash "+this.getLatestBlock().previousHash);
           log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
           //need to return a message that returns the uncle info and uncle block reward to sending peer
+          this.addOmmer(inBlock.timestamp,inBlock.previousHash,inBlock.hash,inBlock.miner,inBlock.sponsor);
+          //how to handle an uncle is to make the sending peer self report it but can we record it now
+
         }else{
           log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
           log("no inblock prev hash of "+inBlock.previousHash+" does not match the hash of chain "+this.getLatestBlock().hash);
@@ -449,7 +471,7 @@ var Blockchain = class Blockchain{
           log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         }
         //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-        var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce, dbBlock.difficulty);
+        var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.pendingOmmers, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce, dbBlock.difficulty, dbBlock.ommers);
         this.chain.push(block);
         //careful I have the ischain valid returining true on all tries
         if(this.isChainValid() == false){
@@ -475,6 +497,10 @@ var Blockchain = class Blockchain{
           }
           log("Order just placed is "+JSON.stringify(order));
           this.pendingOrders.push(order);
+      }
+
+      addOmmer(ommer){
+        this.pendingOmmers.push(ommer);
       }
 
       getBalanceOfAddress(address){
@@ -807,6 +833,7 @@ var Blockchain = class Blockchain{
 
 module.exports = {
     genesisBLK:genesisBLK,
+    Ommer:Ommer,
     Transaction:Transaction,
     Order:Order,
     Block:Block,

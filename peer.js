@@ -166,6 +166,7 @@ function isJSON(str) {
               timestamp:JSON.parse(data)["timestamp"],
               transactions:JSON.parse(data)["transactions"],
               orders:JSON.parse(data)["orders"],
+              ommers:JSON.parse(data)["ommers"],
               hash:JSON.parse(data)["hash"],
               nonce:JSON.parse(data)["nonce"],
               eGEMBackReferenceBlock:JSON.parse(data)["eGEMBackReferenceBlock"],
@@ -212,18 +213,27 @@ function isJSON(str) {
             }
 
             if(parseInt(frankieCoin.getLength() - 1) != lastSynchBlock){
-              log("TTTTTTTTTTTHHHHHHHHHHHIIIIIIIIIISSSSSSSSSSS IS A GOOD BLOCK REMOVAL");
+              log(chalk.red("V-----------------------------------------------------------------V"));
+              log(chalk.red("                CONFLICT AND BLOCK REMOVAL                         "));
             }else{
               log("TTTTTTTTTTTHHHHHHHHHHHIIIIIIIIIISSSSSSSSSSS IS WHERE THE SYNCH IS STUCK");
             }
 
             frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
             frankieCoin.chain.pop();
+
+            //going test getting into synch with these parameters
+            frankieCoin.inSynch=false;
+            ///could just send this to one peeer but
+            //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},300);
+            for (let id in peers) {
+              log(chalk.yellow("          Sending ping for chain sync to all peers              "));
+              log(chalk.red("^-----------------------------------------------------------------^"));
+              //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
+              peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
+            }
             //we would never get the block to this point
             //BlockchainDB.clearBlock(frankieCoin.getLength());
-
-
-
             //okay do we need a return?
           }
 
@@ -409,6 +419,7 @@ function queryr1(){
           timestamp:frankieCoin.getLatestBlock()["timestamp"],
           transactions:frankieCoin.getLatestBlock()["transactions"],
           orders:frankieCoin.getLatestBlock()["orders"],
+          ommers:frankieCoin.getLatestBlock()["ommers"],
           hash:frankieCoin.getLatestBlock()["hash"],
           nonce:frankieCoin.getLatestBlock()["nonce"],
           eGEMBackReferenceBlock:frankieCoin.getLatestBlock()["eGEMBackReferenceBlock"],
@@ -652,6 +663,7 @@ var genBlock = {"blockchain":{
   timestamp:frankieCoin.getLatestBlock()["timestamp"],
   transactions:frankieCoin.getLatestBlock()["transactions"],
   orders:frankieCoin.getLatestBlock()["orders"],
+  ommers:frankieCoin.getLatestBlock()["ommers"],
   hash:frankieCoin.getLatestBlock()["hash"],
   nonce:frankieCoin.getLatestBlock()["nonce"],
   eGEMBackReferenceBlock:frankieCoin.getLatestBlock()["eGEMBackReferenceBlock"],
@@ -929,6 +941,7 @@ var impcchild = function(childData,functionName){
         timestamp:frankieCoin.getLatestBlock()["timestamp"],
         transactions:frankieCoin.getLatestBlock()["transactions"],
         orders:frankieCoin.getLatestBlock()["orders"],
+        ommers:frankieCoin.getLatestBlock()["ommers"],
         hash:frankieCoin.getLatestBlock()["hash"],
         nonce:frankieCoin.getLatestBlock()["nonce"],
         eGEMBackReferenceBlock:frankieCoin.getLatestBlock()["eGEMBackReferenceBlock"],
