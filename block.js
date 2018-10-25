@@ -133,7 +133,7 @@ var Hash = function(inputs) {
 
 var Block = class Block {
 
-    constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2, ommers) {
+    constructor(timestamp, transactions, orders, ommers, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
 
         log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
@@ -146,6 +146,8 @@ var Block = class Block {
         this.transactions = transactions;
         //adding orders for dex
         this.orders = orders;
+        //ommers
+        this.ommers = ommers;
         //this is if mined or peer pushed block and PROBABBLY NEEDS so be much more secure
         //if(hash){
         if(hash)  {
@@ -186,7 +188,6 @@ var Block = class Block {
         //total Hash for sequencing
         this.hashOfThisBlock = '';
         this.difficulty = difficulty;
-        this.ommers = ommers;
       }
 
     calculateHash() {
@@ -365,6 +366,7 @@ var Blockchain = class Blockchain{
               new Transaction(null, miningRewardAddress, this.miningReward, "SPHR")
           ];
           this.pendingOrders = [];
+          this.pendingOmmers = [];
       }
 
       ///for mining transactions from outside miner
@@ -426,7 +428,7 @@ var Blockchain = class Blockchain{
           log("----------------------------------------------------");
 
           //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-          var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.pendingOmmers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty, inBlock.ommers);
+          var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
           this.chain.push(block);
           //careful I have the ischain valid returining true on all tries
 
@@ -435,6 +437,7 @@ var Blockchain = class Blockchain{
           log("UNCLE previous hash matches"+inBlock.previousHash+" current prev hash "+this.getLatestBlock().previousHash);
           log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
           //need to return a message that returns the uncle info and uncle block reward to sending peer
+          log(chalk.bgRed("ADDING OMMER TO CHAIN "+inBlock.timestamp+" PREV HASH "+inBlock.previousHash));
           this.addOmmer(inBlock.timestamp,inBlock.previousHash,inBlock.hash,inBlock.miner,inBlock.sponsor);
           //how to handle an uncle is to make the sending peer self report it but can we record it now
 
@@ -471,7 +474,7 @@ var Blockchain = class Blockchain{
           log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         }
         //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-        var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.pendingOmmers, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce, dbBlock.difficulty, dbBlock.ommers);
+        var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.ommers, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce, dbBlock.difficulty);
         this.chain.push(block);
         //careful I have the ischain valid returining true on all tries
         if(this.isChainValid() == false){

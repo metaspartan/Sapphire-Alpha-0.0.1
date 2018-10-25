@@ -929,7 +929,7 @@ var impcchild = function(childData,functionName){
       franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
       ////////here is the database update and peers broadcast
       log("[placeholder] mining stats from outside miner");
-      log("Outside Miner Mined BLock Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
+      log("Outside Miner Mined Block Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
       //franks.calculateDigest("first try",10);
 
       //this is the most sensible place to add the block
