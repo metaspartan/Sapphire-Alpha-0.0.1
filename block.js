@@ -446,7 +446,7 @@ var Blockchain = class Blockchain{
           log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
           //need to return a message that returns the uncle info and uncle block reward to sending peer
           log(chalk.bgRed("ADDING OMMER TO CHAIN "+inBlock.timestamp+" PREV HASH "+inBlock.previousHash));
-          this.addOmmer(inBlock.timestamp,inBlock.previousHash,inBlock.nonce,inBlock.hash,inBlock.miner,inBlock.sponsor);
+          this.addOmmer(new Ommer(inBlock.timestamp,inBlock.previousHash,inBlock.nonce,inBlock.hash,inBlock.miner,inBlock.sponsor));
           //how to handle an uncle is to make the sending peer self report it but can we record it now
 
         }else{
