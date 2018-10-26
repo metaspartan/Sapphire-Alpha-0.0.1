@@ -131,7 +131,7 @@ function isJSON(str) {
       )
 
       var sendBack = function(msg,peerId){
-        peers[peerId].conn.write(msg);
+        peers[peerId].conn.write(JSON.stringify(msg));
       }
 
 ////////////////////////////////////////////begin the if block for incoming data
@@ -248,7 +248,7 @@ function isJSON(str) {
         }else if(JSON.parse(data)["uncle"]){
 
           log(chalk.bgOrange("THIS IS THE UNCLRE RETURN WE LOG THE OMMER AND DELETE"));
-          log(data["uncle"].toString());
+          log(data["uncle"]);
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
