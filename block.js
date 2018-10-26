@@ -447,13 +447,17 @@ var Blockchain = class Blockchain{
           //since this is an UNCLE we need to check the timestamp to see who won ....
           if(this.getLatestBlock().timestamp < inBlock.timestamp){
             //proceed to not add a block and just log an ommer
-            log(chalk.bgRed("ADDING OMMER TO CHAIN "+inBlock.timestamp+" PREV HASH "+inBlock.previousHash));
-            this.addOmmer(new Ommer(inBlock.timestamp,inBlock.previousHash,inBlock.nonce,inBlock.hash,inBlock.miner,inBlock.sponsor));
+            log(chalk.bgRed("ADDING OMMER TO CHAIN peer block is OMMER chain block REMAINS "+inBlock.timestamp+" PREV HASH "+inBlock.previousHash));
+            var tmpOmmer = new Ommer(inBlock.timestamp,inBlock.previousHash,inBlock.nonce,inBlock.hash,inBlock.miner,inBlock.sponsor)
+            this.addOmmer(tmpOmmer);
             //and return the last block to the sending peer...
             callback({"uncle":{"blockNumber":parseInt(this.chain.length-1),"block":inBlock}},peerId);
           }else if(this.getLatestBlock().timestamp >= inBlock.timestamp){
             //proceed to add the block and remove the latest block log as ommer and return the last block as ommer
             var returnBlock = this.getLatestBlock();
+            log(chalk.bgRed("ADDING OMMER TO CHAIN peer block is VALID and OVER WRITES chain block "+inBlock.timestamp+" PREV HASH "+inBlock.previousHash));
+            var tmpOmmer = new Ommer(returnBlock.timestamp,returnBlock.previousHash,returnBlock.nonce,returnBlock.hash,returnBlock.miner,returnBlock.sponsor);
+            this.addOmmer(tmpOmmer);
             callback({"uncle":{"blockNumber":parseInt(this.chain.length),"block":returnBlock}},peerId);
             this.chain.pop()
             var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
