@@ -425,7 +425,7 @@ var Blockchain = class Blockchain{
       }
 
       //th8s is the peers adding a block needs to be VALIDATED
-      addBlockFromPeers(inBlock){
+      addBlockFromPeers(inBlock,callback,peerId){
         //if all that consensus stuff I am going to add....then
         //here is where I check if two things and I think make them globals
         //1 issync should be YES
@@ -441,19 +441,35 @@ var Blockchain = class Blockchain{
           //careful I have the ischain valid returining true on all tries
 
         }else if(this.chain[this.chain.length - 2].hash == inBlock.previousHash && this.getLatestBlock().previousHash == inBlock.previousHash){//uncle block
-          log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
+          log(chalk.bgRed("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"));
           log("UNCLE previous hash matches"+inBlock.previousHash+" current prev hash "+this.getLatestBlock().previousHash);
-          log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu");
+          log(chalk.bgRed("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"));
+          //since this is an UNCLE we need to check the timestamp to see who won ....
+          if(this.getLatestBlock().timestamp < inBlock.timestamp){
+            //proceed to not add a block and just log an ommer
+            log(chalk.bgRed("ADDING OMMER TO CHAIN "+inBlock.timestamp+" PREV HASH "+inBlock.previousHash));
+            this.addOmmer(new Ommer(inBlock.timestamp,inBlock.previousHash,inBlock.nonce,inBlock.hash,inBlock.miner,inBlock.sponsor));
+            //and return the last block to the sending peer...
+            callback({"uncle":{"blockNumber":parseInt(this.chain.length-1),"block":inBlock}},peerId);
+          }else if(this.getLatestBlock().timestamp >= inBlock.timestamp){
+            //proceed to add the block and remove the latest block log as ommer and return the last block as ommer
+            var returnBlock = this.getLatestBlock();
+            callback({"uncle":{"blockNumber":parseInt(this.chain.length),"block":returnBlock}},peerId);
+            this.chain.pop()
+            var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
+            this.chain.push(block);
+          }else{
+            log.chalk.bgRed("NO TIMESTAMPS so KILLING THE BLOCK");
+            this.chain.pop();
+          }
           //need to return a message that returns the uncle info and uncle block reward to sending peer
-          log(chalk.bgRed("ADDING OMMER TO CHAIN "+inBlock.timestamp+" PREV HASH "+inBlock.previousHash));
-          this.addOmmer(new Ommer(inBlock.timestamp,inBlock.previousHash,inBlock.nonce,inBlock.hash,inBlock.miner,inBlock.sponsor));
-          //how to handle an uncle is to make the sending peer self report it but can we record it now
 
         }else{
           log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
           log("no inblock prev hash of "+inBlock.previousHash+" does not match the hash of chain "+this.getLatestBlock().hash);
           log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
           //this case represents a problem because it is just a bad block
+          //this.chain.pop();
         }
 
         if(this.isChainValid() == false){

@@ -130,6 +130,10 @@ function isJSON(str) {
         '----> ' + data.toString()
       )
 
+      var sendBack = function(msg,peerId){
+        peers[peerId].conn.write(msg);
+      }
+
 ////////////////////////////////////////////begin the if block for incoming data
       if(isJSON(data.toString())){
 ////////////////////////////////////////////////////////////incomeing peer block
@@ -137,8 +141,8 @@ function isJSON(str) {
           //storing some variables of current chain
           var currentChainHash = frankieCoin.getLatestBlock()["hash"];
           var blocknumber = 0;
-          //first we add the block to the blockchain
-          var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data));
+          //first we add the block to the blockchain with call back and id of submitting peer for conflict resolution
+          var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data),sendBack,peerId);
 
           log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD?"+successfulBlockAdd));
 
@@ -240,6 +244,11 @@ function isJSON(str) {
         }else if(JSON.parse(data)["fromAddress"]){
 
           log("well, this is an order and we need to give it a transaction id when mined");
+
+        }else if(JSON.parse(data)["uncle"]){
+
+          log(chalk.bgOrange("THIS IS THE UNCLRE RETURN WE LOG THE OMMER AND DELETE"));
+          log(data["uncle"].toString());
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
