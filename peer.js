@@ -247,7 +247,7 @@ function isJSON(str) {
 
         }else if(JSON.parse(data)["uncle"]){
 
-          log(chalk.bgOrange("THIS IS THE UNCLRE RETURN WE LOG THE OMMER AND DELETE"));
+          log(chalk.bgBlue("THIS IS THE UNCLRE RETURN WE LOG THE OMMER AND DELETE"));
           log(data["uncle"]);
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
