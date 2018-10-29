@@ -11,6 +11,8 @@ const crypto = require('crypto');
 const defaults = require('dat-swarm-defaults');
 const readline = require('readline');
 const getPort = require('get-port');
+var Web3 = require("web3");
+var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
 
 //genesis hash variables
 var Genesis = require('./genesis');
@@ -934,10 +936,11 @@ var broadcastPeersBlock = function(){
 
 //parent communicator callback function sent to child below
 var impcchild = function(childData,functionName){
-  log("------------------------------------------------------");
-  log(chalk.blue("Incoming data from child: "+chalk.green(childData)));
+  //log("------------------------------------------------------");
+  process.stdout.clearLine();
+  process.stdout.cursorTo(0);
+  process.stdout.write(chalk.blue("Incoming data from child: "+chalk.green(childData)));
   if(isJSON(childData) && JSON.parse(childData)["createBlock"]){
-    log("------------------------------------------------------");
     log(chalk.blue("Current prev hash is: "+chalk.green(frankieCoin.getLatestBlock().hash)+"\nIncoming block previous hash is: "+JSON.parse(childData)["createBlock"]["block"]["previousHash"]));
 
     if(frankieCoin.getLatestBlock().hash == JSON.parse(childData)["createBlock"]["block"]["previousHash"]){
@@ -995,7 +998,10 @@ var impcchild = function(childData,functionName){
     }
 
   }else if(isJSON(childData) && JSON.parse(childData)["getWorkForMiner"]){
-    log(JSON.parse(childData)["getWorkForMiner"])
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+    process.stdout.write(chalk.green("work returned to miner"));
+    //log(JSON.parse(childData)["getWorkForMiner"])
   }else if(isJSON(childData) && JSON.parse(childData)["getOrderBook"]){
     log("now we are gonna have some fun")
     impceventcaller("returning from function","maybe the calling peer is not necessary");
@@ -1026,6 +1032,14 @@ var impcchild = function(childData,functionName){
         log(body.id) // Print the shortened url.
       }
     });
+  }else if(isJSON(childData) && JSON.parse(childData)["transaction"]){
+    log("her in the peer file for transaction");
+    log(chalk.yellow(JSON.stringify(JSON.parse(childData)["transaction"]["txhash"])));
+    var txhash = JSON.parse(childData)["transaction"]["txhash"];
+    var txsignature = JSON.parse(childData)["transaction"]["signature"];
+    var egemSendingAddress = web3.eth.accounts.recover(txhash,txsignature);
+    log("This transaction was submitted by "+chalk.yellow(egemSendingAddress));
+    impceventcaller("This transaction was submitted by "+egemSendingAddress)
   }else{
     log("RCP commands were not properly formatted");
   }

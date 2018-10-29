@@ -10,10 +10,12 @@ var BLAKE2s = require("./blake2s.js")
 //testing web3
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
-
+//console colors
 const chalk = require('chalk');
 const log = console.log;
-
+//files and crypto for hash
+const fs = require('fs');
+const sha256 = require('crypto-js/sha256');
 //adds a link to one module function for database
 var addOrder = module.parent.children[6].exports.addOrder;
 ///////////////////////////////////////when fired this creates the genesis block
@@ -21,12 +23,22 @@ var genBlock;
 var genesisBLK = function genesisBLK() {
   var prevHash = "0";
   var txtData = "Blake2s Genesis for EtherGem Opal Coin 18 Feb 2018 at 02:18:18 AM";
+var filename = "sfrx_airdrop.js";
+var sfrxAirdropHash;
+  fs.readFile(filename, 'utf8', function(err, data) {
+      if (err) throw err;
+      sfrxAirdropHash = JSON.stringify(data);
+      //log(sfrxAirdropHash)
+      //sfrxAirdropHash=data.replace(/(\r\n|\n|\r)/gm,"");
+      //sfrxAirdropHash = sha256(tbh).toString();
+      //log(sfrxAirdropHash.toString());
+      log(chalk.cyan("EGEM Block 1530000 2:1 SFRX AIRDROP IN TRANSACTION POOL"));
+  });
+
   var genesisTx = [
     new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SPHR"),//oso
-    new Transaction(null, "0x5080fb28d8cf96c320e1a2e56a901abb7391b4ce", 500000, "SPHR")//ridz
-    //new Transaction(null, miningRewardAddress, this.miningReward, "SPHR"),
-    //new Transaction(null, miningRewardAddress, this.miningReward, "SPHR"),
-    //new Transaction(null, miningRewardAddress, this.miningReward, "SPHR")
+    new Transaction(null, "0x5080fb28d8cf96c320e1a2e56a901abb7391b4ce", 500000, "SPHR"),//ridz
+    //JSON.stringify(sfrxAirdropHash)
   ];
 
   var sampleTX = new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SPHR");

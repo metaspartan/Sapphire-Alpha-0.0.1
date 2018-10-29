@@ -144,7 +144,9 @@ function requestListener(request, response) {
         } else {
             buf = buf + data;
         }
-        log(chalk.blue("Reference Check: "+ chalk.green(buf.toString())));
+        process.stdout.clearLine();
+        process.stdout.cursorTo(0);
+        process.stdout.write(chalk.blue("Reference Check: "+ chalk.green(buf.toString())));
         impcparent(buf.toString(),parentBroadcastPeersFunction);
     });
 

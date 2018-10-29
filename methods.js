@@ -256,6 +256,29 @@ let methods = {
          });
      }
    },
+
+   //transaction:{"from":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","to":"0x7c4a4cbb0b9e8bd0792fc5ba2bc9660f1fcbfd85","amount":1375.002,"ticker":"SPHR"}}
+   transaction: {
+     description: '',
+     params: ['signature:egem signed transaction','txhash:the sapphire chain','transaction:transaction object'],
+     returns: ['transactionHash'],
+   },
+   exec(transactionObj) {
+     return new Promise((resolve) => {
+         if (typeof (transactionObj) !== 'object') {
+             throw new Error('was expecting an object!');
+         }
+         // you would usually do some validations here
+         // and check for required fields
+
+         //can I return a function?
+         log("incoming signed transaction");
+         let _transactionObj = JSON.parse(JSON.stringify(transactionObj));
+         log("submitting signed transaction"+_transactionObj);
+         resolve(callerEvent(_transactionObj));
+     });
+   },
+
    parentComEvent:parentComEvent
 };
 
