@@ -434,6 +434,7 @@ var Blockchain = class Blockchain{
               new Transaction(null, miningRewardAddress, this.miningReward, "SPHR")
           ];
           this.pendingOrders = [];
+          this.pendingOmmers = [];
       }
 
       //th8s is the peers adding a block needs to be VALIDATED
