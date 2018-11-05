@@ -232,7 +232,8 @@ var Block = class Block {
 
 }
 
-var Blockchain = class Blockchain{
+var Blockchain = class Blockchain {
+
       constructor() {
           this.chain = [this.createGenesisBlock()];
           //adding in the peers connectivity
@@ -547,9 +548,40 @@ var Blockchain = class Blockchain{
         this.pendingOmmers.push(ommer);
       }
 
+      getAirdropBalanceFromEgem(address,callback,airdrop) {
+          //grab latest EGEM BLock
+          web3.eth.getBalance(address, 1337331, async function (error, result) {
+          	if (!error){
+          		//console.log('Egem:', web3.utils.fromWei(result,'ether')); // Show the ether balance after converting it from Wei
+              var responder = await callback(web3.utils.fromWei(result,'ether'));
+              //console.log("responder equals "+responder);
+              //return result;
+          	}else{
+          		console.log('Houston we have a promblem: ', error); // Should dump errors here
+            }
+          });
+
+      }
+
       getBalanceOfAddress(address){
 
           let balance = [];
+
+          var airdrop;
+
+          //calling the airdrop balance
+          var mycallback1 = async function(response){
+            //console.log("we have returned"+response);
+            airdrop = response;
+            //console.log("second check on airdrop" +airdrop);
+            return airdrop;
+          }
+
+          this.getAirdropBalanceFromEgem(address,mycallback1);
+
+          //setTimeout(async function(){await console.log("my test is "+airdrop);},500);
+
+          //console.log("post timeout "+airdrop);
 
           //let balance = 0;
           for(const block of this.chain){
@@ -571,7 +603,26 @@ var Blockchain = class Blockchain{
 
           }
 
-          return balance;
+          async function returnTime(){
+            if(airdrop){
+              //console.log("okay"+balance["SPHR"]+airdrop);
+              var existing = parseFloat(balance["SPHR"]);
+              if(!existing){existing = 0};
+              var orig = parseFloat(airdrop);
+              if(!orig){orig = 0};
+              //console.log("okay2"+existing+orig);
+              var newbal = await parseFloat(existing + orig);
+              balance["SPHR"] = newbal;
+              console.log(balance);
+              return balance;
+            }else{
+              console.log("not yet")
+              setTimeout(function(){returnTime();},700);
+            }
+          }
+
+          returnTime(airdrop,balance);
+
       }
 
       processTrades(){

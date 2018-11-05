@@ -30,7 +30,7 @@ var Miner = class Miner {
 
   getBalanceOfAddress(addr){
     var getBalance = this.chain.getBalanceOfAddress(addr);
-    log('\nMiners Function Balance of '+addr+' is', getBalance);
+    //log('\nMiners Function Balance of '+addr+' is', getBalance);
     return getBalance;
   }
 

@@ -259,27 +259,39 @@ function isJSON(str) {
             log(chalk.green("Global hashes matched!"));
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"])
             var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
+            var pongBack = false;
 
               //increment it by one to return the next block
               peerBlockHeight++;
               //returning the block
               if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
                 peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
+                pongBack = true;
               }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
                 peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-              }else if(peerBlockHeight > frankieCoin.getLength()){
+                pongBack = true;
+              }else if((peerBlockHeight > frankieCoin.getLength()) && (peerBlockHeight == (frankieCoin.getLength()+1))){
                 //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
                 peerBlockHeight--;
-              }
-              /****
-              }else if(peerBlockHeight > frankieCoin.getLength() && frankieCoin.inSynch == false){
-                setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+                pongBack = true;
+              }else if(peerBlockHeight > (frankieCoin.getLength()+2)){
+
+                pongBack = false;
+                //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
                 log("8888777766665555       THIS PEER IS NOT SYNCHED     5555666677778888");
+                log("8888777766665555       THIS PEER IS NOT SYNCHED     5555666677778888");
+                log("8888777766665555       51           51              5555666677778888");
+                log("8888777766665555                 51                 5555666677778888");
+                log("8888777766665555              ??                    5555666677778888");
+                log("8888777766665555            ??                      5555666677778888");
+                log("8888777766665555                                    5555666677778888");
+                log("8888777766665555           PEER                     5555666677778888");
+                log("8888777766665555           PEER                     5555666677778888");
               }
-              ****/
+
             //setting a delay and pong back
             //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
-            if(peers[peerId]){
+            if(peers[peerId] && pongBack == true){
               setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},300);
             }
             //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
@@ -371,10 +383,10 @@ function queryr2(query){
       log(JSON.stringify(frankieCoin.getBlock(parseInt(answer))));
       queryr1();
     }else if(query == "getBalance"){
-      franks.getBalanceOfAddress(answer);
+      //franks.getBalanceOfAddress(answer);
       //note I did not need to use the miner function for balances
-      var getBalance2 = frankieCoin.getBalanceOfAddress(answer);
-      log('\nMiners Function Balance of '+answer+' is', getBalance2);
+      frankieCoin.getBalanceOfAddress(answer);
+      //log('\nMiners Function Balance of '+answer+' is', getBalance2);
       queryr1();
     }else{
       log("not a valid query at this time");
