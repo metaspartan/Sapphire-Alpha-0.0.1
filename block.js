@@ -23,8 +23,8 @@ var genBlock;
 var genesisBLK = function genesisBLK() {
   var prevHash = "0";
   var txtData = "Blake2s Genesis for EtherGem Opal Coin 18 Feb 2018 at 02:18:18 AM";
-var filename = "sfrx_airdrop.js";
-var sfrxAirdropHash;
+  var filename = "sfrx_airdrop.js";
+  var sfrxAirdropHash;
   fs.readFile(filename, 'utf8', function(err, data) {
       if (err) throw err;
       sfrxAirdropHash = JSON.stringify(data);
@@ -41,8 +41,8 @@ var sfrxAirdropHash;
     //JSON.stringify(sfrxAirdropHash)
   ];
 
-  var sampleTX = new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SPHR");
-  log(chalk.blue(JSON.stringify(sampleTX)));
+  //var sampleTX = new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SPHR");
+  //log(chalk.blue(JSON.stringify(sampleTX)));
 
   var datum = new Date(Date.UTC('2018','02','18','02','18','18'));
   var genBlockTimestamp = datum.getTime()/1000;
@@ -236,6 +236,8 @@ var Blockchain = class Blockchain {
 
       constructor() {
           this.chain = [this.createGenesisBlock()];
+          this.id = 663;
+          this.chainRiser = 10//1 - 100,101-200,etc. blocks in memory
           //adding in the peers connectivity
           this.nodes = [];
           //difficulty adjusts
@@ -380,8 +382,13 @@ var Blockchain = class Blockchain {
 
           //adding a trading mechanism and if below this chain push it processes same block HINT MOVE IT TWO LINES DOWN
           //this.processTrades();
+          log(chalk.yellow("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
-
+          log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
+          if(this.chain.length > this.chainRiser){
+            this.chain.shift();
+          }
+          log(chalk.yellow("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           //end adding trading mechanism
           this.pendingTransactions = [
               new Transaction(null, miningRewardAddress, this.miningReward, "SPHR")
@@ -428,7 +435,13 @@ var Blockchain = class Blockchain {
 
           //adding a trading mechanism and if below this chain push it processes same block HINT MOVE IT TWO LINES DOWN
           //this.processTrades();
+          log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
+          log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
+          if(this.chain.length > this.chainRiser){
+            this.chain.shift();
+          }
+          log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
 
           //end adding trading mechanism
           this.pendingTransactions = [
@@ -451,7 +464,13 @@ var Blockchain = class Blockchain {
 
           //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
           var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
+          log(chalk.blue("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
+          log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
+          if(this.chain.length > this.chainRiser){
+            this.chain.shift();
+          }
+          log(chalk.blue("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           //careful I have the ischain valid returining true on all tries
 
         }else if(this.chain[this.chain.length - 2].hash == inBlock.previousHash && this.getLatestBlock().previousHash == inBlock.previousHash){//uncle block
@@ -475,7 +494,13 @@ var Blockchain = class Blockchain {
             callback({"uncle":{"blockNumber":parseInt(this.chain.length),"block":returnBlock}},peerId);
             this.chain.pop()
             var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
+            log(chalk.red("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
             this.chain.push(block);
+            log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
+            if(this.chain.length > this.chainRiser){
+              this.chain.shift();
+            }
+            log(chalk.red("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           }else{
             log.chalk.bgRed("NO TIMESTAMPS so KILLING THE BLOCK");
             this.chain.pop();
@@ -517,7 +542,13 @@ var Blockchain = class Blockchain {
         }
         //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
         var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.ommers, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce, dbBlock.difficulty);
+        log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
         this.chain.push(block);
+        log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
+        if(this.chain.length > this.chainRiser){
+          this.chain.shift();
+        }
+        log(chalk.red("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
         //careful I have the ischain valid returining true on all tries
         if(this.isChainValid() == false){
           this.chain.pop();
@@ -888,37 +919,37 @@ var Blockchain = class Blockchain {
       }
 
       isChainValid() {
-          for (let i = 1; i < this.chain.length; i++){
-              //log("current block "+JSON.stringify(this.chain[i]))
-              //log("current block "+JSON.stringify(this.getBlock(i+1)));
-              const currentBlock = this.chain[i];
-              if (this.chain[i].hash !== this.chain[i].calculateHash()) {
-                  log("would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i+1).calculateHash());
-                  log("previoushash"+this.getBlock(i+1).previousHash+"timestamp"+this.getBlock(i+1).timestamp+"nonce"+this.getBlock(i+1).nonce);
-                  log("double check calc is same"+this.getBlock(i+1).calculateHash());
-                  ///triple check
-                  try {
-                    var h = new BLAKE2s(32, decodeUTF8(""));
-                  } catch (e) {
-                    alert("Error: " + e);
-                  };
-                  //h.update(decodeUTF8(this.chain[i+1].previousHash + this.chain[i+1].timestamp + JSON.stringify(this.chain[i+1].transactions) + JSON.stringify(this.chain[i+1].orders) + this.chain[i+1].nonce));
-                  h.update(decodeUTF8(this.getBlock(i+1).previousHash + this.getBlock(i+1).timestamp + this.getBlock(i+1).nonce));
-                  log(h.hexDigest());
-                  return false;
-              }else{
-                process.stdout.clearLine();
-                process.stdout.cursorTo(0);
-                process.stdout.write(chalk.green('Block Valid: ')+i+chalk.green(' Hash: ') + chalk.yellow(this.chain[i].hash));
-              }
-              const previousBlock = this.chain[i - 1];
-              if (this.chain[i].previousHash !== this.chain[i-1].hash) {
-                  log("would be returning false here: cb prevhash "+currentBlock.previousHash+" prev block hash "+previousBlock.hash);
-                  return false;
-              }
+        for (let i = 1; i < this.chain.length; i++){
+          //log("current block "+JSON.stringify(this.chain[i]))
+          //log("current block "+JSON.stringify(this.getBlock(i+1)));
+          const currentBlock = this.chain[i];
+          if (this.chain[i].hash !== this.chain[i].calculateHash()) {
+              log("would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i+1).calculateHash());
+              log("previoushash"+this.getBlock(i+1).previousHash+"timestamp"+this.getBlock(i+1).timestamp+"nonce"+this.getBlock(i+1).nonce);
+              log("double check calc is same"+this.getBlock(i+1).calculateHash());
+              ///triple check
+              try {
+                var h = new BLAKE2s(32, decodeUTF8(""));
+              } catch (e) {
+                alert("Error: " + e);
+              };
+              //h.update(decodeUTF8(this.chain[i+1].previousHash + this.chain[i+1].timestamp + JSON.stringify(this.chain[i+1].transactions) + JSON.stringify(this.chain[i+1].orders) + this.chain[i+1].nonce));
+              h.update(decodeUTF8(this.getBlock(i+1).previousHash + this.getBlock(i+1).timestamp + this.getBlock(i+1).nonce));
+              log(h.hexDigest());
+              return false;
+          }else{
+            process.stdout.clearLine();
+            process.stdout.cursorTo(0);
+            process.stdout.write(chalk.green('Block Valid: ')+i+chalk.green(' Hash: ') + chalk.yellow(this.chain[i].hash));
           }
+          const previousBlock = this.chain[i - 1];
+          if (this.chain[i].previousHash !== this.chain[i-1].hash) {
+              log("would be returning false here: cb prevhash "+currentBlock.previousHash+" prev block hash "+previousBlock.hash);
+              return false;
+          }
+        }
 
-          return true;
+        return true;
       }
 
       /////////functions for pulling blocks and processingTrades
