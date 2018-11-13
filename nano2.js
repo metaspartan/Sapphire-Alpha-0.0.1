@@ -1,8 +1,7 @@
-//const express = require('express');
 const nSQL = require("nano-sql").nSQL;
 const chalk = require('chalk');
 const log = console.log;
-// Use an instance table to query and organize existing tables of data.
+
 var blockchain = nSQL('blockchain')// Table/Store Name, required to declare model and attach it to this store.
 .model([ // Data Model, required
     {key:'id',type:'uuid',props:['pk']}, // This has the primary key value
@@ -28,11 +27,6 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
     {key:'hashOfThisBlock',type:'string'},
     {key:'difficulty',type:'int'}
 ])
-.config({
-    mode: "PERM", // With this enabled, the best storage engine will be auttomatically selected and all changes saved to it.  Works in browser AND nodeJS automatically.
-    history: true, // allow the database to undo/redo changes on the fly.
-    dbPath: "./datadir/"
-})
 .actions([ // Optional
     {
         name:'add_block',
@@ -97,6 +91,112 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
             return db.query('select',['id','blocknum','previousHash','hash','timestamp','transactions','orders','ommers','eGEMBackReferenceBlock','egemBackReferenceBlockHash','nonce','difficulty']).orderBy({blocknum:"asc"}).exec();
         }
     }
+]);
+var orders = nSQL('orders')
+.model([
+    {key:'id',type:'uuid',props:['pk']},
+    {key:'fromAddress',type:'string'},
+    {key:'buyOrSell',type:'string'},
+    {key:'pairBuy',type:'string'},
+    {key:'pairSell',type:'string'},
+    {key:'amount',type:'string'},
+    {key:'price',type:'string'},
+    {key:'state',type:'string'},
+    {key:'timestamp',type:'string'},
+    {key:'transactionID',type:'string'},
+    {key:'originationID',type:'string'},
+]).actions([ // Optional
+    {
+        name:'add_new_order',
+        args:['order:map'],
+        call:function(args, db) {
+            return db.query('upsert',args.order).exec();
+        }
+    }
+])
+.views([ // Optional
+    {
+        name: 'get_order_by_pairBuy',
+        args: ['pairBuy:string'],
+        call: function(args, db) {
+            return db.query('select').where([["pairBuy","=",args.pairBuy],"AND",["buyOrSell","=","BUY"]]).orderBy({price:"desc",amount:"desc"}).exec();
+        }
+    },
+    {
+        name: 'get_order_by_pairSell',
+        args: ['pairSell:string'],
+        call: function(args, db) {
+            return db.query('select').where([["pairSell","=",args.pairSell],"AND",["buyOrSell","=","SELL"]]).orderBy({price:"asc",amount:"asc"}).exec();
+        }
+    },
+    {
+        name: 'list_all_orders',
+        args: ['page:int'],
+        call: function(args, db) {
+            //return db.query('select',['id',"fromAddress","amount","buyOrSell","pairBuy","pairSell","price","transactionID"]).exec();
+            return db.query('select').exec();
+        }
+    },
+    {
+        name: 'list_all_orders_buy',
+        args: ['page:int'],
+        call: function(args, db) {
+            return db.query('select').where(["buyOrSell","=","BUY"]).orderBy({price:"desc",amount:"desc"}).exec();
+        }
+    },
+    {
+        name: 'list_all_orders_sell',
+        args: ['page:int'],
+        call: function(args, db) {
+            return db.query('select').where(["buyOrSell","=","SELL"]).orderBy({price:"asc",amount:"asc"}).exec();
+        }
+    }
+]);
+var sfrxreceipts = nSQL('sfrxreceipts')
+.model([ // Data Model, required
+    {key:'id',type:'uuid',props:['pk']}, // This has the primary key value
+    {key:'address',type:'string'},
+    {key:'fromAddress',type:'string'},
+    {key:'ticker',type:'string'},
+    {key:'amount',type:'string'},//using string for long tail floats and big numbers but convert
+    {key:'timestamp',type:'string'},
+    {key:'transactionID',type:'string'},
+    {key:'blockHash',type:'string'}
+]).config({
+    mode: "PERM", // With this enabled, the best storage engine will be auttomatically selected and all changes saved to it.  Works in browser AND nodeJS automatically.
+    history: true,  // allow the database to undo/redo changes on the fly.
+    dbPath: "./datadir/"
+}).actions([ // Optional
+    {
+        name:'add_new_receipt',
+        args:['sfrxreceipt:map'],
+        call:function(args, db) {
+            return db.query('upsert',args.sfrxreceipt).exec();
+        }
+    }
+])
+.views([ // Optional
+    {
+        name: 'get_receipts_by_ticker',
+        args: ['ticker:string'],
+        call: function(args, db) {
+            return db.query('select').where([["ticker","=",args.ticker],"AND",["address","=",args.address]]).orderBy({ticker:"asc",timestamp:"asc"}).exec();
+        }
+    },
+    {
+        name: 'list_all_receipts',
+        args: ['page:int'],
+        call: function(args, db) {
+            return db.query('select').exec();
+        }
+    },
+    {
+        name: 'list_all_receipts_address',
+        args: ['page:int'],
+        call: function(args, db) {
+            return db.query('select').where(["address","=",args.address]).orderBy({ticker:"asc",timestamp:"asc"}).exec();
+        }
+    }
 ]).connect();
 
 var addBlock = function(block){
@@ -148,8 +248,8 @@ var getBlock = function(number,callBack){
       // DB ready to use.
       nSQL("blockchain").getView('get_block',{blocknum:number})
       .then(function(result) {
-          log(chalk.green(result)) //  <- single object array containing the row we inserted.
-          callBack(result);
+          log(chalk.green(JSON.stringify(result))) //  <- single object array containing the row we inserted.
+          callBack(JSON.stringify(result));
       });
 
 }
@@ -164,75 +264,6 @@ var getLatestBlock = function(){
       });
 
 }
-
-//////////////////////////////////////this is the ORDER database now////////////
-// Use an instance table to query and organize existing tables of data.
-var orders = nSQL('orders')
-.model([
-    {key:'id',type:'uuid',props:['pk']},
-    {key:'fromAddress',type:'string'},
-    {key:'buyOrSell',type:'string'},
-    {key:'pairBuy',type:'string'},
-    {key:'pairSell',type:'string'},
-    {key:'amount',type:'string'},
-    {key:'price',type:'string'},
-    {key:'state',type:'string'},
-    {key:'timestamp',type:'string'},
-    {key:'transactionID',type:'string'},
-    {key:'originationID',type:'string'},
-])
-.config({
-    mode: "PERM", // With this enabled, the best storage engine will be auttomatically selected and all changes saved to it.  Works in browser AND nodeJS automatically.
-    history: true,  // allow the database to undo/redo changes on the fly.
-    dbPath: "./datadir/"
-})
-.actions([ // Optional
-    {
-        name:'add_new_order',
-        args:['order:map'],
-        call:function(args, db) {
-            return db.query('upsert',args.order).exec();
-        }
-    }
-])
-.views([ // Optional
-    {
-        name: 'get_order_by_pairBuy',
-        args: ['pairBuy:string'],
-        call: function(args, db) {
-            return db.query('select').where([["pairBuy","=",args.pairBuy],"AND",["buyOrSell","=","BUY"]]).orderBy({price:"desc",amount:"desc"}).exec();
-        }
-    },
-    {
-        name: 'get_order_by_pairSell',
-        args: ['pairSell:string'],
-        call: function(args, db) {
-            return db.query('select').where([["pairSell","=",args.pairSell],"AND",["buyOrSell","=","SELL"]]).orderBy({price:"asc",amount:"asc"}).exec();
-        }
-    },
-    {
-        name: 'list_all_orders',
-        args: ['page:int'],
-        call: function(args, db) {
-            //return db.query('select',['id',"fromAddress","amount","buyOrSell","pairBuy","pairSell","price","transactionID"]).exec();
-            return db.query('select').exec();
-        }
-    },
-    {
-        name: 'list_all_orders_buy',
-        args: ['page:int'],
-        call: function(args, db) {
-            return db.query('select').where(["buyOrSell","=","BUY"]).orderBy({price:"desc",amount:"desc"}).exec();
-        }
-    },
-    {
-        name: 'list_all_orders_sell',
-        args: ['page:int'],
-        call: function(args, db) {
-            return db.query('select').where(["buyOrSell","=","SELL"]).orderBy({price:"asc",amount:"asc"}).exec();
-        }
-    }
-]).connect();
 
 var clearOrderById = function(id){
   nSQL("orders").query("delete").where(["id","=",id]).exec()
@@ -255,16 +286,6 @@ var addOrder = function(order){
       });
   //});
 }
-
-/***
-var simple = nSQL([
-    {id:null,fromAddress:'0x0666bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'BUY',pairBuy:'EGEM',pairSell:'SPHR',amount:'300',price:'24.5567'},
-    {id:null,fromAddress:'0x0667bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SPHR',amount:'320',price:'24.5567'},
-    {id:null,fromAddress:'0x0668bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'BUY',pairBuy:'EGEM',pairSell:'SPHR',amount:'350',price:'24.5567'},
-    {id:null,fromAddress:'0x5c4ae12c853012d355b5ee36a6cb8285708760e6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SPHR',amount:'450',price:'25.5567'},
-    {id:null,fromAddress:'0x5c4ae12c853012d775b5ee36a6cb8285708760e6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SPHR',amount:'920',price:'26.5567'},
-]);
-***/
 
 var ordersToBuy = [];
 
@@ -332,61 +353,6 @@ var getAllOrders = function(){
       });
 
 }
-//////////////////////////////////////end order database////////////////////////
-
-//////////////////////balances database/////////////////////////////////////////
-//note this data structure will become a patricia merkle trie
-/***
-var sfrxreceipts = nSQL('sfrxreceipts')
-.model([ // Data Model, required
-    {key:'id',type:'uuid',props:['pk']}, // This has the primary key value
-    {key:'address',type:'string'},
-    {key:'fromAddress',type:'string'},
-    {key:'ticker',type:'string'},
-    {key:'amount',type:'string'},//using string for long tail floats and big numbers but convert
-    {key:'timestamp',type:'string'},
-    {key:'transactionID',type:'string'},
-    {key:'blockHash',type:'string'}
-])
-.config({
-    mode: "PERM", // With this enabled, the best storage engine will be auttomatically selected and all changes saved to it.  Works in browser AND nodeJS automatically.
-    history: true,  // allow the database to undo/redo changes on the fly.
-    dbPath: "./datadir/"
-})
-.actions([ // Optional
-    {
-        name:'add_new_receipt',
-        args:['sfrxreceipt:map'],
-        call:function(args, db) {
-            return db.query('upsert',args.sfrxreceipt).exec();
-        }
-    }
-])
-.views([ // Optional
-    {
-        name: 'get_receipts_by_ticker',
-        args: ['ticker:string'],
-        call: function(args, db) {
-            return db.query('select').where([["ticker","=",args.ticker],"AND",["address","=",args.address]]).orderBy({ticker:"asc",timestamp:"asc"}).exec();
-        }
-    },
-    {
-        name: 'list_all_receipts',
-        args: ['page:int'],
-        call: function(args, db) {
-            return db.query('select').exec();
-        }
-    },
-    {
-        name: 'list_all_receipts_address',
-        args: ['page:int'],
-        call: function(args, db) {
-            return db.query('select').where(["address","=",args.address]).orderBy({ticker:"asc",timestamp:"asc"}).exec();
-        }
-    }
-]).connect();
-****/
-//////////////////////end balances database/////////////////////////////////////
 
 module.exports = {
     addBlock:addBlock,

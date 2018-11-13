@@ -47,6 +47,7 @@ var genesisBLK = function genesisBLK() {
   var datum = new Date(Date.UTC('2018','02','18','02','18','18'));
   var genBlockTimestamp = datum.getTime()/1000;
   var genBlockPreviousHash = "";
+  //var genBlockPreviousHash = "0000019890000000000000000000000000000000000000000000000000000000";
   log(chalk.green("Creating genesis block:"));
   //log(powHash);
   try {
@@ -149,7 +150,7 @@ var Hash = function(inputs) {
 
 var Block = class Block {
 
-    constructor(timestamp, transactions, orders, ommers, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
+    constructor(timestamp, transactions, orders, ommers, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 3) {
 
         log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
@@ -204,6 +205,7 @@ var Block = class Block {
         //total Hash for sequencing
         this.hashOfThisBlock = '';
         this.difficulty = difficulty;
+
       }
 
     calculateHash() {
@@ -235,6 +237,7 @@ var Block = class Block {
 var Blockchain = class Blockchain {
 
       constructor() {
+
           this.chain = [this.createGenesisBlock()];
           this.id = 663;
           this.chainRiser = 10//1 - 100,101-200,etc. blocks in memory
@@ -255,11 +258,13 @@ var Blockchain = class Blockchain {
           this.quarryNodeReward = 0.25;
           //is the chain synched and mine and assist others? when true yes
           this.inSynch = false;
+          this.blockHeight = 0;//genesis block
           this.inSynchBlockHeight = 0;
           this.longestPeerBlockHeight = 0;
           //just logging the chain creation
           log(chalk.cyan("Genesis block created!"));
           log(chalk.blue("Chain is: "+chalk.green(JSON.stringify(this.chain))));
+
       }
 
       registerNode(id,ip,port) {
@@ -336,7 +341,19 @@ var Blockchain = class Blockchain {
       }
 
       getLength(){
-        return this.chain.length;
+        //return this.chain.length;
+        if(typeof this.blockHeight === 'undefined' || this.blockHeight === null){//if (typeof variable === 'undefined' || variable === null) {
+          console.log("WAS NULL FRANKIECOIN GET LENGTH CALLED"+this.blockHeight);
+          return 1;
+        }else{
+          console.log("FRANKIECOIN GET LENGTH CALLED"+this.blockHeight);
+          return this.blockHeight;
+        }
+      }
+
+      getLengthTwo(){
+        console.log("chain length "+this.chain.length);
+        console.log("last block "+this.getLatestBlock().block)
       }
 
       getEntireChain() {
@@ -384,6 +401,7 @@ var Blockchain = class Blockchain {
           //this.processTrades();
           log(chalk.yellow("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
+          this.blockHeight += 1;
           log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
           if(this.chain.length > this.chainRiser){
             this.chain.shift();
@@ -437,11 +455,12 @@ var Blockchain = class Blockchain {
           //this.processTrades();
           log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
+          this.blockHeight += 1;
           log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
           if(this.chain.length > this.chainRiser){
             this.chain.shift();
           }
-          log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
+          log(chalk.green("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
 
           //end adding trading mechanism
           this.pendingTransactions = [
@@ -466,11 +485,13 @@ var Blockchain = class Blockchain {
           var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
           log(chalk.blue("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
+          this.blockHeight = inBlock.blocknum;
+          //this.chain.blockHeight += 1;
           log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
           if(this.chain.length > this.chainRiser){
             this.chain.shift();
           }
-          log(chalk.blue("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
+          log(chalk.blue("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
           //careful I have the ischain valid returining true on all tries
 
         }else if(this.chain[this.chain.length - 2].hash == inBlock.previousHash && this.getLatestBlock().previousHash == inBlock.previousHash){//uncle block
@@ -496,11 +517,12 @@ var Blockchain = class Blockchain {
             var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
             log(chalk.red("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
             this.chain.push(block);
+            this.blockHeight += 1;
             log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
             if(this.chain.length > this.chainRiser){
               this.chain.shift();
             }
-            log(chalk.red("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
+            log(chalk.red("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
           }else{
             log.chalk.bgRed("NO TIMESTAMPS so KILLING THE BLOCK");
             this.chain.pop();
@@ -544,11 +566,12 @@ var Blockchain = class Blockchain {
         var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.ommers, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce, dbBlock.difficulty);
         log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
         this.chain.push(block);
+        this.blockHeight = dbBlock.blocknum;
         log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
         if(this.chain.length > this.chainRiser){
           this.chain.shift();
         }
-        log(chalk.red("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
+        log(chalk.red("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
         //careful I have the ischain valid returining true on all tries
         if(this.isChainValid() == false){
           this.chain.pop();

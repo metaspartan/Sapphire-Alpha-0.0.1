@@ -1,7 +1,10 @@
-var sapphirechain = require("./block.js");
 var BLAKE2s = require("./blake2s.js");
 const chalk = require('chalk');
 const log = console.log;
+var sapphirechain;
+var setSapphireChain = function(chain){
+  sapphirechain = chain;
+}
 
 //let frankieCoin = new sapphirechain.Blockchain();
 let ctr = 0;
@@ -105,5 +108,6 @@ var Miner = class Miner {
 }
 
 module.exports = {
-    Miner:Miner
+    Miner:Miner,
+    setSapphireChain:setSapphireChain
 }
