@@ -16,8 +16,11 @@ const log = console.log;
 //files and crypto for hash
 const fs = require('fs');
 const sha256 = require('crypto-js/sha256');
-//adds a link to one module function for database
-var addOrder = module.parent.children[6].exports.addOrder;
+//BlockchainDB reference
+var BlockchainDB;
+var setBlockchainDB = function(bdb){
+  BlockchainDB = bdb;
+}
 ///////////////////////////////////////when fired this creates the genesis block
 var genBlock;
 var genesisBLK = function genesisBLK() {
@@ -258,7 +261,7 @@ var Blockchain = class Blockchain {
           this.quarryNodeReward = 0.25;
           //is the chain synched and mine and assist others? when true yes
           this.inSynch = false;
-          this.blockHeight = 0;//genesis block
+          this.blockHeight = 1;//genesis block
           this.inSynchBlockHeight = 0;
           this.longestPeerBlockHeight = 0;
           //just logging the chain creation
@@ -739,7 +742,7 @@ var Blockchain = class Blockchain {
                         ''
                       );
                       this.createOrder(replacementOrder,allsells[transactions]["originationID"]);
-                      addOrder({order:replacementOrder});
+                      BlockchainDB.addOrder({order:replacementOrder});
                       /*****
                       //one order gets closed
                       this.createOrder(
@@ -786,7 +789,7 @@ var Blockchain = class Blockchain {
                         ''
                       );
                       this.createOrder(replacementOrder,allbuys[ordersofbuy]["originationID"]);
-                      addOrder({order:replacementOrder});
+                      BlockchainDB.addOrder({order:replacementOrder});
                       //one order gets closed
                       //one gets partisl
                       //and a new one gets open
@@ -987,5 +990,6 @@ module.exports = {
     Order:Order,
     Block:Block,
     Blockchain:Blockchain,
+    setBlockchainDB:setBlockchainDB,
     Hash,Hash
 }

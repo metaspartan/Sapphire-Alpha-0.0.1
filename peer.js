@@ -34,6 +34,7 @@ var request = require('request');
 
 ///////////////////////Mining stuff : blockchain algo and mining initializations
 var sapphirechain = require("./block.js");
+sapphirechain.setBlockchainDB(BlockchainDB);
 var BLAKE2s = require("./blake2s.js");
 var Miner = require("./miner.js");
 Miner.setSapphireChain(sapphirechain);
