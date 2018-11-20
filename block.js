@@ -94,11 +94,13 @@ var Ommer = class Ommer{
 
 var Transaction = class Transaction{
     //we can do an address validation and kick back false
-    constructor(fromAddress, toAddress, amount, ticker){
+    constructor(fromAddress, toAddress, amount, ticker, txTimestamp = Date.now()){
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
         this.amount = amount;
         this.ticker = ticker;
+        this.timestamp = txTimestamp;
+        this.hash = Hash(toAddress+amount+ticker+txTimestamp);
     }
 }
 
@@ -607,10 +609,10 @@ var Blockchain = class Blockchain {
 
       getAirdropBalanceFromEgem(address,callback,airdrop) {
           //grab latest EGEM BLock
-          web3.eth.getBalance(address, 1337331, async function (error, result) {
+          web3.eth.getBalance(address, 1530000, async function (error, result) {
           	if (!error){
           		//console.log('Egem:', web3.utils.fromWei(result,'ether')); // Show the ether balance after converting it from Wei
-              var responder = await callback(web3.utils.fromWei(result,'ether'));
+              var responder = await callback(parseFloat(web3.utils.fromWei(result,'ether')*2));
               //console.log("responder equals "+responder);
               //return result;
           	}else{

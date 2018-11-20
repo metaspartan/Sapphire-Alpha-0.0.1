@@ -192,7 +192,7 @@ var sfrxreceipts = nSQL('sfrxreceipts')
     },
     {
         name: 'list_all_receipts_address',
-        args: ['page:int'],
+        args: ['address:string'],
         call: function(args, db) {
             return db.query('select').where(["address","=",args.address]).orderBy({ticker:"asc",timestamp:"asc"}).exec();
         }
@@ -354,6 +354,65 @@ var getAllOrders = function(){
 
 }
 
+var addTransactions = function(transactions,blockhash){
+  console.log("T R A N S A C T I O N S  B E I N G  A D D E D  H E R E");
+  console.log(transactions);
+  console.log(blockhash);
+  transactions = JSON.parse(JSON.stringify(transactions));
+  for(tranx in JSON.parse(transactions)){
+
+    console.log("inside loop"+tranx+JSON.parse(transactions)[tranx]);
+
+    var receipt = JSON.parse(transactions)[tranx];
+    var myreceipt = {
+      "sfrxreceipt":
+      {"id":null,
+      "address":receipt["toAddress"],
+      "fromAddress":receipt["fromAddress"],
+      "ticker":receipt["ticker"],
+      "amount":receipt["amount"],
+      "timestamp":receipt["timestamp"],
+      "transactionID":receipt["hash"],//to be added
+      "blockHash":blockhash
+    }};
+    log("Inserting Tranactions"+myreceipt.toString());
+        // DB ready to use.
+    nSQL("sfrxreceipts").doAction('add_new_receipt',myreceipt
+    ).then(function(result) {
+        log(result) //  <- single object array containing the row we inserted.
+    });
+
+  }
+
+  log("here are my receipts: "+JSON.stringify(getAllTransactionReceipts()));
+
+}
+
+var getAllTransactionReceipts = function(){
+  log("ALL Transaction Receipts");
+      // DB ready to use.
+      nSQL("sfrxreceipts").getView('list_all_receipts')
+      .then(function(result) {
+          log(result) //  <- single object array containing the row we inserted.
+      });
+
+}
+
+var getTransactionReceiptsByAddress = function(address){
+  log("ALL Transaction Receipts");
+      // DB ready to use.
+      nSQL("sfrxreceipts").getView('list_all_receipts_address',{address:address})
+      .then(function(result) {
+          log(result) //  <- single object array containing the row we inserted.
+      });
+
+}
+
+var clearTransactionDatabase = function(){
+  console.log("deleting all transactions");
+  nSQL("sfrxreceipts").query("delete").exec();
+}
+
 module.exports = {
     addBlock:addBlock,
     addGenBlock:addGenBlock,
@@ -361,6 +420,9 @@ module.exports = {
     getBlock:getBlock,
     getLatestBlock:getLatestBlock,
     addOrder:addOrder,
+    addTransactions:addTransactions,
+    getAllTransactionReceipts:getAllTransactionReceipts,
+    getTransactionReceiptsByAddress:getTransactionReceiptsByAddress,
     getOrdersBuy:getOrdersBuy,
     getOrdersSell:getOrdersSell,
     getAllOrders:getAllOrders,
@@ -370,5 +432,6 @@ module.exports = {
     clearDatabase:clearDatabase,
     clearBlock:clearBlock,
     clearOrderDatabase:clearOrderDatabase,
-    clearOrderById:clearOrderById
+    clearOrderById:clearOrderById,
+    clearTransactionDatabase:clearTransactionDatabase
 }

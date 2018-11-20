@@ -192,6 +192,7 @@ function isJSON(str) {
             }};
             //add it to the database
             BlockchainDB.addBlock(peerblock);
+            BlockchainDB.addTransactions(JSON.parse(data)["transactions"],JSON.parse(data)["hash"]);
             //add it to the RPC for miner
             var options = {
               uri: 'http://localhost:9090/rpc',
@@ -387,6 +388,7 @@ function queryr2(query){
       //franks.getBalanceOfAddress(answer);
       //note I did not need to use the miner function for balances
       frankieCoin.getBalanceOfAddress(answer);
+      BlockchainDB.getTransactionReceiptsByAddress(answer);
       //log('\nMiners Function Balance of '+answer+' is', getBalance2);
       queryr1();
     }else{
@@ -462,6 +464,7 @@ function queryr1(){
         }};
         log(minedblock);
         BlockchainDB.addBlock(minedblock);
+        BlockchainDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
         //sending the block to the peers
         broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 
@@ -543,6 +546,7 @@ function queryr1(){
     }else if(answer == "S"){//S is currently cleaning the databases was "Send" so leaving commented out transactions and orders for testing
       BlockchainDB.clearDatabase();
       BlockchainDB.clearOrderDatabase();
+      BlockchainDB.clearTransactionDatabase();
       log("------------------------------------------------------");
       log(chalk.red("Database has been deleted please close and reopen. (Crtl + c)"));
       log("------------------------------------------------------");
@@ -551,6 +555,7 @@ function queryr1(){
       BlockchainDB.getLatestBlock();
       console.log("----------------------------");
       BlockchainDB.getBlockchain(99,callBackEntireDatabase);
+      BlockchainDB.getAllTransactionReceipts();
       queryr1();
     }else if(answer.includes("Send(")){//SEND function Send ( json tx )
       log(answer.slice(answer.indexOf("Send(")+5, answer.indexOf(")")));
@@ -707,6 +712,7 @@ var genBlock = {"blockchain":{
   difficulty:4
 }};
 BlockchainDB.addGenBlock(genBlock);
+BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 log("peer chain is"+ frankieCoin.getEntireChain());
 var franks = miner(frankieCoin);
 
@@ -989,7 +995,7 @@ var impcchild = function(childData,functionName){
       }};
       log(minedblock);
       BlockchainDB.addBlock(minedblock);
-
+      BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 
       functionName();
       ////////end database update and peers broadcast
