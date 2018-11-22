@@ -38,6 +38,7 @@ var genesisBLK = function genesisBLK() {
       log(chalk.cyan("EGEM Block 1530000 2:1 SFRX AIRDROP IN TRANSACTION POOL"));
   });
 
+  //dev team drops
   var genesisTx = [
     new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SPHR"),//oso
     new Transaction(null, "0x5080fb28d8cf96c320e1a2e56a901abb7391b4ce", 500000, "SPHR"),//ridz

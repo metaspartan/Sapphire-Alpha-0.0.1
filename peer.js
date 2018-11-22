@@ -389,6 +389,8 @@ function queryr2(query){
       //note I did not need to use the miner function for balances
       frankieCoin.getBalanceOfAddress(answer);
       BlockchainDB.getTransactionReceiptsByAddress(answer);
+      log("---------------");
+      BlockchainDB.getBalanceByAddress(answer);
       //log('\nMiners Function Balance of '+answer+' is', getBalance2);
       queryr1();
     }else{
@@ -541,7 +543,7 @@ function queryr1(){
       log(JSON.stringify(frankieCoin.retrieveNodes()));
       queryr1();
     }else if(answer == "G"){//G currently is for getBlock which is also a function
-      log("BLOCK NUMBER: 1");
+      log("Enter Block Number to Retrieve: ");
       queryr2("getBlock");
     }else if(answer == "S"){//S is currently cleaning the databases was "Send" so leaving commented out transactions and orders for testing
       BlockchainDB.clearDatabase();
@@ -558,6 +560,7 @@ function queryr1(){
       BlockchainDB.getAllTransactionReceipts();
       queryr1();
     }else if(answer.includes("Send(")){//SEND function Send ( json tx )
+
       log(answer.slice(answer.indexOf("Send(")+5, answer.indexOf(")")));
       var jsonSend = answer.slice(answer.indexOf("Send(")+5, answer.indexOf(")"));
       var from = JSON.parse(jsonSend)["from"];
@@ -568,7 +571,7 @@ function queryr1(){
       frankieCoin.createTransaction(new sapphirechain.Transaction(from, to, amount, ticker));
       queryr1();
       //queryr2("getBlock");
-    }else if(answer.includes("Hash(")){//SEND function Send ( json tx )
+    }else if(answer.includes("Hash(")){//HASH FUNCTION FOR VERIFICATIONS
       log(answer.slice(answer.indexOf("Hash(")+5, answer.indexOf(")")));
       var hashText = answer.slice(answer.indexOf("Hash(")+5, answer.indexOf(")"));
 
@@ -1064,7 +1067,7 @@ var impcchild = function(childData,functionName){
 
 var impcMethods = function(datacall){
   return new Promise((resolve)=> {
-    log("calling in peer");
+    log(chalk.yellow("data calling in peer [this message is for dev]"));
     log(JSON.stringify(datacall));
     var dataBuySell = [];
     var myCallbackOrderBuy = function(data) {

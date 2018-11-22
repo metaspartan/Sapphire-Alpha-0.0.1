@@ -37,14 +37,14 @@ var globalParentComMethods = function(callback){
 
 var methodEvent = function(datacall){
   return new Promise((resolve)=> {
-    log("and here I am in rpc server");
+    log(chalk.yellow("event replay through rpc server [this message for dev]"));
     resolve(impcParentMethods(datacall));
   })
 }
 
 //another impc event cycle for parent messages
 var impcevent = function(mydata,mypeer){
-  log("SURELY AS SHIT IT FIRED BRO"+mydata+mypeer);
+  log("IMPC EVENT FIRED"+mydata+mypeer);//probably will be removed
 }
 //callback gonna push a callback to parent
 var globalParentEvent = function(callback){

@@ -196,6 +196,13 @@ var sfrxreceipts = nSQL('sfrxreceipts')
         call: function(args, db) {
             return db.query('select').where(["address","=",args.address]).orderBy({ticker:"asc",timestamp:"asc"}).exec();
         }
+    },
+    {
+        name: 'get_balance_at_address',
+        args: ['address:string'],
+        call: function(args, db) {
+            return db.query('select',["amount"]).where(["address","=",args.address]).orderBy({ticker:"asc",timestamp:"asc"}).exec();
+        }
     }
 ]).connect();
 
@@ -408,6 +415,21 @@ var getTransactionReceiptsByAddress = function(address){
 
 }
 
+var getBalanceByAddress = function(address){
+  log("ALL Transaction Receipts");
+      // DB ready to use.
+      nSQL("sfrxreceipts").getView('get_balance_at_address',{address:address})
+      .then(function(result) {
+          log(result) //  <- single object array containing the row we inserted.
+          var bal = 0;
+          for(amt in result){
+            bal+=parseFloat(result[amt]["amount"]);
+          }
+          log("final balance is "+bal);
+      });
+
+}
+
 var clearTransactionDatabase = function(){
   console.log("deleting all transactions");
   nSQL("sfrxreceipts").query("delete").exec();
@@ -419,6 +441,7 @@ module.exports = {
     getBlockchain:getBlockchain,
     getBlock:getBlock,
     getLatestBlock:getLatestBlock,
+    getBalanceByAddress:getBalanceByAddress,
     addOrder:addOrder,
     addTransactions:addTransactions,
     getAllTransactionReceipts:getAllTransactionReceipts,
