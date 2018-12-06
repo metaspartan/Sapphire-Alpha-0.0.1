@@ -31,7 +31,9 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
     {
         name:'add_block',
         args:['blockchain:map'],
+        /***
         call:function(args, db) {
+          log("<<<------------this is the data insert----------->>>")
           return db.query('select').where(['hash','=',args.blockchain["hash"]]).exec().then(function(rows) {
               if(rows.length == 0){
                 log(chalk.blue("We are inserting: "+ chalk.green(rows.length+args.blockchain["hash"])))
@@ -43,11 +45,15 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
             }
           );
         }
-        /***
+          ***/
+
+
+
         call:function(args, db) {
+            log("<<<------------this is the data insert----------->>>")
             return db.query('upsert',args.blockchain).exec();
         }
-        ***/
+
     },
     {
         name:'add_genblock',
@@ -91,7 +97,7 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
             return db.query('select',['id','blocknum','previousHash','hash','timestamp','transactions','orders','ommers','eGEMBackReferenceBlock','egemBackReferenceBlockHash','nonce','difficulty']).orderBy({blocknum:"asc"}).exec();
         }
     }
-]);
+])
 var orders = nSQL('orders')
 .model([
     {key:'id',type:'uuid',props:['pk']},
@@ -151,7 +157,7 @@ var orders = nSQL('orders')
             return db.query('select').where(["buyOrSell","=","SELL"]).orderBy({price:"asc",amount:"asc"}).exec();
         }
     }
-]);
+])
 var sfrxreceipts = nSQL('sfrxreceipts')
 .model([ // Data Model, required
     {key:'id',type:'uuid',props:['pk']}, // This has the primary key value
@@ -171,7 +177,30 @@ var sfrxreceipts = nSQL('sfrxreceipts')
         name:'add_new_receipt',
         args:['sfrxreceipt:map'],
         call:function(args, db) {
-            return db.query('upsert',args.sfrxreceipt).exec();
+
+          return db.query('upsert',args.sfrxreceipt).exec();
+
+          /***
+          return db.query('select').where(
+            ['address','=',args.sfrxreceipt["address"]],
+            "AND",
+            ['ticker','=',args.sfrxreceipt["ticker"]],
+            "AND",
+            ['timestamp','=',args.sfrxreceipt["timestamp"]],
+            "AND",
+            ['amount','=',args.sfrxreceipt["amount"]]
+          ).exec().then(function(rows) {
+              if(rows.length == 0){
+                log(chalk.blue("Inserting transaction id: "+ chalk.green(args.sfrxreceipt["transactionID"])))
+                return db.query('upsert',args.sfrxreceipt).exec();
+              }else{
+                log(chalk.blue("Attempted insert of transaction id : "+ chalk.green(args.sfrxreceipt["address"]+args.sfrxreceipt["ticker"]+args.sfrxreceipt["blockHash"]+args.sfrxreceipt["amount"])))
+                log(chalk.red("It already exists at blockhash: "+args.sfrxreceipt["blockHash"]));
+              }
+            }
+          );
+          ****/
+
         }
     }
 ])
@@ -207,6 +236,7 @@ var sfrxreceipts = nSQL('sfrxreceipts')
 ]).connect();
 
 var addBlock = function(block){
+  console.log("<<<<<----------------GETTING READY TO ADD BLOCK HERE------------>>>>>")
   log(JSON.stringify(block));
   //orders.connect().then(function(result) {
       // DB ready to use.
@@ -363,7 +393,7 @@ var getAllOrders = function(){
 
 var addTransactions = function(transactions,blockhash){
   console.log("T R A N S A C T I O N S  B E I N G  A D D E D  H E R E");
-  console.log(transactions);
+  console.log(transactions+transactions.length);
   console.log(blockhash);
   transactions = JSON.parse(JSON.stringify(transactions));
   for(tranx in JSON.parse(transactions)){

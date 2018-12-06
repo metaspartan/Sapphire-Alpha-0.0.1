@@ -39,8 +39,6 @@ var BLAKE2s = require("./blake2s.js");
 var Miner = require("./miner.js");
 Miner.setSapphireChain(sapphirechain);
 
-let ctr = 0;
-
 var msg = "genesis message";
 var length = 32;
 var key = "ax8906hg4c";
@@ -362,13 +360,6 @@ function isJSON(str) {
 })()
 /////////////////////////////////////ending asynchronous peers connection engine
 
-/////sampling some homemade ipc
-var tryingAgain = function(){
-  log("tried again and it worked")
-}
-/////end th homemade ipc
-
-
 //////////////////////////////////////////////////////////////messaging to peers
 var broadcastPeers = function(message){
   for (let id in peers) {
@@ -464,7 +455,12 @@ function queryr1(){
           hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"],
           difficulty:frankieCoin.getLatestBlock()["difficulty"]
         }};
+        log("here is the mined block: ")
         log(minedblock);
+        var blockExists = function(block){
+          console.log("does my block exist: "+block["blocknum"]);
+        }
+        BlockchainDB.getBlock(parseInt(frankieCoin.getLength()),blockExists);
         BlockchainDB.addBlock(minedblock);
         BlockchainDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
         //sending the block to the peers
@@ -817,7 +813,7 @@ function ChainGrab(blocknum){
   //maybe some other stuff like .then
 };
 //and finally the actual call to function for synch
-setTimeout(function(){ChainGrab();},5000);
+setTimeout(function(){ChainGrab();},3000);
 //end by now we will know if synched or not and enable or disable mining
 log("------------------------------------------------------")
 log(chalk.green("CHAIN SYNCED"))
@@ -960,6 +956,7 @@ var impcchild = function(childData,functionName){
   process.stdout.clearLine();
   process.stdout.cursorTo(0);
   process.stdout.write(chalk.blue("Incoming data from child: "+chalk.green(childData)));
+
   if(isJSON(childData) && JSON.parse(childData)["createBlock"]){
     log(chalk.blue("Current prev hash is: "+chalk.green(frankieCoin.getLatestBlock().hash)+"\nIncoming block previous hash is: "+JSON.parse(childData)["createBlock"]["block"]["previousHash"]));
 
@@ -997,6 +994,10 @@ var impcchild = function(childData,functionName){
         difficulty:frankieCoin.getLatestBlock()["difficulty"]
       }};
       log(minedblock);
+      var blockExists = function(block){
+        console.log("does my block exist: "+block["blocknum"]);
+      }
+      BlockchainDB.getBlock(parseInt(frankieCoin.getLength()),blockExists);
       BlockchainDB.addBlock(minedblock);
       BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 
@@ -1053,7 +1054,7 @@ var impcchild = function(childData,functionName){
       }
     });
   }else if(isJSON(childData) && JSON.parse(childData)["transaction"]){
-    log("her in the peer file for transaction");
+    log("Incoming Transaction over RPC");
     log(chalk.yellow(JSON.stringify(JSON.parse(childData)["transaction"]["txhash"])));
     var txhash = JSON.parse(childData)["transaction"]["txhash"];
     var txsignature = JSON.parse(childData)["transaction"]["signature"];

@@ -275,6 +275,7 @@ let methods = {
          log("incoming signed transaction");
          let _transactionObj = JSON.parse(JSON.stringify(transactionObj));
          log("submitting signed transaction"+_transactionObj);
+         //peer.js.impcMethods( is the inevitable called function
          resolve(callerEvent(_transactionObj));
      });
    },

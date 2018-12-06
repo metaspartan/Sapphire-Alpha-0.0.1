@@ -94,7 +94,7 @@ var Ommer = class Ommer{
 }
 
 var Transaction = class Transaction{
-    //we can do an address validation and kick back false
+    //address validation in signed raw tx
     constructor(fromAddress, toAddress, amount, ticker, txTimestamp = Date.now()){
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
@@ -427,6 +427,8 @@ var Blockchain = class Blockchain {
           //need to add the mining reward HERE
           var minedReward = new Transaction(null, minedBlock["miner"], this.miningReward, "SPHR");
           this.createTransaction(minedReward);
+
+          log("MINEDREWARD EQUALS "+JSON.stringify(minedReward));
 
           var blockTimeStamp = minedBlock["timestamp"];
           log("BBBBBBBBBBBBBBBBB block time stamp"+minedBlock["timestamp"]+" LAST BLOCK TIME STAMPING "+this.getLatestBlock().timestamp+"MINED  BLOCK PREV HASH "+minedBlock["previousHash"]+" LAST BLOCK HASH "+this.getLatestBlock().hash);
