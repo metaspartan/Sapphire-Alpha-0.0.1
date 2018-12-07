@@ -495,7 +495,8 @@ function cliGetInput(){
       BlockchainDB.getBlock(blocknum,cbGetBlock);//change name from callback 2 to something meaningful
       cliGetInput();
     }else if(userInput == "getLength()"){
-      frankieCoin.getLength()
+      var currentChainLenth = frankieCoin.getLength();
+      log("Current Chain Length = "+currentChainLenth);
       cliGetInput();
     }else if(userInput.startsWith("getBalance(")){
       log("");
