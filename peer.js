@@ -368,37 +368,13 @@ var broadcastPeers = function(message){
 }
 //////////////////////////////////////////////////////////end messaging to peers
 
-///////////////////////////////////////////////////////query 2 will go away soon
-function queryr2(query){
-  rl.question(query, (answer) => {
-    log(`input: ${query} ${answer}`);
-    if(query == "getBlock"){
-      log(JSON.stringify(frankieCoin.getBlock(parseInt(answer))));
-      queryr1();
-    }else if(query == "getBalance"){
-      //franks.getBalanceOfAddress(answer);
-      //note I did not need to use the miner function for balances
-      frankieCoin.getBalanceOfAddress(answer);
-      BlockchainDB.getTransactionReceiptsByAddress(answer);
-      log("---------------");
-      BlockchainDB.getBalanceByAddress(answer);
-      //log('\nMiners Function Balance of '+answer+' is', getBalance2);
-      queryr1();
-    }else{
-      log("not a valid query at this time");
-      queryr1();
-    }
-  })
-}
-/////////////////////////////////////////////////////////////////////end query 2
-
 //////////////////////////////////////////////////main console interface query 1
-function queryr1(){
+function waitForInput(){
   //command line stuff
-  rl.question('Enter a command: ', (answer) => {
-    // TODO: Log the answer in a database
-    log(`selected: ${answer}`);
-    if(answer == "M"){//M is for mine and triggers the miner
+  rl.question('Enter a command: ', (userInput) => {
+    // TODO: Log the userInput in a database
+    log(`selected: ${userInput}`);
+    if(userInput == "M"){//M is for mine and triggers the miner
       if(frankieCoin.inSynch == true || (frankieCoin.getLength() < 100 && peers[0] == undefined)){
         log("need to pull orders matching pairbuy orders from database and add to pending orders");
         log('at least within a certain range...');
@@ -484,15 +460,13 @@ function queryr1(){
         log(chalk.green("CHAIN IS NOT SYNCHED FOR MINING PLEASE WAIT"+frankieCoin.getLength()+peers[0]));
         log("------------------------------------------------------");
       }
-
-
-      queryr1();
-    }else if(answer == "MM"){
+      waitForInput();
+    }else if(userInput == "MM"){
       //var silly = rpcserver.db.miners.fetchKey(key,value);
       //log("got it and its "+silly);
       impceventcaller("passing data","this my peer");
-      queryr1();
-    }else if(answer == "O"){//O is for order
+      waitForInput();
+    }else if(userInput == "O"){//O is for order
       //other commands can go Here
       log("Order is processing from the database not chain");
       //this function calls buy order from database and...
@@ -502,8 +476,8 @@ function queryr1(){
       //just a reminder I have other order functions coded
       //Orderdb.getOrdersSell();
       //Orderdb.getAllOrders();
-      queryr1();
-    }else if(answer == "OO"){//O is for order
+      waitForInput();
+    }else if(userInput == "OO"){//O is for order
       //other commands can go Here
       log("Order is processing from the database not chain");
       //this function calls buy order from database and...
@@ -513,15 +487,25 @@ function queryr1(){
       //just a reminder I have other order functions coded
       //Orderdb.getOrdersSell();
       //Orderdb.getAllOrders();
-      queryr1();
-    }else if(answer == "B"){//B is for balance
-      log("maybe can do logic for BALANCE of ADDRESS at the console line but for now...");
-      queryr2("getBalance");
-      //log("chain is now: "+JSON.stringify(frankieCoin));
-      //log("balance is: "+frankieCoin.getBalanceOfAddress("0x0666bf13ab1902de7dee4f8193c819118d7e21a6")+" <---why no money");
-      //log("balance is: "+franks.getBalanceOfAddress("0x0666bf13ab1902de7dee4f8193c819118d7e21a6")+" <---why no money");
-      //queryr1();
-    }else if(answer == "T"){//T is for talk but using it to initiate chain sync
+      waitForInput();
+    }else if(userInput.startsWith("getBlock(")){//GETBLOCK function
+      log(userInput.slice(userInput.indexOf("getBlock(")+9, userInput.indexOf(")")));
+      var blocknum = userInput.slice(userInput.indexOf("getBlock(")+9, userInput.indexOf(")"));
+      log(JSON.stringify(frankieCoin.getBlock(parseInt(blocknum))));
+      BlockchainDB.getBlock(blocknum,cbGetBlock);//change name from callback 2 to something meaningful
+      waitForInput();
+    }else if(userInput.startsWith("getBalance(")){
+      log("");
+      //franks.getBalanceOfAddress(userInput);
+      //note I did not need to use the miner function for balances
+      frankieCoin.getBalanceOfAddress(userInput);
+      frankieCoin.getBalanceOfAddress(userInput);
+      BlockchainDB.getTransactionReceiptsByAddress(userInput);
+      log("---------------");
+      BlockchainDB.getBalanceByAddress(userInput);
+      //log('\nMiners Function Balance of '+userInput+' is', getBalance2);
+      waitForInput();
+    }else if(userInput == "T"){//T is for talk but using it to initiate chain sync
       //sneaking this chain synch in here...that is a "talk"
       for (let id in peers) {
         log("------------------------------------------------------");
@@ -530,69 +514,58 @@ function queryr1(){
         //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
         peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
       }
-      queryr1();
-    }else if(answer == "N"){//N is for Node info
+      waitForInput();
+    }else if(userInput == "N"){//N is for Node info
       Genesis.fileHash();
       log("------------------------------------------------------");
       log(chalk.green("List of Nodes: "));//had to BCASH LOL
       log("------------------------------------------------------");
       log(JSON.stringify(frankieCoin.retrieveNodes()));
-      queryr1();
-    }else if(answer == "G"){//G currently is for getBlock which is also a function
-      log("Enter Block Number to Retrieve: ");
-      queryr2("getBlock");
-    }else if(answer == "S"){//S is currently cleaning the databases was "Send" so leaving commented out transactions and orders for testing
+      waitForInput();
+    }else if(userInput == "cleardb"){
+      log(chalk.yellow("|------------------------------|"));
       BlockchainDB.clearDatabase();
       BlockchainDB.clearOrderDatabase();
       BlockchainDB.clearTransactionDatabase();
-      log("------------------------------------------------------");
-      log(chalk.red("Database has been deleted please close and reopen. (Crtl + c)"));
-      log("------------------------------------------------------");
-      queryr1();
-    }else if(answer == "SS"){
+      log(chalk.green("| Database has been deleted.   |"));
+      log(chalk.red("| Terminating...               |"));
+      log(chalk.yellow("|------------------------------|"));
+      process.exit();
+    }else if(userInput == "SS"){
       BlockchainDB.getLatestBlock();
       console.log("----------------------------");
       BlockchainDB.getBlockchain(99,callBackEntireDatabase);
       BlockchainDB.getAllTransactionReceipts();
-      queryr1();
-    }else if(answer.includes("Send(")){//SEND function Send ( json tx )
-
-      log(answer.slice(answer.indexOf("Send(")+5, answer.indexOf(")")));
-      var jsonSend = answer.slice(answer.indexOf("Send(")+5, answer.indexOf(")"));
+      waitForInput();
+    }else if(userInput.startsWith("Send(")){//SEND function Send ( json tx )
+      log(userInput.slice(userInput.indexOf("Send(")+5, userInput.indexOf(")")));
+      var jsonSend = userInput.slice(userInput.indexOf("Send(")+5, userInput.indexOf(")"));
       var from = JSON.parse(jsonSend)["from"];
       var to = JSON.parse(jsonSend)["to"];
       var amount = JSON.parse(jsonSend)["amount"];
       var ticker = JSON.parse(jsonSend)["ticker"];
       log("Sending "+amount+" "+ticker+" from "+from+" to "+to);
       frankieCoin.createTransaction(new sapphirechain.Transaction(from, to, amount, ticker));
-      queryr1();
-      //queryr2("getBlock");
-    }else if(answer.includes("Hash(")){//HASH FUNCTION FOR VERIFICATIONS
-      log(answer.slice(answer.indexOf("Hash(")+5, answer.indexOf(")")));
-      var hashText = answer.slice(answer.indexOf("Hash(")+5, answer.indexOf(")"));
+      waitForInput();
+    }else if(userInput.startsWith("Hash(")){//HASH FUNCTION FOR VERIFICATIONS
+      log(userInput.slice(userInput.indexOf("Hash(")+5, userInput.indexOf(")")));
+      var hashText = userInput.slice(userInput.indexOf("Hash(")+5, userInput.indexOf(")"));
 
       log(hashText);
       sapphirechain.Hash(hashText);
-      queryr1();
-      //queryr2("getBlock");
-    }else if(answer.includes("getBlock(")){//GETBLOCK function
-      log(answer.slice(answer.indexOf("getBlock(")+9, answer.indexOf(")")));
-      var blocknum = answer.slice(answer.indexOf("getBlock(")+9, answer.indexOf(")"));
-      log(JSON.stringify(frankieCoin.getBlock(parseInt(blocknum))));
-      BlockchainDB.getBlock(blocknum,cbGetBlock);//change name from callback 2 to something meaningful
-      queryr1();
-    }else if(answer.includes("getOmmer(")){//GETBLOCK function
-      log(answer.slice(answer.indexOf("getOmmer(")+9, answer.indexOf(")")));
-      var blocknum = answer.slice(answer.indexOf("getOmmer(")+9, answer.indexOf(")"));
+      waitForInput();
+    }else if(userInput.startsWith("getOmmer(")){//GETBLOCK function
+      log(userInput.slice(userInput.indexOf("getOmmer(")+9, userInput.indexOf(")")));
+      var blocknum = userInput.slice(userInput.indexOf("getOmmer(")+9, userInput.indexOf(")"));
       log(JSON.stringify(frankieCoin.getOmmersAtBlock(parseInt(blocknum))));
       BlockchainDB.getBlock(blocknum,cbGetBlock);//change name from callback 2 to something meaningful
-      queryr1();
-    }else if(answer.includes("Order(")){//ORDER function merging with below \/ \/
+      waitForInput();
+    }else if(userInput.startsWith("Order(")){//ORDER function merging with below \/ \/
       ////frankieCoin.createOrder(new sapphirechain.Order('0x0666bf13ab1902de7dee4f8193c819118d7e21a6','BUY','SPHREGEM',3500,0.25));
       ////Order({"maker":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","action":"BUY","amount":24,"pair":"SPHREGEM","price":1.38,"ticker":"EGEM"});
-      log(answer.slice(answer.indexOf("Order(")+6, answer.indexOf(")")));
+      log(userInput.slice(userInput.indexOf("Order(")+6, userInput.indexOf(")")));
       //extract the JSON
-      var jsonSend = answer.slice(answer.indexOf("Order(")+6, answer.indexOf(")"));
+      var jsonSend = userInput.slice(userInput.indexOf("Order(")+6, userInput.indexOf(")"));
       //set upi order for database add
       var myorder = {
         "order":
@@ -620,36 +593,36 @@ function queryr1(){
       myblockorder = new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price);
       frankieCoin.createOrder(myblockorder);
       BlockchainDB.addOrder({order:myblockorder});
-      queryr1();
-    }else if(isJSON(answer)){//ORDER JSON style strait to order DB ^^ merging with above
-      if(RegExp("^0x[a-fA-F0-9]{40}$").test(JSON.parse(answer)["fromAddress"])){//adding function capabilioties
+      waitForInput();
+    }else if(isJSON(userInput)){//ORDER JSON style strait to order DB ^^ merging with above
+      if(RegExp("^0x[a-fA-F0-9]{40}$").test(JSON.parse(userInput)["fromAddress"])){//adding function capabilioties
         //Order({"maker":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","action":"BUY","amount":24,"pairBuy":"EGEM","price":1.38,"pairSell":"SPHR"});
         log("Valid EGEM Sapphire Address")
         //create the order
         var myorder = {
           "order":
           {"id":null,
-          "fromAddress":JSON.parse(answer)["fromAddress"],
-          "buyOrSell":JSON.parse(answer)["buyOrSell"],
-          "pairBuy":JSON.parse(answer)["pairBuy"],
-          "pairSell":JSON.parse(answer)["pairSell"],
-          "amount":JSON.parse(answer)["amount"],
-          "price":JSON.parse(answer)["price"],
-          //"state":JSON.parse(answer)["state"],
-          //"transactionID":JSON.parse(answer)["transactionID"],
-          //"originationID":JSON.parse(answer)["originationID"],
-          //"timestamp":JSON.parse(answer)["timestamp"]
+          "fromAddress":JSON.parse(userInput)["fromAddress"],
+          "buyOrSell":JSON.parse(userInput)["buyOrSell"],
+          "pairBuy":JSON.parse(userInput)["pairBuy"],
+          "pairSell":JSON.parse(userInput)["pairSell"],
+          "amount":JSON.parse(userInput)["amount"],
+          "price":JSON.parse(userInput)["price"],
+          //"state":JSON.parse(userInput)["state"],
+          //"transactionID":JSON.parse(userInput)["transactionID"],
+          //"originationID":JSON.parse(userInput)["originationID"],
+          //"timestamp":JSON.parse(userInput)["timestamp"]
         }};
-        //var myorder = {order:JSON.parse(answer)};
+        //var myorder = {order:JSON.parse(userInput)};
         log("order is "+myorder)
 
         //putting it on the chain first
-        var maker = JSON.parse(answer)["fromAddress"];
-        var action = JSON.parse(answer)["buyOrSell"];
-        var amount = JSON.parse(answer)["amount"];
-        var price = JSON.parse(answer)["price"];
-        var pairBuy = JSON.parse(answer)["pairBuy"];
-        var pairSell = JSON.parse(answer)["pairSell"];
+        var maker = JSON.parse(userInput)["fromAddress"];
+        var action = JSON.parse(userInput)["buyOrSell"];
+        var amount = JSON.parse(userInput)["amount"];
+        var price = JSON.parse(userInput)["price"];
+        var pairBuy = JSON.parse(userInput)["pairBuy"];
+        var pairSell = JSON.parse(userInput)["pairSell"];
         log("2nd Placing order to "+action+" "+amount+" of "+pairBuy+" for "+price+" by "+maker);
 
         myblockorder = new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price);
@@ -657,11 +630,11 @@ function queryr1(){
         BlockchainDB.addOrder({order:myblockorder});
         //{"order":{"id":null,"fromAddress":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","buyOrSell":"SELL","pairBuy":"EGEM","pairSell":"SPHR","amount":"300","price":"26.00"}}
 
-        queryr1();
+        waitForInput();
       }
     }else{
       log("[placeholder] that selection is not valid atm");
-      queryr1();
+      waitForInput();
     }
     //rl.close();
   });
@@ -1098,7 +1071,7 @@ rpcserver.globalParentComMethods(impcMethods);
 //////////////////////////////////////end inter module parent child communicator
 
 ////////////////////////////////////////////////initialize the console interface
-queryr1();
+waitForInput();
 //////////////////////////////////////////////////////////command line interface
 
 ////////////////////////////////////////////////////////////////export functions
