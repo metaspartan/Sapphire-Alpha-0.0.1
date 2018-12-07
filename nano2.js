@@ -31,6 +31,9 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
     {
         name:'add_block',
         args:['blockchain:map'],
+        call:function(args, db) {
+          return db.query('upsert',args.blockchain).exec();
+        }
         /***
         call:function(args, db) {
           log("<<<------------this is the data insert----------->>>")
@@ -46,13 +49,8 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
           );
         }
           ***/
+        log("<<<------------this was the data insert----------->>>")
 
-
-
-        call:function(args, db) {
-            log("<<<------------this is the data insert----------->>>")
-            return db.query('upsert',args.blockchain).exec();
-        }
 
     },
     {
