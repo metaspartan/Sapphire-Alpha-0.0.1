@@ -49,9 +49,6 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
           );
         }
           ***/
-        log("<<<------------this was the data insert----------->>>")
-
-
     },
     {
         name:'add_genblock',
