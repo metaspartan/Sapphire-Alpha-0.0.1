@@ -259,6 +259,7 @@ var addGenBlock = function(block){
 }
 
 var clearDatabase = function(){
+  console.log(chalk.yellow("| Deleting database...         |"));
   nSQL("blockchain").query("delete").exec();
 }
 
@@ -307,6 +308,7 @@ var clearOrderById = function(id){
 }
 
 var clearOrderDatabase = function(){
+  console.log(chalk.yellow("| Deleting all orders...       |"));
   nSQL("orders").query("delete").exec();
 }
 
@@ -461,7 +463,7 @@ var getBalanceByAddress = function(address){
 }
 
 var clearTransactionDatabase = function(){
-  console.log("deleting all transactions");
+  console.log(chalk.yellow("| Deleting all transactions... |"));
   nSQL("sfrxreceipts").query("delete").exec();
 }
 
