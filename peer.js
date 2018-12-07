@@ -530,7 +530,7 @@ function waitForInput(){
       log(chalk.green("| Database has been deleted.   |"));
       log(chalk.red("| Terminating...               |"));
       log(chalk.yellow("|------------------------------|"));
-      process.exit();
+      //process.exit();
     }else if(userInput == "SS"){
       BlockchainDB.getLatestBlock();
       console.log("----------------------------");
