@@ -494,13 +494,15 @@ function cliGetInput(){
       log(JSON.stringify(frankieCoin.getBlock(parseInt(blocknum))));
       BlockchainDB.getBlock(blocknum,cbGetBlock);//change name from callback 2 to something meaningful
       cliGetInput();
+    }else if(userInput == "getLength()"){
+      frankieCoin.getLength()
+      cliGetInput();
     }else if(userInput.startsWith("getBalance(")){
       log("");
       log(userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")")));
       var egemAddress = userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")"));
       //franks.getBalanceOfAddress(userInput);
       //note I did not need to use the miner function for balances
-      frankieCoin.getBalanceOfAddress(egemAddress);
       frankieCoin.getBalanceOfAddress(egemAddress);
       BlockchainDB.getTransactionReceiptsByAddress(egemAddress);
       log("---------------");
