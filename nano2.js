@@ -34,21 +34,6 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
         call:function(args, db) {
           return db.query('upsert',args.blockchain).exec();
         }
-        /***
-        call:function(args, db) {
-          log("<<<------------this is the data insert----------->>>")
-          return db.query('select').where(['hash','=',args.blockchain["hash"]]).exec().then(function(rows) {
-              if(rows.length == 0){
-                log(chalk.blue("We are inserting: "+ chalk.green(rows.length+args.blockchain["hash"])))
-                return db.query('upsert',args.blockchain).exec();
-              }else{
-                log(chalk.blue("We are inserting genesis block: "+ chalk.green(rows.length+args.blockchain["hash"])))
-                log(chalk.red("Block already existed hash is "+args.blockchain["hash"]));
-              }
-            }
-          );
-        }
-          ***/
     },
     {
         name:'add_genblock',
@@ -56,11 +41,6 @@ var blockchain = nSQL('blockchain')// Table/Store Name, required to declare mode
         call:function(args, db) {
           return db.query('upsert',args.blockchain).exec();
         }
-        /***
-        call:function(args, db) {
-            return db.query('upsert',args.blockchain).exec();
-        }
-        ***/
     }
 ])
 .views([ // Optional
