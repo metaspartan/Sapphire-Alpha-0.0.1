@@ -935,7 +935,7 @@ var broadcastPeersBlock = function(){
   log("------------------------------------------------------")
   log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
   log("------------------------------------------------------")
-  broadcastPeers(frankieCoin.getLatestBlock());
+  broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 }
 
 //parent communicator callback function sent to child below
