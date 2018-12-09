@@ -25,6 +25,7 @@ const log = console.log;
 
 ////////////////////////////////////calls the nano-sql data interface to leveldb
 var BlockchainDB = require('./nano2.js');
+var BlkDB = require('./level.js');
 
 //////////////////////////////////////////////////////////////////////rpc sercer
 var rpcserver = require('./rpc_server.js');
@@ -439,6 +440,7 @@ function cliGetInput(){
         BlockchainDB.getBlock(parseInt(frankieCoin.getLength()),blockExists);
         BlockchainDB.addBlock(minedblock);
         BlockchainDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
+        BlkDB.addBlock(frankieCoin.blockHeight,frankieCoin.getLatestBlock());
         //sending the block to the peers
         broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 
@@ -493,6 +495,7 @@ function cliGetInput(){
       var blocknum = userInput.slice(userInput.indexOf("getBlock(")+9, userInput.indexOf(")"));
       log(JSON.stringify(frankieCoin.getBlock(parseInt(blocknum))));
       BlockchainDB.getBlock(blocknum,cbGetBlock);//change name from callback 2 to something meaningful
+      BlkDB.getBlock(blocknum,cbGetBlock);
       cliGetInput();
     }else if(userInput == "getLength()"){
       var currentChainLenth = frankieCoin.getLength();
@@ -935,7 +938,7 @@ var broadcastPeersBlock = function(){
   log("------------------------------------------------------")
   log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
   log("------------------------------------------------------")
-  broadcastPeers(JSON.stringify(BlockchainDB.getLatestBlock()));
+  broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 }
 
 //parent communicator callback function sent to child below
@@ -987,6 +990,7 @@ var impcchild = function(childData,functionName){
       }
       BlockchainDB.getBlock(parseInt(frankieCoin.getLength()),blockExists);
       BlockchainDB.addBlock(minedblock);
+      BlkDB.addBlock(frankieCoin.blockHeight,JSON.stringify(frankieCoin.getLatestBlock()));
       BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 
       functionName();
