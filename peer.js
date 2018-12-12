@@ -468,6 +468,15 @@ function cliGetInput(){
       //log("got it and its "+silly);
       impceventcaller("passing data","this my peer");
       cliGetInput();
+    }else if(userInput == "MMM"){
+      console.log("calling all the blocks level db");
+      BlkDB.getAllBLocks();
+      BlkDB.getTransactionReceiptsByAddress('0x2025ed239a8dec4de0034a252d5c5e385b73fcd0');
+      var addyBal = function(val){
+        console.log("this address balance is "+val);
+      }
+      BlkDB.getBalanceAtAddress('0x2025ed239a8dec4de0034a252d5c5e385b73fcd0',addyBal);
+      cliGetInput();
     }else if(userInput == "O"){//O is for order
       //other commands can go Here
       log("Order is processing from the database not chain");
@@ -533,6 +542,7 @@ function cliGetInput(){
     }else if(userInput == "reindex"){
       log(chalk.yellow("|------------------------------|"));
       BlockchainDB.clearDatabase();
+      BlkDB.clearDatabase();
       BlockchainDB.clearOrderDatabase();
       BlockchainDB.clearTransactionDatabase();
       log(chalk.red("| Database has been deleted.   |"));
@@ -702,6 +712,8 @@ var genBlock = {"blockchain":{
   difficulty:4
 }};
 BlockchainDB.addGenBlock(genBlock);
+BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()));
+BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 log("peer chain is"+ frankieCoin.getEntireChain());
 var franks = miner(frankieCoin);
@@ -991,6 +1003,7 @@ var impcchild = function(childData,functionName){
       BlockchainDB.getBlock(parseInt(frankieCoin.getLength()),blockExists);
       BlockchainDB.addBlock(minedblock);
       BlkDB.addBlock(frankieCoin.blockHeight,JSON.stringify(frankieCoin.getLatestBlock()));
+      BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
       BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 
       functionName();

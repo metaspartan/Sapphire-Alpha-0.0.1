@@ -12,10 +12,10 @@ var putRecord = function(key, val){
 
 var addBlock = function(blknum,block){
   console.log("<<<<<----------------ADDS BLOCK TO LEVEL DB HERE------------>>>>>")
-  console.log(JSON.stringify(block));
+  //console.log(JSON.stringify(block));
   var blocknum = parseInt(blknum);
   var hexBlockNum = ("000000000000000" + blocknum.toString(16)).substr(-16);
-  console.log(hexBlockNum);
+  console.log("adding block "+blknum+" as "+hexBlockNum);
   putRecord(hexBlockNum,block)
   //parseInt(hexString, 16);//this is back to number from hex
 }
@@ -37,20 +37,83 @@ var getBlock = function(blknum,callBack){
     })
 }
 
+var getAllBLocks = function(){
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    console.log('key = '+data.key+" value = "+data.value.toString());
+  })
+}
+
+var clearDatabase = function(){
+  console.log("| Deleting database... level not set up for delete yet just delete the SFRX folder for now        |");
+  //levelup(leveldown.destroy('./SFRX',function(){console.log("donada")}));
+  //db = levelup(leveldown('./SFRX'));
+}
+
+var addTransactions = function(transactions,blockhash){
+
+  console.log("T R A N S A C T I O N S  B E I N G  A D D E D  H E R E");
+  console.log(transactions+transactions.length);
+  console.log(blockhash);
+  transactions = JSON.parse(JSON.stringify(transactions));
+  for(tranx in JSON.parse(transactions)){
+
+    console.log("inside loop"+tranx+JSON.parse(transactions)[tranx]);
+
+    var receipt = JSON.parse(transactions)[tranx];
+    //receipts have a key of toAddress:timestamp:receipthash atm
+    putRecord(receipt["toAddress"]+":"+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt));
+
+  }
+
+}
+
+var getTransactionReceiptsByAddress = function(address){
+  
+  console.log("ALL Transaction Receipts for "+address);
+
+  var stream = db.createKeyStream();
+  stream.on('data',function(data){
+    if(data.toString().split(":")[0] == address){
+      console.log(data.toString());
+    }
+
+  })
+
+}
+
+var getBalanceAtAddress = function(address,callback){
+
+    console.log("Total Balance of "+address);
+    var addrBalance = 0;
+    var stream = db.createKeyStream();
+
+    stream.on('data',function(data){
+
+      if(data.toString().split(":")[0] == address){
+        db.get(data, function (err, value) {
+
+          addrBalance=parseFloat(addrBalance);
+          addrBalance2=parseFloat(JSON.parse(value)["amount"]);
+          //incrementer+=parseInt(value["amount"]);
+          console.log("adding "+parseFloat(JSON.parse(value)["amount"])+" to "+addrBalance);
+          addrBalance = parseFloat(addrBalance+addrBalance2);
+        })
+      }
+
+    });
+
+    stream.on('close',function(){
+      console.log("streaming has ended and balance is "+addrBalance);
+      callback(addrBalance);
+    });
+    //console.log("balance without airdrop is "+addrBalance);
+
+}
+
 ///////from here down needs editing
 
 /***
-
-var addGenBlock = function(block){
-  log(JSON.stringify(block));
-  //orders.connect().then(function(result) {
-      // DB ready to use.
-      nSQL("blockchain").doAction('add_genblock', block
-      ).then(function(result) {
-          log(result) //  <- single object array containing the row we inserted.
-      });
-  //});
-}
 
 var clearDatabase = function(){
   console.log(chalk.yellow("| Deleting database...         |"));
@@ -74,7 +137,6 @@ var getBlockchain = function(limit,callBack){
       });
 
 }
-
 
 
 var getLatestBlock = function(){
@@ -256,4 +318,9 @@ var clearTransactionDatabase = function(){
 module.exports = {
     addBlock:addBlock,
     getBlock:getBlock,
+    getAllBLocks:getAllBLocks,
+    clearDatabase:clearDatabase,
+    addTransactions:addTransactions,
+    getTransactionReceiptsByAddress:getTransactionReceiptsByAddress,
+    getBalanceAtAddress:getBalanceAtAddress
 }
