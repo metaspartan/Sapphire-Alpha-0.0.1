@@ -1,5 +1,8 @@
 var levelup = require('levelup')
 var leveldown = require('leveldown')
+//web3
+var Web3 = require("web3");
+var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
 
 // 1) Create our store
 var db = levelup(leveldown('./SFRX'))
@@ -69,7 +72,7 @@ var addTransactions = function(transactions,blockhash){
 }
 
 var getTransactionReceiptsByAddress = function(address){
-  
+
   console.log("ALL Transaction Receipts for "+address);
 
   var stream = db.createKeyStream();
@@ -82,9 +85,39 @@ var getTransactionReceiptsByAddress = function(address){
 
 }
 
+function getAirdropBalanceFromEgem(address,callback,airdrop) {
+    //grab latest EGEM BLock
+    web3.eth.getBalance(address, 1530000, async function (error, result) {
+      if (!error){
+        //console.log('Egem:', web3.utils.fromWei(result,'ether')); // Show the ether balance after converting it from Wei
+        var responder = await callback(parseFloat(web3.utils.fromWei(result,'ether')*2));
+        //console.log("responder equals "+responder);
+        //return result;
+      }else{
+        console.log('Houston we have a promblem: ', error); // Should dump errors here
+      }
+    });
+
+}
+
 var getBalanceAtAddress = function(address,callback){
 
     console.log("Total Balance of "+address);
+
+    ///first we call the airdrop
+    var airdrop;
+
+    //calling the airdrop balance
+    var mycallback1 = async function(response){
+      //console.log("we have returned"+response);
+      airdrop = response;
+      //console.log("second check on airdrop" +airdrop);
+      return airdrop;
+    }
+
+    getAirdropBalanceFromEgem(address,mycallback1);
+
+
     var addrBalance = 0;
     var stream = db.createKeyStream();
 
@@ -105,7 +138,30 @@ var getBalanceAtAddress = function(address,callback){
 
     stream.on('close',function(){
       console.log("streaming has ended and balance is "+addrBalance);
-      callback(addrBalance);
+      //callback(addrBalance);
+
+      async function returnTime(){
+        if(airdrop){
+          //console.log("okay"+balance["SPHR"]+airdrop);
+          var existing = parseFloat(addrBalance);
+          //var existing = parseFloat(balance["SPHR"]);//going to have to replace this later
+          if(!existing){existing = 0};
+          var orig = parseFloat(airdrop);
+          if(!orig){orig = 0};
+          //console.log("okay2"+existing+orig);
+          var newbal = await parseFloat(existing + orig);
+          //balance["SPHR"] = newbal;
+          //console.log(balance);
+          //return balance;
+          callback(newbal);
+        }else{
+          console.log("not yet")
+          setTimeout(function(){returnTime();},700);
+        }
+      }
+
+      returnTime(airdrop);
+
     });
     //console.log("balance without airdrop is "+addrBalance);
 

@@ -96,6 +96,12 @@ function isJSON(str) {
 }
 /////////////////////////end simple function to test JSON input and avoid errors
 
+/////////////////////////////////////////////////////////callback for address balances
+var addyBal = function(val){
+  console.log("this address balance is "+val);
+}
+/////////////////////////////////////////////////////end callback for address balances
+
 //////////////////////////////////////////////////////core function asynchronous
 ;(async () => {
   const port = await getPort()
@@ -472,9 +478,7 @@ function cliGetInput(){
       console.log("calling all the blocks level db");
       BlkDB.getAllBLocks();
       BlkDB.getTransactionReceiptsByAddress('0x2025ed239a8dec4de0034a252d5c5e385b73fcd0');
-      var addyBal = function(val){
-        console.log("this address balance is "+val);
-      }
+
       BlkDB.getBalanceAtAddress('0x2025ed239a8dec4de0034a252d5c5e385b73fcd0',addyBal);
       cliGetInput();
     }else if(userInput == "O"){//O is for order
@@ -517,6 +521,7 @@ function cliGetInput(){
       //franks.getBalanceOfAddress(userInput);
       //note I did not need to use the miner function for balances
       frankieCoin.getBalanceOfAddress(egemAddress);
+      BlkDB.getBalanceAtAddress(egemAddress,addyBal)
       BlockchainDB.getTransactionReceiptsByAddress(egemAddress);
       log("---------------");
       BlockchainDB.getBalanceByAddress(userInput);
