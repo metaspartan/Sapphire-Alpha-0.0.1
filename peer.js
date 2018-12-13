@@ -484,6 +484,7 @@ function cliGetInput(){
         console.log(JSON.stringify(data));
       }
       BlkDB.getOrdersBuy(myOrdersBuyCBTest);
+      BlkDB.getOrdersBuySorted(myOrdersBuyCBTest);
       cliGetInput();
     }else if(userInput == "O"){//O is for order
       //other commands can go Here

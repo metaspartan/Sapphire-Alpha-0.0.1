@@ -168,6 +168,7 @@ var getBalanceAtAddress = function(address,callback){
 }
 
 var addOrder = function(orderkey,order){
+  //current key action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp
   console.log("we are placing this order "+orderkey+" --> "+order);
   putRecord(orderkey,JSON.stringify(order));
 }
@@ -190,7 +191,93 @@ var getOrdersBuy = function(callBack){
 
   });
 
+  stream.on('close',function(){
+    callBack(result);
+  });
+
+}
+
+var getOrdersBuySorted = function(callBack){
+
+  console.log("Open BUY Orders SORTED leveldb");
+  var result = [];
+
+  var stream = db.createKeyStream();
+
+  stream.on('data',function(data){
+
+    if(data.toString().split(":")[0] == "BUY"){
+      db.get(data, function (err, value) {
+        console.log("value"+value);
+        result.push(value.toString());
+      })
+    }
+
+  });
+
+  stream.on('close',function(){
+    //console.log("SORTING N HERE");
+    //console.log("results are "+result);
+    var resultss = result.sort(function(a,b){
+      var x = JSON.parse(a)["timestamp"];
+      //console.log("x "+x+a);
+      var y = JSON.parse(b)["timestamp"];
+      //console.log("y "+y+b)
+      if (x < y) {return -1;}
+      if (x > y) {return 1;}
+      return 0;
+    })
+    //console.log("POST SORT");
+    //console.log("results ss are "+resultss);
+    callBack(resultss);
+  });
+
+}
+
+//////////////////////////////////////////////////////////////////////first call
+var getOrdersPairBuy = function(pair,callback){
+
+  console.log("Open PAIR BUY Orders leveldb");
+  var result = [];
+
+  var stream = db.createKeyStream();
+
+  stream.on('data',function(data){
+
+    if(data.toString().split(":")[0] == "BUY" && data.toString().split(":")[1] == pair){
+      db.get(data, function (err, value) {
+        console.log("value"+value);
+        result.push(value.toString());
+      })
+    }
+
+  });
+  //need to test the second callback to match previous set ups from nanosql
   stream.on('close',function(data){
+    callBack(result);
+  });
+
+}
+
+var getOrdersSell = function(){
+
+  console.log("Open SELL Orders leveldb");
+  var result = [];
+
+  var stream = db.createKeyStream();
+
+  stream.on('data',function(data){
+
+    if(data.toString().split(":")[0] == "SELL"){
+      db.get(data, function (err, value) {
+        console.log("value"+value);
+        result.push(value.toString());
+      })
+    }
+
+  });
+
+  stream.on('close',function(){
     callBack(result);
   });
 
@@ -244,31 +331,7 @@ var addOrder = function(order){
   //});
 }
 
-var ordersToBuy = [];
 
-var getOrdersBuy = function(callBack){
-  log("Open BUY Orders");
-      // DB ready to use.
-      nSQL("orders").getView('list_all_orders_buy')
-      .then(function(result) {
-          //log(result) //  <- single object array containing the row we inserted.
-          callBack(result);
-      });
-
-}
-
-////////////////////////////////////////////////////////////////////////////first call
-var getOrdersPairBuy = function(pair,callback){
-  log("Open PAIR BUY Orders");
-      // DB ready to use.
-      nSQL("orders").getView('get_order_by_pairBuy',{pairBuy:pair})
-      .then(function(result) {
-          //log(result) //  <- single object array containing the row we inserted.
-          callback(result);
-          //log(result);
-      });
-
-}
 ////////////////////////////////////////////////////////////////////////////first call
 var getOrdersPairSell = function(pair,callback){
   log("Open PAIR BUY Orders");
@@ -291,15 +354,6 @@ var buildTrade = function(obj,callBack){
   });
 }
 
-var getOrdersSell = function(){
-  log("Open SELL Orders");
-      // DB ready to use.
-      nSQL("orders").getView('list_all_orders_sell')
-      .then(function(result) {
-          log(result) //  <- single object array containing the row we inserted.
-      });
-
-}
 
 var getAllOrders = function(){
   log("ALL Open Orders");
@@ -396,4 +450,5 @@ module.exports = {
     getBalanceAtAddress:getBalanceAtAddress,
     addOrder:addOrder,
     getOrdersBuy:getOrdersBuy,
+    getOrdersBuySorted:getOrdersBuySorted,
 }
