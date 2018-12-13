@@ -167,6 +167,11 @@ var getBalanceAtAddress = function(address,callback){
 
 }
 
+var addOrder = function(orderkey,order){
+  console.log("we are placing this order "+orderkey+" --> "+order);
+  putRecord(orderkey,order)
+}
+
 ///////from here down needs editing
 
 /***
@@ -378,5 +383,6 @@ module.exports = {
     clearDatabase:clearDatabase,
     addTransactions:addTransactions,
     getTransactionReceiptsByAddress:getTransactionReceiptsByAddress,
-    getBalanceAtAddress:getBalanceAtAddress
+    getBalanceAtAddress:getBalanceAtAddress,
+    addOrder:addOrder,
 }

@@ -626,6 +626,7 @@ function cliGetInput(){
       myblockorder = new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price);
       frankieCoin.createOrder(myblockorder);
       BlockchainDB.addOrder({order:myblockorder});
+      BlkDB.addOrder(action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
       cliGetInput();
     }else if(isJSON(userInput)){//ORDER JSON style strait to order DB ^^ merging with above
       if(RegExp("^0x[a-fA-F0-9]{40}$").test(JSON.parse(userInput)["fromAddress"])){//adding function capabilioties
@@ -661,6 +662,7 @@ function cliGetInput(){
         myblockorder = new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price);
         frankieCoin.createOrder(myblockorder);
         BlockchainDB.addOrder({order:myblockorder});
+        BlkDB.addOrder(action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
         //{"order":{"id":null,"fromAddress":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","buyOrSell":"SELL","pairBuy":"EGEM","pairSell":"SPHR","amount":"300","price":"26.00"}}
 
         cliGetInput();
