@@ -169,7 +169,31 @@ var getBalanceAtAddress = function(address,callback){
 
 var addOrder = function(orderkey,order){
   console.log("we are placing this order "+orderkey+" --> "+order);
-  putRecord(orderkey,order)
+  putRecord(orderkey,JSON.stringify(order));
+}
+
+var getOrdersBuy = function(callBack){
+
+  console.log("Open BUY Orders leveldb");
+  var result = [];
+
+  var stream = db.createKeyStream();
+
+  stream.on('data',function(data){
+
+    if(data.toString().split(":")[0] == "BUY"){
+      db.get(data, function (err, value) {
+        console.log("value"+value);
+        result.push(value.toString());
+      })
+    }
+
+  });
+
+  stream.on('close',function(data){
+    callBack(result);
+  });
+
 }
 
 ///////from here down needs editing
@@ -183,20 +207,6 @@ var clearDatabase = function(){
 
 var clearBlock = function(blocknum){
   nSQL("blockchain").query("delete").where(['blocknum','=',blocknum]).exec();
-}
-
-var getBlockchain = function(limit,callBack){
-  log("ENTIRE BLOCKCHAIN");
-      if(limit){
-        log(" LIMITED by "+limit);
-      }
-      // DB ready to use.
-      nSQL("blockchain").getView('get_blockchain')
-      .then(function(result) {
-          log(result) //  <- single object array containing the row we inserted.
-          callBack(result);
-      });
-
 }
 
 
@@ -385,4 +395,5 @@ module.exports = {
     getTransactionReceiptsByAddress:getTransactionReceiptsByAddress,
     getBalanceAtAddress:getBalanceAtAddress,
     addOrder:addOrder,
+    getOrdersBuy:getOrdersBuy,
 }

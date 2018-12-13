@@ -478,8 +478,12 @@ function cliGetInput(){
       console.log("calling all the blocks level db");
       BlkDB.getAllBLocks();
       BlkDB.getTransactionReceiptsByAddress('0x2025ed239a8dec4de0034a252d5c5e385b73fcd0');
-
       BlkDB.getBalanceAtAddress('0x2025ed239a8dec4de0034a252d5c5e385b73fcd0',addyBal);
+      var myOrdersBuyCBTest = function(data){
+        console.log("returning leeldb buy orders");
+        console.log(JSON.stringify(data));
+      }
+      BlkDB.getOrdersBuy(myOrdersBuyCBTest);
       cliGetInput();
     }else if(userInput == "O"){//O is for order
       //other commands can go Here
