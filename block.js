@@ -495,7 +495,7 @@ var Blockchain = class Blockchain {
           var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
           log(chalk.blue("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
-          this.blockHeight = inBlock.blocknum;
+          this.blockHeight = inBlock.blockHeight;
           //this.chain.blockHeight += 1;
           log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
           if(this.chain.length > this.chainRiser){
@@ -576,7 +576,7 @@ var Blockchain = class Blockchain {
         var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.ommers, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce, dbBlock.difficulty);
         log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
         this.chain.push(block);
-        this.blockHeight = dbBlock.blocknum;
+        this.blockHeight = dbBlock.blockHeight;
         log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
         if(this.chain.length > this.chainRiser){
           this.chain.shift();
