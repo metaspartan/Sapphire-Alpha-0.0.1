@@ -458,7 +458,7 @@ function cliGetInput(){
         BlkDB.addTransactions(peerBroadcastBlock["transactions"],peerBroadcastBlock["hash"]);
         BlkDB.addBlock(currentBlockHeight,peerBroadcastBlock);
         //sending the block to the peers
-        broadcastPeers(JSON.stringify(peerBroadcastBlock));
+        broadcastPeers(peerBroadcastBlock);
 
         //post to rpcserver
         //this is where we SUBMIT WORK leaving it to eeror right now
@@ -986,7 +986,7 @@ var broadcastPeersBlock = function(){
   log("------------------------------------------------------")
   log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
   log("------------------------------------------------------")
-  broadcastPeers(JSON.stringify(peerBroadcastBlock));
+  broadcastPeers(peerBroadcastBlock);
 }
 
 //parent communicator callback function sent to child below
