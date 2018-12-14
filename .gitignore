@@ -3,4 +3,6 @@ sapphire-block-data/
 pub-sapphire-block-data/
 datadir/*.*
 datadir/*
+SFRX/*.*
+SFRX/*
 package-lock.json

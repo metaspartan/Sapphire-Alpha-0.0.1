@@ -18,8 +18,10 @@ const fs = require('fs');
 const sha256 = require('crypto-js/sha256');
 //BlockchainDB reference
 var BlockchainDB;
-var setBlockchainDB = function(bdb){
+var BlkDB;
+var setBlockchainDB = function(bdb,bkd){
   BlockchainDB = bdb;
+  BlkDB = bkd;
 }
 ///////////////////////////////////////when fired this creates the genesis block
 var genBlock;
@@ -747,7 +749,8 @@ var Blockchain = class Blockchain {
                         ''
                       );
                       this.createOrder(replacementOrder,allsells[transactions]["originationID"]);
-                      BlockchainDB.addOrder({order:replacementOrder});
+                      //BlockchainDB.addOrder({order:replacementOrder});
+                      BlkDB.addOrder("SELL"+":"+allsells[transactions]["pairBuy"]+":"+allsells[transactions]["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
                       /*****
                       //one order gets closed
                       this.createOrder(
@@ -794,7 +797,8 @@ var Blockchain = class Blockchain {
                         ''
                       );
                       this.createOrder(replacementOrder,allbuys[ordersofbuy]["originationID"]);
-                      BlockchainDB.addOrder({order:replacementOrder});
+                      //BlockchainDB.addOrder({order:replacementOrder});
+                      BlkDB.addOrder("BUY"+":"+allbuys[ordersofbuy]["pairBuy"]+":"+allbuys[ordersofbuy]["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
                       //one order gets closed
                       //one gets partisl
                       //and a new one gets open

@@ -35,7 +35,7 @@ var request = require('request');
 
 ///////////////////////Mining stuff : blockchain algo and mining initializations
 var sapphirechain = require("./block.js");
-sapphirechain.setBlockchainDB(BlockchainDB);
+sapphirechain.setBlockchainDB(BlockchainDB,BlkDB);
 var BLAKE2s = require("./blake2s.js");
 var Miner = require("./miner.js");
 Miner.setSapphireChain(sapphirechain);
@@ -196,8 +196,10 @@ var addyBal = function(val){
               difficulty:frankieCoin.getLatestBlock()["difficulty"]
             }};
             //add it to the database
-            BlockchainDB.addBlock(peerblock);
-            BlockchainDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
+            //BlockchainDB.addBlock(peerblock);
+            BlkDB.addBlock(peerblock);
+            //BlockchainDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
+            BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
             //add it to the RPC for miner
             var options = {
               uri: 'http://localhost:9090/rpc',
@@ -394,14 +396,16 @@ function cliGetInput(){
             log(frankieCoin.pendingOrders[odr]["price"]);
             log(frankieCoin.pendingOrders[odr]["amount"]);
             log("Any Sell Orders with pricing less tha or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity requested");
-            BlockchainDB.getOrdersPairBuy(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackBuyMiner);
+            //BlockchainDB.getOrdersPairBuy(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackBuyMiner);
+            BlkDB.getOrdersPairBuy(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackBuyMiner)
           }else if (frankieCoin.pendingOrders[odr]["buyOrSell"] == "SELL"){
             log(frankieCoin.pendingOrders[odr]["pairBuy"]);
             log(frankieCoin.pendingOrders[odr]["buyOrSell"]);
             log(frankieCoin.pendingOrders[odr]["price"]);
             log(frankieCoin.pendingOrders[odr]["amount"]);
             log("Any BUY Orders with pricing greater than or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity offered");
-            BlockchainDB.getOrdersPairSell(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackSellMiner);
+            //BlockchainDB.getOrdersPairSell(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackSellMiner);
+            BlkDB.getOrdersPairSell(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackBuyMiner)
           }
         }
 
@@ -440,12 +444,15 @@ function cliGetInput(){
         }};
         log("here is the mined block: ")
         log(minedblock);
+        /***
         var blockExists = function(block){
           console.log("does my block exist: "+block["blocknum"]);
         }
         BlockchainDB.getBlock(parseInt(frankieCoin.getLength()),blockExists);
-        BlockchainDB.addBlock(minedblock);
-        BlockchainDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
+        ***/
+        //BlockchainDB.addBlock(minedblock);
+        //BlockchainDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
+        BlkDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
         BlkDB.addBlock(frankieCoin.blockHeight,frankieCoin.getLatestBlock());
         //sending the block to the peers
         broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
@@ -492,18 +499,19 @@ function cliGetInput(){
       //this function calls buy order from database and...
       //mycallcakbuy calls the sells to match them up
       //the logic may update itself as we move forward from loop to event
-      BlockchainDB.getOrdersPairBuy("EGEM",myCallbackBuy);
+      //BlockchainDB.getOrdersPairBuy("EGEM",myCallbackBuy);
+      BlkDB.getOrdersPairBuy("EGEM",myCallbackBuy);
       //just a reminder I have other order functions coded
       //Orderdb.getOrdersSell();
       //Orderdb.getAllOrders();
       cliGetInput();
     }else if(userInput == "OO"){//O is for order
       //other commands can go Here
-      log("Order is processing from the database not chain");
+      log("Nothing is happening in this selection as its commented out");
       //this function calls buy order from database and...
       //mycallcakbuy calls the sells to match them up
       //the logic may update itself as we move forward from loop to event
-      BlockchainDB.getAllOrders();
+      //BlockchainDB.getAllOrders();
       //just a reminder I have other order functions coded
       //Orderdb.getOrdersSell();
       //Orderdb.getAllOrders();
@@ -512,7 +520,7 @@ function cliGetInput(){
       log(userInput.slice(userInput.indexOf("getBlock(")+9, userInput.indexOf(")")));
       var blocknum = userInput.slice(userInput.indexOf("getBlock(")+9, userInput.indexOf(")"));
       log(JSON.stringify(frankieCoin.getBlock(parseInt(blocknum))));
-      BlockchainDB.getBlock(blocknum,cbGetBlock);//change name from callback 2 to something meaningful
+      //BlockchainDB.getBlock(blocknum,cbGetBlock);//change name from callback 2 to something meaningful
       BlkDB.getBlock(blocknum,cbGetBlock);
       cliGetInput();
     }else if(userInput == "getLength()"){
@@ -527,9 +535,9 @@ function cliGetInput(){
       //note I did not need to use the miner function for balances
       frankieCoin.getBalanceOfAddress(egemAddress);
       BlkDB.getBalanceAtAddress(egemAddress,addyBal)
-      BlockchainDB.getTransactionReceiptsByAddress(egemAddress);
+      //BlockchainDB.getTransactionReceiptsByAddress(egemAddress);
       log("---------------");
-      BlockchainDB.getBalanceByAddress(userInput);
+      //BlockchainDB.getBalanceByAddress(userInput);
       //log('\nMiners Function Balance of '+userInput+' is', getBalance2);
       cliGetInput();
     }else if(userInput == "T"){//T is for talk but using it to initiate chain sync
@@ -570,10 +578,11 @@ function cliGetInput(){
       }
       setTimeout(function(peers){reindexChain(peers);},200)
     }else if(userInput == "SS"){
-      BlockchainDB.getLatestBlock();
+      //BlockchainDB.getLatestBlock();
       console.log("----------------------------");
-      BlockchainDB.getBlockchain(99,callBackEntireDatabase);
-      BlockchainDB.getAllTransactionReceipts();
+      //BlockchainDB.getBlockchain(99,callBackEntireDatabase);
+      BlkDB.getBlockchain(99,callBackEntireDatabase);
+      //BlockchainDB.getAllTransactionReceipts();
       cliGetInput();
     }else if(userInput.startsWith("Send(")){//SEND function Send ( json tx )
       log(userInput.slice(userInput.indexOf("Send(")+5, userInput.indexOf(")")));
@@ -596,7 +605,8 @@ function cliGetInput(){
       log(userInput.slice(userInput.indexOf("getOmmer(")+9, userInput.indexOf(")")));
       var blocknum = userInput.slice(userInput.indexOf("getOmmer(")+9, userInput.indexOf(")"));
       log(JSON.stringify(frankieCoin.getOmmersAtBlock(parseInt(blocknum))));
-      BlockchainDB.getBlock(blocknum,cbGetBlock);//change name from callback 2 to something meaningful
+      //BlockchainDB.getBlock(blocknum,cbGetBlock);//change name from callback 2 to something meaningful
+      BlkDB.getBlock(blocknum,cbGetBlock);
       cliGetInput();
     }else if(userInput.startsWith("Order(")){//ORDER function merging with below \/ \/
       ////frankieCoin.createOrder(new sapphirechain.Order('0x0666bf13ab1902de7dee4f8193c819118d7e21a6','BUY','SPHREGEM',3500,0.25));
@@ -630,7 +640,7 @@ function cliGetInput(){
       log("1st Placing order to "+action+" "+amount+" of "+pairBuy+" for "+price+" by "+maker);
       myblockorder = new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price);
       frankieCoin.createOrder(myblockorder);
-      BlockchainDB.addOrder({order:myblockorder});
+      //BlockchainDB.addOrder({order:myblockorder});
       BlkDB.addOrder(action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
       cliGetInput();
     }else if(isJSON(userInput)){//ORDER JSON style strait to order DB ^^ merging with above
@@ -666,7 +676,7 @@ function cliGetInput(){
 
         myblockorder = new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price);
         frankieCoin.createOrder(myblockorder);
-        BlockchainDB.addOrder({order:myblockorder});
+        //BlockchainDB.addOrder({order:myblockorder});
         BlkDB.addOrder(action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
         //{"order":{"id":null,"fromAddress":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","buyOrSell":"SELL","pairBuy":"EGEM","pairSell":"SPHR","amount":"300","price":"26.00"}}
 
@@ -723,10 +733,10 @@ var genBlock = {"blockchain":{
   hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"],
   difficulty:4
 }};
-BlockchainDB.addGenBlock(genBlock);
+//BlockchainDB.addGenBlock(genBlock);
 BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()));
 BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
-BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
+//BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 log("peer chain is"+ frankieCoin.getEntireChain());
 var franks = miner(frankieCoin);
 
@@ -824,7 +834,8 @@ var cbChainGrab = function(data) {
 };
 //a function call for datastore
 function ChainGrab(blocknum){
-  BlockchainDB.getBlockchain(99,cbChainGrab);
+  //BlockchainDB.getBlockchain(99,cbChainGrab);
+  BlkDB.getBlockchain(99,cbChainGrab)
   //maybe some other stuff like .then
 };
 //and finally the actual call to function for synch
@@ -864,7 +875,8 @@ var myTradeCallback = function(orig,data) {
         ''
       );
       frankieCoin.createOrder(replacementOrder,data[obj]["originationID"]);
-      BlockchainDB.addOrder({order:replacementOrder});
+      //BlockchainDB.addOrder({order:replacementOrder});
+      BlkDB.addOrder("SELL"+":"+data[obj]["pairBuy"]+":"+data[obj]["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
     }else if (orig["amount"] > parseInt(data[obj]["amount"])){
       log("TRANSACTION: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "+parseFloat(data[obj]["amount"])+ " OF "+orig["pairBuy"]);
       frankieCoin.createTransaction(new sapphirechain.Transaction(data[obj]["fromAddress"], orig["fromAddress"], parseFloat(orig["amount"]), orig["pairBuy"]));
@@ -882,7 +894,8 @@ var myTradeCallback = function(orig,data) {
         ''
       );
       this.createOrder(replacementOrder,orig["originationID"]);
-      BlockchainDB.addOrder({order:replacementOrder});
+      //BlockchainDB.addOrder({order:replacementOrder});
+      BlkDB.addOrder("BUY"+":"+orig["pairBuy"]+":"+orig["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
     }
 
   }
@@ -916,7 +929,8 @@ var myCallbackBuyMiner = function(data) {
     log("BUYER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairBuy"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" PER "+data[obj]["pairSell"]);
     //frankieCoin.createOrder(new sapphirechain.Order(data[obj]["fromAddress"],data[obj]["action"],data[obj]["pairBuy"],data[obj]["pairSell"],data[obj]["amount"],data[obj]["price"]));
     //frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', data[obj]["fromAddress"], 20, "SPHR"));
-    BlockchainDB.buildTrade(data[obj],myTradeCallback);
+    //BlockchainDB.buildTrade(data[obj],myTradeCallback);
+    BlkDB.buildTrade(data[obj],myTradeCallback);
     BlockchainDB.clearOrderById(data[obj]["id"]);
     //since the order needs to be on the blockchain here we really need to just delete it but the order processing below is not necessary
     //however I am keeping it here in comments in case I want to move this function to the block
@@ -930,7 +944,8 @@ var myCallbackSellMiner = function(data) {
   for (obj in data){
     log("SELLER[BUYER] "+data[obj]["fromAddress"]+" OF "+data[obj]["pairBuy"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" PER "+data[obj]["pairSell"]);
     frankieCoin.createOrder(new sapphirechain.Order(data[obj]["fromAddress"],data[obj]["action"],data[obj]["pairBuy"],data[obj]["pairSell"],data[obj]["amount"],data[obj]["price"]));
-    BlockchainDB.buildTrade(data[obj],myTradeCallback);
+    //BlockchainDB.buildTrade(data[obj],myTradeCallback);
+    BlkDB.buildTrade(data[obj],myTradeCallback);
     BlockchainDB.clearOrderById(data[obj]["id"]);
     //since the order needs to be on the blockchain here we really need to just delete it but the order processing below is not necessary
     //however I am keeping it here in comments in case I want to move this function to the block
@@ -942,8 +957,10 @@ var myCallbackSellMiner = function(data) {
 var myCallbackBuy = function(data) {
   log('BUY ORDERS: '+JSON.stringify(data));//test for input
   for (obj in data){
-    log("BUYER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairBuy"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" PER "+data[obj]["pairSell"]+" timestamp "+data[obj]["timestamp"]+" transactionID "+data[obj]["transactionID"]);
-    BlockchainDB.buildTrade(data[obj],myTradeCallback);
+
+    log("BUYER "+JSON.parse(data[obj])["fromAddress"]+" OF "+JSON.parse(data[obj])["pairBuy"]+" QTY "+JSON.parse(data[obj])["amount"]+" FOR "+JSON.parse(data[obj])["price"]+" PER "+JSON.parse(data[obj])["pairSell"]+" timestamp "+JSON.parse(data[obj])["timestamp"]+" transactionID "+JSON.parse(data[obj])["transactionID"]);
+    //BlockchainDB.buildTrade(data[obj],myTradeCallback);
+    BlkDB.buildTrade(JSON.parse(data[obj]),myTradeCallback);
   }
 };
 //this callback is for processing trades to database and may be eliminated to new process
@@ -951,7 +968,8 @@ var myCallbackSell = function(data) {
   log('BUY ORDERS: '+JSON.stringify(data));//test for input
   for (obj in data){
     log("BUYER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairBuy"]+" QTY "+data[obj]["amount"]+" FOR "+data[obj]["price"]+" PER "+data[obj]["pairSell"]+" timestamp "+data[obj]["timestamp"]+" transactionID "+data[obj]["transactionID"]);
-    BlockchainDB.buildTrade(data[obj],myTradeCallback);
+    //BlockchainDB.buildTrade(data[obj],myTradeCallback);
+    BlkDB.buildTrade(data[obj],myTradeCallback);
   }
 };
 ////////////////////////////////////////////////////////end functions for orders
@@ -1012,11 +1030,11 @@ var impcchild = function(childData,functionName){
       var blockExists = function(block){
         console.log("does my block exist: "+block["blocknum"]);
       }
-      BlockchainDB.getBlock(parseInt(frankieCoin.getLength()),blockExists);
-      BlockchainDB.addBlock(minedblock);
+      //BlockchainDB.getBlock(parseInt(frankieCoin.getLength()),blockExists);
+      //BlockchainDB.addBlock(minedblock);
       BlkDB.addBlock(frankieCoin.blockHeight,JSON.stringify(frankieCoin.getLatestBlock()));
       BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
-      BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
+      //BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 
       functionName();
       ////////end database update and peers broadcast
@@ -1092,14 +1110,16 @@ var impcMethods = function(datacall){
       log('BUY ORDERS: '+JSON.stringify(data));//test for input
       //resolve(data);
       dataBuySell.push({"buy":data});
-      BlockchainDB.getOrdersPairSell(datacall["tickerBuy"],myCallbackOrderSell);
+      BlkDB.getOrdersPairSell(datacall["tickerBuy"],myCallbackOrderSell);
+      //BlockchainDB.getOrdersPairSell(datacall["tickerBuy"],myCallbackOrderSell);
     };
     var myCallbackOrderSell = function(data) {
       log('SELL ORDERS: '+JSON.stringify(data));//test for input
       dataBuySell.push({"sell":data});
       resolve(dataBuySell);
     };
-    BlockchainDB.getOrdersPairBuy(datacall["tickerBuy"],myCallbackOrderBuy);
+    BlkDB.getOrdersPairBuy(datacall["tickerBuy"],myCallbackOrderBuy);
+    //BlockchainDB.getOrdersPairBuy(datacall["tickerBuy"],myCallbackOrderBuy);
   })
 }
 

@@ -47,6 +47,16 @@ var getAllBLocks = function(){
   })
 }
 
+var getBlockchain = function(limit,callback){
+  var returner = [];
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    //console.log('key = '+data.key+" value = "+data.value.toString());
+    returner.pop(data.value.toString());
+  })
+  callback(returner);
+}
+
 var clearDatabase = function(){
   console.log("| Deleting database... level not set up for delete yet just delete the SFRX folder for now        |");
   //levelup(leveldown.destroy('./SFRX',function(){console.log("donada")}));
@@ -219,9 +229,9 @@ var getOrdersBuySorted = function(callBack){
     //console.log("SORTING N HERE");
     //console.log("results are "+result);
     var resultss = result.sort(function(a,b){
-      var x = JSON.parse(a)["timestamp"];
+      var x = JSON.parse(a)["price"];
       //console.log("x "+x+a);
-      var y = JSON.parse(b)["timestamp"];
+      var y = JSON.parse(b)["price"];
       //console.log("y "+y+b)
       if (x < y) {return -1;}
       if (x > y) {return 1;}
@@ -254,7 +264,16 @@ var getOrdersPairBuy = function(pair,callback){
   });
   //need to test the second callback to match previous set ups from nanosql
   stream.on('close',function(data){
-    callBack(result);
+    var resultss = result.sort(function(a,b){
+      var x = JSON.parse(a)["price"];
+      //console.log("x "+x+a);
+      var y = JSON.parse(b)["price"];
+      //console.log("y "+y+b)
+      if (x < y) {return -1;}
+      if (x > y) {return 1;}
+      return 0;
+    })
+    callBack(resultss);
   });
 
 }
@@ -281,6 +300,58 @@ var getOrdersSell = function(){
     callBack(result);
   });
 
+}
+
+//////////////////////////////////////////////////////////////////////first call
+var getOrdersPairSell = function(pair,callback){
+
+  console.log("Open PAIR SELL Orders leveldb");
+  var result = [];
+
+  var stream = db.createKeyStream();
+
+  stream.on('data',function(data){
+
+    if(data.toString().split(":")[0] == "SELL" && data.toString().split(":")[1] == pair){
+      db.get(data, function (err, value) {
+        console.log("value"+value);
+        result.push(value.toString());
+      })
+    }
+
+  });
+  //need to test the second callback to match previous set ups from nanosql
+  stream.on('close',function(data){
+    var resultss = result.sort(function(a,b){
+      var x = JSON.parse(a)["price"];
+      //console.log("x "+x+a);
+      var y = JSON.parse(b)["price"];
+      //console.log("y "+y+b)
+      if (x > y) {return -1;}
+      if (x < y) {return 1;}
+      return 0;
+    })
+    callback(resultss);
+  });
+
+}
+
+var buildTrade = function(obj,callBack){
+  console.log("Building transactions from sell orders LEVELDB for "+JSON.stringify(obj));
+
+  var callBackResults = function(resultset){
+    callBack(obj,resultset)
+  }
+
+  getOrdersPairSell(obj["pairSell"],callBackResults);
+
+  /***
+  nSQL("orders").getView('get_order_by_pairSell',{pairSell:obj["pairSell"]})
+  .then(function(result) {
+      //log(result) //  <- single object array containing the row we inserted.
+      callBack(obj,result);
+  });
+  ***/
 }
 
 ///////from here down needs editing
@@ -444,6 +515,7 @@ module.exports = {
     addBlock:addBlock,
     getBlock:getBlock,
     getAllBLocks:getAllBLocks,
+    getBlockchain:getBlockchain,
     clearDatabase:clearDatabase,
     addTransactions:addTransactions,
     getTransactionReceiptsByAddress:getTransactionReceiptsByAddress,
@@ -451,4 +523,7 @@ module.exports = {
     addOrder:addOrder,
     getOrdersBuy:getOrdersBuy,
     getOrdersBuySorted:getOrdersBuySorted,
+    getOrdersPairBuy:getOrdersPairSell,
+    getOrdersPairSell:getOrdersPairSell,
+    buildTrade:buildTrade,
 }
