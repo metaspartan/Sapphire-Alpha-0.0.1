@@ -980,10 +980,13 @@ var myCallbackSell = function(data) {
 //////////////////////////////////////////inter module parent child communicator
 var broadcastPeersBlock = function(){
   //sending the block to the peers
+  var currentBlockHeight = frankieCoin.blockHeight;
+  var peerBroadcastBlock = frankiecoin.getLatestBlock();
+  peerBroadcastBlock.blockHeight = currentBlockHeight;
   log("------------------------------------------------------")
   log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
   log("------------------------------------------------------")
-  broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
+  broadcastPeers(JSON.stringify(peerBroadcastBlock));
 }
 
 //parent communicator callback function sent to child below
