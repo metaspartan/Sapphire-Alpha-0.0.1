@@ -197,7 +197,7 @@ var addyBal = function(val){
             }};
             //add it to the database
             //BlockchainDB.addBlock(peerblock);
-            BlkDB.addBlock(frankieCoin.blockHeight,frankieCoin.getLatestBlock());
+            BlkDB.addBlock(frankieCoin.blockHeight,JSON.stringify(frankieCoin.getLatestBlock()));
             //BlockchainDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
             BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
             //add it to the RPC for miner
@@ -453,7 +453,7 @@ function cliGetInput(){
         //BlockchainDB.addBlock(minedblock);
         //BlockchainDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
         BlkDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
-        BlkDB.addBlock(frankieCoin.blockHeight,frankieCoin.getLatestBlock());
+        BlkDB.addBlock(frankieCoin.blockHeight,JSON.stringify(frankieCoin.getLatestBlock()));
         //sending the block to the peers
         broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 
