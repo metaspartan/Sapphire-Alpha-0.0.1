@@ -452,10 +452,13 @@ function cliGetInput(){
         ***/
         //BlockchainDB.addBlock(minedblock);
         //BlockchainDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
-        BlkDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
-        BlkDB.addBlock(frankieCoin.blockHeight,frankieCoin.getLatestBlock());
+        var currentBlockHeight = frankieCoin.blockHeight;
+        var peerBroadcastBlock = frankiecoin.getLatestBlock();
+        peerBroadcastBlock.blockHeight = currentBlockHeight;
+        BlkDB.addTransactions(peerBroadcastBlock["transactions"],peerBroadcastBlock["hash"]);
+        BlkDB.addBlock(currentBlockHeight,peerBroadcastBlock);
         //sending the block to the peers
-        broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
+        broadcastPeers(JSON.stringify(peerBroadcastBlock));
 
         //post to rpcserver
         //this is where we SUBMIT WORK leaving it to eeror right now
