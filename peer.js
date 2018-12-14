@@ -197,7 +197,7 @@ var addyBal = function(val){
             }};
             //add it to the database
             //BlockchainDB.addBlock(peerblock);
-            BlkDB.addBlock(peerblock);
+            BlkDB.addBlock(frankieCoin.blockHeight,frankieCoin.getLatestBlock());
             //BlockchainDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
             BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
             //add it to the RPC for miner
