@@ -452,13 +452,10 @@ function cliGetInput(){
         ***/
         //BlockchainDB.addBlock(minedblock);
         //BlockchainDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
-        var currentBlockHeight = frankieCoin.blockHeight;
-        var peerBroadcastBlock = frankiecoin.getLatestBlock();
-        peerBroadcastBlock.blockHeight = currentBlockHeight;
-        BlkDB.addTransactions(peerBroadcastBlock["transactions"],peerBroadcastBlock["hash"]);
-        BlkDB.addBlock(currentBlockHeight,peerBroadcastBlock);
+        BlkDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
+        BlkDB.addBlock(frankieCoin.blockHeight,frankieCoin.getLatestBlock());
         //sending the block to the peers
-        broadcastPeers(JSON.stringify(JSON.parse(peerBroadcastBlock)));
+        broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 
         //post to rpcserver
         //this is where we SUBMIT WORK leaving it to eeror right now
@@ -980,13 +977,10 @@ var myCallbackSell = function(data) {
 //////////////////////////////////////////inter module parent child communicator
 var broadcastPeersBlock = function(){
   //sending the block to the peers
-  var currentBlockHeight = frankieCoin.blockHeight;
-  var peerBroadcastBlock = frankieCoin.getLatestBlock();
-  peerBroadcastBlock.blockHeight = currentBlockHeight;
   log("------------------------------------------------------")
   log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
   log("------------------------------------------------------")
-  broadcastPeers(JSON.stringify(JSON.parse(peerBroadcastBlock)));
+  broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 }
 
 //parent communicator callback function sent to child below

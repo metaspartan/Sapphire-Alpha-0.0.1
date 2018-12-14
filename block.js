@@ -213,7 +213,7 @@ var Block = class Block {
         //total Hash for sequencing
         this.hashOfThisBlock = '';
         this.difficulty = difficulty;
-
+        this.blockHeight = this.chain.blockHeight;
       }
 
     calculateHash() {
