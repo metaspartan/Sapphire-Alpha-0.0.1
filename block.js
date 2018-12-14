@@ -66,7 +66,7 @@ var genesisBLK = function genesisBLK() {
 
   h.update(decodeUTF8(prevHash+genBlockTimestamp+genBlockPreviousHash+txtData));
 
-  genBlock = new Block(genBlockTimestamp, genesisTx, [], [], genBlockPreviousHash,"","","",txtData,h.hexDigest());
+  genBlock = new Block(1,genBlockTimestamp, genesisTx, [], [], genBlockPreviousHash,"","","",txtData,h.hexDigest());
   //constructor(timestamp, transactions, orders, ommers, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
 
   //this.chain.push(genBlock);
@@ -158,7 +158,7 @@ var Hash = function(inputs) {
 
 var Block = class Block {
 
-    constructor(timestamp, transactions, orders, ommers, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 3) {
+    constructor(blockheight, timestamp, transactions, orders, ommers, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 3) {
 
         log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
@@ -166,6 +166,7 @@ var Block = class Block {
           getBlockFromEgem(currentEgemBlockCallBack);
         }
 
+        this.blockHeight = blockheight;
         this.previousHash = previousHash;
         this.timestamp = timestamp;
         this.transactions = transactions;
@@ -213,7 +214,6 @@ var Block = class Block {
         //total Hash for sequencing
         this.hashOfThisBlock = '';
         this.difficulty = difficulty;
-        this.blockHeight = this.chain.blockHeight;
       }
 
     calculateHash() {
@@ -373,7 +373,7 @@ var Blockchain = class Blockchain {
           var blockTimeStamp = Date.now();
 
           //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
-          let block = new Block(blockTimeStamp, this.pendingTransactions, this.pendingOrders, this.pendingOmmers, this.getLatestBlock().hash);
+          let block = new Block(parseInt(this.blockHeight+1), blockTimeStamp, this.pendingTransactions, this.pendingOrders, this.pendingOmmers, this.getLatestBlock().hash);
           //not sure we do this here yet might be removed
           //block.difficulty = this.difficulty;
           if(this.getLatestBlock().difficulty){
@@ -435,7 +435,7 @@ var Blockchain = class Blockchain {
           var blockTimeStamp = minedBlock["timestamp"];
           log("BBBBBBBBBBBBBBBBB block time stamp"+minedBlock["timestamp"]+" LAST BLOCK TIME STAMPING "+this.getLatestBlock().timestamp+"MINED  BLOCK PREV HASH "+minedBlock["previousHash"]+" LAST BLOCK HASH "+this.getLatestBlock().hash);
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
-          let block = new Block(minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, this.pendingOmmers, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
+          let block = new Block(parseInt(this.blockHeight + 1),minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, this.pendingOmmers, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
           //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0) {
           //block.mineBlock(this.difficulty);
           block.difficulty = minedBlock["difficulty"];
@@ -492,7 +492,7 @@ var Blockchain = class Blockchain {
           log("----------------------------------------------------");
 
           //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-          var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
+          var block = new Block(parseInt(inBlock.blockHeight), inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
           log(chalk.blue("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
           this.blockHeight = inBlock.blockHeight;
@@ -524,7 +524,7 @@ var Blockchain = class Blockchain {
             this.addOmmer(tmpOmmer);
             callback({"uncle":{"blockNumber":parseInt(this.chain.length),"block":returnBlock}},peerId);
             this.chain.pop()
-            var block = new Block(inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
+            var block = new Block(parseInt(inBlock.blockHeight),inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
             log(chalk.red("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
             this.chain.push(block);
             this.blockHeight += 1;
@@ -573,7 +573,7 @@ var Blockchain = class Blockchain {
           log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         }
         //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-        var block = new Block(dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.ommers, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce, dbBlock.difficulty);
+        var block = new Block(parseInt(dbBlock.blockHeight), dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.ommers, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce, dbBlock.difficulty);
         log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
         this.chain.push(block);
         this.blockHeight = dbBlock.blockHeight;
