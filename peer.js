@@ -981,7 +981,7 @@ var myCallbackSell = function(data) {
 var broadcastPeersBlock = function(){
   //sending the block to the peers
   var currentBlockHeight = frankieCoin.blockHeight;
-  var peerBroadcastBlock = frankiecoin.getLatestBlock();
+  var peerBroadcastBlock = frankieCoin.getLatestBlock();
   peerBroadcastBlock.blockHeight = currentBlockHeight;
   log("------------------------------------------------------")
   log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
