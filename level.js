@@ -51,8 +51,7 @@ var getBlockAtHeight = function(blknum){
         // Ta da!
         console.log(hexBlockNum+": " + value)
         console.log("previousHash: "+JSON.parse(value)["previousHash"])
-        resolve(value);
-        return value.toString();
+        resolve(value.toString());
       })
     })
 }
