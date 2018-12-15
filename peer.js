@@ -275,7 +275,7 @@ var addyBal = function(val){
               //returning the block
               if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
                 //peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
-                peers[peerId].conn.write(JSON.stringify(BlkDB.getBlock(parseInt(peerBlockHeight))));
+                peers[peerId].conn.write(JSON.stringify(BlkDB.getBlockAtHeight(parseInt(peerBlockHeight))));
                 pongBack = true;
               }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
                 //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
