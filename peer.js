@@ -274,10 +274,12 @@ var addyBal = function(val){
               peerBlockHeight++;
               //returning the block
               if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
-                peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
+                //peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
+                peers[peerId].conn.write(JSON.stringify(BlkDB.getBlock(parseInt(peerBlockHeight))));
                 pongBack = true;
               }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
-                peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+                //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+                peers[peerId].conn.write(JSON.stringify(BlkDB.getLatestBlock()));
                 pongBack = true;
               }else if((peerBlockHeight > frankieCoin.getLength()) && (peerBlockHeight == (frankieCoin.getLength()+1))){
                 //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
