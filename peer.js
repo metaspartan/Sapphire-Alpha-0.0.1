@@ -377,7 +377,7 @@ var addyBal = function(val){
 
 //////////////////////////////////////////////////////////////messaging to peers
 var broadcastPeers = function(message){
-  for (let id in peers)
+  for (let id in peers){
     if(peers[id] != "undefined"){
       peers[id].conn.write(message)
     }
