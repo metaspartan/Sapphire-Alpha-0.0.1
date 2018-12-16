@@ -275,11 +275,14 @@ var addyBal = function(val){
               //returning the block
               if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
                 //peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
-                peers[peerId].conn.write(JSON.stringify(BlkDB.getBlockAtHeight(parseInt(peerBlockHeight))));
+                var pongBackBlock = function(blockData){
+                  peers[peerId].conn.write(blockData.toString());
+                }
+                BlkDB.getBlock(parseInt(peerBlockHeight),pongBackBlock);
                 pongBack = true;
               }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
                 //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-                peers[peerId].conn.write(JSON.stringify(BlkDB.getLatestBlock()));
+                peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
                 pongBack = true;
               }else if((peerBlockHeight > frankieCoin.getLength()) && (peerBlockHeight == (frankieCoin.getLength()+1))){
                 //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
@@ -524,6 +527,10 @@ function cliGetInput(){
       log(JSON.stringify(frankieCoin.getBlock(parseInt(blocknum))));
       //BlockchainDB.getBlock(blocknum,cbGetBlock);//change name from callback 2 to something meaningful
       BlkDB.getBlock(blocknum,cbGetBlock);
+      var pongBackBlock = function(blockData){
+        console.log("this was the way to do it "+blockData.toString());
+      }
+      BlkDB.getBlock(parseInt(blocknum),pongBackBlock);
       cliGetInput();
     }else if(userInput == "getLength()"){
       var currentChainLenth = frankieCoin.getLength();

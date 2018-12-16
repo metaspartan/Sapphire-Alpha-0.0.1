@@ -40,22 +40,6 @@ var getBlock = function(blknum,callBack){
     })
 }
 
-var getBlockAtHeight = function(blknum){
-  console.log("BLOCK FROM LEVEL DB");
-  var blocknum = parseInt(blknum);
-  var hexBlockNum = ("000000000000000" + blocknum.toString(16)).substr(-16);
-    db.get(hexBlockNum, function (err, value) {
-      return new Promise((resolve) => {
-        if (err) return console.log('Ooops!', err) // likely the key was not found
-
-        // Ta da!
-        console.log(hexBlockNum+": " + value)
-        console.log("previousHash: "+JSON.parse(value)["previousHash"])
-        resolve(value.toString());
-      })
-    })
-}
-
 var getAllBLocks = function(){
   var stream = db.createReadStream();
   stream.on('data',function(data){
@@ -530,7 +514,6 @@ var clearTransactionDatabase = function(){
 module.exports = {
     addBlock:addBlock,
     getBlock:getBlock,
-    getBlockAtHeight:getBlockAtHeight,
     getAllBLocks:getAllBLocks,
     getBlockchain:getBlockchain,
     clearDatabase:clearDatabase,
