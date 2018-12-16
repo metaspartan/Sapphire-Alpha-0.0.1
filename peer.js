@@ -235,6 +235,7 @@ var addyBal = function(val){
             }
 
             frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
+            frankieCoin.blockHeight-=1;
             frankieCoin.chain.pop();
 
             //going test getting into synch with these parameters
@@ -376,8 +377,10 @@ var addyBal = function(val){
 
 //////////////////////////////////////////////////////////////messaging to peers
 var broadcastPeers = function(message){
-  for (let id in peers) {
-    peers[id].conn.write(message)
+  for (let id in peers)
+    if(peers[id] != "undefined"){
+      peers[id].conn.write(message)
+    }
   }
 }
 //////////////////////////////////////////////////////////end messaging to peers

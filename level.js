@@ -40,6 +40,15 @@ var getBlock = function(blknum,callBack){
     })
 }
 
+var removeBlock = function(blknum){
+  console.log("REMOVING BLOCK NUMBER "+blknum+" FROM LEVELDB");
+  var blocknum = parseInt(blknum);
+  var hexBlockNum = ("000000000000000" + blocknum.toString(16)).substr(-16);
+  db.del(hexBlockNum, function(err){
+    if(err) return console.log('Ooops!', err) // likely the key was not found
+  });
+}
+
 var getAllBLocks = function(){
   var stream = db.createReadStream();
   stream.on('data',function(data){
@@ -514,6 +523,7 @@ var clearTransactionDatabase = function(){
 module.exports = {
     addBlock:addBlock,
     getBlock:getBlock,
+    removeBlock:removeBlock,
     getAllBLocks:getAllBLocks,
     getBlockchain:getBlockchain,
     clearDatabase:clearDatabase,
