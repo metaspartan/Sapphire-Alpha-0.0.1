@@ -32,13 +32,14 @@ var getChainParamsBlockHeight = function(hashKey){
   });
 }
 
-var addBlock = function(blknum,block){
+var addBlock = function(blknum,block,callfrom){
   console.log("<<<<<----------------ADDS BLOCK TO LEVEL DB HERE------------>>>>>")
-  //console.log(JSON.stringify(block));
+  console.log("called from "+callfrom);
+  console.log("inside add block"+JSON.stringify(block));
   var blocknum = parseInt(blknum);
   var hexBlockNum = ("000000000000000" + blocknum.toString(16)).substr(-16);
   console.log("adding block "+blknum+" as "+hexBlockNum);
-  putRecord(hexBlockNum,block)
+  putRecord("sfblk:"+hexBlockNum,block)
   //parseInt(hexString, 16);//this is back to number from hex
 }
 
@@ -46,7 +47,7 @@ var getBlock = function(blknum,callBack){
   console.log("BLOCK FROM LEVEL DB");
   var blocknum = parseInt(blknum);
   var hexBlockNum = ("000000000000000" + blocknum.toString(16)).substr(-16);
-    db.get(hexBlockNum, function (err, value) {
+    db.get("sfblk:"+hexBlockNum, function (err, value) {
       return new Promise((resolve) => {
         if (err) return console.log('Ooops!', err) // likely the key was not found
 
@@ -63,7 +64,7 @@ var removeBlock = function(blknum){
   console.log("REMOVING BLOCK NUMBER "+blknum+" FROM LEVELDB");
   var blocknum = parseInt(blknum);
   var hexBlockNum = ("000000000000000" + blocknum.toString(16)).substr(-16);
-  db.del(hexBlockNum, function(err){
+  db.del("sfblk:"+hexBlockNum, function(err){
     if(err) return console.log('Ooops!', err) // likely the key was not found
   });
 }
@@ -71,7 +72,9 @@ var removeBlock = function(blknum){
 var getAllBLocks = function(){
   var stream = db.createReadStream();
   stream.on('data',function(data){
-    console.log('key = '+data.key+" value = "+data.value.toString());
+    if(data.key.toString().split(":")[0] == "sfblk"){
+      console.log('key = '+data.key+" value = "+data.value.toString());
+    }
   })
 }
 
@@ -85,9 +88,15 @@ var getBlockchain = function(limit,callback,hashKey){
       var stream = db.createReadStream();
       stream.on('data',function(data){
         //console.log('key = '+data.key+" value = "+data.value.toString());
-        returner.pop(data.value.toString());
-      })
-      callback(returner);
+        if(data.key.toString().split(":")[0] == "sfblk"){
+          console.log("here");
+          returner.pop(data.value.toString());
+        }
+      });
+      stream.on('close',function(){
+        console.log("data stream is complete");
+        callback(JSON.stringify(returner));
+      });
     }else{
       console.log("you are running the wrong version and need to update "+value.toString());
     }

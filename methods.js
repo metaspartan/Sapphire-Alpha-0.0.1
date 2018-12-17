@@ -10,6 +10,29 @@ var parentComEvent = function(callback){
   callerEvent = callback;
 }
 
+//going to replace data to rpc database for getwork from an rpc call
+var postRPCforMiner = function(blockObj){
+  console.log("block data arrived at methods and available for getwork")
+
+      return new Promise((resolve) => {
+          if (typeof (blockObj) !== 'object') {
+              throw new Error('was expecting an object!');
+          }
+          // you would usually do some validations here
+          // and check for required fields
+
+          //going to delete all first
+          resolve(db.blocks.unsetAll());
+
+          // attach an id the save to db
+          let _blockObj = JSON.parse(JSON.stringify(blockObj));
+          _blockObj.id = (Math.random() * 10000000) | 0;
+          resolve(db.blocks.save(blockObj));
+      });
+}
+
+
+
 let methods = {
     createUser: {
         description: `creates a new user, and returns the details of the new user`,
@@ -280,7 +303,8 @@ let methods = {
      });
    },
 
-   parentComEvent:parentComEvent
+   parentComEvent:parentComEvent,
+   postRPCforMiner:postRPCforMiner
 };
 
 //module.exports = methods;

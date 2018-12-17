@@ -350,6 +350,7 @@ var Blockchain = class Blockchain {
 
       getLength(){
         //return this.chain.length;
+        console.log("what does this.blockHeight equeal then??? "+parseInt(this.blockHeight));
         if(typeof this.blockHeight === 'undefined' || this.blockHeight === null){//if (typeof variable === 'undefined' || variable === null) {
           console.log("WAS NULL FRANKIECOIN GET LENGTH CALLED"+this.blockHeight);
           return 1;
@@ -373,7 +374,7 @@ var Blockchain = class Blockchain {
           var blockTimeStamp = Date.now();
 
           //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
-          let block = new Block(parseInt(this.blockHeight+1), blockTimeStamp, this.pendingTransactions, this.pendingOrders, this.pendingOmmers, this.getLatestBlock().hash);
+          let block = new Block((parseInt(this.getLength())+1), blockTimeStamp, this.pendingTransactions, this.pendingOrders, this.pendingOmmers, this.getLatestBlock().hash);
           //not sure we do this here yet might be removed
           //block.difficulty = this.difficulty;
           if(this.getLatestBlock().difficulty){
@@ -409,12 +410,12 @@ var Blockchain = class Blockchain {
           //this.processTrades();
           log(chalk.yellow("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
-          this.blockHeight += 1;
+          this.blockHeight=(parseInt(this.getLength())+1);
           log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
           if(this.chain.length > this.chainRiser){
             this.chain.shift();
           }
-          log(chalk.yellow("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
+          log(chalk.yellow("<===========chain length >>>>"+this.blockHeight+"<<<< chain length============>"));
           //end adding trading mechanism
           this.pendingTransactions = [
               new Transaction(null, miningRewardAddress, this.miningReward, "SPHR")
@@ -433,9 +434,10 @@ var Blockchain = class Blockchain {
           log("MINEDREWARD EQUALS "+JSON.stringify(minedReward));
 
           var blockTimeStamp = minedBlock["timestamp"];
+          console.log("UGGGGHHHHHHH THE BLOCK HEIGHT IS "+this.blockHeight);
           log("BBBBBBBBBBBBBBBBB block time stamp"+minedBlock["timestamp"]+" LAST BLOCK TIME STAMPING "+this.getLatestBlock().timestamp+"MINED  BLOCK PREV HASH "+minedBlock["previousHash"]+" LAST BLOCK HASH "+this.getLatestBlock().hash);
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
-          let block = new Block(parseInt(this.blockHeight + 1),minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, this.pendingOmmers, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
+          let block = new Block((parseInt(this.getLength())+1),minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, this.pendingOmmers, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
           //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0) {
           //block.mineBlock(this.difficulty);
           block.difficulty = minedBlock["difficulty"];
@@ -465,7 +467,7 @@ var Blockchain = class Blockchain {
           //this.processTrades();
           log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
-          this.blockHeight += 1;
+          this.blockHeight=(parseInt(this.blockHeight)+1);
           log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
           if(this.chain.length > this.chainRiser){
             this.chain.shift();
