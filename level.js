@@ -13,6 +13,25 @@ var putRecord = function(key, val){
   })
 }
 
+var addChainParams = function(key, value){
+  console.log("Chain Parameters Loading as follows - version"+ JSON.parse(value)["version"])
+  db.put(key, value, function (err) {
+    if (err) return console.log('Ooops!', err) // some kind of I/O error
+  })
+}
+
+var getChainParams = function(hashKey){
+  db.get(hashKey, function (err, value) {
+    console.log("Chain Params "+value.toString());
+  });
+}
+
+var getChainParamsBlockHeight = function(hashKey){
+  db.get(hashKey+":blockHeight", function (err, value) {
+    console.log("Chain Params "+value.toString());
+  });
+}
+
 var addBlock = function(blknum,block){
   console.log("<<<<<----------------ADDS BLOCK TO LEVEL DB HERE------------>>>>>")
   //console.log(JSON.stringify(block));
@@ -56,14 +75,23 @@ var getAllBLocks = function(){
   })
 }
 
-var getBlockchain = function(limit,callback){
-  var returner = [];
-  var stream = db.createReadStream();
-  stream.on('data',function(data){
-    //console.log('key = '+data.key+" value = "+data.value.toString());
-    returner.pop(data.value.toString());
+var getBlockchain = function(limit,callback,hashKey){
+  db.get(hashKey, function (err, value) {
+    console.log("Chain Params "+value.toString());
+    //value.toString();
+    if(JSON.parse(value.toString())["version"]=="alpha.0.0.1"){
+      console.log("The chain params are correct proceeding")
+      var returner = [];
+      var stream = db.createReadStream();
+      stream.on('data',function(data){
+        //console.log('key = '+data.key+" value = "+data.value.toString());
+        returner.pop(data.value.toString());
+      })
+      callback(returner);
+    }else{
+      console.log("you are running the wrong version and need to update "+value.toString());
+    }
   })
-  callback(returner);
 }
 
 var clearDatabase = function(){
@@ -73,21 +101,13 @@ var clearDatabase = function(){
 }
 
 var addTransactions = function(transactions,blockhash){
-
   console.log("T R A N S A C T I O N S  B E I N G  A D D E D  H E R E");
-  console.log(transactions+transactions.length);
-  console.log(blockhash);
   transactions = JSON.parse(JSON.stringify(transactions));
   for(tranx in JSON.parse(transactions)){
-
-    console.log("inside loop"+tranx+JSON.parse(transactions)[tranx]);
-
     var receipt = JSON.parse(transactions)[tranx];
     //receipts have a key of toAddress:timestamp:receipthash atm
     putRecord(receipt["toAddress"]+":"+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt));
-
   }
-
 }
 
 var getTransactionReceiptsByAddress = function(address){
@@ -521,6 +541,9 @@ var clearTransactionDatabase = function(){
 ***/
 
 module.exports = {
+    addChainParams:addChainParams,
+    getChainParams:getChainParams,
+    getChainParamsBlockHeight:getChainParamsBlockHeight,
     addBlock:addBlock,
     getBlock:getBlock,
     removeBlock:removeBlock,

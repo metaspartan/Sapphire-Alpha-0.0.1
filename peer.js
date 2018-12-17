@@ -60,6 +60,8 @@ var output = fs.readFile(filename, 'utf8', function(err, data) {
     }else{
       log(chalk.red("It did not validate"));
     }
+    BlkDB.addChainParams(globalGenesisHash,JSON.stringify({"version":"alpha.0.0.1"}));
+    BlkDB.addChainParams(globalGenesisHash+":blockHeight",0);
 });
 ////////////////////////////////////////////////////////////////end genesis hash
 
@@ -198,6 +200,7 @@ var addyBal = function(val){
             //add it to the database
             //BlockchainDB.addBlock(peerblock);
             BlkDB.addBlock(frankieCoin.blockHeight,JSON.stringify(frankieCoin.getLatestBlock()));
+            BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
             //BlockchainDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
             BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
             //add it to the RPC for miner
@@ -462,6 +465,7 @@ function cliGetInput(){
         //BlockchainDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
         BlkDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
         BlkDB.addBlock(frankieCoin.blockHeight,JSON.stringify(frankieCoin.getLatestBlock()));
+        BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
         //sending the block to the peers
         broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 
@@ -534,6 +538,10 @@ function cliGetInput(){
         console.log("this was the way to do it "+blockData.toString());
       }
       BlkDB.getBlock(parseInt(blocknum),pongBackBlock);
+      cliGetInput();
+    }else if(userInput.startsWith("getChainParams()")){//GETBLOCK function
+      BlkDB.getChainParams(globalGenesisHash);
+      BlkDB.getChainParamsBlockHeight(globalGenesisHash);
       cliGetInput();
     }else if(userInput == "getLength()"){
       var currentChainLenth = frankieCoin.getLength();
@@ -747,6 +755,7 @@ var genBlock = {"blockchain":{
 }};
 //BlockchainDB.addGenBlock(genBlock);
 BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()));
+BlkDB.addChainParams(globalGenesisHash+":blockHeight",1);
 BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 //BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 log("peer chain is"+ frankieCoin.getEntireChain());
@@ -809,6 +818,7 @@ var callBackEntireDatabase = function(data){
 var cbChainGrab = function(data) {
   //log('got data: '+JSON.stringify(data));//test for input
   for (obj in data){
+    console.log("I don't understand why it stops")
     //log("BLOCK CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));
     if(typeof frankieCoin.getBlock(data[obj]["blocknum"]) === "undefined" || frankieCoin.getBlock(data[obj]["blocknum"]) === null){
       //block not in memory
@@ -847,7 +857,7 @@ var cbChainGrab = function(data) {
 //a function call for datastore
 function ChainGrab(blocknum){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
-  BlkDB.getBlockchain(99,cbChainGrab)
+  BlkDB.getBlockchain(99,cbChainGrab,globalGenesisHash)
   //maybe some other stuff like .then
 };
 //and finally the actual call to function for synch
@@ -1045,6 +1055,7 @@ var impcchild = function(childData,functionName){
       //BlockchainDB.getBlock(parseInt(frankieCoin.getLength()),blockExists);
       //BlockchainDB.addBlock(minedblock);
       BlkDB.addBlock(frankieCoin.blockHeight,JSON.stringify(frankieCoin.getLatestBlock()));
+      BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
       BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
       //BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 
