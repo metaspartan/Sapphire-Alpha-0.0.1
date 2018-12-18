@@ -52,8 +52,8 @@ var genesisBLK = function genesisBLK() {
 
   var datum = new Date(Date.UTC('2018','02','18','02','18','18'));
   var genBlockTimestamp = datum.getTime()/1000;
-  var genBlockPreviousHash = "";
-  //var genBlockPreviousHash = "0000019890000000000000000000000000000000000000000000000000000000";
+  //var genBlockPreviousHash = "";
+  var genBlockPreviousHash = "0000000000000000000000000000000000000000000000000000000000000000";
   log(chalk.green("Creating genesis block:"));
   //log(powHash);
   try {
@@ -188,7 +188,7 @@ var Block = class Block {
           this.nonce = 0;
         }
         //tie this to the main EGEM chain
-        log("constructor again : "+egemBRBlock+" "+egemBRHash+" "+currentEgemBlock+" "+currentEgemBlockHash);
+        log("Egem Chain Information : "+egemBRBlock+" "+egemBRHash+" "+currentEgemBlock+" "+currentEgemBlockHash);
         if(egemBRBlock != '')  {
           this.eGEMBackReferenceBlock = egemBRBlock;
           this.egemBackReferenceBlockHash = egemBRHash;
@@ -350,6 +350,7 @@ var Blockchain = class Blockchain {
 
       getLength(){
         //return this.chain.length;
+        console.log("what does this.blockHeight equeal then??? "+parseInt(this.blockHeight));
         if(typeof this.blockHeight === 'undefined' || this.blockHeight === null){//if (typeof variable === 'undefined' || variable === null) {
           console.log("WAS NULL FRANKIECOIN GET LENGTH CALLED"+this.blockHeight);
           return 1;
@@ -373,7 +374,7 @@ var Blockchain = class Blockchain {
           var blockTimeStamp = Date.now();
 
           //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
-          let block = new Block(parseInt(this.blockHeight+1), blockTimeStamp, this.pendingTransactions, this.pendingOrders, this.pendingOmmers, this.getLatestBlock().hash);
+          let block = new Block((parseInt(this.getLength())+1), blockTimeStamp, this.pendingTransactions, this.pendingOrders, this.pendingOmmers, this.getLatestBlock().hash);
           //not sure we do this here yet might be removed
           //block.difficulty = this.difficulty;
           if(this.getLatestBlock().difficulty){
@@ -409,15 +410,15 @@ var Blockchain = class Blockchain {
           //this.processTrades();
           log(chalk.yellow("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
-          this.blockHeight += 1;
+          this.blockHeight=(parseInt(this.getLength())+1);
           log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
           if(this.chain.length > this.chainRiser){
             this.chain.shift();
           }
-          log(chalk.yellow("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
+          log(chalk.yellow("<===========chain length >>>>"+this.blockHeight+"<<<< chain length============>"));
           //end adding trading mechanism
           this.pendingTransactions = [
-              new Transaction(null, miningRewardAddress, this.miningReward, "SPHR")
+              new Transaction(null, miningRewardAddress, this.miningReward, "SFRX")
           ];
           this.pendingOrders = [];
           this.pendingOmmers = [];
@@ -427,18 +428,22 @@ var Blockchain = class Blockchain {
       addPendingTransactionsToMinedBLock(miningRewardAddress, minedBlock){
 
           //need to add the mining reward HERE
-          var minedReward = new Transaction(null, minedBlock["miner"], this.miningReward, "SPHR");
+          var minedReward = new Transaction(null, minedBlock["miner"], this.miningReward, "SFRX");
           this.createTransaction(minedReward);
 
           log("MINEDREWARD EQUALS "+JSON.stringify(minedReward));
 
           var blockTimeStamp = minedBlock["timestamp"];
+          console.log("UGGGGHHHHHHH THE BLOCK HEIGHT IS "+this.blockHeight);
           log("BBBBBBBBBBBBBBBBB block time stamp"+minedBlock["timestamp"]+" LAST BLOCK TIME STAMPING "+this.getLatestBlock().timestamp+"MINED  BLOCK PREV HASH "+minedBlock["previousHash"]+" LAST BLOCK HASH "+this.getLatestBlock().hash);
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
-          let block = new Block(parseInt(this.blockHeight + 1),minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, this.pendingOmmers, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
+          let block = new Block((parseInt(this.getLength())+1),minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, this.pendingOmmers, minedBlock["previousHash"],this.sponsor,miningRewardAddress,"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
           //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0) {
           //block.mineBlock(this.difficulty);
-          block.difficulty = minedBlock["difficulty"];
+          //block.difficulty = minedBlock["difficulty"];
+          if(this.getLatestBlock().difficulty){
+            this.difficulty = this.getLatestBlock().difficulty;
+          }
 
           if(blockTimeDiff < 4){
             //temporary difficulty setting stopped at 6
@@ -465,7 +470,7 @@ var Blockchain = class Blockchain {
           //this.processTrades();
           log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
-          this.blockHeight += 1;
+          this.blockHeight=(parseInt(this.blockHeight)+1);
           log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
           if(this.chain.length > this.chainRiser){
             this.chain.shift();
@@ -558,25 +563,29 @@ var Blockchain = class Blockchain {
       }
 
       //th8s is the peers adding a block needs to be VALIDATED
-      addBlockFromDatabase(dbBlock){
+      addBlockFromDatabase(dbBlock,msg){
+
+        console.log("&&&&&& ^^^^^^ ***** in the addBlockfromdb and msg is "+msg);
+
+        console.log("can we get the database data "+this.getLatestBlock().hash+" compared to "+JSON.parse(dbBlock)["blockHeight"]+" "+JSON.parse(dbBlock)["previousHash"])
         //if all that consensus stuff I am going to add....then
         //here is where I check if two things and I think make them globals
         //1 issync should be YES
         //2 previous hash must match current chain top hash
-        if(this.getLatestBlock().hash == dbBlock.previousHash){
+        if(this.getLatestBlock().hash == JSON.parse(dbBlock)["previousHash"]){
           log("----------------------------------------------------");
-          log("yes DB BLOCK prev hash of "+dbBlock.previousHash+" matches the hash of chain "+this.getLatestBlock().hash);
+          log("yes DB BLOCK prev hash of "+JSON.parse(dbBlock)["previousHash"]+" matches the hash of chain "+this.getLatestBlock().hash);
           log("----------------------------------------------------");
         }else{
           log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-          log("no DB BLOCK prev hash of "+dbBlock.previousHash+" does not match the hash of chain "+this.getLatestBlock().hash);
+          log("no DB BLOCK prev hash of "+JSON.parse(dbBlock)["previousHash"]+" does not match the hash of chain "+this.getLatestBlock().hash);
           log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         }
         //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-        var block = new Block(parseInt(dbBlock.blockHeight), dbBlock.timestamp, dbBlock.transactions, dbBlock.orders, dbBlock.ommers, dbBlock.previousHash, dbBlock.sponsor, dbBlock.miner, dbBlock.eGEMBackReferenceBlock, dbBlock.data, dbBlock.hash, dbBlock.egemBackReferenceBlockHash, dbBlock.nonce, dbBlock.difficulty);
+        var block = new Block(parseInt(JSON.parse(dbBlock)["blockHeight"]), JSON.parse(dbBlock)["timestamp"], JSON.parse(dbBlock)["transactions"], JSON.parse(dbBlock)["orders"], JSON.parse(dbBlock)["ommers"], JSON.parse(dbBlock)["previousHash"], JSON.parse(dbBlock)["sponsor"], JSON.parse(dbBlock)["miner"], JSON.parse(dbBlock)["eGEMBackReferenceBlock"], JSON.parse(dbBlock)["data"], JSON.parse(dbBlock)["hash"], JSON.parse(dbBlock)["egemBackReferenceBlockHash"], JSON.parse(dbBlock)["nonce"], JSON.parse(dbBlock)["difficulty"]);
         log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
         this.chain.push(block);
-        this.blockHeight = dbBlock.blockHeight;
+        this.blockHeight = JSON.parse(dbBlock)["blockHeight"];
         log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
         if(this.chain.length > this.chainRiser){
           this.chain.shift();

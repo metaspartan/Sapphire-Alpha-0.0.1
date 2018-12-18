@@ -199,10 +199,11 @@ var addyBal = function(val){
             }};
             //add it to the database
             //BlockchainDB.addBlock(peerblock);
-            BlkDB.addBlock(frankieCoin.blockHeight,JSON.stringify(frankieCoin.getLatestBlock()));
-            BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
+            BlkDB.addBlock(parseInt(frankieCoin.getLength()),JSON.stringify(frankieCoin.getLatestBlock()),"202");
+            BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.getLength()));
             //BlockchainDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
             BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
+            /****
             //add it to the RPC for miner
             var options = {
               uri: 'http://localhost:9090/rpc',
@@ -215,7 +216,8 @@ var addyBal = function(val){
                 log(body.id) // Print the shortened url.
               }
             });
-
+            ****/
+            rpcserver.rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
           }else{
             log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
             //for now I am going to remove the next block down....until I scrape to a match
@@ -464,8 +466,8 @@ function cliGetInput(){
         //BlockchainDB.addBlock(minedblock);
         //BlockchainDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
         BlkDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
-        BlkDB.addBlock(frankieCoin.blockHeight,JSON.stringify(frankieCoin.getLatestBlock()));
-        BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
+        BlkDB.addBlock(parseInt(frankieCoin.getLength()),JSON.stringify(frankieCoin.getLatestBlock()),"469");
+        BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.getLength()));
         //sending the block to the peers
         broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 
@@ -731,7 +733,7 @@ var frankieCoin = blockchain();
 //have to load the first block into local database
 var genBlock = {"blockchain":{
   id:null,
-  blocknum:parseInt(frankieCoin.getLength()),
+  blocknum:1,
   previousHash:frankieCoin.getLatestBlock()["previousHash"],
   timestamp:frankieCoin.getLatestBlock()["timestamp"],
   transactions:frankieCoin.getLatestBlock()["transactions"],
@@ -754,11 +756,12 @@ var genBlock = {"blockchain":{
   difficulty:4
 }};
 //BlockchainDB.addGenBlock(genBlock);
-BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()));
+BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()),"759");
 BlkDB.addChainParams(globalGenesisHash+":blockHeight",1);
 BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 //BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 log("peer chain is"+ frankieCoin.getEntireChain());
+
 var franks = miner(frankieCoin);
 
 /////////////////////////////////////////////////////////////////synch the chain
@@ -816,21 +819,30 @@ var callBackEntireDatabase = function(data){
 
 //the idea is to sync the chain data before progression so we start with a callback of data store limited by number of blocks
 var cbChainGrab = function(data) {
-  //log('got data: '+JSON.stringify(data));//test for input
+  console.log("well, does it ever even get called")
+  log('got data: '+data.toString());//test for input
+
   for (obj in data){
-    console.log("I don't understand why it stops")
     //log("BLOCK CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));
-    if(typeof frankieCoin.getBlock(data[obj]["blocknum"]) === "undefined" || frankieCoin.getBlock(data[obj]["blocknum"]) === null){
+
+    console.log("blockdata coming inbound "+JSON.parse(data[obj])["blockHeight"]+" vs memory "+JSON.stringify(frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"])))
+
+    if(typeof frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"]) === "undefined" || frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"]) === null){
       //block not in memory
-      frankieCoin.addBlockFromDatabase(data[obj]);
+      console.log("block does not exist "+data[obj]);
+      //frankieCoin.addBlockFromDatabase(data[obj]);
+      console.log("before the damn timeout "+JSON.parse(data[obj])["blockHeight"])
+      var tempBlock = data[obj];
+      frankieCoin.addBlockFromDatabase(tempBlock,"sending in block "+JSON.parse(tempBlock)["blockHeight"])
     }else{
-      //log("block exists in chain data: "+data[obj]["blocknum"]);
+      log("block exists in chain data: "+JSON.parse(data[obj])["blockHeight"]);
     }
     blockHeightPtr++;
   }
 
   log(chalk.blue("BlocHeightPtr: "+ chalk.green(blockHeightPtr)));
   //this is where we call a function with the blockHeight pointer that finds out the peerBlockHeight and then download missing data
+  /***
   for (let id in peers) {
     //chain sync ping
     peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
@@ -840,7 +852,9 @@ var cbChainGrab = function(data) {
   log("------------------------------------------------------");
   log(chalk.green("CALLING SUBMIT BLOCK"));
   log("------------------------------------------------------");
+  ***?
 
+  /*****
   var options = {
     uri: 'http://localhost:9090/rpc',
     method: 'POST',
@@ -852,7 +866,9 @@ var cbChainGrab = function(data) {
       log(body.id) // Print the shortened url.
     }
   });
-
+  *****/
+  console.log("about to send this to rpc "+JSON.stringify({block:frankieCoin.getLatestBlock()}))
+  rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
 };
 //a function call for datastore
 function ChainGrab(blocknum){
@@ -1004,18 +1020,18 @@ var broadcastPeersBlock = function(){
   log("------------------------------------------------------")
   broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 }
-
 //parent communicator callback function sent to child below
-var impcchild = function(childData,functionName){
+var impcchild = function(childData,fbroadcastPeersBlock){
   //log("------------------------------------------------------");
-  process.stdout.clearLine();
-  process.stdout.cursorTo(0);
+  //process.stdout.clearLine();
+  //process.stdout.cursorTo(0);
   process.stdout.write(chalk.blue("Incoming data from child: "+chalk.green(childData)));
 
   if(isJSON(childData) && JSON.parse(childData)["createBlock"]){
     log(chalk.blue("Current prev hash is: "+chalk.green(frankieCoin.getLatestBlock().hash)+"\nIncoming block previous hash is: "+JSON.parse(childData)["createBlock"]["block"]["previousHash"]));
 
     if((frankieCoin.getLatestBlock().hash == JSON.parse(childData)["createBlock"]["block"]["previousHash"]) && JSON.parse(childData)["createBlock"]["block"]["timestamp"] != "1541437502148"){
+      //block from miner is commmitted though internal miner - could chainge this to a direct call
       franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
       ////////here is the database update and peers broadcast
       log("[placeholder] mining stats from outside miner");
@@ -1046,20 +1062,23 @@ var impcchild = function(childData,functionName){
         allConfig:frankieCoin.getLatestBlock()["allConfig"],
         allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
         hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"],
-        difficulty:frankieCoin.getLatestBlock()["difficulty"]
+        difficulty:frankieCoin.getLatestBlock()["difficulty"],
+        blockHeight:parseInt(JSON.parse(childData)["createBlock"]["block"]["blockHeight"])
       }};
-      log(minedblock);
+      log("if interested "+JSON.stringify(minedblock));
       var blockExists = function(block){
         console.log("does my block exist: "+block["blocknum"]);
       }
       //BlockchainDB.getBlock(parseInt(frankieCoin.getLength()),blockExists);
       //BlockchainDB.addBlock(minedblock);
-      BlkDB.addBlock(frankieCoin.blockHeight,JSON.stringify(frankieCoin.getLatestBlock()));
+      console.log("*****************|||///---\\\\\\|||F GET CHAIN LENGTH "+frankieCoin.blockHeight);
+      BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),"1072");
       BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
       BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
       //BlockchainDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 
-      functionName();
+      fbroadcastPeersBlock();
+      /*****found a better way for rpc data call using rpcserver.postRPCforMiner
       ////////end database update and peers broadcast
       //post to rpcserver
       //this is where we SUBMIT WORK leaving it to eeror right now
@@ -1074,13 +1093,16 @@ var impcchild = function(childData,functionName){
           log(body.id) // Print the shortened url.
         }
       });
+      *****/
+
+      rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
     }
 
   }else if(isJSON(childData) && JSON.parse(childData)["getWorkForMiner"]){
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
     process.stdout.write(chalk.green("work returned to miner"));
-    //log(JSON.parse(childData)["getWorkForMiner"])
+    log(JSON.parse(childData)["getWorkForMiner"])
   }else if(isJSON(childData) && JSON.parse(childData)["getOrderBook"]){
     log("now we are gonna have some fun")
     impceventcaller("returning from function","maybe the calling peer is not necessary");

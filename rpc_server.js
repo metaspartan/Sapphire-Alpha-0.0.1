@@ -46,11 +46,28 @@ var methodEvent = function(datacall){
 var impcevent = function(mydata,mypeer){
   log("IMPC EVENT FIRED"+mydata+mypeer);//probably will be removed
 }
+/*****
+//this code is in peer.js pushed into rpc_server.js
+//1) peer.js calls globalParentEvent and pushes the impcevent from peer.js
+//2) rpc_server.js pushes back its own impcevent as the callback
+//3) what does this do? complete comments
+var impceventcaller;
+var impcevent = function(callback){
+    //sets the impcparent with the function from parent
+    impceventcaller = callback;
+}
+*****/
 //callback gonna push a callback to parent
 var globalParentEvent = function(callback){
   callback(impcevent);
 }
 //end impx event cycle
+
+var postRPCforMiner = function(data){
+  console.log("block data is rpc relayed thorugh rpc_server to methods for miner");
+  console.log("and the rpc relayed data "+JSON.stringify(data));
+  methods.postRPCforMiner(data);
+}
 
 let routes = {
     // this is the rpc endpoint
@@ -189,5 +206,6 @@ server.listen(PORT);
 module.exports = {
   globalParentCom:globalParentCom,
   globalParentEvent:globalParentEvent,
-  globalParentComMethods:globalParentComMethods
+  globalParentComMethods:globalParentComMethods,
+  postRPCforMiner:postRPCforMiner
 }
