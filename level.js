@@ -35,7 +35,7 @@ var getChainParamsBlockHeight = function(hashKey){
 var addBlock = function(blknum,block,callfrom){
   console.log("<<<<<----------------ADDS BLOCK TO LEVEL DB HERE------------>>>>>")
   console.log("called from "+callfrom);
-  console.log("inside add block"+JSON.stringify(block));
+  console.log("inside add block"+block.toString());
   var blocknum = parseInt(blknum);
   var hexBlockNum = ("000000000000000" + blocknum.toString(16)).substr(-16);
   console.log("adding block "+blknum+" as "+hexBlockNum);
@@ -89,13 +89,14 @@ var getBlockchain = function(limit,callback,hashKey){
       stream.on('data',function(data){
         //console.log('key = '+data.key+" value = "+data.value.toString());
         if(data.key.toString().split(":")[0] == "sfblk"){
-          console.log("here");
-          returner.pop(data.value.toString());
+          console.log("here... "+data.key.toString()+" "+data.value.toString());
+          returner.push(data.value.toString());
         }
       });
       stream.on('close',function(){
         console.log("data stream is complete");
-        callback(JSON.stringify(returner));
+        //console.log("inside the return "+JSON.stringify(returner))
+        callback(returner);
       });
     }else{
       console.log("you are running the wrong version and need to update "+value.toString());
