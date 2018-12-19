@@ -150,6 +150,8 @@ var addyBal = function(val){
         if(JSON.parse(data)["previousHash"]){///////////////need more refinement
           //storing some variables of current chain
           var currentChainHash = frankieCoin.getLatestBlock()["hash"];
+          var incomingBLockHeight = JSON.parse(data)["blockHeight"];
+          console.log("VVVVVVVVVVVVVVVVVVVVV        "+incomingBLockHeight+"        VVVVVVVVVVVVVVVVVVVV    ---->   "+frankieCoin.blockHeight);
           var blocknumber = 0;
           //first we add the block to the blockchain with call back and id of submitting peer for conflict resolution
           var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data),sendBack,peerId);
