@@ -42,12 +42,12 @@ var genesisBLK = function genesisBLK() {
 
   //dev team drops
   var genesisTx = [
-    new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SPHR"),//oso
-    new Transaction(null, "0x5080fb28d8cf96c320e1a2e56a901abb7391b4ce", 500000, "SPHR"),//ridz
+    new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SFRX"),//oso
+    new Transaction(null, "0x5080fb28d8cf96c320e1a2e56a901abb7391b4ce", 500000, "SFRX"),//ridz
     //JSON.stringify(sfrxAirdropHash)
   ];
 
-  //var sampleTX = new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SPHR");
+  //var sampleTX = new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SFRX");
   //log(chalk.blue(JSON.stringify(sampleTX)));
 
   var datum = new Date(Date.UTC('2018','02','18','02','18','18'));
@@ -337,6 +337,12 @@ var Blockchain = class Blockchain {
       }
 
       getBlock(num) {
+          console.log("chain blockheight "+this.blockHeight);
+          console.log("chain riser "+this.chainRiser);
+          console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
+          var offset = (parseInt(this.blockHeight)-parseInt(this.chainRiser));
+          var newNum = (parseInt(num)-parseInt(offset));
+          console.log("real blockheight:"+JSON.stringify(this.chain[parseInt(newNum) - 1]));
           return this.chain[parseInt(num) - 1];
       }
 
@@ -479,7 +485,7 @@ var Blockchain = class Blockchain {
 
           //end adding trading mechanism
           this.pendingTransactions = [
-              new Transaction(null, miningRewardAddress, this.miningReward, "SPHR")
+              new Transaction(null, miningRewardAddress, this.miningReward, "SFRX")
           ];
           this.pendingOrders = [];
           this.pendingOmmers = [];
@@ -678,14 +684,14 @@ var Blockchain = class Blockchain {
 
           async function returnTime(){
             if(airdrop){
-              //console.log("okay"+balance["SPHR"]+airdrop);
-              var existing = parseFloat(balance["SPHR"]);
+              //console.log("okay"+balance["SFRX"]+airdrop);
+              var existing = parseFloat(balance["SFRX"]);
               if(!existing){existing = 0};
               var orig = parseFloat(airdrop);
               if(!orig){orig = 0};
               //console.log("okay2"+existing+orig);
               var newbal = await parseFloat(existing + orig);
-              balance["SPHR"] = newbal;
+              balance["SFRX"] = newbal;
               console.log(balance);
               return balance;
             }else{

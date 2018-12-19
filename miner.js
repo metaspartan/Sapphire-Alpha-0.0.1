@@ -81,8 +81,8 @@ var Miner = class Miner {
 
       //log('\nBalance of 0x5c4ae12c853012d355b5ee36a6cb8285708760e6 is', this.chain.getBalanceOfAddress('0x5c4ae12c853012d355b5ee36a6cb8285708760e6'));
       //log('\nBalance of '+sponsor+' is', frankieCoin.getBalanceOfAddress(sponsor));
-      //log("processed trades SPHR EGEM = "+this.chain.processTrades()["SPHREGEM"]);
-      //log("processed trades SPHR XSH = "+this.chain.processTrades()["SPHRXSH"]);
+      //log("processed trades SFRX EGEM = "+this.chain.processTrades()["SFRXEGEM"]);
+      //log("processed trades SFRX XSH = "+this.chain.processTrades()["SFRXXSH"]);
 
       log("entire chain: "+this.chain.getEntireChain());
     }else if(myDigestVar.substring(0,2) == "00" && difc >0){

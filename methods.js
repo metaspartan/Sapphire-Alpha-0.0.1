@@ -257,7 +257,7 @@ let methods = {
      }
    },
 
-   //transaction:{"from":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","to":"0x7c4a4cbb0b9e8bd0792fc5ba2bc9660f1fcbfd85","amount":1375.002,"ticker":"SPHR"}}
+   //transaction:{"from":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","to":"0x7c4a4cbb0b9e8bd0792fc5ba2bc9660f1fcbfd85","amount":1375.002,"ticker":"SFRX"}}
    transaction: {
      description: '',
      params: ['signature:egem signed transaction','txhash:the sapphire chain','transaction:transaction object'],

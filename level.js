@@ -104,6 +104,41 @@ var getBlockchain = function(limit,callback,hashKey){
   })
 }
 
+var getBlockchain2 = function(limit,callback,hashKey){
+
+  db.get(hashKey, function (err, value) {
+    console.log("Chain Params "+value.toString());
+    //value.toString();
+    if(JSON.parse(value.toString())["version"]=="alpha.0.0.1"){
+      console.log("The chain params are correct proceeding")
+
+      db.get(hashKey+":blockHeight", function (err, value) {
+
+        var chainBlockHeight = (parseInt(value.toString())-parseInt(limit));
+
+          var returner = [];
+          var stream = db.createReadStream();
+          stream.on('data',function(data){
+            //console.log('key = '+data.key+" value = "+data.value.toString());
+            if(data.key.toString().split(":")[0] == "sfblk"){
+              console.log("here... "+data.key.toString()+" "+data.value.toString());
+              returner.push(data.value.toString());
+            }
+          });
+          stream.on('close',function(){
+            console.log("data stream is complete");
+            //console.log("inside the return "+JSON.stringify(returner))
+            callback(returner);
+          });
+
+    })
+
+    }else{
+      console.log("you are running the wrong version and need to update "+value.toString());
+    }
+  })
+}
+
 var clearDatabase = function(){
   console.log("| Deleting database... level not set up for delete yet just delete the SFRX folder for now        |");
   //levelup(leveldown.destroy('./SFRX',function(){console.log("donada")}));
@@ -191,15 +226,15 @@ var getBalanceAtAddress = function(address,callback){
 
       async function returnTime(){
         if(airdrop){
-          //console.log("okay"+balance["SPHR"]+airdrop);
+          //console.log("okay"+balance["SFRX"]+airdrop);
           var existing = parseFloat(addrBalance);
-          //var existing = parseFloat(balance["SPHR"]);//going to have to replace this later
+          //var existing = parseFloat(balance["SFRX"]);//going to have to replace this later
           if(!existing){existing = 0};
           var orig = parseFloat(airdrop);
           if(!orig){orig = 0};
           //console.log("okay2"+existing+orig);
           var newbal = await parseFloat(existing + orig);
-          //balance["SPHR"] = newbal;
+          //balance["SFRX"] = newbal;
           //console.log(balance);
           //return balance;
           callback(newbal);

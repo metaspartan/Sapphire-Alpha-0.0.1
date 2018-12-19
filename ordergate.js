@@ -85,9 +85,9 @@ function queryr1(){
   })
 }
 
-//var myorder = {order:{id:null,fromAddress:'0x0786bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SPHR',amount:'300',price:'26.00'}};
+//var myorder = {order:{id:null,fromAddress:'0x0786bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SFRX',amount:'300',price:'26.00'}};
 
-var myorder = {"order":{id:null,"fromAddress":'0x0786bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SPHR',amount:'300',price:'26.00'}};
+var myorder = {"order":{id:null,"fromAddress":'0x0786bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SFRX',amount:'300',price:'26.00'}};
 
 log(myorder["order"]["fromAddress"]);
 
@@ -97,7 +97,7 @@ log(myorder["order"]["fromAddress"]);
 //Orderdb.addOrder(myorder);
 
 //Orderdb.getOrdersPairBuy("EGEM");
-//Orderdb.getOrdersPairBuy("SPHR");
+//Orderdb.getOrdersPairBuy("SFRX");
 
 //Orderdb.getOrdersSell();
 

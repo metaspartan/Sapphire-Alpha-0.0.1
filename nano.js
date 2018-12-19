@@ -258,11 +258,11 @@ var addOrder = function(order){
 
 /***
 var simple = nSQL([
-    {id:null,fromAddress:'0x0666bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'BUY',pairBuy:'EGEM',pairSell:'SPHR',amount:'300',price:'24.5567'},
-    {id:null,fromAddress:'0x0667bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SPHR',amount:'320',price:'24.5567'},
-    {id:null,fromAddress:'0x0668bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'BUY',pairBuy:'EGEM',pairSell:'SPHR',amount:'350',price:'24.5567'},
-    {id:null,fromAddress:'0x5c4ae12c853012d355b5ee36a6cb8285708760e6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SPHR',amount:'450',price:'25.5567'},
-    {id:null,fromAddress:'0x5c4ae12c853012d775b5ee36a6cb8285708760e6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SPHR',amount:'920',price:'26.5567'},
+    {id:null,fromAddress:'0x0666bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'BUY',pairBuy:'EGEM',pairSell:'SFRX',amount:'300',price:'24.5567'},
+    {id:null,fromAddress:'0x0667bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SFRX',amount:'320',price:'24.5567'},
+    {id:null,fromAddress:'0x0668bf13ab1902de7dee4f8193c819118d7e21a6',buyOrSell:'BUY',pairBuy:'EGEM',pairSell:'SFRX',amount:'350',price:'24.5567'},
+    {id:null,fromAddress:'0x5c4ae12c853012d355b5ee36a6cb8285708760e6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SFRX',amount:'450',price:'25.5567'},
+    {id:null,fromAddress:'0x5c4ae12c853012d775b5ee36a6cb8285708760e6',buyOrSell:'SELL',pairBuy:'EGEM',pairSell:'SFRX',amount:'920',price:'26.5567'},
 ]);
 ***/
 
