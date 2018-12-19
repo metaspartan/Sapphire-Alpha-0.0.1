@@ -152,112 +152,120 @@ var addyBal = function(val){
           var currentChainHash = frankieCoin.getLatestBlock()["hash"];
           var incomingBLockHeight = JSON.parse(data)["blockHeight"];
           console.log("VVVVVVVVVVVVVVVVVVVVV        "+incomingBLockHeight+"        VVVVVVVVVVVVVVVVVVVV    ---->   "+frankieCoin.blockHeight);
-          var blocknumber = 0;
-          //first we add the block to the blockchain with call back and id of submitting peer for conflict resolution
-          var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data),sendBack,peerId);
 
-          log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD?"+successfulBlockAdd));
+          ///if block to skip this process being added here
+          if(parseInt(incomingBLockHeight) == (parseInt(frankieCoin.blockHeight)+1)){
 
-          //verfiy the previous hash in the database matches our expectations - code is incomplete atm
-          if(frankieCoin.getLatestBlock()["previousHash"] == currentChainHash && successfulBlockAdd == true){
+            var blocknumber = 0;
+            //first we add the block to the blockchain with call back and id of submitting peer for conflict resolution
+            var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data),sendBack,peerId);
 
-            //increment the internal peer nonce of sending party to track longest chain
-            frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
-            //logging the block added to chain for console
-            log(chalk.green("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock())));
+            log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD?"+successfulBlockAdd));
 
-            log(chalk.green("hash matches and we are good"));
-            blocknumber = frankieCoin.getLength();
-            log(chalk.red("the database block number is "+blocknumber));
-            log(chalk.red("--------------------------------------------------------------------"));
-            log(chalk.yellow("THERE NEEDS TO BE ANOTHER SOMETHING SET HERE FOR THE DATASE SYNCHING"));
-            log(chalk.yellow("         BUT WE DID JUST GET A SUCESSFUL BLOCK FROM PEER            "));
-            log(chalk.red("--------------------------------------------------------------------"));
+            //verfiy the previous hash in the database matches our expectations - code is incomplete atm
+            if(frankieCoin.getLatestBlock()["previousHash"] == currentChainHash && successfulBlockAdd == true){
 
-            //////update the client database OR reject block and rollback the chain - code is incomplete atm
-            var peerblock = {"blockchain":{
-              id:null,
-              blocknum:parseInt(frankieCoin.getLength()),
-              previousHash:frankieCoin.getLatestBlock()["previousHash"],
-              timestamp:frankieCoin.getLatestBlock()["timestamp"],
-              transactions:frankieCoin.getLatestBlock()["transactions"],
-              orders:frankieCoin.getLatestBlock()["orders"],
-              ommers:frankieCoin.getLatestBlock()["ommers"],
-              hash:frankieCoin.getLatestBlock()["hash"],
-              nonce:frankieCoin.getLatestBlock()["nonce"],
-              eGEMBackReferenceBlock:frankieCoin.getLatestBlock()["eGEMBackReferenceBlock"],
-              egemBackReferenceBlockHash:frankieCoin.getLatestBlock()["egemBackReferenceBlockHash"],
-              data:frankieCoin.getLatestBlock()["data"],
-              sponsor:frankieCoin.getLatestBlock()["sponsor"],
-              miner:frankieCoin.getLatestBlock()["miner"],
-              hardwareTx:frankieCoin.getLatestBlock()["hardwareTx"],
-              softwareTx:frankieCoin.getLatestBlock()["softwareTx"],
-              targetBlock:frankieCoin.getLatestBlock()["targetBlock"],
-              targetBlockDataHash:frankieCoin.getLatestBlock()["targetBlockDataHash"],
-              allConfig:frankieCoin.getLatestBlock()["allConfig"],
-              allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
-              hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"],
-              difficulty:frankieCoin.getLatestBlock()["difficulty"]
-            }};
-            //add it to the database
-            //BlockchainDB.addBlock(peerblock);
-            BlkDB.addBlock(parseInt(frankieCoin.getLength()),JSON.stringify(frankieCoin.getLatestBlock()),"202");
-            BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.getLength()));
-            //BlockchainDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
-            BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
-            /****
-            //add it to the RPC for miner
-            var options = {
-              uri: 'http://localhost:9090/rpc',
-              method: 'POST',
-              json: {createBlock:{block:frankieCoin.getLatestBlock()}}
-            };
+              //increment the internal peer nonce of sending party to track longest chain
+              frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
+              //logging the block added to chain for console
+              log(chalk.green("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock())));
 
-            request(options, function (error, response, body) {
-              if (!error && response.statusCode == 200) {
-                log(body.id) // Print the shortened url.
-              }
-            });
-            ****/
-            rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-          }else{
-            log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
-            //for now I am going to remove the next block down....until I scrape to a match
-            //DEFINITELY need some logic here to verify peer synch height and chain
-            log("which means we are REMOVING BLOCK");
-            //remove the block from the chain and db
+              log(chalk.green("hash matches and we are good"));
+              blocknumber = frankieCoin.getLength();
+              log(chalk.red("the database block number is "+blocknumber));
+              log(chalk.red("--------------------------------------------------------------------"));
+              log(chalk.yellow("THERE NEEDS TO BE ANOTHER SOMETHING SET HERE FOR THE DATASE SYNCHING"));
+              log(chalk.yellow("         BUT WE DID JUST GET A SUCESSFUL BLOCK FROM PEER            "));
+              log(chalk.red("--------------------------------------------------------------------"));
 
-            var lastSynchBlock;
-            for (let i in frankieCoin.chain.nodes){
-              if(frankieCoin.chain.nodes[i]["id"] == peerId){
-                lastSynchBlock = frankieCoin.chain.nodes[i]["info"]["chainlength"];
-              }
-            }
+              //////update the client database OR reject block and rollback the chain - code is incomplete atm
+              var peerblock = {"blockchain":{
+                id:null,
+                blocknum:parseInt(frankieCoin.getLength()),
+                previousHash:frankieCoin.getLatestBlock()["previousHash"],
+                timestamp:frankieCoin.getLatestBlock()["timestamp"],
+                transactions:frankieCoin.getLatestBlock()["transactions"],
+                orders:frankieCoin.getLatestBlock()["orders"],
+                ommers:frankieCoin.getLatestBlock()["ommers"],
+                hash:frankieCoin.getLatestBlock()["hash"],
+                nonce:frankieCoin.getLatestBlock()["nonce"],
+                eGEMBackReferenceBlock:frankieCoin.getLatestBlock()["eGEMBackReferenceBlock"],
+                egemBackReferenceBlockHash:frankieCoin.getLatestBlock()["egemBackReferenceBlockHash"],
+                data:frankieCoin.getLatestBlock()["data"],
+                sponsor:frankieCoin.getLatestBlock()["sponsor"],
+                miner:frankieCoin.getLatestBlock()["miner"],
+                hardwareTx:frankieCoin.getLatestBlock()["hardwareTx"],
+                softwareTx:frankieCoin.getLatestBlock()["softwareTx"],
+                targetBlock:frankieCoin.getLatestBlock()["targetBlock"],
+                targetBlockDataHash:frankieCoin.getLatestBlock()["targetBlockDataHash"],
+                allConfig:frankieCoin.getLatestBlock()["allConfig"],
+                allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
+                hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"],
+                difficulty:frankieCoin.getLatestBlock()["difficulty"]
+              }};
+              //add it to the database
+              //BlockchainDB.addBlock(peerblock);
+              BlkDB.addBlock(parseInt(frankieCoin.getLength()),JSON.stringify(frankieCoin.getLatestBlock()),"202");
+              BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.getLength()));
+              //BlockchainDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
+              BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
+              /****
+              //add it to the RPC for miner
+              var options = {
+                uri: 'http://localhost:9090/rpc',
+                method: 'POST',
+                json: {createBlock:{block:frankieCoin.getLatestBlock()}}
+              };
 
-            if(parseInt(frankieCoin.getLength() - 1) != lastSynchBlock){
-              log(chalk.red("V-----------------------------------------------------------------V"));
-              log(chalk.red("                CONFLICT AND BLOCK REMOVAL                         "));
+              request(options, function (error, response, body) {
+                if (!error && response.statusCode == 200) {
+                  log(body.id) // Print the shortened url.
+                }
+              });
+              ****/
+              rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
             }else{
-              log("TTTTTTTTTTTHHHHHHHHHHHIIIIIIIIIISSSSSSSSSSS IS WHERE THE SYNCH IS STUCK");
-            }
+              log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
+              //for now I am going to remove the next block down....until I scrape to a match
+              //DEFINITELY need some logic here to verify peer synch height and chain
+              log("which means we are REMOVING BLOCK");
+              //remove the block from the chain and db
 
-            frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
-            frankieCoin.blockHeight-=1;
-            frankieCoin.chain.pop();
+              var lastSynchBlock;
+              for (let i in frankieCoin.chain.nodes){
+                if(frankieCoin.chain.nodes[i]["id"] == peerId){
+                  lastSynchBlock = frankieCoin.chain.nodes[i]["info"]["chainlength"];
+                }
+              }
 
-            //going test getting into synch with these parameters
-            frankieCoin.inSynch=false;
-            ///could just send this to one peeer but
-            //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},300);
-            for (let id in peers) {
-              log(chalk.yellow("          Sending ping for chain sync to all peers              "));
-              log(chalk.red("^-----------------------------------------------------------------^"));
-              //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
-              peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
+              if(parseInt(frankieCoin.getLength() - 1) != lastSynchBlock){
+                log(chalk.red("V-----------------------------------------------------------------V"));
+                log(chalk.red("                CONFLICT AND BLOCK REMOVAL                         "));
+              }else{
+                log("TTTTTTTTTTTHHHHHHHHHHHIIIIIIIIIISSSSSSSSSSS IS WHERE THE SYNCH IS STUCK");
+              }
+
+              frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
+              frankieCoin.blockHeight-=1;
+              frankieCoin.chain.pop();
+
+              //going test getting into synch with these parameters
+              frankieCoin.inSynch=false;
+              ///could just send this to one peeer but
+              //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},300);
+              for (let id in peers) {
+                log(chalk.yellow("          Sending ping for chain sync to all peers              "));
+                log(chalk.red("^-----------------------------------------------------------------^"));
+                //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
+                peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
+              }
+              //we would never get the block to this point
+              //BlockchainDB.clearBlock(frankieCoin.getLength());
+              //okay do we need a return?
+
             }
-            //we would never get the block to this point
-            //BlockchainDB.clearBlock(frankieCoin.getLength());
-            //okay do we need a return?
+            ////end if statment to skip this part
+
           }
 
         }else if(JSON.parse(data)["fromAddress"]){
