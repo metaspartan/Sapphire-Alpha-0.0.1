@@ -14,7 +14,7 @@ var putRecord = function(key, val){
 }
 
 var addChainParams = function(key, value){
-  console.log("Chain Parameters Loading as follows - version"+ JSON.parse(value)["version"])
+  console.log("Chain Parameters Loading as follows key: "+key.toString()+" - version"+ JSON.parse(value)["version"])
   db.put(key, value, function (err) {
     if (err) return console.log('Ooops!', err) // some kind of I/O error
   })
@@ -151,8 +151,20 @@ var addTransactions = function(transactions,blockhash){
   for(tranx in JSON.parse(transactions)){
     var receipt = JSON.parse(transactions)[tranx];
     //receipts have a key of toAddress:timestamp:receipthash atm
-    putRecord(receipt["toAddress"]+":"+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt));
+    putRecord("tx:"+receipt["toAddress"]+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt));
   }
+}
+
+var getTransactions = function(){
+  console.log("ALL Transaction Receipts");
+
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    if(data.key.toString().split(":")[0] == "tx"){
+      console.log('key = '+data.key+" value = "+data.value.toString());
+    }
+  })
+
 }
 
 var getTransactionReceiptsByAddress = function(address){
@@ -161,7 +173,7 @@ var getTransactionReceiptsByAddress = function(address){
 
   var stream = db.createKeyStream();
   stream.on('data',function(data){
-    if(data.toString().split(":")[0] == address){
+    if(data.toString().split(":")[1] == address){
       console.log(data.toString());
     }
 
@@ -596,6 +608,7 @@ module.exports = {
     getBlockchain:getBlockchain,
     clearDatabase:clearDatabase,
     addTransactions:addTransactions,
+    getTransactions:getTransactions,
     getTransactionReceiptsByAddress:getTransactionReceiptsByAddress,
     getBalanceAtAddress:getBalanceAtAddress,
     addOrder:addOrder,

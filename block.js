@@ -423,9 +423,7 @@ var Blockchain = class Blockchain {
           }
           log(chalk.yellow("<===========chain length >>>>"+this.blockHeight+"<<<< chain length============>"));
           //end adding trading mechanism
-          this.pendingTransactions = [
-              new Transaction(null, miningRewardAddress, this.miningReward, "SFRX")
-          ];
+          this.pendingTransactions = [];
           this.pendingOrders = [];
           this.pendingOmmers = [];
       }
@@ -484,9 +482,7 @@ var Blockchain = class Blockchain {
           log(chalk.green("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
 
           //end adding trading mechanism
-          this.pendingTransactions = [
-              new Transaction(null, miningRewardAddress, this.miningReward, "SFRX")
-          ];
+          this.pendingTransactions = [];
           this.pendingOrders = [];
           this.pendingOmmers = [];
       }

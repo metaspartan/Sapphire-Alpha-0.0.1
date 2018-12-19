@@ -179,50 +179,12 @@ var addyBal = function(val){
               log(chalk.red("--------------------------------------------------------------------"));
 
               //////update the client database OR reject block and rollback the chain - code is incomplete atm
-              var peerblock = {"blockchain":{
-                id:null,
-                blocknum:parseInt(frankieCoin.getLength()),
-                previousHash:frankieCoin.getLatestBlock()["previousHash"],
-                timestamp:frankieCoin.getLatestBlock()["timestamp"],
-                transactions:frankieCoin.getLatestBlock()["transactions"],
-                orders:frankieCoin.getLatestBlock()["orders"],
-                ommers:frankieCoin.getLatestBlock()["ommers"],
-                hash:frankieCoin.getLatestBlock()["hash"],
-                nonce:frankieCoin.getLatestBlock()["nonce"],
-                eGEMBackReferenceBlock:frankieCoin.getLatestBlock()["eGEMBackReferenceBlock"],
-                egemBackReferenceBlockHash:frankieCoin.getLatestBlock()["egemBackReferenceBlockHash"],
-                data:frankieCoin.getLatestBlock()["data"],
-                sponsor:frankieCoin.getLatestBlock()["sponsor"],
-                miner:frankieCoin.getLatestBlock()["miner"],
-                hardwareTx:frankieCoin.getLatestBlock()["hardwareTx"],
-                softwareTx:frankieCoin.getLatestBlock()["softwareTx"],
-                targetBlock:frankieCoin.getLatestBlock()["targetBlock"],
-                targetBlockDataHash:frankieCoin.getLatestBlock()["targetBlockDataHash"],
-                allConfig:frankieCoin.getLatestBlock()["allConfig"],
-                allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
-                hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"],
-                difficulty:frankieCoin.getLatestBlock()["difficulty"]
-              }};
               //add it to the database
               //BlockchainDB.addBlock(peerblock);
               BlkDB.addBlock(parseInt(frankieCoin.getLength()),JSON.stringify(frankieCoin.getLatestBlock()),"202");
               BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.getLength()));
-              //BlockchainDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
               BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
-              /****
               //add it to the RPC for miner
-              var options = {
-                uri: 'http://localhost:9090/rpc',
-                method: 'POST',
-                json: {createBlock:{block:frankieCoin.getLatestBlock()}}
-              };
-
-              request(options, function (error, response, body) {
-                if (!error && response.statusCode == 200) {
-                  log(body.id) // Print the shortened url.
-                }
-              });
-              ****/
               rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
             }else{
               log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
@@ -441,40 +403,7 @@ function cliGetInput(){
 
         //this is the most sensible place to add the block
         //this would seem to be a function that should be called from miner after meinePendingTx is called but it is better called here
-        var minedblock = {"blockchain":{
-          id:null,
-          blocknum:parseInt(frankieCoin.getLength()),
-          previousHash:frankieCoin.getLatestBlock()["previousHash"],
-          timestamp:frankieCoin.getLatestBlock()["timestamp"],
-          transactions:frankieCoin.getLatestBlock()["transactions"],
-          orders:frankieCoin.getLatestBlock()["orders"],
-          ommers:frankieCoin.getLatestBlock()["ommers"],
-          hash:frankieCoin.getLatestBlock()["hash"],
-          nonce:frankieCoin.getLatestBlock()["nonce"],
-          eGEMBackReferenceBlock:frankieCoin.getLatestBlock()["eGEMBackReferenceBlock"],
-          egemBackReferenceBlockHash:frankieCoin.getLatestBlock()["egemBackReferenceBlockHash"],
-          data:frankieCoin.getLatestBlock()["data"],
-          sponsor:frankieCoin.getLatestBlock()["sponsor"],
-          miner:frankieCoin.getLatestBlock()["miner"],
-          hardwareTx:frankieCoin.getLatestBlock()["hardwareTx"],
-          softwareTx:frankieCoin.getLatestBlock()["softwareTx"],
-          targetBlock:frankieCoin.getLatestBlock()["targetBlock"],
-          targetBlockDataHash:frankieCoin.getLatestBlock()["targetBlockDataHash"],
-          allConfig:frankieCoin.getLatestBlock()["allConfig"],
-          allConfigHash:frankieCoin.getLatestBlock()["allConfigHash"],
-          hashOfThisBlock:frankieCoin.getLatestBlock()["hashOfThisBlock"],
-          difficulty:frankieCoin.getLatestBlock()["difficulty"]
-        }};
-        log("here is the mined block: ")
-        log(minedblock);
-        /***
-        var blockExists = function(block){
-          console.log("does my block exist: "+block["blocknum"]);
-        }
-        BlockchainDB.getBlock(parseInt(frankieCoin.getLength()),blockExists);
-        ***/
-        //BlockchainDB.addBlock(minedblock);
-        //BlockchainDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
+
         BlkDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
         BlkDB.addBlock(parseInt(frankieCoin.getLength()),JSON.stringify(frankieCoin.getLatestBlock()),"469");
         BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.getLength()));
@@ -482,18 +411,8 @@ function cliGetInput(){
         broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 
         //post to rpcserver
-        //this is where we SUBMIT WORK leaving it to eeror right now
-        var options = {
-          uri: 'http://localhost:9090/rpc',
-          method: 'POST',
-          json: {createBlock:{block:frankieCoin.getLatestBlock()}}
-        };
-
-        request(options, function (error, response, body) {
-          if (!error && response.statusCode == 200) {
-            log(body.id) // Print the shortened url.
-          }
-        });
+        rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+        
       }else{
         log("------------------------------------------------------");
         log(chalk.green("CHAIN IS NOT SYNCHED FOR MINING PLEASE WAIT"+frankieCoin.getLength()+peers[0]));
@@ -518,6 +437,9 @@ function cliGetInput(){
       BlkDB.getOrdersBuySorted(myOrdersBuyCBTest);
       BlkDB.getChainParams(globalGenesisHash);
       BlkDB.getChainParamsBlockHeight(globalGenesisHash);
+      cliGetInput();
+    }else if(userInput == "TX"){
+      BlkDB.getTransactions();
       cliGetInput();
     }else if(userInput == "O"){//O is for order
       //other commands can go Here
