@@ -217,7 +217,7 @@ var addyBal = function(val){
               }
             });
             ****/
-            rpcserver.rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+            rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
           }else{
             log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
             //for now I am going to remove the next block down....until I scrape to a match
