@@ -183,40 +183,11 @@ var getTransactionReceiptsByAddress = function(address){
 
 }
 
-function getAirdropBalanceFromEgem(address,callback,airdrop) {
-    //grab latest EGEM BLock
-    web3.eth.getBalance(address, 1530000, async function (error, result) {
-      if (!error){
-        //console.log('Egem:', web3.utils.fromWei(result,'ether')); // Show the ether balance after converting it from Wei
-        var responder = await callback(parseFloat(web3.utils.fromWei(result,'ether')*2));
-        //console.log("responder equals "+responder);
-        //return result;
-      }else{
-        console.log('Houston we have a promblem: ', error); // Should dump errors here
-      }
-    });
-
-}
-
 var getBalanceAtAddress = function(address,callback){
 
     console.log("Total Balance of "+address);
 
-    ///first we call the airdrop
-    var airdrop;
     var balance = [];
-
-    //calling the airdrop balance
-    var mycallback1 = async function(response){
-      //console.log("we have returned"+response);
-      airdrop = response;
-      //console.log("second check on airdrop" +airdrop);
-      return airdrop;
-    }
-
-    getAirdropBalanceFromEgem(address,mycallback1);
-
-
 
     var stream = db.createKeyStream();
 
@@ -264,9 +235,17 @@ var getBalanceAtAddress = function(address,callback){
       //callback(addrBalance);
 
       async function returnTime(){
-        if(airdrop){
+
           //console.log("okay"+balance["SFRX"]+airdrop);
-          var existing = parseFloat(balance["SFRX"]);
+          if(typeof balance["SFRX"] === 'undefined' || balance["SFRX"] === null){
+            balance["SFRX"]=0;
+            var existing = parseFloat(balance["SFRX"]);
+            console.log("i am in here"+balance["SFRX"]);
+          }else{
+            var existing = parseFloat(balance["SFRX"]);
+            console.log("i am in else here"+balance["SFRX"]);
+          }
+
           //var existing = parseFloat(balance["SFRX"]);//going to have to replace this later
           if(!existing){existing = 0};
           //var orig = await parseFloat(airdrop);
@@ -279,17 +258,14 @@ var getBalanceAtAddress = function(address,callback){
           var newbal = parseFloat(existing + orig);
           //console.log("newbal = "+newbal)
           //balance["SFRX"] = newbal;
-          //console.log(balance);
-          balance["SFRX"]+=parseFloat(orig);
+          console.log(balance["SFRX"]);
+          balance["SFRX"]+=parseFloat(newbal);
           //return balance;
           callback(balance);
-        }else{
-          //console.log("not yet")
-          setTimeout(function(){returnTime();},700);
-        }
+
       }
 
-      returnTime(airdrop);
+      returnTime();
 
     });
     //console.log("balance without airdrop is "+addrBalance);

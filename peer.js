@@ -494,10 +494,10 @@ function cliGetInput(){
 
       var message = JSON.parse(signedPackage)["message"];
       var send = JSON.stringify(JSON.parse(message)["send"]);
-      var addressFrom = JSON.stringify(JSON.parse(send)["from"]);
-      var addressTo = JSON.stringify(JSON.parse(send)["to"]);
-      var amount = JSON.stringify(JSON.parse(send)["amount"]);
-      var ticker = JSON.stringify(JSON.parse(send)["ticker"]);
+      var addressFrom = JSON.stringify(JSON.parse(send)["from"]).replace(/['"/]+/g, '');
+      var addressTo = JSON.stringify(JSON.parse(send)["to"]).replace(/['"/]+/g, '');
+      var amount = JSON.stringify(JSON.parse(send)["amount"]).replace(/['"/]+/g, '');
+      var ticker = JSON.stringify(JSON.parse(send)["ticker"]).replace(/['"/]+/g, '');
       var validatedSender = web3.eth.accounts.recover(JSON.parse(signedPackage)["message"],JSON.parse(signedPackage)["signature"]);
       if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
         ///need to alidate that this wallet has the funds to send
