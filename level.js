@@ -151,7 +151,7 @@ var addTransactions = function(transactions,blockhash){
   for(tranx in JSON.parse(transactions)){
     var receipt = JSON.parse(transactions)[tranx];
     //receipts have a key of toAddress:timestamp:receipthash atm
-    putRecord("tx:"+receipt["toAddress"]+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt));
+    putRecord("tx:"+receipt["fromAddress"]+":"+receipt["toAddress"]+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt));
   }
 }
 
@@ -173,7 +173,7 @@ var getTransactionReceiptsByAddress = function(address){
 
   var stream = db.createKeyStream();
   stream.on('data',function(data){
-    if(data.toString().split(":")[1] == address){
+    if(data.toString().split(":")[1] == address || data.toString().split(":")[2] == address){
       console.log(data.toString());
     }
 
@@ -202,6 +202,7 @@ var getBalanceAtAddress = function(address,callback){
 
     ///first we call the airdrop
     var airdrop;
+    var balance = [];
 
     //calling the airdrop balance
     var mycallback1 = async function(response){
@@ -214,44 +215,74 @@ var getBalanceAtAddress = function(address,callback){
     getAirdropBalanceFromEgem(address,mycallback1);
 
 
-    var addrBalance = 0;
+
     var stream = db.createKeyStream();
 
     stream.on('data',function(data){
 
-      if(data.toString().split(":")[0] == address){
+      if(data.toString().split(":")[1] == address || data.toString().split(":")[2] == address){
         db.get(data, function (err, value) {
 
-          addrBalance=parseFloat(addrBalance);
-          addrBalance2=parseFloat(JSON.parse(value)["amount"]);
-          //incrementer+=parseInt(value["amount"]);
-          console.log("adding "+parseFloat(JSON.parse(value)["amount"])+" to "+addrBalance);
-          addrBalance = parseFloat(addrBalance+addrBalance2);
+
+          //console.log("adding or subtracting "+parseFloat(JSON.parse(value)["amount"])+" of "+data.toString().split(":")[3]+" to ");
+
+          /***
+          for(x in balance){
+            console.log("x "+x+" balance is "+JSON.stringify(balance[x]))
+          }
+          ***/
+          //addrBalance = parseFloat(addrBalance+addrBalance2);
+
+
+          if(balance[data.toString().split(":")[3]] == null){
+              balance[data.toString().split(":")[3]] = 0;
+          }
+
+          if(data.toString().split(":")[1] == address){
+              balance[data.toString().split(":")[3]] -= parseFloat(JSON.parse(value)["amount"]);
+          }
+
+          if(data.toString().split(":")[2] == address){
+              balance[data.toString().split(":")[3]] += parseFloat(JSON.parse(value)["amount"]);
+          }
+
+
         })
       }
 
     });
 
     stream.on('close',function(){
-      console.log("streaming has ended and balance is "+addrBalance);
+      //console.log("streaming has ended and balance is ");
+      /***
+      for(x in balance){
+        console.log(balance[x]);
+      }
+      ***/
       //callback(addrBalance);
 
       async function returnTime(){
         if(airdrop){
           //console.log("okay"+balance["SFRX"]+airdrop);
-          var existing = parseFloat(addrBalance);
+          var existing = parseFloat(balance["SFRX"]);
           //var existing = parseFloat(balance["SFRX"]);//going to have to replace this later
           if(!existing){existing = 0};
-          var orig = parseFloat(airdrop);
+          //var orig = await parseFloat(airdrop);
+          var orig = await web3.eth.getBalance(address, 1530000);
+          var orig = await web3.utils.fromWei(orig,'ether');
+          var orig = parseFloat(orig*2);
+          console.log("orig = "+orig)
           if(!orig){orig = 0};
           //console.log("okay2"+existing+orig);
-          var newbal = await parseFloat(existing + orig);
+          var newbal = parseFloat(existing + orig);
+          //console.log("newbal = "+newbal)
           //balance["SFRX"] = newbal;
           //console.log(balance);
+          balance["SFRX"]+=parseFloat(orig);
           //return balance;
-          callback(newbal);
+          callback(balance);
         }else{
-          console.log("not yet")
+          //console.log("not yet")
           setTimeout(function(){returnTime();},700);
         }
       }

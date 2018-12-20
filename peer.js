@@ -100,7 +100,12 @@ function isJSON(str) {
 
 /////////////////////////////////////////////////////////callback for address balances
 var addyBal = function(val){
-  console.log("this address balance is "+val);
+  console.log("this address balance is ");
+  console.log("------------------------");
+  for(x in val){
+    console.log(x+": "+val[x]);
+  }
+  console.log("------------------------");
 }
 /////////////////////////////////////////////////////end callback for address balances
 
@@ -412,7 +417,7 @@ function cliGetInput(){
 
         //post to rpcserver
         rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-        
+
       }else{
         log("------------------------------------------------------");
         log(chalk.green("CHAIN IS NOT SYNCHED FOR MINING PLEASE WAIT"+frankieCoin.getLength()+peers[0]));
@@ -489,7 +494,7 @@ function cliGetInput(){
       var egemAddress = userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")"));
       //franks.getBalanceOfAddress(userInput);
       //note I did not need to use the miner function for balances
-      frankieCoin.getBalanceOfAddress(egemAddress);
+      //frankieCoin.getBalanceOfAddress(egemAddress);
       BlkDB.getBalanceAtAddress(egemAddress,addyBal)
       //BlockchainDB.getTransactionReceiptsByAddress(egemAddress);
       log("---------------");
