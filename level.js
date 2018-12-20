@@ -35,7 +35,7 @@ var getChainParamsBlockHeight = function(hashKey){
 var addBlock = function(blknum,block,callfrom){
   console.log("<<<<<----------------ADDS BLOCK TO LEVEL DB HERE------------>>>>>")
   console.log("called from "+callfrom);
-  console.log("inside add block"+block.toString());
+  //console.log("inside add block"+block.toString());//verbose
   var blocknum = parseInt(blknum);
   var hexBlockNum = ("000000000000000" + blocknum.toString(16)).substr(-16);
   console.log("adding block "+blknum+" as "+hexBlockNum);
@@ -89,7 +89,9 @@ var getBlockchain = function(limit,callback,hashKey){
       stream.on('data',function(data){
         //console.log('key = '+data.key+" value = "+data.value.toString());
         if(data.key.toString().split(":")[0] == "sfblk"){
-          console.log("here... "+data.key.toString()+" "+data.value.toString());
+          //console.log("here... "+data.key.toString()+" "+data.value.toString());
+          //candidate for progress bar widget
+          console.log("here... "+data.key.toString());
           returner.push(data.value.toString());
         }
       });

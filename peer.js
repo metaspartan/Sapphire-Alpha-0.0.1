@@ -161,11 +161,10 @@ var addyBal = function(val){
           ///if block to skip this process being added here
           if(parseInt(incomingBLockHeight) == (parseInt(frankieCoin.blockHeight)+1)){
 
-            var blocknumber = 0;
             //first we add the block to the blockchain with call back and id of submitting peer for conflict resolution
             var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data),sendBack,peerId);
 
-            log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD?"+successfulBlockAdd));
+            log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD? "+successfulBlockAdd));
 
             //verfiy the previous hash in the database matches our expectations - code is incomplete atm
             if(frankieCoin.getLatestBlock()["previousHash"] == currentChainHash && successfulBlockAdd == true){
@@ -173,19 +172,14 @@ var addyBal = function(val){
               //increment the internal peer nonce of sending party to track longest chain
               frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
               //logging the block added to chain for console
-              log(chalk.green("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock())));
-
-              log(chalk.green("hash matches and we are good"));
-              blocknumber = frankieCoin.getLength();
-              log(chalk.red("the database block number is "+blocknumber));
               log(chalk.red("--------------------------------------------------------------------"));
-              log(chalk.yellow("THERE NEEDS TO BE ANOTHER SOMETHING SET HERE FOR THE DATASE SYNCHING"));
-              log(chalk.yellow("         BUT WE DID JUST GET A SUCESSFUL BLOCK FROM PEER            "));
+              //log(chalk.green("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock())));//verbose
+              log(chalk.green("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock()["blockHeight"])));
+              log(chalk.green("in prev hash: ")+frankieCoin.getLatestBlock()["previousHash"]+chalk.green(" <=> chain: ")+currentChainHash);
+              log(chalk.yellow("                     SUCESSFUL BLOCK FROM PEER                      "));
               log(chalk.red("--------------------------------------------------------------------"));
-
               //////update the client database OR reject block and rollback the chain - code is incomplete atm
               //add it to the database
-              //BlockchainDB.addBlock(peerblock);
               BlkDB.addBlock(parseInt(frankieCoin.getLength()),JSON.stringify(frankieCoin.getLatestBlock()),"202");
               BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.getLength()));
               BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
@@ -732,27 +726,24 @@ var callBackEntireDatabase = function(data){
 
 //the idea is to sync the chain data before progression so we start with a callback of data store limited by number of blocks
 var cbChainGrab = function(data) {
-  console.log("well, does it ever even get called")
-  log('got data: '+data.toString());//test for input
+  //console.log("chain grab callback...")
+  //log('got data: '+data.toString());//test for input
 
   for (obj in data){
-    //log("BLOCK CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));
-
-    console.log("blockdata coming inbound "+JSON.parse(data[obj])["blockHeight"]+" vs memory "+JSON.stringify(frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"])))
-
+    //log("BLOCK CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));//verbose
+    //console.log("blockdata coming inbound "+JSON.parse(data[obj])["blockHeight"]+" vs memory "+JSON.stringify(frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"])))//verbose
+    //verify block does not exist in memory
     if(typeof frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"]) === "undefined" || frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"]) === null){
       //block not in memory
       console.log("block does not exist "+data[obj]);
-      //frankieCoin.addBlockFromDatabase(data[obj]);
-      console.log("before the damn timeout "+JSON.parse(data[obj])["blockHeight"])
       var tempBlock = data[obj];
       frankieCoin.addBlockFromDatabase(tempBlock,"sending in block "+JSON.parse(tempBlock)["blockHeight"])
     }else{
+      //block existed
       log("block exists in chain data: "+JSON.parse(data[obj])["blockHeight"]);
     }
     blockHeightPtr++;
   }
-
   log(chalk.blue("BlocHeightPtr: "+ chalk.green(blockHeightPtr)));
   //this is where we call a function with the blockHeight pointer that finds out the peerBlockHeight and then download missing data
   /***

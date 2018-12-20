@@ -342,7 +342,6 @@ var Blockchain = class Blockchain {
           console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
           var offset = (parseInt(this.blockHeight)-parseInt(this.chainRiser));
           var newNum = (parseInt(num)-parseInt(offset));
-          console.log("real blockheight:"+JSON.stringify(this.chain[parseInt(newNum) - 1]));
           return this.chain[parseInt(num) - 1];
       }
 
@@ -567,7 +566,7 @@ var Blockchain = class Blockchain {
       //th8s is the peers adding a block needs to be VALIDATED
       addBlockFromDatabase(dbBlock,msg){
 
-        console.log("&&&&&& ^^^^^^ ***** in the addBlockfromdb and msg is "+msg);
+        console.log("adding block from level to memory: "+chalk.green(msg));
 
         console.log("can we get the database data "+this.getLatestBlock().hash+" compared to "+JSON.parse(dbBlock)["blockHeight"]+" "+JSON.parse(dbBlock)["previousHash"])
         //if all that consensus stuff I am going to add....then
