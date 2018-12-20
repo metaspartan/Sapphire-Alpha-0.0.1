@@ -101,11 +101,11 @@ function isJSON(str) {
 /////////////////////////////////////////////////////////callback for address balances
 var addyBal = function(val){
   console.log("this address balance is ");
-  console.log("------------------------");
+  console.log(chalk.green("------------------------"));
   for(x in val){
-    console.log(x+": "+val[x]);
+    console.log(chalk.yellow(x+": ")+val[x]);
   }
-  console.log("------------------------");
+  console.log(chalk.green("------------------------"));
 }
 /////////////////////////////////////////////////////end callback for address balances
 

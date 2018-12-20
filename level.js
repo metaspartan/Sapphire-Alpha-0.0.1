@@ -145,7 +145,7 @@ var clearDatabase = function(){
   //db = levelup(leveldown('./SFRX'));
 }
 
-var addTransactions = function(transactions,blockhash){
+var addTransactions = function(transactions,blockhash,){
   console.log("T R A N S A C T I O N S  B E I N G  A D D E D  H E R E");
   transactions = JSON.parse(JSON.stringify(transactions));
   for(tranx in JSON.parse(transactions)){
