@@ -500,7 +500,9 @@ function cliGetInput(){
       var ticker = JSON.stringify(JSON.parse(send)["ticker"]);
       var validatedSender = web3.eth.accounts.recover(JSON.parse(signedPackage)["message"],JSON.parse(signedPackage)["signature"]);
       if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
-        console.log("This is a legitimate signed transaction by "+validatedSender);
+        ///need to alidate that this wallet has the funds to send
+        frankieCoin.createTransaction(new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker));
+        console.log("This legitimate signed transaction by "+validatedSender+" has been posted");
       }else{
         console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
       }
