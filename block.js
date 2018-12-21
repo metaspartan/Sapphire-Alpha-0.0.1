@@ -605,13 +605,22 @@ var Blockchain = class Blockchain {
           this.pendingTransactions.push(transaction);
       }
 
-      removeTransaction(transaction){
-          for (ptx in this.pendingTransactions){
-            if(this.pendingTransactions[ptx] == transaction){
-              //remove it asap
+      removeTransactions(transactions){
+          ///////////removes any transactions in the submitted pool from pending
+          var incomingTx = transactions;
+          var existingPendingTx = this.pendingTransactions;
+          var replacementTx = []
+          for(ptx in incomingTx){
+            for(etx in existingPendingTx){
+              if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash"]){
+                //do nothing removes this element
+              }else{
+                replacementTx.push(existingPendingTx[etx]);
+              }
             }
           }
-
+          this.pendingTransactions = [];
+          this.pendingTransactions = replacementTx;
       }
 
       createOrder(order,originationID = ''){
