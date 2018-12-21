@@ -151,8 +151,28 @@ var addyBal = function(val){
 
 ////////////////////////////////////////////begin the if block for incoming data
       if(isJSON(data.toString())){
+////////////////////////////////////////////////////////////incoming transaction
+        if(JSON.parse(data)["signature"]){//////////////////////////////////////
+          console.log("TTTTTTTTTTTTTTTTTTTT        INCOMING TX           TTTTTTTTTTTTTTTTTTTTTTTTTT");
+          console.log("TTTTTTTTTTTTTTTTTTTT        INCOMING TX           TTTTTTTTTTTTTTTTTTTTTTTTTT");
+          console.log("TTTTTTTTTTTTTTTTTTTT        INCOMING TX           TTTTTTTTTTTTTTTTTTTTTTTTTT");
+          var message = JSON.parse(data)["message"];
+          var send = JSON.stringify(JSON.parse(message)["send"]);
+          var addressFrom = JSON.stringify(JSON.parse(send)["from"]).replace(/['"/]+/g, '');
+          var addressTo = JSON.stringify(JSON.parse(send)["to"]).replace(/['"/]+/g, '');
+          var amount = JSON.stringify(JSON.parse(send)["amount"]).replace(/['"/]+/g, '');
+          var ticker = JSON.stringify(JSON.parse(send)["ticker"]).replace(/['"/]+/g, '');
+          var validatedSender = web3.eth.accounts.recover(JSON.parse(signedPackage)["message"],JSON.parse(signedPackage)["signature"]);
+          if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
+            ///need to alidate that this wallet has the funds to send
+            frankieCoin.createTransaction(new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker));
+            console.log("This legitimate signed transaction by "+validatedSender+" has been posted");
+
+          }else{
+            console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
+          }
 ////////////////////////////////////////////////////////////incomeing peer block
-        if(JSON.parse(data)["previousHash"]){///////////////need more refinement
+        }else if(JSON.parse(data)["previousHash"]){/////////need more refinement
           //storing some variables of current chain
           var currentChainHash = frankieCoin.getLatestBlock()["hash"];
           var incomingBLockHeight = JSON.parse(data)["blockHeight"];
@@ -486,6 +506,10 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput.startsWith("signedTransaction(")){//testing signed transactions
       var signedPackage = userInput.slice(userInput.indexOf("signedTransaction(")+18, userInput.indexOf(")"));
+
+      ///////////////////////////////////////////////////////relay asap to peers
+      broadcastPeers(signedPackage);
+
       //console.log("signed package is"+JSON.parse(signedPackage)["message"]);
       var message = JSON.parse(signedPackage)["message"];
       var send = JSON.stringify(JSON.parse(message)["send"]);
@@ -498,6 +522,7 @@ function cliGetInput(){
         ///need to alidate that this wallet has the funds to send
         frankieCoin.createTransaction(new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker));
         console.log("This legitimate signed transaction by "+validatedSender+" has been posted");
+
       }else{
         console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
       }
