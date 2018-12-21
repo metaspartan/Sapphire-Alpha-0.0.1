@@ -181,6 +181,25 @@ var addyBal = function(val){
           ///if block to skip this process being added here
           if(parseInt(incomingBLockHeight) == (parseInt(frankieCoin.blockHeight)+1)){
 
+            ////////////////NEED TO REMOVE ANY MATHED PENDING TXS FROM MEME POOL
+            console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
+            console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
+            console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
+            var incomingTx = JSON.parse(data)["transactions"];
+            var existingPendingTx = frankieCoin.pendingTransactions;
+            var replacementTx = []
+            for(ptx in incomingTx){
+              for(etx in existingPendingTx){
+                if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash]""){
+                  //do nothing
+                }else{
+                  replacementTx.push(existingPendingTx[etx]);
+                }
+              }
+            }
+            frankieCoin.pendingTransactions = [];
+            frankieCoin.pendingTransactions = replacementTx;
+
             //first we add the block to the blockchain with call back and id of submitting peer for conflict resolution
             var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data),sendBack,peerId);
 

@@ -605,6 +605,15 @@ var Blockchain = class Blockchain {
           this.pendingTransactions.push(transaction);
       }
 
+      removeTransaction(transaction){
+          for (ptx in this.pendingTransactions){
+            if(this.pendingTransactions[ptx] == transaction){
+              //remove it asap
+            }
+          }
+
+      }
+
       createOrder(order,originationID = ''){
           order["timestamp"] = Date.now();
           order["transactionID"] = Hash(order["fromAddress"]+order["pairBuy"]+order["timestamp"]);
