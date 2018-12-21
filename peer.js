@@ -190,7 +190,7 @@ var addyBal = function(val){
             var replacementTx = []
             for(ptx in incomingTx){
               for(etx in existingPendingTx){
-                if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash]){
+                if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash"]){
                   //do nothing removes this element
                 }else{
                   replacementTx.push(existingPendingTx[etx]);
