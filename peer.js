@@ -266,6 +266,13 @@ var addyBal = function(val){
             }
             ////end if statment to skip this part
 
+          }else{
+            for (let id in peers) {
+              log(chalk.yellow("          Sending ping for chain sync to all peers              "));
+              log(chalk.red("^-----------------------------------------------------------------^"));
+              //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
+              peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
+            }
           }
 
         }else if(JSON.parse(data)["fromAddress"]){
