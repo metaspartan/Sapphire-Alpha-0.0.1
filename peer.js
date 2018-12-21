@@ -467,18 +467,16 @@ function cliGetInput(){
       var packageToSign = userInput.slice(userInput.indexOf("sign(")+5, userInput.indexOf(")"));
       console.log(packageToSign);
       //console.log("JSON :"+JSON.parse(packageToSign)["data"]);
-
       var signedPackage = web3.eth.accounts.sign(JSON.stringify(JSON.parse(packageToSign)["data"]), JSON.parse(packageToSign)["pk"]);
       //console.log(signedPackage);
       var jsonSignedPackage = {"message":signedPackage["message"],"signature":signedPackage["signature"]}
       //var transaction = JSON.parse(JSON.parse(JSON.stringify(jsonSignedPackage))["message"])["send"];
       //console.log(JSON.parse(JSON.stringify(transaction))["from"])
       cliGetInput();
-    }else if(userInput.startsWith("signTx(")){//Sign some data function
+    }else if(userInput.startsWith("signTx(")){//Sign transaction
       var packageToSign = userInput.slice(userInput.indexOf("signTx(")+7, userInput.indexOf(")"));
       console.log(packageToSign);
       //console.log("JSON :"+JSON.parse(packageToSign)["data"]);
-
       var signedPackage = web3.eth.accounts.sign(JSON.stringify(JSON.parse(packageToSign)["data"]), JSON.parse(packageToSign)["pk"]);
       //console.log(signedPackage);
       var jsonSignedPackage = {"message":signedPackage["message"],"signature":signedPackage["signature"]}
@@ -488,10 +486,7 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput.startsWith("signedTransaction(")){//testing signed transactions
       var signedPackage = userInput.slice(userInput.indexOf("signedTransaction(")+18, userInput.indexOf(")"));
-
       //console.log("signed package is"+JSON.parse(signedPackage)["message"]);
-
-
       var message = JSON.parse(signedPackage)["message"];
       var send = JSON.stringify(JSON.parse(message)["send"]);
       var addressFrom = JSON.stringify(JSON.parse(send)["from"]).replace(/['"/]+/g, '');
@@ -507,10 +502,40 @@ function cliGetInput(){
         console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
       }
       //console.log("finally the address that signed it:" + getMyAddressBack2);
-
-
-
-
+      setTimeout(function(){cliGetInput();},2000);
+    }else if(userInput.startsWith("signOrder(")){//Sign an order for the DEX
+      var packageToSign = userInput.slice(userInput.indexOf("signOrder(")+10, userInput.indexOf(")"));
+      console.log(packageToSign);
+      var signedPackage = web3.eth.accounts.sign(JSON.stringify(JSON.parse(packageToSign)["data"]), JSON.parse(packageToSign)["pk"]);
+      //console.log(signedPackage);
+      var jsonSignedPackage = {"message":signedPackage["message"],"signature":signedPackage["signature"]}
+      //var transaction = JSON.parse(JSON.parse(JSON.stringify(jsonSignedPackage))["message"])["send"];
+      //console.log(JSON.parse(JSON.stringify(transaction))["from"])
+      console.log(JSON.stringify(jsonSignedPackage));
+      cliGetInput();
+    }else if(userInput.startsWith("signedOrder(")){//testing signed transactions
+      var signedPackage = userInput.slice(userInput.indexOf("signedOrder(")+12, userInput.indexOf(")"));
+      //console.log("signed package is"+JSON.parse(signedPackage)["message"]);
+      var message = JSON.parse(signedPackage)["message"];
+      var order = JSON.stringify(JSON.parse(message)["order"]);
+      var addressFrom = JSON.stringify(JSON.parse(order)["fromAddress"]).replace(/['"/]+/g, '');
+      var buyOrSell = JSON.stringify(JSON.parse(order)["buyOrSell"]).replace(/['"/]+/g, '');
+      var pairBuy = JSON.stringify(JSON.parse(order)["pairBuy"]).replace(/['"/]+/g, '');
+      var pairSell = JSON.stringify(JSON.parse(order)["pairSell"]).replace(/['"/]+/g, '');
+      var amount = JSON.stringify(JSON.parse(order)["amount"]).replace(/['"/]+/g, '');
+      var price = JSON.stringify(JSON.parse(order)["price"]).replace(/['"/]+/g, '');
+      var validatedSender = web3.eth.accounts.recover(JSON.parse(signedPackage)["message"],JSON.parse(signedPackage)["signature"]);
+      if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
+        ///need to alidate that this wallet has the funds to send
+        myblockorder = new sapphirechain.Order(addressFrom,buyOrSell,pairBuy,pairSell,amount,price);
+        frankieCoin.createOrder(myblockorder);
+        //BlockchainDB.addOrder({order:myblockorder});
+        BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
+        console.log("This legitimate signed order by "+validatedSender+" has been posted to chain with confirmation "+myblockorder.transactionID);
+      }else{
+        console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
+      }
+      //console.log("finally the address that signed it:" + getMyAddressBack2);
       setTimeout(function(){cliGetInput();},2000);
     }else if(userInput.startsWith("getBlock(")){//GETBLOCK function
       log(userInput.slice(userInput.indexOf("getBlock(")+9, userInput.indexOf(")")));
