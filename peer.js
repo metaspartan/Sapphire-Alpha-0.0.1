@@ -162,7 +162,7 @@ var addyBal = function(val){
           var addressTo = JSON.stringify(JSON.parse(send)["to"]).replace(/['"/]+/g, '');
           var amount = JSON.stringify(JSON.parse(send)["amount"]).replace(/['"/]+/g, '');
           var ticker = JSON.stringify(JSON.parse(send)["ticker"]).replace(/['"/]+/g, '');
-          var validatedSender = web3.eth.accounts.recover(JSON.parse(signedPackage)["message"],JSON.parse(signedPackage)["signature"]);
+          var validatedSender = web3.eth.accounts.recover(JSON.parse(data)["message"],JSON.parse(data)["signature"]);
           if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
             ///need to alidate that this wallet has the funds to send
             frankieCoin.createTransaction(new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker));
