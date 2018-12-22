@@ -60,6 +60,30 @@ var getBlock = function(blknum,callBack){
     })
 }
 
+var getBlockStream = function(blknum,callBack){
+
+      console.log("Providing a block stream to a synching peer")
+      var returner = [];
+      var stream = db.createReadStream();
+      stream.on('data',function(data){
+        //console.log('key = '+data.key+" value = "+data.value.toString());
+        if(data.key.toString().split(":")[0] == "sfblk"){
+          //console.log("here... "+data.key.toString()+" "+data.value.toString());
+          //candidate for progress bar widget
+          console.log("here... "+data.key.toString());
+          returner.push(data.value.toString());
+        }
+      });
+
+      stream.on('close',function(){
+        console.log("data stream is complete");
+        var wrappedStream = {"pongBlockStream":returner};
+        //console.log("inside the return "+JSON.stringify(returner))
+        callback(returner);
+      });
+
+}
+
 var removeBlock = function(blknum){
   console.log("REMOVING BLOCK NUMBER "+blknum+" FROM LEVELDB");
   var blocknum = parseInt(blknum);

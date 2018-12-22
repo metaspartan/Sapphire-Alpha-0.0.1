@@ -338,9 +338,14 @@ var addyBal = function(val){
               //increment it by one to return the next block
               peerBlockHeight++;
               //returning the block
-              console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) % parseInt(frankieCoin.chainRiser)+" <<<<the difference");
-              if(frankieCoin.getLength() > parseInt(peerBlockHeight) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) % parseInt(frankieCoin.chainRiser) > 1){
-                cnsole.log("this is properly flagged for streaming");
+              console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" <<<<the difference");
+              if(frankieCoin.getLength() > parseInt(peerBlockHeight) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
+                console.log("this is properly flagged for streaming");
+                var pongBackBlockStream = function(blockData){
+                  peers[peerId].conn.write(blockData.toString());
+                }
+                BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlock);
+                //pongBack = true;//not sure about this since this is a stream
               }else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
                 //peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
                 var pongBackBlock = function(blockData){
