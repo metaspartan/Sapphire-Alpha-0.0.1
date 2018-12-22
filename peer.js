@@ -341,7 +341,7 @@ var addyBal = function(val){
               console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) % parseInt(frankieCoin.chainRiser)+" <<<<the difference");
               if(frankieCoin.getLength() > parseInt(peerBlockHeight) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) % parseInt(frankieCoin.chainRiser) > 1){
                 cnsole.log("this is properly flagged for streaming");
-              else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
+              }else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
                 //peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
                 var pongBackBlock = function(blockData){
                   peers[peerId].conn.write(blockData.toString());
