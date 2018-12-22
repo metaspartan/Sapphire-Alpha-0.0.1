@@ -639,6 +639,7 @@ module.exports = {
     removeBlock:removeBlock,
     getAllBLocks:getAllBLocks,
     getBlockchain:getBlockchain,
+    getBlockStream:getBlockStream,
     clearDatabase:clearDatabase,
     addTransactions:addTransactions,
     getTransactions:getTransactions,
