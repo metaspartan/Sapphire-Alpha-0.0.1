@@ -143,7 +143,7 @@ var addyBal = function(val){
       log(
         'Received Message from peer ' + peerId,
         '----> ' + data.toString(),
-        '====> ' + data.length +" <--> "+ data;
+        '====> ' + data.length +" <--> "+ data
       )
 
       var sendBack = function(msg,peerId){
