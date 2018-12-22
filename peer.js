@@ -344,7 +344,7 @@ var addyBal = function(val){
                 var pongBackBlockStream = function(blockData){
                   peers[peerId].conn.write(blockData.toString());
                 }
-                BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlock);
+                BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
                 //pongBack = true;//not sure about this since this is a stream
               }else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
                 //peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
