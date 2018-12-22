@@ -636,6 +636,24 @@ var Blockchain = class Blockchain {
           this.pendingOrders.push(order);
       }
 
+      removeOrders(orders){
+          /////////////////removes any orders in the submitted pool from pending
+          var incomingOx = orders;
+          var existingPendingOx = this.pendingOrders;
+          var replacementOx = [];
+          for(pox in incomingOx){
+            for(eox in existingPendingOx){
+              if(incomingOx[pox]["hash"] == existingPendingOx[eox]["hash"]){
+                //do nothing removes this element
+              }else{
+                replacementOx.push(existingPendingOx[eox]);
+              }
+            }
+          }
+          this.pendingOrders = [];
+          this.pendingOrders = replacementOx;
+      }
+
       addOmmer(ommer){
         this.pendingOmmers.push(ommer);
       }

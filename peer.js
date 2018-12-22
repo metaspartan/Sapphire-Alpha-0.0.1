@@ -153,24 +153,49 @@ var addyBal = function(val){
       if(isJSON(data.toString())){
 ////////////////////////////////////////////////////////////incoming transaction
         if(JSON.parse(data)["signature"]){//////////////////////////////////////
-          console.log("TTTTTTTTTTTTTTTTTTTT        INCOMING TX           TTTTTTTTTTTTTTTTTTTTTTTTTT");
-          console.log("TTTTTTTTTTTTTTTTTTTT        INCOMING TX           TTTTTTTTTTTTTTTTTTTTTTTTTT");
-          console.log("TTTTTTTTTTTTTTTTTTTT        INCOMING TX           TTTTTTTTTTTTTTTTTTTTTTTTTT");
+          console.log("TTTTTTTTTTTTTTTTTTTT    INCOMING TX or OX    TTTTTTTTTTTTTTTTTTTTTTTTTT");
+          console.log("TTTTTTTTTTTTTTTTTTTT    INCOMING TX or OX    TTTTTTTTTTTTTTTTTTTTTTTTTT");
           var message = JSON.parse(data)["message"];
-          var send = JSON.stringify(JSON.parse(message)["send"]);
-          var addressFrom = JSON.stringify(JSON.parse(send)["from"]).replace(/['"/]+/g, '');
-          var addressTo = JSON.stringify(JSON.parse(send)["to"]).replace(/['"/]+/g, '');
-          var amount = JSON.stringify(JSON.parse(send)["amount"]).replace(/['"/]+/g, '');
-          var ticker = JSON.stringify(JSON.parse(send)["ticker"]).replace(/['"/]+/g, '');
-          var validatedSender = web3.eth.accounts.recover(JSON.parse(data)["message"],JSON.parse(data)["signature"]);
-          if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
-            ///need to alidate that this wallet has the funds to send
-            frankieCoin.createTransaction(new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker));
-            console.log("This legitimate signed transaction by "+validatedSender+" has been posted");
+          if(JSON.parse(message)["send"]){
+              console.log("TTTTTTTTTTTTTTTTTTTT    TXTXTXTXTXTXTXT    TTTTTTTTTTTTTTTTTTTTTTTTTT");
+              var send = JSON.stringify(JSON.parse(message)["send"]);
+              var addressFrom = JSON.stringify(JSON.parse(send)["from"]).replace(/['"/]+/g, '');
+              var addressTo = JSON.stringify(JSON.parse(send)["to"]).replace(/['"/]+/g, '');
+              var amount = JSON.stringify(JSON.parse(send)["amount"]).replace(/['"/]+/g, '');
+              var ticker = JSON.stringify(JSON.parse(send)["ticker"]).replace(/['"/]+/g, '');
+              var validatedSender = web3.eth.accounts.recover(JSON.parse(data)["message"],JSON.parse(data)["signature"]);
+              if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
+                ///need to alidate that this wallet has the funds to send
+                frankieCoin.createTransaction(new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker));
+                console.log("This legitimate signed transaction by "+validatedSender+" has been posted");
 
+              }else{
+                console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
+              }
+          }else if(JSON.parse(message)["order"]){
+              console.log("TTTTTTTTTTTTTTTTTTTT    OXOXOXOXOXOXOXO    TTTTTTTTTTTTTTTTTTTTTTTTTT");
+              var order = JSON.stringify(JSON.parse(message)["order"]);
+              var addressFrom = JSON.stringify(JSON.parse(order)["fromAddress"]).replace(/['"/]+/g, '');
+              var buyOrSell = JSON.stringify(JSON.parse(order)["buyOrSell"]).replace(/['"/]+/g, '');
+              var pairBuy = JSON.stringify(JSON.parse(order)["pairBuy"]).replace(/['"/]+/g, '');
+              var pairSell = JSON.stringify(JSON.parse(order)["pairSell"]).replace(/['"/]+/g, '');
+              var amount = JSON.stringify(JSON.parse(order)["amount"]).replace(/['"/]+/g, '');
+              var price = JSON.stringify(JSON.parse(order)["price"]).replace(/['"/]+/g, '');
+              var validatedSender = web3.eth.accounts.recover(JSON.parse(data)["message"],JSON.parse(data)["signature"]);
+              if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
+                ///need to alidate that this wallet has the funds to send
+                myblockorder = new sapphirechain.Order(addressFrom,buyOrSell,pairBuy,pairSell,amount,price);
+                frankieCoin.createOrder(myblockorder);
+                //BlockchainDB.addOrder({order:myblockorder});
+                BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
+                console.log("This legitimate signed order by "+validatedSender+" has been posted to chain with confirmation "+myblockorder.transactionID);
+              }else{
+                console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
+              }
           }else{
-            console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
+              console.log("SOME OTHER TRANSMISSION NOT FORMATTED CORRECTLY")
           }
+
 ////////////////////////////////////////////////////////////incomeing peer block
         }else if(JSON.parse(data)["previousHash"]){/////////need more refinement
           //storing some variables of current chain
@@ -184,10 +209,9 @@ var addyBal = function(val){
             ////////////////NEED TO REMOVE ANY MATHED PENDING TXS FROM MEME POOL
             console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
             console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
-            console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
             var incomingTx = JSON.parse(data)["transactions"];
             var existingPendingTx = frankieCoin.pendingTransactions;
-            var replacementTx = []
+            var replacementTx = [];
             for(ptx in incomingTx){
               for(etx in existingPendingTx){
                 if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash"]){
@@ -199,6 +223,24 @@ var addyBal = function(val){
             }
             frankieCoin.pendingTransactions = [];
             frankieCoin.pendingTransactions = replacementTx;
+            ///////////////NEED TO REMOVE ANY MATCHED PENDING OXS FROM MEME POOL
+            console.log("RRRRRRRRRRRRRRRRRRRRR  removing oxs RRRRRRRRRRRRRRR");
+            console.log("RRRRRRRRRRRRRRRRRRRRR  removing oxs RRRRRRRRRRRRRRR");
+            var incomingOx = JSON.parse(data)["orders"];
+            var existingPendingOx = frankieCoin.pendingOrders;
+            var replacementOx = [];
+            for(pox in incomingOx){
+              for(eox in existingPendingOx){
+                if(incomingOx[pox]["hash"] == existingPendingOx[eox]["hash"]){
+                  //do nothing removes this element
+                }else{
+                  replacementOx.push(existingPendingOx[eox]);
+                }
+              }
+            }
+            frankieCoin.pendingOrders = [];
+            frankieCoin.pendingOrders = replacementOx;
+            ////////////////////////////////////END REMOVAL OF PENDING TX AND OX
 
             //first we add the block to the blockchain with call back and id of submitting peer for conflict resolution
             var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data),sendBack,peerId);
@@ -265,7 +307,7 @@ var addyBal = function(val){
 
             }
             ////end if statment to skip this part
-
+          ////////////////else we need to just ping for a synch as it gets stuck
           }else{
             for (let id in peers) {
               log(chalk.yellow("          Sending ping for chain sync to all peers              "));
