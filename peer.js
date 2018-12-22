@@ -142,7 +142,8 @@ var addyBal = function(val){
       // Here we handle incomming messages
       log(
         'Received Message from peer ' + peerId,
-        '----> ' + data.toString()
+        '----> ' + data.toString(),
+        '====> ' + data.length +" <--> "+ data;
       )
 
       var sendBack = function(msg,peerId){
@@ -394,6 +395,13 @@ var addyBal = function(val){
           log("------------------------------------------------------");
           process.exit();
           exit();
+        }else if(JSON.parse(data)["pongBlockStream"]){
+
+          console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
+          console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
+          console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
+          console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
+
         }else if(JSON.parse(data)["ChainSyncPong"]){
           //returned block from sunched peer and parses it for db
           log(JSON.parse(data)["ChainSyncPong"]);
