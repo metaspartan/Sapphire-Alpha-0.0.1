@@ -77,9 +77,9 @@ var getBlockStream = function(blknum,callBack){
 
       stream.on('close',function(){
         console.log("data stream is complete");
-        var wrappedStream = {"pongBlockStream":returner};
+        //var wrappedStream = {"pongBlockStream":returner};
         //console.log("inside the return "+JSON.stringify(returner))
-        callBack(JSON.stringify(wrappedStream));
+        callBack(returner);
       });
 
 }
