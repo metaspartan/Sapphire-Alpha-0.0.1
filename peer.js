@@ -414,6 +414,9 @@ var addyBal = function(val){
               console.log("block does not exist "+mydata[obj]);
               var tempBlock = mydata[obj];
               frankieCoin.addBlockFromDatabase(tempBlock,"streaming in block "+JSON.parse(tempBlock)["blockHeight"])
+              BlkDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
+              BlkDB.addBlock(parseInt(frankieCoin.getLength()),JSON.stringify(frankieCoin.getLatestBlock()),"418");
+              BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
             }else{
               //block existed
               log("block exists in chain data: "+JSON.parse(mydata[obj])["blockHeight"]);
