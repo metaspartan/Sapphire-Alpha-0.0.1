@@ -541,6 +541,10 @@ function cliGetInput(){
       BlkDB.getChainParams(globalGenesisHash);
       BlkDB.getChainParamsBlockHeight(globalGenesisHash);
       cliGetInput();
+    }else if(userInput == "PP"){
+      for (let id in peers) {
+        JSON.stringify(peers[id].conn);
+      }
     }else if(userInput == "TX"){
       BlkDB.getTransactions();
       cliGetInput();
