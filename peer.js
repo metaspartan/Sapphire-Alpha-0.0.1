@@ -343,7 +343,7 @@ var addyBal = function(val){
               if(frankieCoin.getLength() > parseInt(peerBlockHeight) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
                 console.log("this is properly flagged for streaming");
                 var pongBackBlockStream = function(blockData){
-                  peers[peerId].conn.write(blockData.toString());
+                  peers[peerId].conn.write(blockData);
                 }
                 BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
                 //pongBack = true;//not sure about this since this is a stream
@@ -543,7 +543,7 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput == "PP"){
       for (let id in peers) {
-        JSON.stringify(peers[id].conn);
+        console.log(peers[id].conn);
       }
     }else if(userInput == "TX"){
       BlkDB.getTransactions();
