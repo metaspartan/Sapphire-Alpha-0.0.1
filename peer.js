@@ -343,7 +343,7 @@ var addyBal = function(val){
               if(frankieCoin.getLength() > parseInt(peerBlockHeight) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
                 console.log("this is properly flagged for streaming");
                 var pongBackBlockStream = function(blockData){
-                  peers[peerId].conn.write(blockData);
+                  peers[peerId].conn.write(blockData.toString());
                 }
                 BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
                 //pongBack = true;//not sure about this since this is a stream
@@ -397,10 +397,30 @@ var addyBal = function(val){
           exit();
         }else if(JSON.parse(data)["pongBlockStream"]){
 
+          var mydata = JSON.parse(data)["pongBlockStream"];
+
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
+
+          for (obj in mydata){
+            console.log("incoming chain data from synch");
+            //log("BLOCK CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));//verbose
+            //console.log("blockdata coming inbound "+JSON.parse(data[obj])["blockHeight"]+" vs memory "+JSON.stringify(frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"])))//verbose
+            //verify block does not exist in memory
+            if(typeof frankieCoin.getBlock(JSON.parse(mydata[obj])["blockHeight"]) === "undefined" || frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"]) === null){
+              //block not in memory
+              console.log("block does not exist "+mydata[obj]);
+              var tempBlock = mydata[obj];
+              frankieCoin.addBlockFromDatabase(tempBlock,"streaming in block "+JSON.parse(tempBlock)["blockHeight"])
+            }else{
+              //block existed
+              log("block exists in chain data: "+JSON.parse(mydata[obj])["blockHeight"]);
+            }
+            blockHeightPtr++;
+          }
+          log(chalk.blue("BlocHeightPtr: "+ chalk.green(blockHeightPtr)));
 
         }else if(JSON.parse(data)["ChainSyncPong"]){
           //returned block from sunched peer and parses it for db
