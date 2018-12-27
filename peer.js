@@ -343,7 +343,7 @@ var addyBal = function(val){
               if(frankieCoin.getLength() > parseInt(peerBlockHeight) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
                 console.log("this is properly flagged for streaming");
                 var pongBackBlockStream = function(blockData){
-                  peers[peerId].conn.write(JSON.stringify({pongBlockStream:blockData}));
+                  peers[peerId].conn.write({"pongBlockStream":blockData});
                 }
                 BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
                 //pongBack = true;//not sure about this since this is a stream
