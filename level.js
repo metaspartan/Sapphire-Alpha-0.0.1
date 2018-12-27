@@ -71,6 +71,7 @@ var getBlockStream = function(blknum,callBack){
           //console.log("here... "+data.key.toString()+" "+data.value.toString());
           //candidate for progress bar widget
           console.log("here... "+data.key.toString());
+          callBack(returner);
           returner.push(data.value.toString());
         }
       });
@@ -79,7 +80,7 @@ var getBlockStream = function(blknum,callBack){
         console.log("data stream is complete");
         //var wrappedStream = {"pongBlockStream":returner};
         //console.log("inside the return "+JSON.stringify(returner))
-        callBack(returner);
+        //callBack(returner);
       });
 
 }
