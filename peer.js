@@ -130,7 +130,7 @@ var addyBal = function(val){
        });
 
         stream.on('end', function(data) {
-             console.log(binaryString);
+             console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"+binaryString);
              binaryString = "";
        });
   });
@@ -359,7 +359,7 @@ var addyBal = function(val){
               if(frankieCoin.getLength() > parseInt(peerBlockHeight) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
                 console.log("this is properly flagged for streaming");
                 var pongBackBlockStream = function(blockData){
-                  peers[peerId].conn.write(JSON.stringify({pongBlockStream:blockData}));
+                  //peers[peerId].conn.write(JSON.stringify({pongBlockStream:blockData}));
 
                   //var stream = ss.createStream();
 
