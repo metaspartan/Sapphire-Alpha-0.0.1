@@ -71,7 +71,7 @@ var getBlockStream = function(blknum,callBack){
           //console.log("here... "+data.key.toString()+" "+data.value.toString());
           //candidate for progress bar widget
           console.log("here... "+data.key.toString());
-          returner.push(data.value.toString());
+          returner.push(data.value);
         }
       });
 

@@ -140,12 +140,9 @@ var addyBal = function(val){
 
     conn.on('data', data => {
       // Here we handle incomming messages
-      log(
-        'Received Message from peer ' + peerId,
-        '----> ' + data.toString(),
-        '====> ' + data.length +" <--> "+ data
-      )
+      log('Received Message from peer ' + peerId + " data " +data+ "---->" + data.toString() + '====> ' + data.length +" <--> ");
 
+      //call back function if needed for uncles or other broadcasts
       var sendBack = function(msg,peerId){
         peers[peerId].conn.write(JSON.stringify(msg));
       }
