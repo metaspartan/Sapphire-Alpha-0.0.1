@@ -33,10 +33,6 @@ var rpcserver = require('./rpc_server.js');
 /////////////////////////////////////////////////////////////////requests to rpc
 var request = require('request');
 
-
-/////socket.io streaming testing
-var ss = require('socket.io-stream');
-
 ///////////////////////Mining stuff : blockchain algo and mining initializations
 var sapphirechain = require("./block.js");
 sapphirechain.setBlockchainDB(BlockchainDB,BlkDB);
@@ -119,21 +115,6 @@ var addyBal = function(val){
 
   sw.listen(port)
   sw.join('egem-sfrx') // can be any id/name/hash
-
-  sw.on('blockchainOps', function(stream) {
-       var binaryString = "";
-
-       stream.on('data', function(data) {
-           for(var i=0;i<data.length;i++) {
-                binaryString+=String.fromCharCode(data[i]);
-           }
-       });
-
-        stream.on('end', function(data) {
-             console.log("ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ"+binaryString);
-             binaryString = "";
-       });
-  });
 
   sw.on('connection', (conn, info) => {
 
@@ -359,13 +340,7 @@ var addyBal = function(val){
               if(frankieCoin.getLength() > parseInt(peerBlockHeight) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
                 console.log("this is properly flagged for streaming");
                 var pongBackBlockStream = function(blockData){
-                  //peers[peerId].conn.write(JSON.stringify({pongBlockStream:blockData}));
-
-                  //var stream = ss.createStream();
-
-
-                  ss(peers[peerId].conn).emit('blockchainOps', blockData);
-
+                  peers[peerId].conn.write(JSON.stringify({pongBlockStream:blockData}));
                 }
                 BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
                 //pongBack = true;//not sure about this since this is a stream
