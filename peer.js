@@ -33,6 +33,10 @@ var rpcserver = require('./rpc_server.js');
 /////////////////////////////////////////////////////////////////requests to rpc
 var request = require('request');
 
+
+/////socket.io streaming testing
+var ss = require('socket.io-stream');
+
 ///////////////////////Mining stuff : blockchain algo and mining initializations
 var sapphirechain = require("./block.js");
 sapphirechain.setBlockchainDB(BlockchainDB,BlkDB);
@@ -116,6 +120,21 @@ var addyBal = function(val){
   sw.listen(port)
   sw.join('egem-sfrx') // can be any id/name/hash
 
+  sw.on('blockchainOps', function(stream) {
+       var binaryString = "";
+
+       stream.on('data', function(data) {
+           for(var i=0;i<data.length;i++) {
+                binaryString+=String.fromCharCode(data[i]);
+           }
+       });
+
+        stream.on('end', function(data) {
+             console.log(binaryString);
+             binaryString = "";
+       });
+  });
+
   sw.on('connection', (conn, info) => {
 
     log(chalk.blue(JSON.stringify(info)));
@@ -140,11 +159,8 @@ var addyBal = function(val){
 
     conn.on('data', data => {
       // Here we handle incomming messages
-      log(
-        'Received Message from peer ' + peerId,
-        '----> ' + data.toString(),
-        '====> ' + data.length +" <--> "+ data
-      )
+      console.log("type of is "+typeof(data));
+      log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
 
       var sendBack = function(msg,peerId){
         peers[peerId].conn.write(JSON.stringify(msg));
@@ -344,6 +360,12 @@ var addyBal = function(val){
                 console.log("this is properly flagged for streaming");
                 var pongBackBlockStream = function(blockData){
                   peers[peerId].conn.write(JSON.stringify({pongBlockStream:blockData}));
+
+                  //var stream = ss.createStream();
+
+
+                  ss(peers[peerId].conn).emit('blockchainOps', blockData);
+
                 }
                 BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
                 //pongBack = true;//not sure about this since this is a stream

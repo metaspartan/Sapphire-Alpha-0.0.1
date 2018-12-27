@@ -37,6 +37,7 @@
     "nano-sql": "^1.8.0",
     "node-ipc": "^9.1.1",
     "request": "^2.88.0",
+    "socket.io-stream": "^0.9.1",
     "web3": "^1.0.0-beta.35"
   }
 }
