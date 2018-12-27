@@ -404,6 +404,7 @@ var addyBal = function(val){
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
 
+          /*****
           for (obj in mydata){
             console.log("incoming chain data from synch");
             //log("BLOCK CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));//verbose
@@ -420,6 +421,26 @@ var addyBal = function(val){
             }
             blockHeightPtr++;
           }
+          *****/
+
+          ////just the guts
+          console.log("incoming chain data from synch");
+          //log("BLOCK CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));//verbose
+          //console.log("blockdata coming inbound "+JSON.parse(data[obj])["blockHeight"]+" vs memory "+JSON.stringify(frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"])))//verbose
+          //verify block does not exist in memory
+          if(typeof frankieCoin.getBlock(JSON.parse(mydata)["blockHeight"]) === "undefined" || frankieCoin.getBlock(JSON.parse(mydata)["blockHeight"]) === null){
+            //block not in memory
+            console.log("block does not exist "+mydata);
+            var tempBlock = mydata;
+            frankieCoin.addBlockFromDatabase(tempBlock,"streaming in block "+JSON.parse(tempBlock)["blockHeight"])
+          }else{
+            //block existed
+            log("block exists in chain data: "+JSON.parse(mydata)["blockHeight"]);
+          }
+          blockHeightPtr++;
+          ///end just the guts
+
+
           log(chalk.blue("BlocHeightPtr: "+ chalk.green(blockHeightPtr)));
 
         }else if(JSON.parse(data)["ChainSyncPong"]){
