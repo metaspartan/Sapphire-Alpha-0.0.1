@@ -24,7 +24,10 @@ var grabDataFile = function(mykey){
     // 2. Tell Dat what link I want
     key: mykey.split("://")[1] // (a 64 character hash from above)
   }, function (err, dat) {
-    if (err) throw err
+    if(err){
+      //throw err
+      console.log(err.toString());
+    }
 
     // 3. Join the network & download (files are automatically downloaded)
     dat.joinNetwork()
