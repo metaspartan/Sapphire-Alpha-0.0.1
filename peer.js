@@ -39,6 +39,7 @@ sapphirechain.setBlockchainDB(BlockchainDB,BlkDB);
 var BLAKE2s = require("./blake2s.js");
 var Miner = require("./miner.js");
 Miner.setSapphireChain(sapphirechain);
+var DatSyncLink = require("./datsynch.js");
 
 var msg = "genesis message";
 var length = 32;
@@ -106,6 +107,11 @@ var addyBal = function(val){
     console.log(chalk.yellow(x+": ")+val[x]);
   }
   console.log(chalk.green("------------------------"));
+}
+var datSynch = "";
+var setDatSynch = function(link,reqPeer){
+  datSynch = link;
+  reqPeer.conn.write(JSON.stringify({pongBlockStream:datSynch}));
 }
 /////////////////////////////////////////////////////end callback for address balances
 
@@ -339,10 +345,18 @@ var addyBal = function(val){
               console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" <<<<the difference");
               if(frankieCoin.getLength() > parseInt(peerBlockHeight) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
                 console.log("this is properly flagged for streaming");
+                /***
                 var pongBackBlockStream = function(blockData){
                   peers[peerId].conn.write(JSON.stringify({pongBlockStream:blockData}));
                 }
                 BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
+                ***/
+
+                if(datSynch = ""){
+                  DatSyncLink.synchDatabase(setDatSynch,peers[peerId]);
+                }else{
+                  setDatSynch(datSynch,peers[peerId]);
+                }
                 //pongBack = true;//not sure about this since this is a stream
               }else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
                 //peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
@@ -400,7 +414,9 @@ var addyBal = function(val){
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
+          console.log(mydata);
 
+          /****
           for (obj in mydata){
             console.log("incoming chain data from synch");
             //log("BLOCK CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));//verbose
@@ -411,6 +427,7 @@ var addyBal = function(val){
               console.log("block does not exist "+mydata[obj]);
               var tempBlock = mydata[obj];
               frankieCoin.addBlockFromDatabase(tempBlock,"streaming in block "+JSON.parse(tempBlock)["blockHeight"])
+              BlkDB.addBlock(parseInt(JSON.parse(tempBlock)["blockHeight"]),tempBlock,"414");
             }else{
               //block existed
               log("block exists in chain data: "+JSON.parse(mydata[obj])["blockHeight"]);
@@ -418,6 +435,7 @@ var addyBal = function(val){
             blockHeightPtr++;
           }
           log(chalk.blue("BlocHeightPtr: "+ chalk.green(blockHeightPtr)));
+          ****/
 
         }else if(JSON.parse(data)["ChainSyncPong"]){
           //returned block from sunched peer and parses it for db
@@ -547,7 +565,7 @@ function cliGetInput(){
     }else if(userInput == "MMM"){
       console.log("calling all the blocks level db");
       BlkDB.getAllBLocks();
-      BlkDB.getTransactionReceiptsByAddress('0x2025ed239a8dec4de0034a252d5c5e385b73fcd0');
+      BlkDB.getTransactionReceiptsByAddress('o9');
       BlkDB.getBalanceAtAddress('0x2025ed239a8dec4de0034a252d5c5e385b73fcd0',addyBal);
       var myOrdersBuyCBTest = function(data){
         console.log("returning leeldb buy orders");
