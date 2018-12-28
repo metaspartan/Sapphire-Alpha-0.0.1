@@ -418,6 +418,8 @@ var setDatSynch = function(link,reqPeer){
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
           console.log(mydata);
 
+          datsynch.grabDataFile(mydata);
+
           /****
           for (obj in mydata){
             console.log("incoming chain data from synch");
