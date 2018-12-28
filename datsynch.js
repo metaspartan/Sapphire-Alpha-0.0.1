@@ -2,7 +2,7 @@ var Dat = require('dat-node')
 
 var synchDatabase = function(callback,peer){
   // 1. My files are in /joe/cat-pic-analysis
-  Dat('/SFRX', function (err, dat) {
+  Dat('./SFRX', function (err, dat) {
     if (err) throw err
 
     // 2. Import the files
