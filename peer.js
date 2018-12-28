@@ -352,9 +352,11 @@ var setDatSynch = function(link,reqPeer){
                 BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
                 ***/
 
-                if(datSynch = ""){
+                if(datSynch == ""){
+                  console.log("calling dat synch")
                   DatSyncLink.synchDatabase(setDatSynch,peers[peerId]);
                 }else{
+                  console.log("not calling dat synch as its "+datSynch)
                   setDatSynch(datSynch,peers[peerId]);
                 }
                 //pongBack = true;//not sure about this since this is a stream
