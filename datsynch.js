@@ -1,4 +1,3 @@
-var dat = require("dat");
 var Dat = require('dat-node')
 
 var synchDatabase = function(callback,peer){
