@@ -32,6 +32,23 @@ var getChainParamsBlockHeight = function(hashKey){
   });
 }
 
+var addNode = function(key, value){
+  console.log("Adding Node as follows key: "+key.toString()+" - value:"+ value.toString())
+  //node:id:
+  db.put(key, value, function (err) {
+    if (err) return console.log('Ooops!', err) // some kind of I/O error
+  })
+}
+
+var getNodes = function(){
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    if(data.key.toString().split(":")[0] == "node"){
+      console.log('key = '+data.key+" value = "+data.value.toString());
+    }
+  })
+}
+
 var addBlock = function(blknum,block,callfrom){
   console.log("<<<<<----------------ADDS BLOCK TO LEVEL DB HERE------------>>>>>")
   console.log("called from "+callfrom);
@@ -634,6 +651,8 @@ module.exports = {
     addChainParams:addChainParams,
     getChainParams:getChainParams,
     getChainParamsBlockHeight:getChainParamsBlockHeight,
+    addNode:addNode,
+    getNodes:getNodes,
     addBlock:addBlock,
     getBlock:getBlock,
     removeBlock:removeBlock,
