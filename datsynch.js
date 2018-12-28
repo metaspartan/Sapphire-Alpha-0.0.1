@@ -26,6 +26,7 @@ var grabDataFile = function(mykey){
   }, function (err, dat) {
     if(err){
       //throw err
+      throw err
       console.log(err.toString());
     }
 
