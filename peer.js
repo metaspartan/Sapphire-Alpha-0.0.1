@@ -418,7 +418,7 @@ var setDatSynch = function(link,reqPeer){
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
           console.log(mydata);
 
-          datsynch.grabDataFile(mydata);
+          DatSyncLink.grabDataFile(mydata);
 
           /****
           for (obj in mydata){
