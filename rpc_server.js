@@ -26,19 +26,26 @@ var globalParentCom = function(callback,callback2){
 }
 
 var impcParentMethods;
+var impcbalanceEvent
 //callback fuction used to set a caller to the parent called by parent on load
-var globalParentComMethods = function(callback){
+var globalParentComMethods = function(callback,cbIMPCBalance){
   //sets the impcparent with the function from parent
   impcParentMethods = callback;
+  impcbalanceEvent = cbIMPCBalance;
 }
 ///////////////////////////////////////////end inter module parent communication
-
-;
 
 var methodEvent = function(datacall){
   return new Promise((resolve)=> {
     log(chalk.yellow("event replay through rpc server [this message for dev]"));
     resolve(impcParentMethods(datacall));
+  })
+}
+
+var balanceEvent = function(addr,cb){
+  return new Promise((resolve)=> {
+    log(chalk.yellow("event replay through rpc server [this message for dev]"));
+    resolve(impcbalanceEvent(addr,cb));
   })
 }
 
@@ -198,7 +205,7 @@ function requestListener(request, response) {
     })
 }
 
-methods.parentComEvent(methodEvent);
+methods.parentComEvent(methodEvent,balanceEvent);
 
 log(chalk.blue("Started and Listening on "+chalk.green(": "+PORT)));
 server.listen(PORT);

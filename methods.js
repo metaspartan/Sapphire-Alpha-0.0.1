@@ -5,9 +5,11 @@ const chalk = require('chalk');
 const log = console.log;
 
 var callerEvent;
-var parentComEvent = function(callback){
+var balanceEvent;
+var parentComEvent = function(cbOrderEvent,cbBalanceEvent){
   //sets the callerEvent with the function from parent
-  callerEvent = callback;
+  callerEvent = cbOrderEvent;
+  balanceEvent = cbBalanceEvent;
 }
 
 //going to replace data to rpc database for getwork from an rpc call
@@ -205,11 +207,32 @@ let methods = {
      description: `retrieves balance at address provided`,
      params: ['address'],
      returns: ['balance'],
-     exec(tryit) {
-         return new Promise((resolve) => {
-             // fetch
-             setTimeout( function() {resolve(db.balances.fetchAll() || {});},200);
-         });
+     exec(addr) {
+       var localAddr = JSON.parse(JSON.stringify(addr))["address"];
+       return new Promise((resolve) => {
+         var cbTally = function(balances){
+
+
+             console.log("calling in methods this address balance is ");
+
+             console.log(chalk.green("------------------------"));
+             for(var x in balances){
+               console.log(chalk.yellow(x+": ")+balances[x]);
+
+             }
+             let balancereturn = [];
+             Object.keys(balances).forEach(key => {
+               var item = {[key]:balances [key]};
+               balancereturn.push(item);
+             });
+             console.log(chalk.green("------------------------"));
+
+
+           console.log("balance function in methods.js get called back with this balance for SFRX "+balances["SFRX"]);
+           resolve({balancereturn} || {});
+         }
+         balanceEvent(localAddr,cbTally);
+       });
      }
    },
 

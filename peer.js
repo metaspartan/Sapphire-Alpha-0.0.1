@@ -1197,29 +1197,17 @@ var impcchild = function(childData,fbroadcastPeersBlock){
     log("retrieving a balance for address provided...");
     log(JSON.parse(childData)["getBalance"]);
     log(JSON.parse(childData)["getBalance"]["address"]);
-    var getBalance3 = frankieCoin.getBalanceOfAddress(JSON.parse(childData)["getBalance"]["address"]);
-    log('\nMiners Function Balance of '+JSON.parse(childData)["getBalance"]["address"]+' is', getBalance3);
-    log(getBalance3["SFRX"]);
-
-    var getBalance4 = [];
-    //var Keys = Object.keys(getBalance3);
-    for(account in getBalance3){
-      //var tempkey = Keys[account];
-      var tempbalance = {[account]:getBalance3[account]}
-      getBalance4.push(tempbalance);
-    }
-    //this is where I would return that data
-    var options = {
-      uri: 'http://localhost:9090/rpc',
-      method: 'POST',
-      json: {balance:{address:JSON.parse(childData)["getBalance"]["address"],balance:{getBalance4}}}
-    };
-
-    request(options, function (error, response, body) {
-      if (!error && response.statusCode == 200) {
-        log(body.id) // Print the shortened url.
+    //var getBalance3 = frankieCoin.getBalanceOfAddress(JSON.parse(childData)["getBalance"]["address"]);
+    var returnAddressBalance = function(val){
+      console.log("this address balance is ");
+      console.log(chalk.green("------------------------"));
+      for(x in val){
+        console.log(chalk.yellow(x+": ")+val[x]);
       }
-    });
+      console.log(chalk.green("------------------------"));
+    }
+    BlkDB.getBalanceAtAddress(JSON.parse(childData)["getBalance"]["address"],addyBal);
+
   }else if(isJSON(childData) && JSON.parse(childData)["transaction"]){
     log("Incoming Transaction over RPC");
     log(chalk.yellow(JSON.stringify(JSON.parse(childData)["transaction"]["txhash"])));
@@ -1233,6 +1221,7 @@ var impcchild = function(childData,fbroadcastPeersBlock){
   }
 }
 
+//probably need to name this specific order methods
 var impcMethods = function(datacall){
   return new Promise((resolve)=> {
     log(chalk.yellow("data calling in peer [this message is for dev]"));
@@ -1255,6 +1244,10 @@ var impcMethods = function(datacall){
   })
 }
 
+var impcBalance = function(addr,cbBalanceEvent){
+  BlkDB.getBalanceAtAddress(addr,cbBalanceEvent);
+}
+
 var impceventcaller;
 var impcevent = function(callback){
     //sets the impcparent with the function from parent
@@ -1263,7 +1256,7 @@ var impcevent = function(callback){
 //initialize the child with the parent communcator call back function
 rpcserver.globalParentCom(impcchild,broadcastPeersBlock);
 rpcserver.globalParentEvent(impcevent);
-rpcserver.globalParentComMethods(impcMethods);
+rpcserver.globalParentComMethods(impcMethods,impcBalance);
 //////////////////////////////////////end inter module parent child communicator
 
 ////////////////////////////////////////////////initialize the console interface
