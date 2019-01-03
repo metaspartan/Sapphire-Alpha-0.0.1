@@ -608,7 +608,8 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput == "OO"){//O is for order
       //other commands can go Here
-      log("Nothing is happening in this selection as its commented out");
+      log("Just get everything in the database");
+      BlkDB.getAll();
       //this function calls buy order from database and...
       //mycallcakbuy calls the sells to match them up
       //the logic may update itself as we move forward from loop to event

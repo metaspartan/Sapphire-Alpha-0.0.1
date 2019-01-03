@@ -409,7 +409,7 @@ var getOrdersPairBuy = function(pairBuy,pairSell,callback){
       if (x > y) {return 1;}
       return 0;
     })
-    callBack(resultss);
+    callback(resultss);
   });
 
 }
@@ -488,6 +488,26 @@ var buildTrade = function(obj,callBack){
       callBack(obj,result);
   });
   ***/
+}
+
+var getAll = function(){
+
+      var stream = db.createReadStream();
+      stream.on('data',function(data){
+        //console.log('key = '+data.key+" value = "+data.value.toString());
+
+          //console.log("here... "+data.key.toString()+" "+data.value.toString());
+          //candidate for progress bar widget
+          console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+
+
+      });
+      stream.on('close',function(){
+        console.log("data stream is complete");
+
+      });
+
+
 }
 
 ///////from here down needs editing
@@ -648,6 +668,7 @@ var clearTransactionDatabase = function(){
 ***/
 
 module.exports = {
+    getAll:getAll,
     addChainParams:addChainParams,
     getChainParams:getChainParams,
     getChainParamsBlockHeight:getChainParamsBlockHeight,
@@ -667,7 +688,7 @@ module.exports = {
     addOrder:addOrder,
     getOrdersBuy:getOrdersBuy,
     getOrdersBuySorted:getOrdersBuySorted,
-    getOrdersPairBuy:getOrdersPairSell,
+    getOrdersPairBuy:getOrdersPairBuy,
     getOrdersPairSell:getOrdersPairSell,
     buildTrade:buildTrade,
 }
