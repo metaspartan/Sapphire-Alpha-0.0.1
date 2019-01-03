@@ -280,6 +280,44 @@ let methods = {
      }
    },
 
+   signedOrder: {
+     description: 'signed orders placed on dex',
+     params: ['signedOrder:the signed order object'],
+     returns: ['confirnmation'],
+     exec(orderObj) {
+       var signedOrder = JSON.parse(JSON.stringify(orderObj))["message"];
+       console.log("first pass "+signedOrder)
+       var signedOrder = JSON.parse(signedOrder)["order"];
+       console.log("second pass "+signedOrder)
+       return new Promise((resolve) => {
+         var cbOrderConfirmation = function(order){
+
+
+             console.log("calling in methods this orders ");
+
+             /***
+             console.log(chalk.green("------------------------"));
+             for(var x in balances){
+               console.log(chalk.yellow(x+": ")+balances[x]);
+
+             }
+             let balancereturn = [];
+             Object.keys(balances).forEach(key => {
+               var item = {[key]:balances [key]};
+               balancereturn.push(item);
+             });
+             console.log(chalk.green("------------------------"));
+             ****/
+
+
+           console.log("order function in methods.js get called back with this confirmation ");
+           //resolve({balancereturn} || {});
+         }
+        // balanceEvent(localAddr,cbTally);
+       });
+     }
+   },
+
    //transaction:{"from":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","to":"0x7c4a4cbb0b9e8bd0792fc5ba2bc9660f1fcbfd85","amount":1375.002,"ticker":"SFRX"}}
    transaction: {
      description: '',

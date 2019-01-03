@@ -663,6 +663,7 @@ function cliGetInput(){
       //console.log("finally the address that signed it:" + getMyAddressBack2);
       setTimeout(function(){cliGetInput();},2000);
     }else if(userInput.startsWith("signOrder(")){//Sign an order for the DEX
+      //signOrder({"data":{"order":{"fromAddress":"0x7357589f8e367c2c31f51242fb77b350a11830f3","buyOrSell":"SELL","pairBuy":"EGEM","pairSell":"SPHR","amount":"300","price":"26.00"}},"pk":"0x3141592653589793238462643383279502884197169399375105820974944592"})
       var packageToSign = userInput.slice(userInput.indexOf("signOrder(")+10, userInput.indexOf(")"));
       console.log(packageToSign);
       var signedPackage = web3.eth.accounts.sign(JSON.stringify(JSON.parse(packageToSign)["data"]), JSON.parse(packageToSign)["pk"]);
@@ -1216,6 +1217,40 @@ var impcchild = function(childData,fbroadcastPeersBlock){
     var egemSendingAddress = web3.eth.accounts.recover(txhash,txsignature);
     log("This transaction was submitted by "+chalk.yellow(egemSendingAddress));
     impceventcaller("This transaction was submitted by "+egemSendingAddress)
+  }else if(isJSON(childData) && JSON.parse(childData)["signedOrder"]){
+    log("Incoming Order over RPC");
+    log(chalk.yellow(JSON.stringify(JSON.parse(childData)["signedOrder"]["message"])));
+    var order = JSON.stringify(JSON.parse(childData)["signedOrder"]["message"]);
+    var orderFromAddy = JSON.stringify(JSON.parse(childData)["signedOrder"]["message"]["order"]);
+    //order = order.replace(/['"/\\]+/g, '').replace('\"','');
+    var txsignature = JSON.stringify(JSON.parse(childData)["signedOrder"]["signature"])
+    console.log("order is "+order);
+    console.log("order parsed "+JSON.parse(order));
+    var parsedorder = JSON.parse(order);
+    console.log("deep order "+JSON.parse(parsedorder)["order"]);
+    var signedPackageOrder = JSON.parse(parsedorder)["order"];
+    console.log("address is "+signedPackageOrder["fromAddress"]);
+
+
+    var addressFrom = signedPackageOrder["fromAddress"];
+    var buyOrSell = signedPackageOrder["buyOrSell"];
+    var pairBuy = signedPackageOrder["pairBuy"];
+    var pairSell = signedPackageOrder["pairSell"];
+    var amount = signedPackageOrder["amount"];
+    var price = signedPackageOrder["price"];
+    var validatedSender = web3.eth.accounts.recover(JSON.parse(childData)["signedOrder"]["message"],JSON.parse(childData)["signedOrder"]["signature"]);
+    if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
+      ///need to alidate that this wallet has the funds to send
+      myblockorder = new sapphirechain.Order(addressFrom,buyOrSell,pairBuy,pairSell,amount,price);
+      frankieCoin.createOrder(myblockorder);
+      //BlockchainDB.addOrder({order:myblockorder});
+      BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
+      console.log("This legitimate signed order by "+validatedSender+" has been posted to chain with confirmation "+myblockorder.transactionID);
+    }else{
+      console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
+    }
+    console.log("my confirmation to return "+myblockorder.transactionID);
+    //impceventcaller("This order and callback was submitted by "+egemSendingAddress)
   }else{
     log("RCP commands were not properly formatted");
   }
@@ -1231,7 +1266,7 @@ var impcMethods = function(datacall){
       log('BUY ORDERS: '+JSON.stringify(data));//test for input
       //resolve(data);
       dataBuySell.push({"buy":data});
-      BlkDB.getOrdersPairSell(datacall["tickerBuy"],myCallbackOrderSell);
+      BlkDB.getOrdersPairSell(datacall["tickerBuy"],datacall["tickerSell"],myCallbackOrderSell);
       //BlockchainDB.getOrdersPairSell(datacall["tickerBuy"],myCallbackOrderSell);
     };
     var myCallbackOrderSell = function(data) {
@@ -1239,7 +1274,7 @@ var impcMethods = function(datacall){
       dataBuySell.push({"sell":data});
       resolve(dataBuySell);
     };
-    BlkDB.getOrdersPairBuy(datacall["tickerBuy"],myCallbackOrderBuy);
+    BlkDB.getOrdersPairBuy(datacall["tickerBuy"],datacall["tickerSell"],myCallbackOrderBuy);
     //BlockchainDB.getOrdersPairBuy(datacall["tickerBuy"],myCallbackOrderBuy);
   })
 }

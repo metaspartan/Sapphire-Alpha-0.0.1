@@ -381,7 +381,7 @@ var getOrdersBuySorted = function(callBack){
 }
 
 //////////////////////////////////////////////////////////////////////first call
-var getOrdersPairBuy = function(pair,callback){
+var getOrdersPairBuy = function(pairBuy,pairSell,callback){
 
   console.log("Open PAIR BUY Orders leveldb");
   var result = [];
@@ -390,7 +390,7 @@ var getOrdersPairBuy = function(pair,callback){
 
   stream.on('data',function(data){
 
-    if(data.toString().split(":")[1] == "BUY" && data.toString().split(":")[2] == pair){
+    if(data.toString().split(":")[0] == "ox" && data.toString().split(":")[1] == "BUY" && data.toString().split(":")[2] == pairBuy && data.toString().split(":")[3] == pairSell){
       db.get(data, function (err, value) {
         console.log("value"+value);
         result.push(value.toString());
@@ -439,7 +439,7 @@ var getOrdersSell = function(){
 }
 
 //////////////////////////////////////////////////////////////////////first call
-var getOrdersPairSell = function(pair,callback){
+var getOrdersPairSell = function(pairBuy,pairSell,callback){
 
   console.log("Open PAIR SELL Orders leveldb");
   var result = [];
@@ -448,7 +448,7 @@ var getOrdersPairSell = function(pair,callback){
 
   stream.on('data',function(data){
 
-    if(data.toString().split(":")[1] == "SELL" && data.toString().split(":")[2] == pair){
+    if(data.toString().split(":")[0] == "ox" && data.toString().split(":")[1] == "SELL" && data.toString().split(":")[2] == pairBuy && data.toString().split(":")[3] == pairSell){
       db.get(data, function (err, value) {
         console.log("value"+value);
         result.push(value.toString());
