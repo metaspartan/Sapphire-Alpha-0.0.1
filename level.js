@@ -238,7 +238,7 @@ var getBalanceAtAddress = function(address,callback){
         db.get(data, function (err, value) {
 
 
-          //console.log("adding or subtracting "+parseFloat(JSON.parse(value)["amount"])+" of "+data.toString().split(":")[3]+" to ");
+          console.log("adding or subtracting "+parseFloat(JSON.parse(value)["amount"])+" of "+data.toString().split(":")[3]+" to ");
 
           /***
           for(x in balance){
@@ -253,10 +253,12 @@ var getBalanceAtAddress = function(address,callback){
           }
 
           if(data.toString().split(":")[1] == address){
+              console.log("deduct "+parseFloat(JSON.parse(value)["amount"]));
               balance[data.toString().split(":")[3]] -= parseFloat(JSON.parse(value)["amount"]);
           }
 
           if(data.toString().split(":")[2] == address){
+              console.log("addit "+parseFloat(JSON.parse(value)["amount"]));
               balance[data.toString().split(":")[3]] += parseFloat(JSON.parse(value)["amount"]);
           }
 
@@ -287,20 +289,24 @@ var getBalanceAtAddress = function(address,callback){
             console.log("i am in else here"+balance["SFRX"]);
           }
 
+
           //var existing = parseFloat(balance["SFRX"]);//going to have to replace this later
           if(!existing){existing = 0};
           //var orig = await parseFloat(airdrop);
-          var orig = await web3.eth.getBalance(address, 1530000);
-          var orig = await web3.utils.fromWei(orig,'ether');
-          var orig = parseFloat(orig*2);
+          var orig = await web3.eth.getBalance(address, 1530000)
+          orig = web3.utils.fromWei(orig,'ether');
+          //var orig = await web3.utils.fromWei(orig,'ether');
+          //var orig = parseFloat(orig*2);
           console.log("orig = "+orig)
           if(!orig){orig = 0};
-          //console.log("okay2"+existing+orig);
-          var newbal = parseFloat(existing + orig);
+          console.log("okay2"+existing+orig);
+          var newbal = 0;
+          newbal+=parseFloat(existing);
+          newbal+=parseFloat(orig);
           //console.log("newbal = "+newbal)
           //balance["SFRX"] = newbal;
           console.log(balance["SFRX"]);
-          balance["SFRX"]+=parseFloat(newbal);
+          balance["SFRX"]=parseFloat(newbal);
           //return balance;
           callback(balance);
 

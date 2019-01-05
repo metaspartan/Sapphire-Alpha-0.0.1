@@ -6,10 +6,15 @@ const log = console.log;
 
 var callerEvent;
 var balanceEvent;
-var parentComEvent = function(cbOrderEvent,cbBalanceEvent){
+var orderRPCComm;
+var txRPCComm;
+var parentComEvent = function(cbOrderEvent,cbBalanceEvent,orderCallback,transactionCallback){
   //sets the callerEvent with the function from parent
+  console.log("parent com even called in methods js "+cbBalanceEvent);
   callerEvent = cbOrderEvent;
   balanceEvent = cbBalanceEvent;
+  orderRPCComm = orderCallback;
+  txRPCComm = transactionCallback;
 }
 
 //going to replace data to rpc database for getwork from an rpc call
@@ -279,7 +284,7 @@ let methods = {
          });
      }
    },
-
+   //signedOrder({"message":"{\"order\":{\"fromAddress\":\"0x7357589f8e367c2C31F51242fB77B350A11830F3\",\"buyOrSell\":\"BUY\",\"pairBuy\":\"EGEM\",\"pairSell\":\"SPHR\",\"amount\":\"1\",\"price\":2}}","signature":"0x78d89cc55dcf41f1f12000fc344ebd13498b052e5941f6fdcbe386eb615c888d22d9fba968ef89082f7c1bcbafe91e8fe2e1552c7e236768b8857d7dc5b9775f1c"})
    signedOrder: {
      description: 'signed orders placed on dex',
      params: ['signedOrder:the signed order object'],
@@ -290,34 +295,47 @@ let methods = {
        var signedOrder = JSON.parse(signedOrder)["order"];
        console.log("second pass "+signedOrder)
        return new Promise((resolve) => {
-         var cbOrderConfirmation = function(order){
+         var cbOrderConfirmation = function(orderTransactionID){
 
 
-             console.log("calling in methods this orders ");
+             console.log("calling in methods this order transaction id "+orderTransactionID);
 
-             /***
-             console.log(chalk.green("------------------------"));
-             for(var x in balances){
-               console.log(chalk.yellow(x+": ")+balances[x]);
-
-             }
-             let balancereturn = [];
-             Object.keys(balances).forEach(key => {
-               var item = {[key]:balances [key]};
-               balancereturn.push(item);
-             });
-             console.log(chalk.green("------------------------"));
-             ****/
 
 
            console.log("order function in methods.js get called back with this confirmation ");
-           //resolve({balancereturn} || {});
+          resolve({orderTransactionID} || {});
          }
+         orderRPCComm(cbOrderConfirmation);
         // balanceEvent(localAddr,cbTally);
        });
      }
    },
+   //signedTransaction({"message":"{\"send\":{\"from\":\"0x7357589f8e367c2C31F51242fB77B350A11830F3\",\"to\":\"0x2025ed239a8dec4de0034a252d5c5e385b73fcd0\",\"amount\":2.0087,\"ticker\":\"SFRX\"}}","signature":"0x4f96d0fc8e2983d00c62b7dffb242f66145df02c7e15cec7e991859b04af7b751f78f144df4dd8923404a9c56628c166d722e76cdf2e06cb460272d1a9ded73f1c"})
+   signedTransaction: {
+     description: 'signed transactions placed on dex',
+     params: ['signedTransaction:the signed tx object'],
+     returns: ['confirnmation'],
+     exec(transactionObj) {
+       var signedTX = JSON.parse(JSON.stringify(transactionObj))["message"];
+       console.log("first pass "+signedTX)
+       var signedOrder = JSON.parse(signedTX)["order"];
+       console.log("second pass "+signedTX)
+       return new Promise((resolve) => {
+         var cbTXConfirmation = function(transactionID){
 
+
+             console.log("calling in methods this transaction transaction id "+transactionID);
+
+
+
+           console.log("signed transaction function in methods.js get called back with this confirmation ");
+          resolve({transactionID} || {});
+         }
+         txRPCComm(cbTXConfirmation);
+        // balanceEvent(localAddr,cbTally);
+       });
+     }
+   },
    //transaction:{"from":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","to":"0x7c4a4cbb0b9e8bd0792fc5ba2bc9660f1fcbfd85","amount":1375.002,"ticker":"SFRX"}}
    transaction: {
      description: '',

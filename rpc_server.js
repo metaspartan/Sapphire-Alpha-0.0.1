@@ -26,25 +26,41 @@ var globalParentCom = function(callback,callback2){
 }
 
 var impcParentMethods;
-var impcbalanceEvent
+var impcbalanceEvent;
 //callback fuction used to set a caller to the parent called by parent on load
-var globalParentComMethods = function(callback,cbIMPCBalance){
-  //sets the impcparent with the function from parent
-  impcParentMethods = callback;
-  impcbalanceEvent = cbIMPCBalance;
-}
+
 ///////////////////////////////////////////end inter module parent communication
+var storeCBtransactionEvent;
+var transactionCallback = async function(cb){
+  //console.log("the callback is set now");
+  storeCBtransactionEvent = cb;
+}
+var storeCBorderEvent;
+var orderCallback = async function(cb){
+  //console.log("the callback is set now");
+  storeCBorderEvent = cb;
+}
+
+var txConfirmationEvent = function(txidvar){
+  //console.log("loading transaction confrmation event "+txidvar);
+  setTimeout(function(){storeCBtransactionEvent(txidvar)},1000)
+}
+
+var orderConfirmationEvent = function(txidvar){
+  //console.log("loading order confrmation event "+txidvar);
+  setTimeout(function(){storeCBorderEvent(txidvar)},1000)
+}
 
 var methodEvent = function(datacall){
   return new Promise((resolve)=> {
-    log(chalk.yellow("event replay through rpc server [this message for dev]"));
+    //log(chalk.yellow("event replay through rpc server [this message for dev]"));
     resolve(impcParentMethods(datacall));
   })
 }
 
 var balanceEvent = function(addr,cb){
   return new Promise((resolve)=> {
-    log(chalk.yellow("event replay through rpc server [this message for dev]"));
+    //log(chalk.yellow("event replay through rpc server [this message for dev]"));
     resolve(impcbalanceEvent(addr,cb));
   })
 }
@@ -52,6 +68,15 @@ var balanceEvent = function(addr,cb){
 //another impc event cycle for parent messages
 var impcevent = function(mydata,mypeer){
   log("IMPC EVENT FIRED"+mydata+mypeer);//probably will be removed
+}
+
+var globalParentComMethods = function(callback,cbIMPCBalance){
+  //sets the impcparent with the function from parent
+  console.log("global parent com methods called in rpc server")
+  impcParentMethods = callback;
+  impcbalanceEvent = cbIMPCBalance;
+
+  methods.parentComEvent(methodEvent,impcbalanceEvent,orderCallback,transactionCallback);
 }
 /*****
 //this code is in peer.js pushed into rpc_server.js
@@ -171,7 +196,7 @@ function requestListener(request, response) {
         process.stdout.clearLine();
         process.stdout.cursorTo(0);
         process.stdout.write(chalk.blue("Reference Check: "+ chalk.green(buf.toString())));
-        impcparent(buf.toString(),parentBroadcastPeersFunction);
+        impcparent(buf.toString(),parentBroadcastPeersFunction,orderConfirmationEvent,txConfirmationEvent);
     });
 
     // on end proceed with compute
@@ -205,7 +230,7 @@ function requestListener(request, response) {
     })
 }
 
-methods.parentComEvent(methodEvent,balanceEvent);
+//NOTE moved call to methods up into the return function from peers above
 
 log(chalk.blue("Started and Listening on "+chalk.green(": "+PORT)));
 server.listen(PORT);

@@ -1154,6 +1154,7 @@ var myCallbackSell = function(data) {
 ////////////////////////////////////////////////////////end functions for orders
 
 //////////////////////////////////////////inter module parent child communicator
+
 var broadcastPeersBlock = function(){
   //sending the block to the peers
   log("------------------------------------------------------")
@@ -1162,7 +1163,7 @@ var broadcastPeersBlock = function(){
   broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 }
 //parent communicator callback function sent to child below
-var impcchild = function(childData,fbroadcastPeersBlock){
+var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
   //log("------------------------------------------------------");
   //process.stdout.clearLine();
   //process.stdout.cursorTo(0);
@@ -1251,6 +1252,38 @@ var impcchild = function(childData,fbroadcastPeersBlock){
       console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
     }
     console.log("my confirmation to return "+myblockorder.transactionID);
+    sendOrderTXID(myblockorder.transactionID);
+    //impceventcaller("This order and callback was submitted by "+egemSendingAddress)
+  }else if(isJSON(childData) && JSON.parse(childData)["signedTransaction"]){
+    log("Incoming Transaction over RPC");
+    log(chalk.yellow(JSON.stringify(JSON.parse(childData)["signedTransaction"]["message"])));
+    var tx = JSON.stringify(JSON.parse(childData)["signedTransaction"]["message"]);
+    //order = order.replace(/['"/\\]+/g, '').replace('\"','');
+    var txsignature = JSON.stringify(JSON.parse(childData)["signedTransaction"]["signature"])
+    console.log("transaction is "+tx);
+    console.log("transaction parsed "+JSON.parse(tx));
+    var parsedtx = JSON.parse(tx);
+    console.log("deep transaction "+JSON.parse(parsedtx)["send"]);
+    var signedPackageTx = JSON.parse(parsedtx)["send"];
+    console.log("address is "+signedPackageTx["from"]);
+
+
+    var addressFrom = signedPackageTx["from"];
+    var addressTo = signedPackageTx["to"];
+    var amount = signedPackageTx["amount"];
+    var ticker = signedPackageTx["ticker"];
+    var validatedSender = web3.eth.accounts.recover(JSON.parse(childData)["signedTransaction"]["message"],JSON.parse(childData)["signedTransaction"]["signature"]);
+    if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
+      ///need to alidate that this wallet has the funds to send
+      var myblocktx = new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker);
+      frankieCoin.createTransaction(myblocktx);
+      console.log("This legitimate signed transaction by "+validatedSender+" has been posted");
+
+    }else{
+      console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
+    }
+    console.log("my confirmation to return "+"placeholder"+myblocktx.hash);
+    sendTXID("placeholder"+myblocktx.hash);
     //impceventcaller("This order and callback was submitted by "+egemSendingAddress)
   }else{
     log("RCP commands were not properly formatted");
