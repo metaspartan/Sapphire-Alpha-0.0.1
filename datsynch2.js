@@ -71,7 +71,7 @@ var grabDataFile = function(mykey){
     fs.mkdirSync(dest)
 
     Dat(ram, {
-      mykey.split("://")[1],
+      key: mykey.split("://")[1],
       sparse: true }, function (err, dat) {
       if (err) throw err
 
