@@ -1,68 +1,40 @@
 var Dat = require('dat-node')
 
-var levelDat = "";
-
-Dat('./SFRX', function (err, dat) {
-
-  if (err) throw err
-
-  // 2. Import the files
-  dat.importFiles()
-
-  // 3. Share the files on the network!
-  dat.joinNetwork()
-
-  // (And share the link)
-  console.log('My Dat link is: dat://'+dat.key.toString('hex'));
-
-  leveldat = 'dat://'+dat.key.toString('hex');
-
-});
-
 var synchDatabase = function(callback,peer){
   // 1. My files are in /joe/cat-pic-analysis
+  Dat('./SFRX', function (err, dat) {
+    if (err) throw err
 
-  if(levelDat == ""){
-    Dat('./SFRX', function (err, dat) {
-      if (err) throw err
+    // 2. Import the files
+    dat.importFiles()
 
-      // 2. Import the files
-      dat.importFiles()
+    // 3. Share the files on the network!
+    dat.joinNetwork()
 
-      // 3. Share the files on the network!
-      dat.joinNetwork()
+    // (And share the link)
+    console.log('My Dat link is: dat://', dat.key.toString('hex'))
 
-      // (And share the link)
-      console.log('My Dat link is: dat://'+dat.key.toString('hex'))
-
-      callback("dat://"+dat.key.toString('hex'),peer);
-    })
-  }else{
-    callback(levelDat,peer);
-  }
+    callback("dat://"+dat.key.toString('hex'),peer);
+  })
 
 }
 
 var grabDataFile = function(mykey){
+  
+  Dat('./SFRX', {
+    // 2. Tell Dat what link I want
+    key: mykey.split("://")[1] // (a 64 character hash from above)
+  }, function (err, dat) {
+    if(err){
+      //throw err
+      throw err
+      console.log(err.toString());
+    }
 
-  var callSynch = function(){
-    Dat('./SFRX', {
-      // 2. Tell Dat what link I want
-      key: mykey.split("://")[1] // (a 64 character hash from above)
-    }, function (err, dat) {
-      if(err){
-        //throw err
-        throw err
-        console.log(err.toString());
-      }
-
-      // 3. Join the network & download (files are automatically downloaded)
-      dat.joinNetwork()
-      console.log("database should be written now");
-    })
-  }
-
-  setTimeout(function(){callSynch},1000);
+    // 3. Join the network & download (files are automatically downloaded)
+    dat.joinNetwork()
+    console.log("database should be written now");
+  })
 
 }
 
