@@ -8,7 +8,7 @@ var synchDatabase = function(callback,peer){
 
 
     Dat('./SFRX', function (err, dat) {
-      if (err) throw err
+      //if (err) throw err
 
       // 2. Import the files
       dat.importFiles()
@@ -21,7 +21,7 @@ var synchDatabase = function(callback,peer){
 
       callback("dat://"+dat.key.toString('hex'),peer);
     })
-  
+
 
 }
 
