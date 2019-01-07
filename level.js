@@ -516,6 +516,35 @@ var getAll = function(){
 
 }
 
+var dumpDatBitch = function(cb,cb2,peer){
+  var db2 = levelup(leveldown('./SFRX2'))
+
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    //console.log('key = '+data.key+" value = "+data.value.toString());
+
+      //console.log("here... "+data.key.toString()+" "+data.value.toString());
+      //candidate for progress bar widget
+      console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+
+      db2.put(data.key, data.value, function (err) {
+        if (err) return console.log('Ooops!', err) // some kind of I/O error
+      })
+
+
+  });
+  stream.on('close',function(){
+    console.log("data stream is complete");
+    db2.close();
+    setTimeout(function(){cb(cb2,peer)},1000)
+  });
+
+}
+
+
+
+
+
 ///////from here down needs editing
 
 /***
@@ -675,6 +704,7 @@ var clearTransactionDatabase = function(){
 
 module.exports = {
     getAll:getAll,
+    dumpDatBitch:dumpDatBitch,
     addChainParams:addChainParams,
     getChainParams:getChainParams,
     getChainParamsBlockHeight:getChainParamsBlockHeight,

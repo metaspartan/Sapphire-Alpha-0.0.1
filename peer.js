@@ -13,7 +13,7 @@ const readline = require('readline');
 const getPort = require('get-port');
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
-var DatSyncLink = require("./datsynch2.js");
+var DatSyncLink = require("./datsynch.js");
 
 //genesis hash variables
 var Genesis = require('./genesis');
@@ -359,8 +359,11 @@ var setDatSynch = function(link,reqPeer){
                 ***/
 
                 if(datSynch == ""){
-                  console.log("calling dat synch")
-                  DatSyncLink.synchDatabase(setDatSynch,peers[peerId]);
+                  var cbGetSynch = function(setDatSynch,datpeer){
+                    console.log("calling dat synch")
+                    DatSyncLink.synchDatabase(setDatSynch,datpeer);
+                  }
+                  BlkDB.dumpDatBitch(cbGetSynch,setDatSynch,peers[peerId]);
                 }else{
                   console.log("not calling dat synch as its "+datSynch)
                   setDatSynch(datSynch,peers[peerId]);

@@ -2,7 +2,7 @@ var Dat = require('dat-node')
 
 var synchDatabase = function(callback,peer){
   // 1. My files are in /joe/cat-pic-analysis
-  Dat('./SFRX', function (err, dat) {
+  Dat('./SFRX2', function (err, dat) {
     if (err) throw err
 
     // 2. Import the files
@@ -20,7 +20,7 @@ var synchDatabase = function(callback,peer){
 }
 
 var grabDataFile = function(mykey){
-  
+
   Dat('./SFRX', {
     // 2. Tell Dat what link I want
     key: mykey.split("://")[1] // (a 64 character hash from above)
