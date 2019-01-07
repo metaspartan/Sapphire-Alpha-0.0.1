@@ -20,20 +20,26 @@ var synchDatabase = function(callback,peer){
 }
 
 var grabDataFile = function(mykey){
-  Dat('./SFRX', {
-    // 2. Tell Dat what link I want
-    key: mykey.split("://")[1] // (a 64 character hash from above)
-  }, function (err, dat) {
-    if(err){
-      //throw err
-      throw err
-      console.log(err.toString());
-    }
 
-    // 3. Join the network & download (files are automatically downloaded)
-    dat.joinNetwork()
-    console.log("database should be written now");
-  })
+  var callSynch = function(){
+    Dat('./SFRX', {
+      // 2. Tell Dat what link I want
+      key: mykey.split("://")[1] // (a 64 character hash from above)
+    }, function (err, dat) {
+      if(err){
+        //throw err
+        throw err
+        console.log(err.toString());
+      }
+
+      // 3. Join the network & download (files are automatically downloaded)
+      dat.joinNetwork()
+      console.log("database should be written now");
+    })
+  }
+
+  setTimeout(function(){callSynch},1000);
+
 }
 
 module.exports = {
