@@ -13,7 +13,7 @@ const readline = require('readline');
 const getPort = require('get-port');
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
-var DatSyncLink = require("./datsynch.js");
+var DatSyncLink = require("./datsynch2.js");
 
 //genesis hash variables
 var Genesis = require('./genesis');
