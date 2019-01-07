@@ -13,6 +13,7 @@ const readline = require('readline');
 const getPort = require('get-port');
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
+var DatSyncLink = require("./datsynch.js");
 
 //genesis hash variables
 var Genesis = require('./genesis');
@@ -39,7 +40,7 @@ sapphirechain.setBlockchainDB(BlockchainDB,BlkDB);
 var BLAKE2s = require("./blake2s.js");
 var Miner = require("./miner.js");
 Miner.setSapphireChain(sapphirechain);
-var DatSyncLink = require("./datsynch.js");
+
 
 var msg = "genesis message";
 var length = 32;
@@ -1269,7 +1270,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
 
     var addressFrom = signedPackageTx["from"];
-    var addressTo = signedPackageTx["to"];
+    var addressFrom = signedPackageTx["to"];
     var amount = signedPackageTx["amount"];
     var ticker = signedPackageTx["ticker"];
     var validatedSender = web3.eth.accounts.recover(JSON.parse(childData)["signedTransaction"]["message"],JSON.parse(childData)["signedTransaction"]["signature"]);

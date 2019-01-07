@@ -1,4 +1,7 @@
 var Dat = require('dat-node')
+var mirror = require('mirror-folder')
+var ram = require('random-access-memory')
+var fs = require('fs')
 
 var levelDat = "";
 
@@ -46,6 +49,8 @@ var synchDatabase = function(callback,peer){
 var grabDataFile = function(mykey){
 
   var callSynch = function(){
+
+    /***
     Dat('./SFRX', {
       // 2. Tell Dat what link I want
       key: mykey.split("://")[1] // (a 64 character hash from above)
@@ -57,9 +62,39 @@ var grabDataFile = function(mykey){
       }
 
       // 3. Join the network & download (files are automatically downloaded)
-      dat.joinNetwork()
+      var network = dat.joinNetwork()
       console.log("database should be written now");
     })
+    ***/
+
+    var dest = './SFRX';
+    fs.mkdirSync(dest)
+
+    Dat(ram, {
+      mykey.split("://")[1],
+      sparse: true }, function (err, dat) {
+      if (err) throw err
+
+      var network = dat.joinNetwork()
+      network.once('connection', function () {
+        console.log('Connected')
+      })
+      dat.archive.metadata.update(download)
+
+      function download () {
+        var progress = mirror({ fs: dat.archive, name: '/' }, dest, function (err) {
+          if (err) throw err
+          console.log('Done')
+        })
+        progress.on('put', function (src) {
+          console.log('Downloading', src.name)
+        })
+      }
+
+      console.log(`Downloading: ${dat.key.toString('hex')}\n`)
+    })
+
+
   }
 
   setTimeout(function(){callSynch},1000);
