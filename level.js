@@ -554,8 +554,8 @@ var dumpDatCopy = function(cb,peer){
   });
   stream.on('close',function(){
     console.log("Dat Copy data stream is complete");
-    db2.close();
     setTimeout(function(){cb(peer)},1000)
+    db2.close();
   });
 
 }
