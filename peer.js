@@ -1275,7 +1275,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
 
     var addressFrom = signedPackageTx["from"];
-    var addressFrom = signedPackageTx["to"];
+    var addressTo = signedPackageTx["to"];
     var amount = signedPackageTx["amount"];
     var ticker = signedPackageTx["ticker"];
     var validatedSender = web3.eth.accounts.recover(JSON.parse(childData)["signedTransaction"]["message"],JSON.parse(childData)["signedTransaction"]["signature"]);
