@@ -7,10 +7,14 @@ var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/cus
 // 1) Create our store
 var db = levelup(leveldown('./SFRX'))
 
-var refresh = function(cb){
+var refresh = function(cbChainGrab){
   //not working correctluy at the moment
-  db.close();
-  setTimeout(function(){db.open(cb)},1000)
+  var openDB = function(){
+    //passes callback to ChainGrab function upon completion to load db to memory
+    setTimeout(function(){db.open(cbChainGrab)},500)
+  }
+  db.close(openDB);
+
 }
 
 var putRecord = function(key, val){
@@ -522,7 +526,8 @@ var getAll = function(){
 
 }
 
-var dumpDatCopy = function(cb,cb2,peer){
+var dumpDatCopy = function(cb,peer){
+
   var db2 = levelup(leveldown('./SFRX2'))
 
   var stream = db.createReadStream();
@@ -540,9 +545,9 @@ var dumpDatCopy = function(cb,cb2,peer){
 
   });
   stream.on('close',function(){
-    console.log("data stream is complete");
+    console.log("Dat Copy data stream is complete");
     db2.close();
-    setTimeout(function(){cb(cb2,peer)},1000)
+    setTimeout(function(){cb(peer)},1000)
   });
 
 }
@@ -710,8 +715,8 @@ var clearTransactionDatabase = function(){
 
 module.exports = {
     getAll:getAll,
-    dumpDatCopy:dumpDatCopy,
     refresh:refresh,
+    dumpDatCopy:dumpDatCopy,
     addChainParams:addChainParams,
     getChainParams:getChainParams,
     getChainParamsBlockHeight:getChainParamsBlockHeight,

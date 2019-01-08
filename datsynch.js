@@ -19,7 +19,7 @@ var synchDatabase = function(callback,peer){
 
 }
 
-var grabDataFile = function(mykey){
+var grabDataFile = function(mykey,cb){
 
   Dat('./SFRX', {
     // 2. Tell Dat what link I want
@@ -34,6 +34,7 @@ var grabDataFile = function(mykey){
     // 3. Join the network & download (files are automatically downloaded)
     dat.joinNetwork()
     console.log("database should be written now");
+    cb();
   })
 
 }

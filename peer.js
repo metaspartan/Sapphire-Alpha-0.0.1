@@ -109,12 +109,6 @@ var addyBal = function(val){
   }
   console.log(chalk.green("------------------------"));
 }
-var datSynch = "";
-var setDatSynch = function(link,reqPeer){
-  datSynch = link;
-  reqPeer.conn.write(JSON.stringify({pongBlockStream:datSynch}));
-  BlkDB.addNode("node:"+reqPeer.id+":dat",datSynch);
-}
 /////////////////////////////////////////////////////end callback for address balances
 
 //////////////////////////////////////////////////////core function asynchronous
@@ -357,17 +351,15 @@ var setDatSynch = function(link,reqPeer){
                 }
                 BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
                 ***/
-
-                if(datSynch == ""){
-                  var cbGetSynch = function(setDatSynch,datpeer){
-                    console.log("calling dat synch")
-                    DatSyncLink.synchDatabase(setDatSynch,datpeer);
-                  }
-                  BlkDB.dumpDatCopy(cbGetSynch,setDatSynch,peers[peerId]);
-                }else{
-                  console.log("not calling dat synch as its "+datSynch)
-                  setDatSynch(datSynch,peers[peerId]);
+                var setDatSynch = function(datSynch){
+                  reqPeer.conn.write(JSON.stringify({pongBlockStream:datSynch}));
                 }
+                var cbGetSynch = function(setDatSynch,datpeer){
+                  console.log("calling dat synch")
+                  DatSyncLink.synchDatabase(datpeer);
+                }
+                BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
+
                 //pongBack = true;//not sure about this since this is a stream
               }else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
                 //peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
@@ -427,8 +419,14 @@ var setDatSynch = function(link,reqPeer){
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
           console.log(mydata);
 
-          DatSyncLink.grabDataFile(mydata);
-          BlkDB.refresh(ChainGrab);
+          //callback function to refresh db with downloaded synch then pull to memory
+          var cbRefreshDB = function(){
+            //passes in ChainGrab function as callback when db is open
+            BlkDB.refresh(ChainGrab);
+          }
+          //1) going to import the database and callback the refresh
+          DatSyncLink.grabDataFile(mydata,cbRefreshDB);
+
 
 
           /****

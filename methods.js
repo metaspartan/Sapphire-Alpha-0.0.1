@@ -10,7 +10,7 @@ var orderRPCComm;
 var txRPCComm;
 var parentComEvent = function(cbOrderEvent,cbBalanceEvent,orderCallback,transactionCallback){
   //sets the callerEvent with the function from parent
-  console.log("parent com even called in methods js "+cbBalanceEvent);
+  //console.log("parent com even called in methods js "+cbBalanceEvent);
   callerEvent = cbOrderEvent;
   balanceEvent = cbBalanceEvent;
   orderRPCComm = orderCallback;
