@@ -11,8 +11,16 @@ var refresh = function(cbChainGrab){
   //not working correctluy at the moment
   var openDB = function(){
     //passes callback to ChainGrab function upon completion to load db to memory
-    setTimeout(function(){db.open(cbChainGrab)},500)
+    console.log("opening the database");
+    var callBackVerified = function(){
+      console.log("verifying it is open");
+      if(db.isOpen() == true){
+        cbChainGrab();
+      }
+    }
+    db.open(callBackVerified);
   }
+  console.log("closing the database");
   db.close(openDB);
 
 }
