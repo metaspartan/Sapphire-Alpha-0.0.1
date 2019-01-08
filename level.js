@@ -9,7 +9,7 @@ var db = levelup(leveldown('./SFRX'))
 
 var refresh = function(){
   db.close();
-  db = levelup(leveldown('./SFRX'))
+  setTimeout(function(){db = levelup(leveldown('./SFRX'))},1000)
 }
 
 var putRecord = function(key, val){
