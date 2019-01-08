@@ -5,16 +5,27 @@ var synchDatabase = function(callback,peer){
   Dat('./SFRX2', function (err, dat) {
     if (err) throw err
 
+    var callSynch = function(){
+      dat.importFiles()
+
+      // 3. Share the files on the network!
+      dat.joinNetwork()
+
+      // (And share the link)
+      console.log('My Dat link is: dat://'+dat.key.toString('hex'));
+
+      callback("dat://"+dat.key.toString('hex'),peer);
+    }
     // 2. Import the files
-    dat.importFiles()
+    var checkDB = function(){
+      if(dat.isOpen() == true){
+        callSynch();
+      }else{
+        setTimeout(function(){checkDB},1000);
+      }
+    }
 
-    // 3. Share the files on the network!
-    dat.joinNetwork()
 
-    // (And share the link)
-    console.log('My Dat link is: dat://'+dat.key.toString('hex'));
-
-    callback("dat://"+dat.key.toString('hex'),peer);
   })
 
 }
