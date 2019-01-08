@@ -1,4 +1,5 @@
 var Dat = require('dat-node')
+var rimraf = require("rimraf");
 
 var synchDatabase = function(callback,peer){
   // 1. My files are in /joe/cat-pic-analysis
@@ -8,7 +9,6 @@ var synchDatabase = function(callback,peer){
   Dat('./SFRX2', function (err, dat) {
 
     if (err) throw err
-
 
       dat.importFiles()
 
@@ -20,12 +20,14 @@ var synchDatabase = function(callback,peer){
 
       callback("dat://"+dat.key.toString('hex'),peer);
 
+      setTimeout(function(){dat.leave();dat.close();},2000)
 
   })
 
 
 }
 
+/////////////////////////////////////THIS IS THE INCOMING FILE FOR SYNCHING PEER
 var grabDataFile = function(mykey,cb){
 
   Dat('./SFRX', {
@@ -41,7 +43,9 @@ var grabDataFile = function(mykey,cb){
     // 3. Join the network & download (files are automatically downloaded)
     dat.joinNetwork()
     console.log("database should be written now please restart your node");
-    //setTimeout(function(){cb();},1000)
+
+
+    setTimeout(function(){cb();},1000)
   })
 
 }

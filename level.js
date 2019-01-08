@@ -9,8 +9,10 @@ var db = levelup(leveldown('./SFRX'))
 
 var refresh = function(cb){
   //not working correctluy at the moment
+  db2.close();
   db.close();
-  setTimeout(function(){db.open(cb)},1000)
+  setTimeout(function(){db.open(cb)},1000);
+
 }
 
 var putRecord = function(key, val){
@@ -541,9 +543,11 @@ var dumpDatCopy = function(cb,peer){
 
   });
   stream.on('close',function(){
+
     console.log("Dat Copy data stream is complete");
-    db2.close();
-    setTimeout(function(){cb(peer)},1000)
+    db2.close(cb(peer));
+    //cb(peer);
+    //setTimeout(function(){cb(peer)},1000)
   });
 
 }
