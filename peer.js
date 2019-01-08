@@ -351,10 +351,10 @@ var addyBal = function(val){
                 }
                 BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
                 ***/
-                var setDatSynch = function(datSynch){
+                var setDatSynch = function(datSynch,reqPeer){
                   reqPeer.conn.write(JSON.stringify({pongBlockStream:datSynch}));
                 }
-                var cbGetSynch = function(setDatSynch,datpeer){
+                var cbGetSynch = function(datpeer){
                   console.log("calling dat synch")
                   DatSyncLink.synchDatabase(setDatSynch,datpeer);
                 }
