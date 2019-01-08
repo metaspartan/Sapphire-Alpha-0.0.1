@@ -6,7 +6,7 @@ var synchDatabase = function(callback,peer){
   console.log("and now we are setting data synch called with "+callback+" and "+peer)
 
   Dat('./SFRX2', function (err, dat) {
-    
+
     if (err) throw err
 
 
@@ -40,8 +40,8 @@ var grabDataFile = function(mykey,cb){
 
     // 3. Join the network & download (files are automatically downloaded)
     dat.joinNetwork()
-    console.log("database should be written now");
-    cb();
+    console.log("database should be written now please restart your node");
+    //setTimeout(function(){cb();},1000)
   })
 
 }

@@ -356,7 +356,6 @@ var addyBal = function(val){
                 BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
                 ***/
                 var setDatSynch = function(datSynch,reqPeer){
-                  console.log("I guess we never get here");
                   reqPeer.conn.write(JSON.stringify({pongBlockStream:datSynch}));
                 }
                 var cbGetSynch = function(datpeer){
@@ -426,7 +425,6 @@ var addyBal = function(val){
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
           console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
-          
           console.log(mydata);
 
           //callback function to refresh db with downloaded synch then pull to memory
