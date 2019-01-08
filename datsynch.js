@@ -2,10 +2,14 @@ var Dat = require('dat-node')
 
 var synchDatabase = function(callback,peer){
   // 1. My files are in /joe/cat-pic-analysis
+
+  console.log("and now we are setting data synch called with "+callback+" and "+peer)
+
   Dat('./SFRX2', function (err, dat) {
+    
     if (err) throw err
 
-    var callSynch = function(){
+
       dat.importFiles()
 
       // 3. Share the files on the network!
@@ -15,18 +19,10 @@ var synchDatabase = function(callback,peer){
       console.log('My Dat link is: dat://'+dat.key.toString('hex'));
 
       callback("dat://"+dat.key.toString('hex'),peer);
-    }
-    // 2. Import the files
-    var checkDB = function(){
-      if(dat.isOpen() == true){
-        callSynch();
-      }else{
-        setTimeout(function(){checkDB},1000);
-      }
-    }
 
 
   })
+
 
 }
 
