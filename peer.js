@@ -428,8 +428,8 @@ var setDatSynch = function(link,reqPeer){
           console.log(mydata);
 
           DatSyncLink.grabDataFile(mydata);
-          BlkDB.refresh();
-          setTimeout(function(){ChainGrab();},3000);
+          BlkDB.refresh(ChainGrab);
+
 
           /****
           for (obj in mydata){

@@ -7,9 +7,10 @@ var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/cus
 // 1) Create our store
 var db = levelup(leveldown('./SFRX'))
 
-var refresh = function(){
+var refresh = function(cb){
+  //not working correctluy at the moment
   db.close();
-  setTimeout(function(){db = levelup(leveldown('./SFRX'))},1000)
+  setTimeout(function(){db.open(cb)},1000)
 }
 
 var putRecord = function(key, val){
