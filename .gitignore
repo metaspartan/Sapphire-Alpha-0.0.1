@@ -5,4 +5,6 @@ datadir/*.*
 datadir/*
 SFRX/*.*
 SFRX/*
+SFRX2/*.*
+SFRX2/*
 package-lock.json
