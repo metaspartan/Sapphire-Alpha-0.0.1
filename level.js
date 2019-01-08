@@ -7,6 +7,11 @@ var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/cus
 // 1) Create our store
 var db = levelup(leveldown('./SFRX'))
 
+var refresh = function(){
+  db.close();
+  db = levelup(leveldown('./SFRX'))
+}
+
 var putRecord = function(key, val){
   db.put(key, val, function (err) {
     if (err) return console.log('Ooops!', err) // some kind of I/O error
@@ -516,7 +521,7 @@ var getAll = function(){
 
 }
 
-var dumpDatBitch = function(cb,cb2,peer){
+var dumpDatCopy = function(cb,cb2,peer){
   var db2 = levelup(leveldown('./SFRX2'))
 
   var stream = db.createReadStream();
@@ -704,7 +709,8 @@ var clearTransactionDatabase = function(){
 
 module.exports = {
     getAll:getAll,
-    dumpDatBitch:dumpDatBitch,
+    dumpDatCopy:dumpDatCopy,
+    refresh:refresh,
     addChainParams:addChainParams,
     getChainParams:getChainParams,
     getChainParamsBlockHeight:getChainParamsBlockHeight,

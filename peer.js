@@ -363,7 +363,7 @@ var setDatSynch = function(link,reqPeer){
                     console.log("calling dat synch")
                     DatSyncLink.synchDatabase(setDatSynch,datpeer);
                   }
-                  BlkDB.dumpDatBitch(cbGetSynch,setDatSynch,peers[peerId]);
+                  BlkDB.dumpDatCopy(cbGetSynch,setDatSynch,peers[peerId]);
                 }else{
                   console.log("not calling dat synch as its "+datSynch)
                   setDatSynch(datSynch,peers[peerId]);
@@ -428,7 +428,8 @@ var setDatSynch = function(link,reqPeer){
           console.log(mydata);
 
           DatSyncLink.grabDataFile(mydata);
-          setTimeout(function(){ChainGrab();},2000);
+          BlkDB.refresh();
+          setTimeout(function(){ChainGrab();},3000);
 
           /****
           for (obj in mydata){
