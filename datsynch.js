@@ -12,7 +12,7 @@ var synchDatabase = function(callback,peer){
     dat.joinNetwork()
 
     // (And share the link)
-    console.log('My Dat link is: dat://', dat.key.toString('hex'))
+    console.log('My Dat link is: dat://'+dat.key.toString('hex'));
 
     callback("dat://"+dat.key.toString('hex'),peer);
   })

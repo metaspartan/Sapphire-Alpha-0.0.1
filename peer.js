@@ -356,7 +356,7 @@ var addyBal = function(val){
                 }
                 var cbGetSynch = function(setDatSynch,datpeer){
                   console.log("calling dat synch")
-                  DatSyncLink.synchDatabase(datpeer);
+                  DatSyncLink.synchDatabase(setDatSynch,datpeer);
                 }
                 BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
 
