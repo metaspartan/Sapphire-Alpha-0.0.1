@@ -67,6 +67,10 @@ var output = fs.readFile(filename, 'utf8', function(err, data) {
 });
 ////////////////////////////////////////////////////////////////end genesis hash
 
+////////////////////////////////////////////////////////////////synching section
+var isSynching = false;//will add numerics to this
+////////////////////////////////////////////////////////////end synching section
+
 /////////////////////////////////////////////////initialize the CLI query system
 const rl = readline.createInterface({
   input: process.stdin,
@@ -409,7 +413,11 @@ var addyBal = function(val){
           log("------------------------------------------------------");
           process.exit();
           exit();
-        }else if(JSON.parse(data)["pongBlockStream"]){
+        }else if(JSON.parse(data)["pongBlockStream"] && isSynching == true){
+          console.log("Extra peer returned synch message but synch is in progress so ignoring")
+        }else if(JSON.parse(data)["pongBlockStream"] && isSynching == false){
+
+          isSynching = true;
 
           var mydata = JSON.parse(data)["pongBlockStream"];
 
@@ -1014,6 +1022,10 @@ var cbChainGrab = function(data) {
   BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
   console.log("about to send this to rpc "+JSON.stringify({block:frankieCoin.getLatestBlock()}))
   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+
+  //need to open back up synching
+  isSynching = false;
+
 };
 //a function call for datastore
 function ChainGrab(blocknum){
@@ -1022,6 +1034,7 @@ function ChainGrab(blocknum){
   //maybe some other stuff like .then
 };
 //and finally the actual call to function for synch
+isSynching = true;
 setTimeout(function(){ChainGrab();},3000);
 //end by now we will know if synched or not and enable or disable mining
 log("------------------------------------------------------")
