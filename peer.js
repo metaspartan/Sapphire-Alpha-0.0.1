@@ -623,7 +623,7 @@ function cliGetInput(){
     }else if(userInput == "OO"){//O is for order
       //other commands can go Here
       log("Just get everything in the database");
-      BlkDB.dumpToJsonFIle();
+      //BlkDB.dumpToJsonFIle();
       //BlkDB.getAll();
       log("reading from JSON file to screen");
       setTimeout(function(){BlkDB.importFromJSONFile();},2000);
