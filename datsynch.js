@@ -65,7 +65,7 @@ var synchDatabaseJSON = function(callback,peer){
           console.log(files);
           console.log('all files are removed');
         });
-      },2000);
+      },3000);
 
   })
 

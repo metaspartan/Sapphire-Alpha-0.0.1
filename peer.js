@@ -362,7 +362,8 @@ var addyBal = function(val){
                   console.log("calling dat synch")
                   DatSyncLink.synchDatabaseJSON(setDatSynch,datpeer);
                 }
-                BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
+                //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
+                BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
 
                 //pongBack = true;//not sure about this since this is a stream
               }else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
@@ -430,11 +431,12 @@ var addyBal = function(val){
           //callback function to refresh db with downloaded synch then pull to memory
           var cbRefreshDB = function(){
             //passes in ChainGrab function as callback when db is open
-            BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);
+            console.log("we are not doing this part yet");
+            //BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);
 
           }
           //1) going to import the database and callback the refresh
-          BlkDB.closeDB();
+          //BlkDB.closeDB();
           DatSyncLink.grabDataFile(mydata,cbRefreshDB);
 
 
