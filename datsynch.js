@@ -47,11 +47,12 @@ var grabDataFile = function(mykey,cb){
     if(err){
       //throw err
       throw err
-      console.log(err.toString());
+      console.log("this error thrown opening the dat "+err.toString());
     }
 
+    dat.resume();
     // 3. Join the network & download (files are automatically downloaded)
-    dat.joinNetwork()
+    //dat.joinNetwork();
 
     console.log("database should be written now please restart your node");
 
