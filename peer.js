@@ -434,7 +434,7 @@ var addyBal = function(val){
             console.log("Importing the data file to the db and then calling the memory synch");
             //setTimeout(function(){BlkDB.importFromJSONFile();},2000);
             //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
-            setTimeout(function(){ChainGrabRefresh(99,cbChainGrab,globalGenesisHash);},3000}
+            setTimeout(function(){ChainGrabRefresh(99,cbChainGrab,globalGenesisHash);},3000)
 
           }
           //1) going to import the database and callback the refresh
