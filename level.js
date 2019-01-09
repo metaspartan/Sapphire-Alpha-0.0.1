@@ -1,5 +1,6 @@
 var levelup = require('levelup')
 var leveldown = require('leveldown')
+var fs = require('fs')
 //web3
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
@@ -22,6 +23,12 @@ var refresh = function(cb,blockNum,cbChainGrab,globalGenesisHash){
     cb(blockNum,cbChainGrab,globalGenesisHash);
 
   },3000);
+
+}
+
+var closeDB = function(){
+
+  db.close();
 
 }
 
@@ -561,8 +568,65 @@ var dumpDatCopy = function(cb,peer){
     //cb(peer)
     //cb(peer);
     setTimeout(function(){cb(peer)},1000);
-    
+
   });
+
+}
+
+
+var dumpToJsonFIle = function(){
+
+  var jsonSynch = []
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    //console.log('key = '+data.key+" value = "+data.value.toString());
+
+      //console.log("here... "+data.key.toString()+" "+data.value.toString());
+      //candidate for progress bar widget
+      console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+
+      var thisRowKey = data.key.toString();
+      var thisRowValue = data.value.toString();
+      var thisRow = {[thisRowKey]:thisRowValue};
+
+      jsonSynch.push(thisRow);
+
+
+  });
+
+  stream.on('close',function(){
+
+    console.log("Dat Copy data stream is complete");
+
+    //db2.close();
+
+    fs.writeFile("./SYNC/SFRX.json", JSON.stringify(jsonSynch), (err) => {
+        if (err) {
+            console.error(err);
+            return;
+        };
+        console.log("JSON synch File has been created");
+    });
+
+  });
+
+}
+
+
+var importFromJSONFile = function(){
+
+  var content = require('./SYNC/SFRX.json');
+
+  //console.log(Object.keys(content))
+
+  for(row in content){
+    console.log("key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
+    var rowKey = Object.keys(content[row]);
+    var rowValue = Object.values(content[row]);
+    db.put(rowKey, rowValue, function (err) {
+      if (err) return console.log('Ooops!', err) // some kind of I/O error
+    })
+  }
 
 }
 
@@ -730,7 +794,10 @@ var clearTransactionDatabase = function(){
 module.exports = {
     getAll:getAll,
     refresh:refresh,
+    closeDB:closeDB,
     dumpDatCopy:dumpDatCopy,
+    dumpToJsonFIle:dumpToJsonFIle,
+    importFromJSONFile:importFromJSONFile,
     addChainParams:addChainParams,
     getChainParams:getChainParams,
     getChainParamsBlockHeight:getChainParamsBlockHeight,

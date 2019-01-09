@@ -360,7 +360,7 @@ var addyBal = function(val){
                 }
                 var cbGetSynch = function(datpeer){
                   console.log("calling dat synch")
-                  DatSyncLink.synchDatabase(setDatSynch,datpeer);
+                  DatSyncLink.synchDatabaseJSON(setDatSynch,datpeer);
                 }
                 BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
 
@@ -434,6 +434,7 @@ var addyBal = function(val){
 
           }
           //1) going to import the database and callback the refresh
+          BlkDB.closeDB();
           DatSyncLink.grabDataFile(mydata,cbRefreshDB);
 
 
@@ -622,7 +623,10 @@ function cliGetInput(){
     }else if(userInput == "OO"){//O is for order
       //other commands can go Here
       log("Just get everything in the database");
-      BlkDB.getAll();
+      BlkDB.dumpToJsonFIle();
+      //BlkDB.getAll();
+      log("reading from JSON file to screen");
+      setTimeout(function(){BlkDB.importFromJSONFile();},2000);
       //this function calls buy order from database and...
       //mycallcakbuy calls the sells to match them up
       //the logic may update itself as we move forward from loop to event
