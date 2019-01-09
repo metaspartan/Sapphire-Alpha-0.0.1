@@ -719,6 +719,7 @@ var clearTransactionDatabase = function(){
 
 module.exports = {
     getAll:getAll,
+    refresh:refresh,
     dumpDatCopy:dumpDatCopy,
     addChainParams:addChainParams,
     getChainParams:getChainParams,
