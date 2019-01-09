@@ -9,15 +9,19 @@ var db = levelup(leveldown('./SFRX'))
 
 var refresh = function(cb,blockNum,cbChainGrab,globalGenesisHash){
   //not working correctluy at the moment
-  db.close();
+
 
   db = levelup(leveldown('./SFRX'));
+
+  db.close();
+
+  db.open();
 
   setTimeout(function(){
 
     cb(blockNum,cbChainGrab,globalGenesisHash);
 
-  },1500);
+  },3000);
 
 }
 
@@ -551,9 +555,13 @@ var dumpDatCopy = function(cb,peer){
   stream.on('close',function(){
 
     console.log("Dat Copy data stream is complete");
-    db2.close(cb(peer));
+
+    db2.close();
+
+    //cb(peer)
     //cb(peer);
-    //setTimeout(function(){cb(peer)},1000)
+    setTimeout(function(){cb(peer)},1000);
+    
   });
 
 }
