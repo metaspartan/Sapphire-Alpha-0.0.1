@@ -574,7 +574,7 @@ var dumpDatCopy = function(cb,peer){
 }
 
 
-var dumpToJsonFIle = function(){
+var dumpToJsonFIle = function(cb,peer){
 
   var jsonSynch = []
   var stream = db.createReadStream();
@@ -599,6 +599,9 @@ var dumpToJsonFIle = function(){
     console.log("Dat Copy data stream is complete");
 
     //db2.close();
+    if (!fs.existsSync("./SYNC")){
+        fs.mkdirSync("./SYNC");
+    }
 
     fs.writeFile("./SYNC/SFRX.json", JSON.stringify(jsonSynch), (err) => {
         if (err) {
@@ -607,6 +610,8 @@ var dumpToJsonFIle = function(){
         };
         console.log("JSON synch File has been created");
     });
+
+    setTimeout(function(){cb(peer)},1000);
 
   });
 
