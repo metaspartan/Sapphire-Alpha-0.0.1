@@ -430,8 +430,8 @@ var addyBal = function(val){
           //callback function to refresh db with downloaded synch then pull to memory
           var cbRefreshDB = function(){
             //passes in ChainGrab function as callback when db is open
-            BlkDB.refresh(ChainGrab);
-            
+            BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash,);
+
           }
           //1) going to import the database and callback the refresh
           DatSyncLink.grabDataFile(mydata,cbRefreshDB);
@@ -1030,6 +1030,11 @@ var cbChainGrab = function(data) {
 };
 //a function call for datastore
 function ChainGrab(blocknum){
+  //BlockchainDB.getBlockchain(99,cbChainGrab);
+  BlkDB.getBlockchain(99,cbChainGrab,globalGenesisHash)
+  //maybe some other stuff like .then
+};
+function ChainGrabRefresh(blocknum,cbChainGrab,globalGenesisHash){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
   BlkDB.getBlockchain(99,cbChainGrab,globalGenesisHash)
   //maybe some other stuff like .then

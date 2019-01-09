@@ -7,13 +7,13 @@ var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/cus
 // 1) Create our store
 var db = levelup(leveldown('./SFRX'))
 
-var refresh = function(cb){
+var refresh = function(cb,blockNum,cbChainGrab,globalGenesisHash){
   //not working correctluy at the moment
   db.close();
 
   setTimeout(function(){
 
-    db.open(cb())
+    db.open(cb(blockNum,cbChainGrab,globalGenesisHash));
 
   },1500);
 
