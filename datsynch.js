@@ -85,7 +85,7 @@ var grabDataFile = function(mykey,cb){
   ****/
 
   setTimeout(function(){
-    Dat('./SFRX', {
+    Dat('./SYNC', {
       // 2. Tell Dat what link I want
       key: mykey.split("://")[1] // (a 64 character hash from above)
     }, function (err, dat) {
