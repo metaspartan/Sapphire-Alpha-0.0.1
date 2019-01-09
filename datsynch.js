@@ -52,7 +52,7 @@ var grabDataFile = function(mykey,cb){
 
     dat.resume();
     // 3. Join the network & download (files are automatically downloaded)
-    //dat.joinNetwork();
+    dat.joinNetwork();
 
     console.log("database should be written now please restart your node");
 
