@@ -618,7 +618,7 @@ var dumpToJsonFIle = function(cb,peer){
 }
 
 
-var importFromJSONFile = function(){
+var importFromJSONFile = function(cb,blockNum,cbChainGrab,globalGenesisHash){
 
   var content = require('./SYNC/SFRX.json');
 
@@ -632,6 +632,8 @@ var importFromJSONFile = function(){
       if (err) return console.log('Ooops!', err) // some kind of I/O error
     })
   }
+
+  cb(blockNum,cbChainGrab,globalGenesisHash);
 
 }
 
