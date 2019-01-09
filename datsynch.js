@@ -1,5 +1,6 @@
 var Dat = require('dat-node')
-var rimraf = require("rimraf");
+var rmdir = require('rmdir');
+
 
 var synchDatabase = function(callback,peer){
   // 1. My files are in /joe/cat-pic-analysis
@@ -20,7 +21,16 @@ var synchDatabase = function(callback,peer){
 
       callback("dat://"+dat.key.toString('hex'),peer);
 
-      setTimeout(function(){dat.leave();dat.close();},2000)
+      setTimeout(function(){
+        dat.leave();
+        dat.close();
+        var path = './SFRX2';
+        rmdir(path, function (err, dirs, files) {
+          console.log(dirs);
+          console.log(files);
+          console.log('all files are removed');
+        });
+      },2000);
 
   })
 
@@ -42,8 +52,8 @@ var grabDataFile = function(mykey,cb){
 
     // 3. Join the network & download (files are automatically downloaded)
     dat.joinNetwork()
-    console.log("database should be written now please restart your node");
 
+    console.log("database should be written now please restart your node");
 
     setTimeout(function(){cb();},1000)
   })

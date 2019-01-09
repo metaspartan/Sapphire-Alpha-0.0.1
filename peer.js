@@ -430,7 +430,8 @@ var addyBal = function(val){
           //callback function to refresh db with downloaded synch then pull to memory
           var cbRefreshDB = function(){
             //passes in ChainGrab function as callback when db is open
-            //BlkDB.refresh(ChainGrab);
+            BlkDB.refresh(ChainGrab);
+            
           }
           //1) going to import the database and callback the refresh
           DatSyncLink.grabDataFile(mydata,cbRefreshDB);

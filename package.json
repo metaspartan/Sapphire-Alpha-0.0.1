@@ -41,6 +41,7 @@
     "node-ipc": "^9.1.1",
     "random-access-memory": "^3.1.1",
     "request": "^2.88.0",
+    "rmdir": "^1.2.0",
     "socket.io-stream": "^0.9.1",
     "web3": "^1.0.0-beta.35"
   }

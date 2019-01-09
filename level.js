@@ -9,9 +9,13 @@ var db = levelup(leveldown('./SFRX'))
 
 var refresh = function(cb){
   //not working correctluy at the moment
-  db2.close();
   db.close();
-  setTimeout(function(){db.open(cb)},1000);
+
+  setTimeout(function(){
+
+    db.open(cb())
+
+  },1500);
 
 }
 
