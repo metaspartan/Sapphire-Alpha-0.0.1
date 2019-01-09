@@ -11,9 +11,11 @@ var refresh = function(cb,blockNum,cbChainGrab,globalGenesisHash){
   //not working correctluy at the moment
   db.close();
 
+  db = levelup(leveldown('./SFRX'));
+
   setTimeout(function(){
 
-    db.open(cb(blockNum,cbChainGrab,globalGenesisHash));
+    cb(blockNum,cbChainGrab,globalGenesisHash);
 
   },1500);
 

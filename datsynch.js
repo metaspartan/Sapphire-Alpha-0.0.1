@@ -55,7 +55,7 @@ var grabDataFile = function(mykey,cb){
 
     console.log("database should be written now please restart your node");
 
-    setTimeout(function(){cb();},1000)
+    setTimeout(function(){cb();},3000)
   })
 
 }
