@@ -431,14 +431,13 @@ var addyBal = function(val){
           //callback function to refresh db with downloaded synch then pull to memory
           var cbRefreshDB = function(){
             //passes in ChainGrab function as callback when db is open
-            console.log("we are not doing this part yet");
-            setTimeout(function(){BlkDB.importFromJSONFile();},2000);
-            //BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);
+            console.log("Importing the data file to the db and then calling the memory synch");
+            //setTimeout(function(){BlkDB.importFromJSONFile();},2000);
+            //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
+            setTimeout(function(){ChainGrabRefresh(99,cbChainGrab,globalGenesisHash);},3000}
 
           }
           //1) going to import the database and callback the refresh
-          //BlkDB.closeDB();
-
           DatSyncLink.grabDataFile(mydata,cbRefreshDB);
 
 
