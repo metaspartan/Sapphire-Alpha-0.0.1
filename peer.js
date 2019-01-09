@@ -1034,9 +1034,10 @@ function ChainGrab(blocknum){
   BlkDB.getBlockchain(99,cbChainGrab,globalGenesisHash)
   //maybe some other stuff like .then
 };
-function ChainGrabRefresh(blocknum,cbChainGrab,globalGenesisHash){
+function ChainGrabRefresh(blocknum,cbChainGrab,ggHash){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
-  BlkDB.getBlockchain(99,cbChainGrab,globalGenesisHash)
+  console.log("calling chain grab refresh with "+blocknum+cbChainGrab+ggHash)
+  BlkDB.getBlockchain(99,cbChainGrab,ggHash)
   //maybe some other stuff like .then
 };
 //and finally the actual call to function for synch
