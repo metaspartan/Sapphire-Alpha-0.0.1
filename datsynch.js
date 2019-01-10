@@ -103,7 +103,7 @@ var grabDataFile = function(mykey,cb){
 
       setTimeout(function(){cb();},3000)
     })
-  },1000)
+  },1000);
 
   setTimeout(function(){
     dat.leave();
