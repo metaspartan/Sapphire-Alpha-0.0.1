@@ -95,16 +95,26 @@ var grabDataFile = function(mykey,cb){
         console.log("this error thrown opening the dat "+err.toString());
       }
 
-      dat.resume();
+      //dat.resume();
       // 3. Join the network & download (files are automatically downloaded)
       dat.joinNetwork();
 
-      console.log("database should be written now please restart your node");
+      console.log("database should be written now ...STAND BY for memory reload (automatic process)");
 
       setTimeout(function(){cb();},3000)
     })
   },1000)
 
+  setTimeout(function(){
+    dat.leave();
+    dat.close();
+    var path = './SYNC/';
+    rmdir(path, function (err, dirs, files) {
+      console.log(dirs);
+      console.log(files);
+      console.log('all files are removed');
+    });
+  },12000);
 
 
 }
