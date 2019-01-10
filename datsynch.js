@@ -106,15 +106,15 @@ var grabDataFile = function(mykey,cb){
   },1000);
 
   setTimeout(function(){
-    dat.leave();
-    dat.close();
+
     var path = './SYNC/';
     rmdir(path, function (err, dirs, files) {
       console.log(dirs);
       console.log(files);
       console.log('all files are removed');
     });
-  },12000);
+    
+  },20000);
 
 
 }
