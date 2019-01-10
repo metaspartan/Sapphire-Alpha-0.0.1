@@ -350,6 +350,22 @@ var addOrder = function(orderkey,order){
   putRecord(orderkey,JSON.stringify(order));
 }
 
+//remove orders by transactionID and timestamp
+var clearOrderById = function(transactionID,timestamp){
+
+  var stream = db.createKeyStream();
+
+  stream.on('data',function(data){
+
+    if(data.toString().split(":")[4] == transactionID && data.toString().split(":")[5] == timestamp){
+      db.del(data).then(function(){console.log("deleting this order "+transactionID,timestamp);});
+    }
+
+  });
+
+
+}
+
 var getOrdersBuy = function(callBack){
 
   console.log("Open BUY Orders leveldb");

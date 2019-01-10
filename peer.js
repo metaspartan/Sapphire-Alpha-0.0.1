@@ -24,8 +24,7 @@ const sha256 = require('crypto-js/sha256');
 const chalk = require('chalk');
 const log = console.log;
 
-////////////////////////////////////calls the nano-sql data interface to leveldb
-var BlockchainDB = require('./nano2.js');
+////////////////////////////////////////////////////calls the level db interface
 var BlkDB = require('./level.js');
 
 //////////////////////////////////////////////////////////////////////rpc sercer
@@ -36,7 +35,7 @@ var request = require('request');
 
 ///////////////////////Mining stuff : blockchain algo and mining initializations
 var sapphirechain = require("./block.js");
-sapphirechain.setBlockchainDB(BlockchainDB,BlkDB);
+sapphirechain.setBlockchainDB(BlkDB);
 var BLAKE2s = require("./blake2s.js");
 var Miner = require("./miner.js");
 Miner.setSapphireChain(sapphirechain);
@@ -117,11 +116,11 @@ var addyBal = function(val){
 
 //////////////////////////////////////////////////////core function asynchronous
 ;(async () => {
-  const port = await getPort()
+  const port = await getPort()//grab available random port for peer connections
 
-  sw.listen(port)
+  sw.listen(port)//peers
   sw.join('egem-sfrx') // can be any id/name/hash
-
+  //incoming connections from peers
   sw.on('connection', (conn, info) => {
 
     log(chalk.blue(JSON.stringify(info)));
@@ -149,8 +148,8 @@ var addyBal = function(val){
       // Here we handle incomming messages
       console.log("type of is "+typeof(data));
       log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
-
-      var sendBack = function(msg,peerId){
+      // callback returning verified uncles post processing probably needs a rename
+      var sendBackUncle = function(msg,peerId){
         peers[peerId].conn.write(JSON.stringify(msg));
       }
 
@@ -191,8 +190,7 @@ var addyBal = function(val){
                 ///need to alidate that this wallet has the funds to send
                 myblockorder = new sapphirechain.Order(addressFrom,buyOrSell,pairBuy,pairSell,amount,price);
                 frankieCoin.createOrder(myblockorder);
-                //BlockchainDB.addOrder({order:myblockorder});
-                BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
+                //BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
                 console.log("This legitimate signed order by "+validatedSender+" has been posted to chain with confirmation "+myblockorder.transactionID);
               }else{
                 console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
@@ -208,10 +206,10 @@ var addyBal = function(val){
           var incomingBLockHeight = JSON.parse(data)["blockHeight"];
           console.log("VVVVVVVVVVVVVVVVVVVVV        "+incomingBLockHeight+"        VVVVVVVVVVVVVVVVVVVV    ---->   "+frankieCoin.blockHeight);
 
-          ///if block to skip this process being added here
-          if(parseInt(incomingBLockHeight) == (parseInt(frankieCoin.blockHeight)+1)){
+          /////////////////INCOMING BLOCK IS ANTICIPATED HEIGHT AND NOT SYNCHING
+          if((parseInt(incomingBLockHeight) == (parseInt(frankieCoin.blockHeight)+1)) && isSynching == false){
 
-            ////////////////NEED TO REMOVE ANY MATHED PENDING TXS FROM MEME POOL
+            ///////////////NEED TO REMOVE ANY MATCHED PENDING TXS FROM MEME POOL
             console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
             console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
             var incomingTx = JSON.parse(data)["transactions"];
@@ -248,7 +246,7 @@ var addyBal = function(val){
             ////////////////////////////////////END REMOVAL OF PENDING TX AND OX
 
             //first we add the block to the blockchain with call back and id of submitting peer for conflict resolution
-            var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data),sendBack,peerId);
+            var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data),sendBackUncle,peerId);
 
             log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD? "+successfulBlockAdd));
 
@@ -294,9 +292,12 @@ var addyBal = function(val){
               }
 
               frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
+              //////BECAUSE WE ARE REMOVING A BLOCK WE MAY NEED TO DELETE FROM Database
+              BlkDB.removeBlock(frankieCoin.getLength());
               BlkDB.addNode("node:"+peerId+":peerBlockHeight",parseInt(frankieCoin.getLength() - 1));
               frankieCoin.blockHeight-=1;
               frankieCoin.chain.pop();
+
 
               //going test getting into synch with these parameters
               frankieCoin.inSynch=false;
@@ -310,6 +311,7 @@ var addyBal = function(val){
               }
               //we would never get the block to this point
               //BlockchainDB.clearBlock(frankieCoin.getLength());
+              //do I need a Blkdb.clearBlock? I just did it above...
               //okay do we need a return?
 
             }
@@ -406,6 +408,7 @@ var addyBal = function(val){
             log("Did not match this hash and this peer is an imposter");
             //peers[peerId].conn.write("Don't hack me bro");
             peers[peerId].conn.write(JSON.stringify({"BadPeer":{Height:1337}}));
+            ///tesst out setTimeout(function(){disconnet peers[peerId].conn.dissconnet();},1500);
           }
 
         }else if(JSON.parse(data)["BadPeer"]){
@@ -422,15 +425,17 @@ var addyBal = function(val){
 
           var mydata = JSON.parse(data)["pongBlockStream"];
 
-          console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
-          console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
-          console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
-          console.log("SSSSSSSSSSSSSSTTTTTTTTTTTRRRRRRRRRRRRREEEEEEEEEEEEAAAAAAAAAAAAAAMMMMMMMMMMMMM");
-          console.log(mydata);
+          log("------------------------------------------------------");
+          log(chalk.green("         BLOCK STREAM SYNCH          "));
+          log(chalk.yellow("              STAND BY               "));
+          log(chalk.green("         BLOCK STREAM SYNCH          "));
+          log("------------------------------------------------------");
+
+          console.log(mydata);//we can remove this soon
 
           //callback function to refresh db with downloaded synch then pull to memory
           var cbRefreshDB = function(){
-            //passes in ChainGrab function as callback when db is open
+            //passes in ChainGrab function with input params as callback when db is open
             console.log("Importing the data file to the db and then calling the memory synch");
             setTimeout(function(){BlkDB.importFromJSONFile(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},2000);
             //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
@@ -441,10 +446,11 @@ var addyBal = function(val){
 
           }
           //1) going to import the database and callback the refresh
+          console.log("Data stream import initialized");
           DatSyncLink.grabDataFile(mydata,cbRefreshDB);
 
 
-
+          ////////////////////////////////////USE TO DIRECT READ INCOMING STREAM
           /****
           for (obj in mydata){
             console.log("incoming chain data from synch");
@@ -465,6 +471,7 @@ var addyBal = function(val){
           }
           log(chalk.blue("BlocHeightPtr: "+ chalk.green(blockHeightPtr)));
           ****/
+          //////////////////////END ARCHIVED USED TO DIRECT READ INCOMING STREAM
 
         }else if(JSON.parse(data)["ChainSyncPong"]){
           //returned block from sunched peer and parses it for db
@@ -548,7 +555,6 @@ function cliGetInput(){
             log(frankieCoin.pendingOrders[odr]["price"]);
             log(frankieCoin.pendingOrders[odr]["amount"]);
             log("Any Sell Orders with pricing less tha or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity requested");
-            //BlockchainDB.getOrdersPairBuy(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackBuyMiner);
             BlkDB.getOrdersPairBuy(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackBuyMiner)
           }else if (frankieCoin.pendingOrders[odr]["buyOrSell"] == "SELL"){
             log(frankieCoin.pendingOrders[odr]["pairBuy"]);
@@ -556,7 +562,6 @@ function cliGetInput(){
             log(frankieCoin.pendingOrders[odr]["price"]);
             log(frankieCoin.pendingOrders[odr]["amount"]);
             log("Any BUY Orders with pricing greater than or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity offered");
-            //BlockchainDB.getOrdersPairSell(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackSellMiner);
             BlkDB.getOrdersPairSell(frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackBuyMiner)
           }
         }
@@ -597,7 +602,7 @@ function cliGetInput(){
       BlkDB.getTransactionReceiptsByAddress('o9');
       BlkDB.getBalanceAtAddress('0x2025ed239a8dec4de0034a252d5c5e385b73fcd0',addyBal);
       var myOrdersBuyCBTest = function(data){
-        console.log("returning leeldb buy orders");
+        console.log("returning leveldb buy orders");
         console.log(JSON.stringify(data));
       }
       BlkDB.getOrdersBuy(myOrdersBuyCBTest);
@@ -620,7 +625,6 @@ function cliGetInput(){
       //this function calls buy order from database and...
       //mycallcakbuy calls the sells to match them up
       //the logic may update itself as we move forward from loop to event
-      //BlockchainDB.getOrdersPairBuy("EGEM",myCallbackBuy);
       BlkDB.getOrdersPairBuy("EGEM",myCallbackBuy);
       //just a reminder I have other order functions coded
       //Orderdb.getOrdersSell();
@@ -713,19 +717,16 @@ function cliGetInput(){
         ///need to alidate that this wallet has the funds to send
         myblockorder = new sapphirechain.Order(addressFrom,buyOrSell,pairBuy,pairSell,amount,price);
         frankieCoin.createOrder(myblockorder);
-        //BlockchainDB.addOrder({order:myblockorder});
-        BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
+        //BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
         console.log("This legitimate signed order by "+validatedSender+" has been posted to chain with confirmation "+myblockorder.transactionID);
       }else{
         console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
       }
-      //console.log("finally the address that signed it:" + getMyAddressBack2);
       setTimeout(function(){cliGetInput();},2000);
     }else if(userInput.startsWith("getBlock(")){//GETBLOCK function
       log(userInput.slice(userInput.indexOf("getBlock(")+9, userInput.indexOf(")")));
       var blocknum = userInput.slice(userInput.indexOf("getBlock(")+9, userInput.indexOf(")"));
       log(JSON.stringify(frankieCoin.getBlock(parseInt(blocknum))));
-      //BlockchainDB.getBlock(blocknum,cbGetBlock);//change name from callback 2 to something meaningful
       BlkDB.getBlock(blocknum,cbGetBlock);
       var pongBackBlock = function(blockData){
         console.log("this was the way to do it "+blockData.toString());
@@ -744,14 +745,8 @@ function cliGetInput(){
       log("");
       log(userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")")));
       var egemAddress = userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")"));
-      //franks.getBalanceOfAddress(userInput);
-      //note I did not need to use the miner function for balances
-      //frankieCoin.getBalanceOfAddress(egemAddress);
       BlkDB.getBalanceAtAddress(egemAddress,addyBal)
-      //BlockchainDB.getTransactionReceiptsByAddress(egemAddress);
       log("---------------");
-      //BlockchainDB.getBalanceByAddress(userInput);
-      //log('\nMiners Function Balance of '+userInput+' is', getBalance2);
       cliGetInput();
     }else if(userInput == "T"){//T is for talk but using it to initiate chain sync
       //sneaking this chain synch in here...that is a "talk"
@@ -772,10 +767,8 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput == "reindex"){
       log(chalk.yellow("|------------------------------|"));
-      BlockchainDB.clearDatabase();
-      BlkDB.clearDatabase();
-      BlockchainDB.clearOrderDatabase();
-      BlockchainDB.clearTransactionDatabase();
+      //possibly needs a callback
+      BlkDB.clearDatabase();//Not implemented yet
       log(chalk.red("| Database has been deleted.   |"));
       log(chalk.green("| Synchronizing with network...|"));
       log(chalk.yellow("|------------------------------|"));
@@ -785,17 +778,13 @@ function cliGetInput(){
           log("------------------------------------------------------");
           log(chalk.green("Sending ping for chain sync."));
           log("------------------------------------------------------");
-          //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
           peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
         }
       }
       setTimeout(function(peers){reindexChain(peers);},200)
-    }else if(userInput == "SS"){
-      //BlockchainDB.getLatestBlock();
+    }else if(userInput == "SS"){//open function right now
       console.log("----------------------------");
-      //BlockchainDB.getBlockchain(99,callBackEntireDatabase);
-      BlkDB.getBlockchain(99,callBackEntireDatabase);
-      //BlockchainDB.getAllTransactionReceipts();
+      //BlkDB.getBlockchain(99,callBackEntireDatabase);
       cliGetInput();
     }else if(userInput.startsWith("Send(")){//SEND function Send ( json tx )
       log(userInput.slice(userInput.indexOf("Send(")+5, userInput.indexOf(")")));
@@ -810,8 +799,7 @@ function cliGetInput(){
     }else if(userInput.startsWith("Hash(")){//HASH FUNCTION FOR VERIFICATIONS
       log(userInput.slice(userInput.indexOf("Hash(")+5, userInput.indexOf(")")));
       var hashText = userInput.slice(userInput.indexOf("Hash(")+5, userInput.indexOf(")"));
-
-      log(hashText);
+      log("HASHING THIS TEXT: "+hashText);
       sapphirechain.Hash(hashText);
       cliGetInput();
     }else if(userInput.startsWith("getOmmer(")){//GETBLOCK function
@@ -853,8 +841,7 @@ function cliGetInput(){
       log("1st Placing order to "+action+" "+amount+" of "+pairBuy+" for "+price+" by "+maker);
       myblockorder = new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price);
       frankieCoin.createOrder(myblockorder);
-      //BlockchainDB.addOrder({order:myblockorder});
-      BlkDB.addOrder(action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
+      //BlkDB.addOrder("ox:"+action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
       cliGetInput();
     }else if(isJSON(userInput)){//ORDER JSON style strait to order DB ^^ merging with above
       if(RegExp("^0x[a-fA-F0-9]{40}$").test(JSON.parse(userInput)["fromAddress"])){//adding function capabilioties
@@ -889,8 +876,7 @@ function cliGetInput(){
 
         myblockorder = new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price);
         frankieCoin.createOrder(myblockorder);
-        //BlockchainDB.addOrder({order:myblockorder});
-        BlkDB.addOrder(action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
+        //BlkDB.addOrder("ox:"+action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
         //{"order":{"id":null,"fromAddress":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","buyOrSell":"SELL","pairBuy":"EGEM","pairSell":"SFRX","amount":"300","price":"26.00"}}
 
         cliGetInput();
@@ -1089,7 +1075,7 @@ var myTradeCallback = function(orig,data) {
       );
       frankieCoin.createOrder(replacementOrder,data[obj]["originationID"]);
       //BlockchainDB.addOrder({order:replacementOrder});
-      BlkDB.addOrder("SELL"+":"+data[obj]["pairBuy"]+":"+data[obj]["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+      BlkDB.addOrder("ox:SELL"+":"+data[obj]["pairBuy"]+":"+data[obj]["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
     }else if (orig["amount"] > parseInt(data[obj]["amount"])){
       log("TRANSACTION: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "+parseFloat(data[obj]["amount"])+ " OF "+orig["pairBuy"]);
       frankieCoin.createTransaction(new sapphirechain.Transaction(data[obj]["fromAddress"], orig["fromAddress"], parseFloat(orig["amount"]), orig["pairBuy"]));
@@ -1108,7 +1094,7 @@ var myTradeCallback = function(orig,data) {
       );
       this.createOrder(replacementOrder,orig["originationID"]);
       //BlockchainDB.addOrder({order:replacementOrder});
-      BlkDB.addOrder("BUY"+":"+orig["pairBuy"]+":"+orig["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+      BlkDB.addOrder("ox:BUY"+":"+orig["pairBuy"]+":"+orig["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
     }
 
   }
@@ -1144,6 +1130,8 @@ var myCallbackBuyMiner = function(data) {
     //frankieCoin.createTransaction(new sapphirechain.Transaction('0x0666bf13ab1902de7dee4f8193c819118d7e21a6', data[obj]["fromAddress"], 20, "SFRX"));
     //BlockchainDB.buildTrade(data[obj],myTradeCallback);
     BlkDB.buildTrade(data[obj],myTradeCallback);
+
+    BlkDB.clearOrderById(data[obj]["transactionID"]);//NOT YET IMPLEMENTED
     BlockchainDB.clearOrderById(data[obj]["id"]);
     //since the order needs to be on the blockchain here we really need to just delete it but the order processing below is not necessary
     //however I am keeping it here in comments in case I want to move this function to the block
@@ -1159,6 +1147,8 @@ var myCallbackSellMiner = function(data) {
     frankieCoin.createOrder(new sapphirechain.Order(data[obj]["fromAddress"],data[obj]["action"],data[obj]["pairBuy"],data[obj]["pairSell"],data[obj]["amount"],data[obj]["price"]));
     //BlockchainDB.buildTrade(data[obj],myTradeCallback);
     BlkDB.buildTrade(data[obj],myTradeCallback);
+
+    BlkDB.clearOrderById(data[obj]["transactionID"]);//NOT YET IMPLEMENTED
     BlockchainDB.clearOrderById(data[obj]["id"]);
     //since the order needs to be on the blockchain here we really need to just delete it but the order processing below is not necessary
     //however I am keeping it here in comments in case I want to move this function to the block
@@ -1279,8 +1269,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
       ///need to alidate that this wallet has the funds to send
       myblockorder = new sapphirechain.Order(addressFrom,buyOrSell,pairBuy,pairSell,amount,price);
       frankieCoin.createOrder(myblockorder);
-      //BlockchainDB.addOrder({order:myblockorder});
-      BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
+      //BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
       console.log("This legitimate signed order by "+validatedSender+" has been posted to chain with confirmation "+myblockorder.transactionID);
     }else{
       console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());

@@ -17,10 +17,8 @@ const log = console.log;
 const fs = require('fs');
 const sha256 = require('crypto-js/sha256');
 //BlockchainDB reference
-var BlockchainDB;
 var BlkDB;
-var setBlockchainDB = function(bdb,bkd){
-  BlockchainDB = bdb;
+var setBlockchainDB = function(bkd){
   BlkDB = bkd;
 }
 ///////////////////////////////////////when fired this creates the genesis block
@@ -412,7 +410,7 @@ var Blockchain = class Blockchain {
           ////extra check
 
           //adding a trading mechanism and if below this chain push it processes same block HINT MOVE IT TWO LINES DOWN
-          //this.processTrades();
+          this.processTrades();
           log(chalk.yellow("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
           this.blockHeight=(parseInt(this.getLength())+1);
@@ -470,7 +468,7 @@ var Blockchain = class Blockchain {
           ////extra check
 
           //adding a trading mechanism and if below this chain push it processes same block HINT MOVE IT TWO LINES DOWN
-          //this.processTrades();
+          this.processTrades();
           log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
           this.blockHeight=(parseInt(this.blockHeight)+1);
@@ -795,8 +793,7 @@ var Blockchain = class Blockchain {
                         ''
                       );
                       this.createOrder(replacementOrder,allsells[transactions]["originationID"]);
-                      //BlockchainDB.addOrder({order:replacementOrder});
-                      BlkDB.addOrder("SELL"+":"+allsells[transactions]["pairBuy"]+":"+allsells[transactions]["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+                      BlkDB.addOrder("ox:SELL"+":"+allsells[transactions]["pairBuy"]+":"+allsells[transactions]["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
                       /*****
                       //one order gets closed
                       this.createOrder(
@@ -843,8 +840,7 @@ var Blockchain = class Blockchain {
                         ''
                       );
                       this.createOrder(replacementOrder,allbuys[ordersofbuy]["originationID"]);
-                      //BlockchainDB.addOrder({order:replacementOrder});
-                      BlkDB.addOrder("BUY"+":"+allbuys[ordersofbuy]["pairBuy"]+":"+allbuys[ordersofbuy]["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+                      BlkDB.addOrder("ox:BUY"+":"+allbuys[ordersofbuy]["pairBuy"]+":"+allbuys[ordersofbuy]["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
                       //one order gets closed
                       //one gets partisl
                       //and a new one gets open
