@@ -561,7 +561,7 @@ var Blockchain = class Blockchain {
         }
       }
 
-      //th8s is the peers adding a block needs to be VALIDATED
+      //this is the peers adding a block needs to be VALIDATED
       addBlockFromDatabase(dbBlock,msg){
 
         console.log("adding block from level to memory: "+chalk.green(msg));
@@ -597,6 +597,24 @@ var Blockchain = class Blockchain {
         }else{
           log("Block added from DATABASE")
         }
+      }
+
+      //this is the peers adding a block needs to be VALIDATED
+      addBlockFromDataStream(dbBlock,msg){
+
+        console.log("adding block from level to memory: "+chalk.green(msg));
+
+        var block = new Block(parseInt(JSON.parse(dbBlock)["blockHeight"]), JSON.parse(dbBlock)["timestamp"], JSON.parse(dbBlock)["transactions"], JSON.parse(dbBlock)["orders"], JSON.parse(dbBlock)["ommers"], JSON.parse(dbBlock)["previousHash"], JSON.parse(dbBlock)["sponsor"], JSON.parse(dbBlock)["miner"], JSON.parse(dbBlock)["eGEMBackReferenceBlock"], JSON.parse(dbBlock)["data"], JSON.parse(dbBlock)["hash"], JSON.parse(dbBlock)["egemBackReferenceBlockHash"], JSON.parse(dbBlock)["nonce"], JSON.parse(dbBlock)["difficulty"]);
+        log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
+        this.chain.push(block);
+        this.blockHeight = JSON.parse(dbBlock)["blockHeight"];
+        log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
+        if(this.chain.length > this.chainRiser){
+          this.chain.shift();
+        }
+        log(chalk.red("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
+        //careful I have the ischain valid returining true on all tries
+
       }
 
       createTransaction(transaction){

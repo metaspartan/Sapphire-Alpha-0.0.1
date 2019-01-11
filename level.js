@@ -208,7 +208,7 @@ var getBlockRange = function(blockHeight,riser,callback){
         }
       });
       stream.on('close',function(){
-        console.log("data stream is complete");
+        console.log("Block range data stream is complete");
         //console.log("inside the return "+JSON.stringify(returner))
         callback(returner);
       });

@@ -434,6 +434,7 @@ var addyBal = function(val){
           log(chalk.green("         BLOCK STREAM SYNCH          "));
           log("------------------------------------------------------");
 
+          console.log("Block Height of provider is "+providerBlockHeight);
           console.log(mydata);//we can remove this soon
 
           //callback function to refresh db with downloaded synch then pull to memory
@@ -999,7 +1000,7 @@ var cbChainGrab = function(data) {
       //block not in memory
       console.log("block does not exist "+data[obj]);
       var tempBlock = data[obj];
-      frankieCoin.addBlockFromDatabase(tempBlock,"sending in block "+JSON.parse(tempBlock)["blockHeight"])
+      frankieCoin.addBlockFromDataStream(tempBlock,"sending in block "+JSON.parse(tempBlock)["blockHeight"])
     }else{
       //block existed
       log("block exists in chain data: "+JSON.parse(data[obj])["blockHeight"]);
@@ -1057,12 +1058,7 @@ function ChainGrabRefresh(blocknum,cbChainGrab,chainRiser){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
   console.log("calling chain grab refresh with "+blocknum+cbChainGrab+chainRiser)
   //BlkDB.getBlockchain(99,cbChainGrab,ggHash)
-  var currentHeight = function(val){
-    console.log(val);
-    BlkDB.getBlockRange(val,frankieCoin.chainRiser,cbChainGrab)
-  }
-  BlkDB.getChainStateParam("blockHeight",currentHeight);
-  //BlkDB.getBlockRange(blocknum,chainRiser,cbChainGrab)
+  BlkDB.getBlockRange(blocknum,chainRiser,cbChainGrab)
   //maybe some other stuff like .then
 };
 //and finally the actual call to function for synch
