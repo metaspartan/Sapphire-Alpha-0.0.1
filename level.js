@@ -57,6 +57,22 @@ var getChainParamsBlockHeight = function(hashKey){
   });
 }
 
+var addChainState = function(key,val){
+  console.log("chain state of "+key.toString()+" and value "+val.toString());
+  db.put(key, val, function (err) {
+    if (err) return console.log('Ooops!', err) // some kind of I/O error
+  })
+}
+
+var getChainStateParam = function(state,cb){
+  db.get("cs:"+state, function (err, value) {
+
+    console.log("Chain State Param: "+state+" = "+value.toString());
+    cb(value.toString());
+
+  });
+}
+
 var addNode = function(key, value){
   console.log("Adding Node as follows key: "+key.toString()+" - value:"+ value.toString())
   //node:id:
@@ -170,6 +186,31 @@ var getBlockchain = function(limit,callback,hashKey){
       console.log("you are running the wrong version and need to update "+value.toString());
     }
   })
+}
+
+var getBlockRange = function(blockHeight,riser,callback){
+
+
+    var chainBlockHeight=blockHeight;
+    chainBlockHeight-=riser;
+
+      console.log("riser: "+riser+" blockHeight: "+blockHeight+" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
+      var returner = [];
+      var stream = db.createReadStream();
+      stream.on('data',function(data){
+        //console.log("block: "+parseInt(data.key.toString().split(":")[1],16).toString(10)+" hexBlockNum: "+parseInt(chainBlockHeight))
+        //console.log('key = '+data.key+" value = "+data.value.toString());
+        if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight))){//possible another block enters the db s no upper limit
+          //console.log("here... "+data.key.toString()+" "+data.value.toString());
+          returner.push(data.value.toString());
+        }
+      });
+      stream.on('close',function(){
+        console.log("data stream is complete");
+        //console.log("inside the return "+JSON.stringify(returner))
+        callback(returner);
+      });
+
 }
 
 var getBlockchain2 = function(limit,callback,hashKey){
@@ -824,6 +865,8 @@ module.exports = {
     addChainParams:addChainParams,
     getChainParams:getChainParams,
     getChainParamsBlockHeight:getChainParamsBlockHeight,
+    addChainState:addChainState,
+    getChainStateParam:getChainStateParam,
     addNode:addNode,
     getNodes:getNodes,
     addBlock:addBlock,
@@ -832,6 +875,7 @@ module.exports = {
     getAllBLocks:getAllBLocks,
     getBlockchain:getBlockchain,
     getBlockStream:getBlockStream,
+    getBlockRange:getBlockRange,
     clearDatabase:clearDatabase,
     addTransactions:addTransactions,
     getTransactions:getTransactions,

@@ -63,6 +63,7 @@ var output = fs.readFile(filename, 'utf8', function(err, data) {
     }
     BlkDB.addChainParams(globalGenesisHash,JSON.stringify({"version":"alpha.0.0.1"}));
     BlkDB.addChainParams(globalGenesisHash+":blockHeight",0);
+    //BlkDB.addChainState("cs:blockHeight",403);//NEVER CALL THIS HERE WITH 0 IT DEFEATS THE PURPOSE
 });
 ////////////////////////////////////////////////////////////////end genesis hash
 
@@ -267,6 +268,7 @@ var addyBal = function(val){
               //add it to the database
               BlkDB.addBlock(parseInt(frankieCoin.getLength()),JSON.stringify(frankieCoin.getLatestBlock()),"202");
               BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.getLength()));
+              BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.getLength()));
               BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
               //add it to the RPC for miner
               rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
@@ -311,7 +313,7 @@ var addyBal = function(val){
               }
               //we would never get the block to this point
               //BlockchainDB.clearBlock(frankieCoin.getLength());
-              //do I need a Blkdb.clearBlock? I just did it above...
+              //do I need a BlkDB.clearBlock? I just did it above...
               //okay do we need a return?
 
             }
@@ -506,7 +508,7 @@ var addyBal = function(val){
           log("the hash matched you would record that now");
         }
 
-        if(data.toString().includes("BlockHeight: ")){
+        if(data.toString().includes("BlockHeight ")){
           log("Blockheight is "+data.toString());
         }
 
@@ -579,6 +581,7 @@ function cliGetInput(){
         BlkDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
         BlkDB.addBlock(parseInt(frankieCoin.getLength()),JSON.stringify(frankieCoin.getLatestBlock()),"469");
         BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.getLength()));
+        BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.getLength()));
         //sending the block to the peers
         broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
 
@@ -784,6 +787,18 @@ function cliGetInput(){
       setTimeout(function(peers){reindexChain(peers);},200)
     }else if(userInput == "SS"){//open function right now
       console.log("----------------------------");
+
+      var chainRiserStream = function(data){
+        console.log("if hex works only top 10 "+data.toString())
+      }
+      var currentHeight = function(val){
+        console.log(val);
+        BlkDB.getBlockRange(val,parseInt(frankieCoin.chainRiser),chainRiserStream)
+      }
+      BlkDB.getChainStateParam("blockHeight",currentHeight);
+
+
+
       //BlkDB.getBlockchain(99,callBackEntireDatabase);
       cliGetInput();
     }else if(userInput.startsWith("Send(")){//SEND function Send ( json tx )
@@ -910,6 +925,7 @@ var frankieCoin = blockchain();
 //have to load the first block into local database
 BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()),"759");
 BlkDB.addChainParams(globalGenesisHash+":blockHeight",1);
+//BlkDB.addChainState("cs:blockHeight",1);//NEVER LOAD THIS HERE IT DEFEATS THE WHOLE PURPOSE
 BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 log("peer chain is"+ frankieCoin.getEntireChain());
 
@@ -1017,6 +1033,7 @@ var cbChainGrab = function(data) {
   });
   *****/
   BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
+  BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
   console.log("about to send this to rpc "+JSON.stringify({block:frankieCoin.getLatestBlock()}))
   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
 
@@ -1027,13 +1044,19 @@ var cbChainGrab = function(data) {
 //a function call for datastore
 function ChainGrab(blocknum){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
-  BlkDB.getBlockchain(99,cbChainGrab,globalGenesisHash)
+  //BlkDB.getBlockchain(99,cbChainGrab,globalGenesisHash)
+  var currentHeight = function(val){
+    console.log(val);
+    BlkDB.getBlockRange(val,frankieCoin.chainRiser,cbChainGrab)
+  }
+  BlkDB.getChainStateParam("blockHeight",currentHeight);
   //maybe some other stuff like .then
 };
 function ChainGrabRefresh(blocknum,cbChainGrab,ggHash){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
   console.log("calling chain grab refresh with "+blocknum+cbChainGrab+ggHash)
   BlkDB.getBlockchain(99,cbChainGrab,ggHash)
+  //BlkDB.getBlockRange(blockHeight,riser,callback)
   //maybe some other stuff like .then
 };
 //and finally the actual call to function for synch
@@ -1205,6 +1228,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
       BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),"1040");
       BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
+      BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
       BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
 
       fbroadcastPeersBlock();
