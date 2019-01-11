@@ -66,10 +66,12 @@ var addChainState = function(key,val){
 
 var getChainStateParam = function(state,cb){
   db.get("cs:"+state, function (err, value) {
-
-    console.log("Chain State Param: "+state+" = "+value.toString());
-    cb(value.toString());
-
+    if(value){
+      console.log("Chain State Param: "+state+" = "+value.toString());
+      cb(value.toString());
+    }else{
+      cb(0);
+    }
   });
 }
 
