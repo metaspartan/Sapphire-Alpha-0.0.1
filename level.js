@@ -677,7 +677,7 @@ var dumpToJsonFIle = function(cb,peer){
 }
 
 
-var importFromJSONFile = function(cb,blockNum,cbChainGrab,globalGenesisHash){
+var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
 
   var content = require('./SYNC/SFRX.json');
 
@@ -692,7 +692,7 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,globalGenesisHash){
     })
   }
 
-  cb(blockNum,cbChainGrab,globalGenesisHash);
+  cb(blockNum,cbChainGrab,chainRiser);
 
 }
 

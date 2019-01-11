@@ -360,7 +360,7 @@ var addyBal = function(val){
                 BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
                 ***/
                 var setDatSynch = function(datSynch,reqPeer){
-                  reqPeer.conn.write(JSON.stringify({pongBlockStream:datSynch}));
+                  reqPeer.conn.write(JSON.stringify({pongBlockStream:datSynch,blockHeight:frankieCoin.getLength()}));
                 }
                 var cbGetSynch = function(datpeer){
                   console.log("calling dat synch")
@@ -426,6 +426,7 @@ var addyBal = function(val){
           isSynching = true;
 
           var mydata = JSON.parse(data)["pongBlockStream"];
+          var providerBlockHeight = parseInt(JSON.parse(data)["blockHeight"]);
 
           log("------------------------------------------------------");
           log(chalk.green("         BLOCK STREAM SYNCH          "));
@@ -439,10 +440,10 @@ var addyBal = function(val){
           var cbRefreshDB = function(){
             //passes in ChainGrab function with input params as callback when db is open
             console.log("Importing the data file to the db and then calling the memory synch");
-            setTimeout(function(){BlkDB.importFromJSONFile(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},2000);
+            setTimeout(function(){BlkDB.importFromJSONFile(ChainGrabRefresh,providerBlockHeight,cbChainGrab,frankieCoin.chainRiser);},2000);
             //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
-            var cbBlockMemLoad = function(blockNum,cbChainGrab,globalGenesisHash){
-              setTimeout(function(){ChainGrabRefresh(blockNum,cbChainGrab,globalGenesisHash);},3000)
+            var cbBlockMemLoad = function(blockNum,cbChainGrab,chainRiser){
+              setTimeout(function(){ChainGrabRefresh(blockNum,cbChainGrab,chainRiser);},3000)
             }
 
 
@@ -1052,11 +1053,11 @@ function ChainGrab(blocknum){
   BlkDB.getChainStateParam("blockHeight",currentHeight);
   //maybe some other stuff like .then
 };
-function ChainGrabRefresh(blocknum,cbChainGrab,ggHash){
+function ChainGrabRefresh(blocknum,cbChainGrab,chainRiser){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
   console.log("calling chain grab refresh with "+blocknum+cbChainGrab+ggHash)
-  BlkDB.getBlockchain(99,cbChainGrab,ggHash)
-  //BlkDB.getBlockRange(blockHeight,riser,callback)
+  //BlkDB.getBlockchain(99,cbChainGrab,ggHash)
+  BlkDB.getBlockRange(blocknum,chainRiser,cbChainGrab)
   //maybe some other stuff like .then
 };
 //and finally the actual call to function for synch
