@@ -39,13 +39,26 @@ var synchDatabase = function(callback,peer){
 
 var synchDatabaseJSON = function(callback,peer){
   // 1. My files are in /joe/cat-pic-analysis
-
   console.log("and now we are setting data synch called with "+callback+" and "+peer)
 
   Dat('./SYNC', function (err, dat) {
 
-    if (err) throw err
+    if(err){
+      //going to attempt to handle this exception and continue
+      console.log("error in synchDatabaseJSON: "+err);
+      dat.leave();
+      dat.close();
+      var path = './SYNC/';
+      rmdir(path, function (err, dirs, files) {
+        console.log(dirs);
+        console.log(files);
+        console.log('all files are removed');
+      });
+      setTimeout(function(){
+        synchDatabaseJSON(callback,peer)
+      },1000)
 
+    }else{
       dat.importFiles()
 
       // 3. Share the files on the network!
@@ -66,6 +79,7 @@ var synchDatabaseJSON = function(callback,peer){
           console.log('all files are removed');
         });
       },3000);
+    }
 
   })
 
@@ -89,19 +103,32 @@ var grabDataFile = function(mykey,cb){
       // 2. Tell Dat what link I want
       key: mykey.split("://")[1] // (a 64 character hash from above)
     }, function (err, dat) {
+
       if(err){
-        //throw err
-        throw err
-        console.log("this error thrown opening the dat "+err.toString());
+        //going to attempt to handle this exception and continue
+        console.log("error in grabDataFile: "+err);
+        dat.leave();
+        dat.close();
+        var path = './SYNC/';
+        rmdir(path, function (err, dirs, files) {
+          console.log(dirs);
+          console.log(files);
+          console.log('all files are removed');
+        });
+        setTimeout(function(){
+          grabDataFile(mykey,cb)
+        },1000)
+
+      }else{
+        //dat.resume();
+        // 3. Join the network & download (files are automatically downloaded)
+        dat.joinNetwork();
+
+        console.log("database should be written now ...STAND BY for memory reload (automatic process)");
+
+        setTimeout(function(){cb();},3000)
       }
 
-      //dat.resume();
-      // 3. Join the network & download (files are automatically downloaded)
-      dat.joinNetwork();
-
-      console.log("database should be written now ...STAND BY for memory reload (automatic process)");
-
-      setTimeout(function(){cb();},3000)
     })
   },1000);
 
@@ -113,7 +140,7 @@ var grabDataFile = function(mykey,cb){
       console.log(files);
       console.log('all files are removed');
     });
-    
+
   },20000);
 
 
