@@ -107,8 +107,6 @@ var grabDataFile = function(mykey,cb){
       if(err){
         //going to attempt to handle this exception and continue
         console.log("error in grabDataFile: "+err);
-        dat.leave();
-        dat.close();
         var path = './SYNC/';
         rmdir(path, function (err, dirs, files) {
           console.log(dirs);
