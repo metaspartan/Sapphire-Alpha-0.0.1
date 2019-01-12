@@ -56,7 +56,7 @@ var synchDatabaseJSON = function(callback,peer){
       });
       setTimeout(function(){
         synchDatabaseJSON(callback,peer)
-      },1000)
+      },100)
 
     }else{
       dat.importFiles()
@@ -115,7 +115,7 @@ var grabDataFile = function(mykey,cb){
         });
         setTimeout(function(){
           grabDataFile(mykey,cb)
-        },1000)
+        },100)
 
       }else{
         //dat.resume();
