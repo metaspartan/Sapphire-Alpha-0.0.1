@@ -1082,11 +1082,7 @@ var myTradeCallback = function(orig,data) {
     if(parseInt(orig["amount"]) <= parseInt(data[obj]["amount"])){
       ///////////////////////////////////if the buy amount is less than the sell
       log("TRANSACTION: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "+parseFloat(orig["amount"])+ " OF "+orig["pairBuy"]);
-      /////TWO TRANDACRTIONS HAPPENING HERE BECAUSE ITS A TRADE
-      //this one is the buy
       frankieCoin.createTransaction(new sapphirechain.Transaction(data[obj]["fromAddress"], orig["fromAddress"], parseFloat(orig["amount"]), orig["pairBuy"]));
-      //this one is the sell *** NOT TESTED and PRICE may need to be from the order not the oric
-      frankieCoin.createTransaction(new sapphirechain.Transaction(orig["fromAddress"], data[obj]["fromAddress"], parseFloat(orig["amount"]*orig["price"]), orig["pairSell"]));
       log("UNFILLED REPLACEMENT - SELLER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairSell"]+" QTY "+(parseFloat(data[obj]["amount"]) - parseFloat(orig["amount"]))+" FOR "+data[obj]["price"]+" OF "+data[obj]["pairBuy"]+" PER "+data[obj]["pairSell"]);
       //log("UNFILLED REPLACEMENT ORDER: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "++ " OF "+orig["pairBuy"]);
       var newOrderAmpount = parseFloat(parseFloat(data[obj]["amount"]) - parseFloat(orig["amount"]));
@@ -1107,11 +1103,7 @@ var myTradeCallback = function(orig,data) {
       BlkDB.addOrder("ox:SELL"+":"+data[obj]["pairBuy"]+":"+data[obj]["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
     }else if (orig["amount"] > parseInt(data[obj]["amount"])){
       log("TRANSACTION: SELLER "+data[obj]["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "+parseFloat(data[obj]["amount"])+ " OF "+orig["pairBuy"]);
-      //again two transactions makes a trade
-      //this is the buy
       frankieCoin.createTransaction(new sapphirechain.Transaction(data[obj]["fromAddress"], orig["fromAddress"], parseFloat(orig["amount"]), orig["pairBuy"]));
-      //not tested
-      frankieCoin.createTransaction(new sapphirechain.Transaction(orig["fromAddress"], data[obj]["fromAddress"], parseFloat(orig["amount"]*orig["price"]), orig["pairSell"]));
       log("UNFILLED REPLACEMENT - SELLER "+data[obj]["fromAddress"]+" OF "+data[obj]["pairSell"]+" QTY "+(parseFloat(orig["amount"]) - parseFloat(data[obj]["amount"]))+" FOR "+data[obj]["price"]+" OF "+data[obj]["pairBuy"]+" PER "+data[obj]["pairSell"]);
       var newOrderAmpount = parseFloat(parseFloat(orig["amount"])-parseFloat(data[obj]["amount"]));
       //constructor(fromAddress, buyOrSell, pairBuy, pairSell, amount, price, transactionID, originationID){

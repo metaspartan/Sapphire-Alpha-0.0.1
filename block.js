@@ -797,6 +797,7 @@ var Blockchain = class Blockchain {
                     if(allbuys[ordersofbuy].amount < allsells[transactions].amount){
                       log("transaction created is "+allsells[transactions]["fromAddress"]+allbuys[ordersofbuy]["fromAddress"]+allbuys[ordersofbuy]["amount"]+allbuys[ordersofbuy]["pairBuy"]);
                       this.createTransaction(new Transaction(allsells[transactions]["fromAddress"], allbuys[ordersofbuy]["fromAddress"], allbuys[ordersofbuy]["amount"], allbuys[ordersofbuy]["pairBuy"]));
+                      this.createTransaction(new Transaction(allbuys[ordersofbuy]["fromAddress"], allsells[transactions]["fromAddress"], parseFloat(allbuys[ordersofbuy]["amount"]*allsells[transactions]["price"]), allbuys[ordersofbuy]["pairSell"]));
                       var newOrderAmpount = allsells[transactions]["amount"]-allbuys[ordersofbuy]["amount"];
                       //constructor(fromAddress, buyOrSell, pairBuy, pairSell, amount, price, transactionID, originationID){
                       //and a new one gets open
@@ -845,6 +846,7 @@ var Blockchain = class Blockchain {
                       *****/
                     }else if(allbuys[ordersofbuy].amount > allsells[transactions].amount){
                       this.createTransaction(new Transaction(allsells[transactions]["fromAddress"], allbuys[ordersofbuy]["fromAddress"], allsells[transactions]["amount"], allbuys[ordersofbuy]["pairBuy"]));
+                      this.createTransaction(new Transaction(allbuys[ordersofbuy]["fromAddress"], allsells[transactions]["fromAddress"], parseFloat(allsells[transactions]["amount"]*allsells[transactions]["price"]), allbuys[ordersofbuy]["pairSell"]));
                       var newOrderAmpount = allbuys[ordersofbuy]["amount"]-allsells[transactions]["amount"];
                       //constructor(fromAddress, buyOrSell, pairBuy, pairSell, amount, price, transactionID, originationID){
                       var replacementOrder = new Order(
