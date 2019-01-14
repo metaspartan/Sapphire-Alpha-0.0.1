@@ -681,30 +681,26 @@ var dumpToJsonFIleRange = function(cb,peer,start){
   var chainBlockHeight=start;
   var jsonSynch = []
 
-    console.log(" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
+  console.log(" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
 
-    var stream = db.createReadStream();
-    stream.on('data',function(data){
-      //console.log("block: "+parseInt(data.key.toString().split(":")[1],16).toString(10)+" hexBlockNum: "+parseInt(chainBlockHeight))
-      //console.log('key = '+data.key+" value = "+data.value.toString());
-      if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight))){//possible another block enters the db s no upper limit
-        //console.log("here... "+data.key.toString()+" "+data.value.toString());
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    //console.log("block: "+parseInt(data.key.toString().split(":")[1],16).toString(10)+" hexBlockNum: "+parseInt(chainBlockHeight))
+    //console.log('key = '+data.key+" value = "+data.value.toString());
+    if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight))){//possible another block enters the db s no upper limit
+      //console.log("here... "+data.key.toString()+" "+data.value.toString());
 
-        console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+      console.log("key... "+data.key.toString()+".....value "+data.value.toString());
 
-        var thisRowKey = data.key.toString();
-        var thisRowValue = data.value.toString();
-        var thisRow = {[thisRowKey]:thisRowValue};
+      var thisRowKey = data.key.toString();
+      var thisRowValue = data.value.toString();
+      var thisRow = {[thisRowKey]:thisRowValue};
 
-        jsonSynch.push(thisRow);
+      jsonSynch.push(thisRow);
 
-      }
-    });
-    stream.on('close',function(){
-      console.log("Block range data stream is complete");
-      //console.log("inside the return "+JSON.stringify(returner))
-      callback(returner);
-    });
+    }
+  });
+  
 
   stream.on('close',function(){
 
