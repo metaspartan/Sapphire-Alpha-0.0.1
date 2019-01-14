@@ -367,7 +367,9 @@ var addyBal = function(val){
                   DatSyncLink.synchDatabaseJSON(setDatSynch,datpeer);
                 }
                 //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
-                BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
+                //BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
+                BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"]);
+
 
                 //pongBack = true;//not sure about this since this is a stream
               }else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){

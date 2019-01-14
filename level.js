@@ -676,6 +676,59 @@ var dumpToJsonFIle = function(cb,peer){
 
 }
 
+var dumpToJsonFIleRange = function(cb,peer,start){
+
+  var chainBlockHeight=start;
+  var jsonSynch = []
+
+    console.log(" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
+
+    var stream = db.createReadStream();
+    stream.on('data',function(data){
+      //console.log("block: "+parseInt(data.key.toString().split(":")[1],16).toString(10)+" hexBlockNum: "+parseInt(chainBlockHeight))
+      //console.log('key = '+data.key+" value = "+data.value.toString());
+      if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight))){//possible another block enters the db s no upper limit
+        //console.log("here... "+data.key.toString()+" "+data.value.toString());
+
+        console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+
+        var thisRowKey = data.key.toString();
+        var thisRowValue = data.value.toString();
+        var thisRow = {[thisRowKey]:thisRowValue};
+
+        jsonSynch.push(thisRow);
+
+      }
+    });
+    stream.on('close',function(){
+      console.log("Block range data stream is complete");
+      //console.log("inside the return "+JSON.stringify(returner))
+      callback(returner);
+    });
+
+  stream.on('close',function(){
+
+    console.log("Dat Copy data stream is complete");
+
+    //db2.close();
+    if (!fs.existsSync("./SYNC")){
+        fs.mkdirSync("./SYNC");
+    }
+
+    fs.writeFile("./SYNC/SFRX.json", JSON.stringify(jsonSynch), (err) => {
+        if (err) {
+            console.error(err);
+            return;
+        };
+        console.log("JSON synch File has been created");
+    });
+
+    setTimeout(function(){cb(peer)},1000);
+
+  });
+
+}
+
 
 var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
 
@@ -863,6 +916,7 @@ module.exports = {
     closeDB:closeDB,
     dumpDatCopy:dumpDatCopy,
     dumpToJsonFIle:dumpToJsonFIle,
+    dumpToJsonFIleRange:dumpToJsonFIleRange,
     importFromJSONFile:importFromJSONFile,
     addChainParams:addChainParams,
     getChainParams:getChainParams,
