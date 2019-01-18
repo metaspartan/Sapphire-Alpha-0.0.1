@@ -1,9 +1,40 @@
+var BLAKE2s = require("./blake2s.js")
 var levelup = require('levelup')
 var leveldown = require('leveldown')
 var fs = require('fs')
 //web3
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
+
+function decodeUTF8(s) {
+  var i, d = unescape(encodeURIComponent(s)), b = new Uint8Array(d.length);
+  for (i = 0; i < d.length; i++) b[i] = d.charCodeAt(i);
+  return b;
+}
+
+var Hash = function(inputs) {
+  try {
+    var h = new BLAKE2s(32, decodeUTF8(""));
+  } catch (e) {
+    console.log("Error: " + e);
+  };
+  h.update(decodeUTF8(inputs));
+  var thishash = h.hexDigest().toString();
+  console.log(thishash);
+  return thishash;
+}
+
+var Transaction = class Transaction{
+    //address validation in signed raw tx
+    constructor(fromAddress, toAddress, amount, ticker, txTimestamp){
+        this.fromAddress = fromAddress;
+        this.toAddress = toAddress;
+        this.amount = amount;
+        this.ticker = ticker;
+        this.timestamp = txTimestamp;
+        this.hash = Hash(toAddress+amount+ticker+txTimestamp);
+    }
+}
 
 // 1) Create our store
 var db = levelup(leveldown('./SFRX'))
@@ -101,6 +132,63 @@ var addBlock = function(blknum,block,callfrom){
   console.log("adding block "+blknum+" as "+hexBlockNum);
   putRecord("sfblk:"+hexBlockNum,block)
   //parseInt(hexString, 16);//this is back to number from hex
+  console.log("<<<<<----------------BLOCK REWARDS LEVEL DB HERE------------>>>>>")
+  //console.log("block: "+JSON.stringify(block));
+
+  var calcBlockReward;
+  if(parseInt(blknum) < 7500001){calcBlockReward=9}//ERA1
+  else if(parseInt(blknum) < 15000001){calcBlockReward=4.5}//ERA2
+  else if(parseInt(blknum) < 21500001){calcBlockReward=2.25}//ERA3
+  else if(parseInt(blknum) < 30000001){calcBlockReward=1.125}//ERA4
+  else if(parseInt(blknum) < 37500001){calcBlockReward=0.625}//ERA5
+  else if(parseInt(blknum) < 45000001){calcBlockReward=0.3125}//ERA6
+  else if(parseInt(blknum) > 45000000){calcBlockReward=0.15625}//ERA7
+
+  var calcMiningReward = parseFloat(calcBlockReward*0.8633);//miner
+  var calcDevReward = parseFloat(calcBlockReward*0.0513);//coredev
+  var calcCMDevReward = parseFloat(calcBlockReward*0.0454);//community dev
+  var calcSponsorReward = parseFloat(calcBlockReward*0.01);//sponsor
+  var calcBigNodeReward = parseFloat(calcBlockReward*0.02);//big node sapphire
+  var calcEGEMT1NodeReward = 0.005;//egem node
+  var calcEGEMT2NodeReward = 0.005;//egem big bit node
+
+  if(parseInt(blknum) == 1){//permines
+    ///////////////////////////////////////////////////////////////////CORE DEVS
+    var osoTx = new Transaction("sapphire", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", "750000", "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx));
+    var ridzTx = new Transaction("sapphire", "0xc393659c2918a64cdfb44d463de9c747aa4ce3f7", "750000", "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx));
+    var jalTx = new Transaction("sapphire", "0xA54EE4A7ab23068529b7Fec588Ec3959E384a816", "750000", "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx));
+    var tbatesTx = new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", "750000", "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx));
+    var beastTx = new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", "750000", "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx));
+    ////////////////////////////////////////////////////////////////EARLY SUPPORT
+    /***
+    var sehidTx = new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", "250000", "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx));
+    var galimbaTx = new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", "250000", "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx));
+    var wookieTx = new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", "250000", "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx));
+    var buzzTx = new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", "250000", "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx));
+    ***/
+    ////////////////////////////////////////////////////////////TESTING ACCOUNTSS
+  }else{//perblock rewards from block 2 until
+    var osoTx = new Transaction("sapphire", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx));
+    var ridzTx = new Transaction("sapphire", "0xc393659c2918a64cdfb44d463de9c747aa4ce3f7", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx));
+    var jalTx = new Transaction("sapphire", "0xA54EE4A7ab23068529b7Fec588Ec3959E384a816", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx));
+    var tbatesTx = new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx));
+    var beastTx = new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
+    putRecord("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx));
+  }
+  //console.log("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"]+","+JSON.stringify(osoTx))
 }
 
 var getBlock = function(blknum,callBack){
@@ -700,7 +788,7 @@ var dumpToJsonFIleRange = function(cb,peer,start){
 
     }
   });
-  
+
 
   stream.on('close',function(){
 

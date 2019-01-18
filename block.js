@@ -40,8 +40,9 @@ var genesisBLK = function genesisBLK() {
 
   //dev team drops
   var genesisTx = [
-    new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SFRX"),//oso
-    new Transaction(null, "0x5080fb28d8cf96c320e1a2e56a901abb7391b4ce", 500000, "SFRX"),//ridz
+    //these transactions are moved to block reward
+    //new Transaction(null, "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", 500000, "SFRX"),//oso
+    //new Transaction(null, "0x5080fb28d8cf96c320e1a2e56a901abb7391b4ce", 500000, "SFRX"),//ridz
     //pre loaded multicurrency account
     new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 100000, "EGEM"),//BTC
     new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 3, "BTC"),//BTC
