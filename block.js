@@ -262,6 +262,7 @@ var Blockchain = class Blockchain {
           //ommers
           this.pendingOmmers = [];
           //need to set the block rewards
+          //////calculations in level.js database now but will replicate in here
           this.miningReward = 8;
           this.sponsorReward = 0.5;
           this.devReward = 0.5;
