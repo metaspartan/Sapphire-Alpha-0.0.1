@@ -799,8 +799,7 @@ var dumpToJsonFIleRange = function(cb,peer,start){
     //console.log('key = '+data.key+" value = "+data.value.toString());
     if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight))){//possible another block enters the db s no upper limit
       //console.log("here... "+data.key.toString()+" "+data.value.toString());
-
-      console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+      //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
 
       var thisRowKey = data.key.toString();
       var thisRowValue = data.value.toString();
@@ -808,6 +807,15 @@ var dumpToJsonFIleRange = function(cb,peer,start){
 
       jsonSynch.push(thisRow);
 
+    }else if(data.key.toString().split(":")[0] == "tx"){
+      //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+
+      var thisRowKey = data.key.toString();
+      var thisRowValue = data.value.toString();
+      var thisRow = {[thisRowKey]:thisRowValue};
+
+      jsonSynch.push(thisRow);
+      
     }
   });
 

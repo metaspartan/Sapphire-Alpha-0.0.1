@@ -431,11 +431,11 @@ var Blockchain = class Blockchain {
       ///for mining transactions from outside miner
       addPendingTransactionsToMinedBLock(miningRewardAddress, minedBlock){
 
-          //need to add the mining reward HERE
-          var minedReward = new Transaction(null, minedBlock["miner"], this.miningReward, "SFRX");
-          this.createTransaction(minedReward);
+          //MINING REWARD MOVED TO DATABASE DIRECT
+          //var minedReward = new Transaction(null, minedBlock["miner"], this.miningReward, "SFRX");
+          //this.createTransaction(minedReward);
 
-          log("MINEDREWARD EQUALS "+JSON.stringify(minedReward));
+          //log("MINEDREWARD EQUALS "+JSON.stringify(minedReward));
 
           var blockTimeStamp = minedBlock["timestamp"];
           console.log("UGGGGHHHHHHH THE BLOCK HEIGHT IS "+this.blockHeight);
