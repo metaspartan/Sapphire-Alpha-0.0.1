@@ -1020,11 +1020,14 @@ var Blockchain = class Blockchain {
 
       isChainValid() {
         for (let i = 1; i < this.chain.length; i++){
+          console.log("||*********************CHAIN VERIFICATION PROCEDURE*************************||");
+          console.log("||*********************CHAIN VERIFICATION PROCEDURE*************************||");
+          console.log("||*********************CHAIN VERIFICATION PROCEDURE*************************||");
           //log("current block "+JSON.stringify(this.chain[i]))
           //log("current block "+JSON.stringify(this.getBlock(i+1)));
           const currentBlock = this.chain[i];
           if (this.chain[i].hash !== this.chain[i].calculateHash()) {
-              log("would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i+1).calculateHash());
+              log("UPPER would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i+1).calculateHash());
               log("previoushash"+this.getBlock(i+1).previousHash+"timestamp"+this.getBlock(i+1).timestamp+"nonce"+this.getBlock(i+1).nonce);
               log("double check calc is same"+this.getBlock(i+1).calculateHash());
               ///triple check
@@ -1044,7 +1047,7 @@ var Blockchain = class Blockchain {
           }
           const previousBlock = this.chain[i - 1];
           if (this.chain[i].previousHash !== this.chain[i-1].hash) {
-              log("would be returning false here: cb prevhash "+currentBlock.previousHash+" prev block hash "+previousBlock.hash);
+              log("LOWER would be returning false here: cb prevhash "+currentBlock.previousHash+" prev block hash "+previousBlock.hash);
               return false;
           }
         }
