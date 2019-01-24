@@ -444,6 +444,8 @@ var addyBal = function(val){
             //passes in ChainGrab function with input params as callback when db is open
             console.log("Importing the data file to the db and then calling the memory synch");
             setTimeout(function(){BlkDB.importFromJSONFile(ChainGrabRefresh,providerBlockHeight,cbChainGrab,frankieCoin.chainRiser);},2000);
+            //setting this here and heed more intake checks
+            frankieCoin.blockHeight = parseInt(providerBlockHeight);
             //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
             var cbBlockMemLoad = function(blockNum,cbChainGrab,chainRiser){
               setTimeout(function(){ChainGrabRefresh(blockNum,cbChainGrab,chainRiser);},3000)
