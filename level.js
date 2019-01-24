@@ -851,7 +851,7 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
   //console.log(Object.keys(content))
 
   for(row in content){
-    if(Object.keys(content[row]).split(":")[0] != "tx"){
+    if(Object.keys(content[row]).toString().split(":")[0] != "tx"){
       console.log("key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
     }
 
