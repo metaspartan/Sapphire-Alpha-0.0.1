@@ -449,7 +449,7 @@ var Blockchain = class Blockchain {
             this.difficulty = this.getLatestBlock().difficulty;
           }
 
-          if(blockTimeDiff < 4){
+          if(blockTimeDiff < 5){
             //temporary difficulty setting stopped at 6
             if(minedBlock["difficulty"] < 5){
               block.difficulty = parseFloat(block.difficulty+1);
