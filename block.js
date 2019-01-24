@@ -1019,7 +1019,8 @@ var Blockchain = class Blockchain {
       }
 
       isChainValid() {
-        for (let i = 1; i < this.chain.length; i++){
+        var i = parseInt(this.blockHeight-this.chainRiser);
+        for (i; i < this.chain.length; i++){
           console.log("||*********************CHAIN VERIFICATION PROCEDURE*************************||");
           console.log("||*********************CHAIN VERIFICATION PROCEDURE*************************||");
           console.log("||*********************CHAIN VERIFICATION PROCEDURE*************************||");
