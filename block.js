@@ -1027,9 +1027,9 @@ var Blockchain = class Blockchain {
           //log("current block "+JSON.stringify(this.getBlock(i+1)));
           const currentBlock = this.chain[i];
           if (this.chain[i].hash !== this.chain[i].calculateHash()) {
-              log("UPPER would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i+1).calculateHash());
-              log("previoushash"+this.getBlock(i+1).previousHash+"timestamp"+this.getBlock(i+1).timestamp+"nonce"+this.getBlock(i+1).nonce);
-              log("double check calc is same"+this.getBlock(i+1).calculateHash());
+              log("UPPER would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i).calculateHash());
+              log("previoushash"+this.getBlock(i+1).previousHash+"timestamp"+this.getBlock(i+1).timestamp+"nonce"+this.getBlock(i).nonce);
+              log("double check calc is same"+this.getBlock(i).calculateHash());
               ///triple check
               try {
                 var h = new BLAKE2s(32, decodeUTF8(""));
@@ -1037,7 +1037,7 @@ var Blockchain = class Blockchain {
                 alert("Error: " + e);
               };
               //h.update(decodeUTF8(this.chain[i+1].previousHash + this.chain[i+1].timestamp + JSON.stringify(this.chain[i+1].transactions) + JSON.stringify(this.chain[i+1].orders) + this.chain[i+1].nonce));
-              h.update(decodeUTF8(this.getBlock(i+1).previousHash + this.getBlock(i+1).timestamp + this.getBlock(i+1).nonce));
+              h.update(decodeUTF8(this.getBlock(i).previousHash + this.getBlock(i).timestamp + this.getBlock(i).nonce));
               log(h.hexDigest());
               return false;
           }else{
