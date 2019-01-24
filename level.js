@@ -851,7 +851,10 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
   //console.log(Object.keys(content))
 
   for(row in content){
-    console.log("key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
+    if(Object.keys(content[row]).split(":")[0] != "tx"){
+      console.log("key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
+    }
+
     var rowKey = Object.keys(content[row]);
     var rowValue = Object.values(content[row]);
     db.put(rowKey, rowValue, function (err) {
