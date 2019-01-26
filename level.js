@@ -924,6 +924,15 @@ var dumpToJsonFIleRange = function(cb,peer,start){
 
       jsonSynch.push(thisRow);
 
+    }else if(data.key.toString().split(":")[0] == "ox"){
+      //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+
+      var thisRowKey = data.key.toString();
+      var thisRowValue = data.value.toString();
+      var thisRow = {[thisRowKey]:thisRowValue};
+
+      jsonSynch.push(thisRow);
+
     }
   });
 
