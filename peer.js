@@ -1534,7 +1534,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
     }
     console.log("my confirmation to return "+myblockorder.transactionID);
     sendOrderTXID(myblockorder.transactionID);
-    broadcastPeers(JSON.stringify(JSON.parse(childData)["signedOrder"]["message"]));
+    broadcastPeers(childData);
     //impceventcaller("This order and callback was submitted by "+egemSendingAddress)
   }else if(isJSON(childData) && JSON.parse(childData)["signedTransaction"]){
     log("Incoming Transaction over RPC");
@@ -1566,7 +1566,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
     }
     console.log("my confirmation to return "+"placeholder"+myblocktx.hash);
     sendTXID("placeholder"+myblocktx.hash);
-    broadcastPeers(JSON.stringify(JSON.parse(childData)["signedTransaction"]["message"]));
+    broadcastPeers(childData);
     //impceventcaller("This order and callback was submitted by "+egemSendingAddress)
   }else{
     log("RCP commands were not properly formatted");
