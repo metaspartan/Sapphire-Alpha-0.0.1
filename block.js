@@ -158,7 +158,7 @@ var Hash = function(inputs) {
 
 var Block = class Block {
 
-    constructor(blockheight, timestamp, transactions, orders, ommers, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 3) {
+    constructor(blockheight, timestamp, transactions, orders, ommers, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 4) {
 
         log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
@@ -413,7 +413,7 @@ var Blockchain = class Blockchain {
           ////extra check
 
           //adding a trading mechanism and if below this chain push it processes same block HINT MOVE IT TWO LINES DOWN
-          this.processTrades();
+          //this.processTrades();
           log(chalk.yellow("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
           this.blockHeight=(parseInt(this.getLength())+1);
@@ -437,6 +437,8 @@ var Blockchain = class Blockchain {
 
           //log("MINEDREWARD EQUALS "+JSON.stringify(minedReward));
 
+          log("PENDING ORDERS ARE WHAT????????????????????????"+JSON.stringify(this.pendingOrders));
+
           var blockTimeStamp = minedBlock["timestamp"];
           console.log("UGGGGHHHHHHH THE BLOCK HEIGHT IS "+this.blockHeight);
           log("BBBBBBBBBBBBBBBBB block time stamp"+minedBlock["timestamp"]+" LAST BLOCK TIME STAMPING "+this.getLatestBlock().timestamp+"MINED  BLOCK PREV HASH "+minedBlock["previousHash"]+" LAST BLOCK HASH "+this.getLatestBlock().hash);
@@ -451,14 +453,16 @@ var Blockchain = class Blockchain {
 
           if(blockTimeDiff < 5){
             //temporary difficulty setting stopped at 6
-            if(minedBlock["difficulty"] < 5){
+            if(minedBlock["difficulty"] < 6){
               block.difficulty = parseFloat(block.difficulty+1);
+              console.log("BLOCK DIFF "+block.difficulty);
             }
           }else{
             block.difficulty = parseFloat(block.difficulty-1);
           }
           log(chalk.bgGreen('Differential is '+blockTimeDiff));
           log('Block successfully added by outside miner '+blockTimeStamp);
+          log("BLOCK DIFFICULTY "+block.difficulty);
           ////extra check
           try {
             var h = new BLAKE2s(32, decodeUTF8(""));
@@ -471,7 +475,7 @@ var Blockchain = class Blockchain {
           ////extra check
 
           //adding a trading mechanism and if below this chain push it processes same block HINT MOVE IT TWO LINES DOWN
-          this.processTrades();
+          //this.processTrades();
           log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
           this.chain.push(block);
           this.blockHeight=(parseInt(this.blockHeight)+1);
@@ -768,6 +772,10 @@ var Blockchain = class Blockchain {
             function(myblock){ return ( myblock.buyOrSell=="BUY" ); }
           );
 
+          var allsellsS = myblock.filter(
+            function(myblock){ return ( myblock.buyOrSell=="SELL" ); }
+          );
+
           /***
           for (odr in myblock){
             getOrdersFromBlockBuy(myblock,myblock[odr]["pairBuy"],myCallbackBuy,this);//myCallbackBuyMiner
@@ -793,7 +801,12 @@ var Blockchain = class Blockchain {
             );
 
             log("88888888888888888888 here is the SELLS log"+JSON.stringify(allsells));
+            var numSells = 0;
+
+            /*****
+
             for(var transactions in allsells){
+              numSells+=1;
               if(allbuys[ordersofbuy]["pairBuy"] == allsells[transactions]["pairBuy"] && allbuys[ordersofbuy]["pairSell"] == allsells[transactions]["pairSell"]){
                 log("99999999999999999 are we transacting? "+allbuys[ordersofbuy]["pairSell"]+allbuys[ordersofbuy]["price"]+" and "+allsells[transactions]["pairSell"]+allsells[transactions]["price"]);
                 if(allbuys[ordersofbuy]["price"] >= allsells[transactions]["price"]){
@@ -816,37 +829,7 @@ var Blockchain = class Blockchain {
                       );
                       this.createOrder(replacementOrder,allsells[transactions]["originationID"]);
                       BlkDB.addOrder("ox:SELL"+":"+allsells[transactions]["pairBuy"]+":"+allsells[transactions]["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
-                      /*****
-                      //one order gets closed
-                      this.createOrder(
-                        new Order(
-                          allbuys[ordersofbuy]["fromAddress"],
-                          allbuys[ordersofbuy]["buyOrSell"],
-                          allbuys[ordersofbuy]["pairBuy"],
-                          allbuys[ordersofbuy]["pairSell"],
-                          allbuys[ordersofbuy]["amount"],
-                          allbuys[ordersofbuy]["price"],
-                          allbuys[ordersofbuy]["transactionID"],//may want to get the txidof of closing order here
-                          allbuys[ordersofbuy]["originationID"],
-                          "closed"
-                        ),allbuys[ordersofbuy]["originationID"]
-                      );
-                      //one gets partisl
-                      this.createOrder(
-                        new Order(
-                          allsells[transactions]["fromAddress"],
-                          allsells[transactions]["buyOrSell"],
-                          allsells[transactions]["pairBuy"],
-                          allsells[transactions]["pairSell"],
-                          allsells[transactions]["amount"],
-                          allsells[transactions]["price"],
-                          allsells[transactions]["transactionID"],//may want to get the txidof of closing order here
-                          allsells[transactions]["originationID"],
-                          "partial"
-                        ),allbuys[ordersofbuy]["originationID"]
-                      );
-                      //ending buy < sell
-                      *****/
+
                     }else if(allbuys[ordersofbuy].amount > allsells[transactions].amount){
                       this.createTransaction(new Transaction(allsells[transactions]["fromAddress"], allbuys[ordersofbuy]["fromAddress"], allsells[transactions]["amount"], allbuys[ordersofbuy]["pairBuy"]));
                       this.createTransaction(new Transaction(allbuys[ordersofbuy]["fromAddress"], allsells[transactions]["fromAddress"], parseFloat(allsells[transactions]["amount"]*allsells[transactions]["price"]), allbuys[ordersofbuy]["pairSell"]));
@@ -877,6 +860,88 @@ var Blockchain = class Blockchain {
 
 
             }//end transactions in allsells loop
+            ****/
+
+            if(numSells == 0){
+              console.log("adding buy order to level db "+"ox:BUY"+":"+allbuys[ordersofbuy]["pairBuy"]+":"+allbuys[ordersofbuy]["pairSell"]+":"+allbuys[ordersofbuy]["transactionID"]+":"+allbuys[ordersofbuy]["timestamp"]+allbuys[ordersofbuy]);
+              BlkDB.addOrder("ox:BUY"+":"+allbuys[ordersofbuy]["pairBuy"]+":"+allbuys[ordersofbuy]["pairSell"]+":"+allbuys[ordersofbuy]["transactionID"]+":"+allbuys[ordersofbuy]["timestamp"],allbuys[ordersofbuy]);
+            }
+
+          }///end ordersofbuy loop
+
+          for(var ordersofsell in allsellsS){
+
+            var allbuysS = myblock.filter(
+              //function(myblock){ return ( myblock.buyOrSell=="SELL" && myblock.pairSell==ordersofbuy["pairSell"]); }
+              function(myblock){ return ( myblock.buyOrSell=="BUY" ); }
+            );
+
+            log("88888888888888888888 here is the BUYS log"+JSON.stringify(allsells));
+            var numBuys = 0;
+            /****
+            for(var transactions in allbuysS){
+              numBuys+=1;
+              //if(allbuys[ordersofbuy]["pairBuy"] == allsells[transactions]["pairBuy"] && allbuys[ordersofbuy]["pairSell"] == allsells[transactions]["pairSell"]){
+              if(allsellsS[ordersofsell]["pairBuy"] == allbuysS[transactions]["pairBuy"] && allsellsS[ordersofsell]["pairSell"] == allbuysS[transactions]["pairSell"]){
+                log("GGGGGGGGGGGGGGGS are we transacting? "+allsellsS[ordersofsell]["pairSell"]+allsellsS[ordersofsell]["price"]+" and "+allbuysS[transactions]["pairSell"]+allbuysS[transactions]["price"]);
+                if(allsellsS[ordersofsell]["price"] <= allbuysS[transactions]["price"]){
+                    if(allsellsS[ordersofsell].amount < allbuysS[transactions].amount){
+                      log("transaction created is "+allbuysS[transactions]["fromAddress"]+allsellsS[ordersofsell]["fromAddress"]+allsellsS[ordersofsell]["amount"]+allsellsS[ordersofsell]["pairBuy"]);
+                      this.createTransaction(new Transaction(allbuysS[transactions]["fromAddress"], allsellsS[ordersofsell]["fromAddress"], allsellsS[ordersofsell]["amount"], allsellsS[ordersofsell]["pairBuy"]));
+                      this.createTransaction(new Transaction(allsellsS[ordersofsell]["fromAddress"], allbuysS[transactions]["fromAddress"], parseFloat(allsellsS[ordersofsell]["amount"]*allbuysS[transactions]["price"]), allsellsS[ordersofsell]["pairSell"]));
+                      var newOrderAmpount = allbuysS[transactions]["amount"]-allsellsS[ordersofsell]["amount"];
+                      //constructor(fromAddress, buyOrSell, pairBuy, pairSell, amount, price, transactionID, originationID){
+                      //and a new one gets open
+                      var replacementOrder = new Order(
+                        allbuysS[transactions]["fromAddress"],
+                        'SELL',
+                        allbuysS[transactions]["pairBuy"],
+                        allbuysS[transactions]["pairSell"],
+                        newOrderAmpount,
+                        allbuysS[transactions]["price"],
+                        '',
+                        ''
+                      );
+                      this.createOrder(replacementOrder,allbuysS[transactions]["originationID"]);
+                      BlkDB.addOrder("ox:SELL"+":"+allbuysS[transactions]["pairBuy"]+":"+allbuysS[transactions]["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+
+                    }else if(allsellsS[ordersofsell].amount > allbuysS[transactions].amount){
+                      this.createTransaction(new Transaction(allbuysS[transactions]["fromAddress"], allbuys[ordersofbuy]["fromAddress"], allbuysS[transactions]["amount"], allbuys[ordersofbuy]["pairBuy"]));
+                      this.createTransaction(new Transaction(allbuys[ordersofbuy]["fromAddress"], allbuysS[transactions]["fromAddress"], parseFloat(allbuysS[transactions]["amount"]*allbuysS[transactions]["price"]), allbuys[ordersofbuy]["pairSell"]));
+                      var newOrderAmpount = allbuys[ordersofbuy]["amount"]-allbuysS[transactions]["amount"];
+                      //constructor(fromAddress, buyOrSell, pairBuy, pairSell, amount, price, transactionID, originationID){
+                      var replacementOrder = new Order(
+                        allsellsS[ordersofsell]["fromAddress"],
+                        'BUY',
+                        allsellsS[ordersofsell]["pairBuy"],
+                        allsellsS[ordersofsell]["pairSell"],
+                        newOrderAmpount,
+                        allsellsS[ordersofsell]["price"],
+                        '',
+                        ''
+                      );
+                      this.createOrder(replacementOrder,allsellsS[ordersofsell]["originationID"]);
+                      BlkDB.addOrder("ox:BUY"+":"+allsellsS[ordersofsell]["pairBuy"]+":"+allsellsS[ordersofsell]["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+                      //one order gets closed
+                      //one gets partisl
+                      //and a new one gets open
+                    }else{
+                      log("&&&&&&&&&& EXACT MATCH &&&&&&&&&&&&&");
+                      //this.createTransaction(new Transaction(allsells[transactions]["fromAddress"], allbuys[ordersofbuy]["fromAddress"], allsells[transactions]["amount"], allbuys[ordersofbuy].pairBuy));
+                      //close two orders
+                    }
+                  }
+              }
+
+
+            }//end transactions in allsells loop
+            ****/
+
+            if(numBuys == 0){
+              console.log("adding sell order to level db "+"ox:SELL"+":"+allsellsS[ordersofsell]["pairBuy"]+":"+allsellsS[ordersofsell]["pairSell"]+":"+allsellsS[ordersofsell]["transactionID"]+":"+allsellsS[ordersofsell]["timestamp"]+allsellsS[ordersofsell]);
+              BlkDB.addOrder("ox:SELL"+":"+allsellsS[ordersofsell]["pairBuy"]+":"+allsellsS[ordersofsell]["pairSell"]+":"+allsellsS[ordersofsell]["transactionID"]+":"+allsellsS[ordersofsell]["timestamp"],allsellsS[ordersofsell]);
+            }
+
           }///end ordersofbuy loop
           ////////////////////////////////////////////////////////BUYS AND SELLS
 
@@ -1021,8 +1086,6 @@ var Blockchain = class Blockchain {
       isChainValid() {
         var i = parseInt(this.blockHeight-this.chainRiser);
         for (i; i < this.chain.length; i++){
-          console.log("||*********************CHAIN VERIFICATION PROCEDURE*************************||");
-          console.log("||*********************CHAIN VERIFICATION PROCEDURE*************************||");
           console.log("||*********************CHAIN VERIFICATION PROCEDURE*************************||");
           log("current block chain "+JSON.stringify(this.chain[i]))
           log("current block get bock "+JSON.stringify(this.getBlock(i+1)));

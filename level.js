@@ -511,6 +511,7 @@ var clearOrderById = function(transactionID,timestamp){
   stream.on('data',function(data){
 
     if(data.toString().split(":")[4] == transactionID && data.toString().split(":")[5] == timestamp){
+      putRecord("fox:"+transactionID,data);
       db.del(data).then(function(){console.log("deleting this order "+transactionID,timestamp);});
     }
 
@@ -580,6 +581,103 @@ var getOrdersBuySorted = function(callBack){
 
 }
 
+var getOrdersSellSorted = function(callBack){
+
+  console.log("Open SELL Orders SORTED leveldb");
+  var result = [];
+
+  var stream = db.createKeyStream();
+
+  stream.on('data',function(data){
+
+    if(data.toString().split(":")[1] == "SELL"){
+      db.get(data, function (err, value) {
+        console.log("value"+value);
+        result.push(value.toString());
+      })
+    }
+
+  });
+
+  stream.on('close',function(){
+    //console.log("SORTING N HERE");
+    //console.log("results are "+result);
+    var resultss = result.sort(function(a,b){
+      var x = JSON.parse(a)["price"];
+      //console.log("x "+x+a);
+      var y = JSON.parse(b)["price"];
+      //console.log("y "+y+b)
+      if (x > y) {return -1;}
+      if (x < y) {return 1;}
+      return 0;
+    })
+    //console.log("POST SORT");
+    //console.log("results ss are "+resultss);
+    callBack(resultss);
+  });
+
+}
+
+var getOrdersPairBuyAndSell = function(pairBuy,pairSell,callback){
+
+  console.log("Open PAIR BUY Orders leveldb");
+  var result = [];
+  var result2 = []
+
+  var stream = db.createKeyStream();
+
+  stream.on('data',function(data){
+
+    if(data.toString().split(":")[0] == "ox" && data.toString().split(":")[1] == "BUY" && data.toString().split(":")[2] == pairBuy && data.toString().split(":")[3] == pairSell){
+      db.get(data, function (err, value) {
+        console.log("value"+value);
+        result.push(value.toString());
+      })
+    }
+
+  });
+  //need to test the second callback to match previous set ups from nanosql
+  stream.on('close',function(data){
+    var resultBuys = result.sort(function(a,b){
+      var x = JSON.parse(a)["price"];
+      //console.log("x "+x+a);
+      var y = JSON.parse(b)["price"];
+      //console.log("y "+y+b)
+      if (x > y) {return -1;}
+      if (x < y) {return 1;}
+      return 0;
+    })
+
+    var stream2 = db.createKeyStream();
+
+    stream2.on('data',function(data){
+
+      if(data.toString().split(":")[0] == "ox" && data.toString().split(":")[1] == "SELL" && data.toString().split(":")[2] == pairBuy && data.toString().split(":")[3] == pairSell){
+        db.get(data, function (err, value) {
+          console.log("value"+value);
+          result2.push(value.toString());
+        })
+      }
+
+    });
+    //need to test the second callback to match previous set ups from nanosql
+    stream2.on('close',function(data){
+      var resultSells = result2.sort(function(a,b){
+        var x = JSON.parse(a)["price"];
+        //console.log("x "+x+a);
+        var y = JSON.parse(b)["price"];
+        //console.log("y "+y+b)
+        if (x < y) {return -1;}
+        if (x > y) {return 1;}
+        return 0;
+      })
+      callback(resultBuys,resultSells);
+    });
+
+  });
+
+}
+
 //////////////////////////////////////////////////////////////////////first call
 var getOrdersPairBuy = function(pairBuy,pairSell,callback){
 
@@ -623,7 +721,7 @@ var getOrdersSell = function(){
 
   stream.on('data',function(data){
 
-    if(data.toString().split(":")[0] == "ox" && data.toString().split(":")[1] == "SELL"){
+    if(data.toString().split(":")[0] == "ox" && data.toString().split(":")[1] == "SELL" && data.toString().split(":")[2] == pairBuy && data.toString().split(":")[3] == pairSell){
       db.get(data, function (err, value) {
         console.log("value"+value);
         result.push(value.toString());
@@ -633,7 +731,16 @@ var getOrdersSell = function(){
   });
 
   stream.on('close',function(){
-    callBack(result);
+    var resultss = result.sort(function(a,b){
+      var x = JSON.parse(a)["price"];
+      //console.log("x "+x+a);
+      var y = JSON.parse(b)["price"];
+      //console.log("y "+y+b)
+      if (x < y) {return -1;}
+      if (x > y) {return 1;}
+      return 0
+    })
+    callBack(resultss);
   });
 
 }
@@ -663,8 +770,8 @@ var getOrdersPairSell = function(pairBuy,pairSell,callback){
       //console.log("x "+x+a);
       var y = JSON.parse(b)["price"];
       //console.log("y "+y+b)
-      if (x > y) {return -1;}
-      if (x < y) {return 1;}
+      if (x < y) {return -1;}
+      if (x > y) {return 1;}
       return 0;
     })
     callback(resultss);
@@ -673,13 +780,14 @@ var getOrdersPairSell = function(pairBuy,pairSell,callback){
 }
 
 var buildTrade = function(obj,callBack){
+
   console.log("Building transactions from sell orders LEVELDB for "+JSON.stringify(obj));
 
   var callBackResults = function(resultset){
     callBack(obj,resultset)
   }
 
-  getOrdersPairSell(obj["pairSell"],callBackResults);
+  getOrdersPairSell(obj["pairBuy"],obj["pairSell"],callBackResults);
 
   /***
   nSQL("orders").getView('get_order_by_pairSell',{pairSell:obj["pairSell"]})
@@ -868,165 +976,6 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
 
 
 
-
-
-///////from here down needs editing
-
-/***
-
-var clearDatabase = function(){
-  console.log(chalk.yellow("| Deleting database...         |"));
-  nSQL("blockchain").query("delete").exec();
-}
-
-var clearBlock = function(blocknum){
-  nSQL("blockchain").query("delete").where(['blocknum','=',blocknum]).exec();
-}
-
-
-var getLatestBlock = function(){
-  log(chalk.blue("LATEST BLOCK"));
-      // DB ready to use.
-      nSQL("blockchain").getView('get_latest_block')
-      .then(function(result) {
-          log(chalk.green(JSON.stringify(result))) //  <- single object array containing the row we inserted.
-          //callBack(result);
-      });
-
-}
-
-var clearOrderById = function(id){
-  nSQL("orders").query("delete").where(["id","=",id]).exec()
-}
-
-var clearOrderDatabase = function(){
-  console.log(chalk.yellow("| Deleting all orders...       |"));
-  nSQL("orders").query("delete").exec();
-}
-
-
-var addOrder = function(order){
-  log("okay at least we are trying to add this order in db"+JSON.stringify(order));
-  //orders.connect().then(function(result) {
-      // DB ready to use.
-      log("we are placing this order "+order);
-
-      nSQL("orders").doAction('add_new_order',order
-      ).then(function(result) {
-          log(result) //  <- single object array containing the row we inserted.
-      });
-  //});
-}
-
-
-////////////////////////////////////////////////////////////////////////////first call
-var getOrdersPairSell = function(pair,callback){
-  log("Open PAIR BUY Orders");
-      // DB ready to use.
-      nSQL("orders").getView('get_order_by_pairSell',{pairSell:pair})
-      .then(function(result) {
-          //log(result) //  <- single object array containing the row we inserted.
-          callback(result);
-          //log(result);
-      });
-
-}
-
-var buildTrade = function(obj,callBack){
-  log("Building transactions from sell orders for "+JSON.stringify(obj));
-  nSQL("orders").getView('get_order_by_pairSell',{pairSell:obj["pairSell"]})
-  .then(function(result) {
-      //log(result) //  <- single object array containing the row we inserted.
-      callBack(obj,result);
-  });
-}
-
-
-var getAllOrders = function(){
-  log("ALL Open Orders");
-      // DB ready to use.
-      nSQL("orders").getView('list_all_orders')
-      .then(function(result) {
-          log(result) //  <- single object array containing the row we inserted.
-      });
-
-}
-
-var addTransactions = function(transactions,blockhash){
-  console.log("T R A N S A C T I O N S  B E I N G  A D D E D  H E R E");
-  console.log(transactions+transactions.length);
-  console.log(blockhash);
-  transactions = JSON.parse(JSON.stringify(transactions));
-  for(tranx in JSON.parse(transactions)){
-
-    console.log("inside loop"+tranx+JSON.parse(transactions)[tranx]);
-
-    var receipt = JSON.parse(transactions)[tranx];
-    var myreceipt = {
-      "sfrxreceipt":
-      {"id":null,
-      "address":receipt["toAddress"],
-      "fromAddress":receipt["fromAddress"],
-      "ticker":receipt["ticker"],
-      "amount":receipt["amount"],
-      "timestamp":receipt["timestamp"],
-      "transactionID":receipt["hash"],//to be added
-      "blockHash":blockhash
-    }};
-    log("Inserting Tranactions"+myreceipt.toString());
-        // DB ready to use.
-    nSQL("sfrxreceipts").doAction('add_new_receipt',myreceipt
-    ).then(function(result) {
-        log(result) //  <- single object array containing the row we inserted.
-    });
-
-  }
-
-  log("here are my receipts: "+JSON.stringify(getAllTransactionReceipts()));
-
-}
-
-var getAllTransactionReceipts = function(){
-  log("ALL Transaction Receipts");
-      // DB ready to use.
-      nSQL("sfrxreceipts").getView('list_all_receipts')
-      .then(function(result) {
-          log(result) //  <- single object array containing the row we inserted.
-      });
-
-}
-
-var getTransactionReceiptsByAddress = function(address){
-  log("ALL Transaction Receipts");
-      // DB ready to use.
-      nSQL("sfrxreceipts").getView('list_all_receipts_address',{address:address})
-      .then(function(result) {
-          log(result) //  <- single object array containing the row we inserted.
-      });
-
-}
-
-var getBalanceByAddress = function(address){
-  log("ALL Transaction Receipts");
-      // DB ready to use.
-      nSQL("sfrxreceipts").getView('get_balance_at_address',{address:address})
-      .then(function(result) {
-          log(result) //  <- single object array containing the row we inserted.
-          var bal = 0;
-          for(amt in result){
-            bal+=parseFloat(result[amt]["amount"]);
-          }
-          log("final balance is "+bal);
-      });
-
-}
-
-var clearTransactionDatabase = function(){
-  console.log(chalk.yellow("| Deleting all transactions... |"));
-  nSQL("sfrxreceipts").query("delete").exec();
-}
-***/
-
 module.exports = {
     getAll:getAll,
     refresh:refresh,
@@ -1057,7 +1006,10 @@ module.exports = {
     addOrder:addOrder,
     getOrdersBuy:getOrdersBuy,
     getOrdersBuySorted:getOrdersBuySorted,
+    getOrdersSellSorted:getOrdersSellSorted,
     getOrdersPairBuy:getOrdersPairBuy,
     getOrdersPairSell:getOrdersPairSell,
+    getOrdersPairBuyAndSell:getOrdersPairBuyAndSell,
+    clearOrderById:clearOrderById,
     buildTrade:buildTrade,
 }
