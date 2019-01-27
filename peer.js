@@ -188,13 +188,14 @@ var addyBal = function(val){
               var price = JSON.stringify(JSON.parse(order)["price"]).replace(/['"/]+/g, '');
               var validatedSender = web3.eth.accounts.recover(JSON.parse(data)["message"],JSON.parse(data)["signature"]);
               var transactionID = JSON.parse(data)["transactionID"];
+              var originationID = JSON.parse(data)["originationID"];
               var timestamp = JSON.parse(data)["timestamp"]
               if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
                 ///need to alidate that this wallet has the funds to send
                 myblockorder = new sapphirechain.Order(addressFrom,buyOrSell,pairBuy,pairSell,amount,price);
                 myblockorder["transactionID"]=transactionID;
+                myblockorder["originationID"]=originationID;
                 myblockorder["timestamp"]=timestamp;
-                console.log(transactionID+" "+myblockorder["transactionID"]+" "+JSON.parse(data)["transactionID"]);
                 frankieCoin.pendingOrders.push(myblockorder);
                 BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+transactionID+":"+timestamp,myblockorder);
                 console.log("This legitimate signed order by "+validatedSender+" has been posted to chain with confirmation "+myblockorder.transactionID);
@@ -1541,6 +1542,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
     sendOrderTXID(myblockorder.transactionID);
     var peerOrder = JSON.parse(childData)["signedOrder"];
     peerOrder["transactionID"] = myblockorder.transactionID;
+    peerOrder["originationID"] = myblockorder.originationID;
     peerOrder["timestamp"] = myblockorder.timestamp;
     broadcastPeers(JSON.stringify(peerOrder));
     //broadcastPeers(JSON.stringify({"message":order,"signature":txsignature,"transactionID":myblockorder.transactionID,"timestamp":myblockorder.timestamp}));
