@@ -187,11 +187,16 @@ var addyBal = function(val){
               var amount = JSON.stringify(JSON.parse(order)["amount"]).replace(/['"/]+/g, '');
               var price = JSON.stringify(JSON.parse(order)["price"]).replace(/['"/]+/g, '');
               var validatedSender = web3.eth.accounts.recover(JSON.parse(data)["message"],JSON.parse(data)["signature"]);
+              var transactionID = JSON.parse(data)["transactionID"];
+              var timestamp = JSON.parse(data)["timestamp"]
               if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
                 ///need to alidate that this wallet has the funds to send
                 myblockorder = new sapphirechain.Order(addressFrom,buyOrSell,pairBuy,pairSell,amount,price);
-                frankieCoin.createOrder(myblockorder);
-                BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
+                myblockorder["transactionID"]=transactionID;
+                myblockorder["timestamp"]=timestamp;
+                console.log(transactionID+" "+myblockorder["transactionID"]+" "+JSON.parse(data)["transactionID"]);
+                frankieCoin.pendingOrders.push(myblockorder);
+                BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+transactionID+":"+timestamp,myblockorder);
                 console.log("This legitimate signed order by "+validatedSender+" has been posted to chain with confirmation "+myblockorder.transactionID);
               }else{
                 console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
@@ -1534,7 +1539,11 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
     }
     console.log("my confirmation to return "+myblockorder.transactionID);
     sendOrderTXID(myblockorder.transactionID);
-    broadcastPeers(JSON.stringify(JSON.parse(childData)["signedOrder"]));
+    var peerOrder = JSON.parse(childData)["signedOrder"];
+    peerOrder["transactionID"] = myblockorder.transactionID;
+    peerOrder["timestamp"] = myblockorder.timestamp;
+    broadcastPeers(JSON.stringify(peerOrder));
+    //broadcastPeers(JSON.stringify({"message":order,"signature":txsignature,"transactionID":myblockorder.transactionID,"timestamp":myblockorder.timestamp}));
     //impceventcaller("This order and callback was submitted by "+egemSendingAddress)
   }else if(isJSON(childData) && JSON.parse(childData)["signedTransaction"]){
     log("Incoming Transaction over RPC");
@@ -1566,6 +1575,13 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
     }
     console.log("my confirmation to return "+"placeholder"+myblocktx.hash);
     sendTXID("placeholder"+myblocktx.hash);
+
+    //prepped up using same format as order
+    //var peerTx = JSON.parse(childData)["signedTransaction"];
+    //peerTx["transactionID"] = myblockorder.transactionID;
+    //peerTx["timestamp"] = myblockorder.timestamp;
+    //broadcastPeers(JSON.stringify(peerTx));
+
     broadcastPeers(JSON.stringify(JSON.parse(childData)["signedTransaction"]));
     //impceventcaller("This order and callback was submitted by "+egemSendingAddress)
   }else{
