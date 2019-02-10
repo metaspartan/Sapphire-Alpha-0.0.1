@@ -212,7 +212,7 @@ var Block = class Block {
         this.allConfig = '';
         this.allConfigHash = '';
         //total Hash for sequencing
-        this.hashOfThisBlock = '';
+        this.hashOfThisBlock = Hash(this.hash+BlkDB.getStateTrieRootHash())+":"+this.hash+":"+BlkDB.getStateTrieRootHash();
         this.difficulty = difficulty;
       }
 

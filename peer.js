@@ -772,6 +772,10 @@ function cliGetInput(){
       var egemAddress = userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")"));
       BlkDB.getBalanceAtAddress(egemAddress,addyBal)
       log("---------------");
+      var addyBal2 = function(data){
+        //do noting now
+      }
+      BlkDB.getBalanceAtAddressFromTrie(egemAddress,addyBal2)
       cliGetInput();
     }else if(userInput.startsWith("getPendingOrders()")){
       log("---------------");
@@ -1459,9 +1463,9 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
       }
 
-
+      //going to have to make this sequential
       franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
-
+      BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
       ////////here is the database update and peers broadcast
       log("[placeholder] mining stats from outside miner");
       log("Outside Miner Mined Block Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
@@ -1469,7 +1473,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
       BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),"1040");
       BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
       BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
-      BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
+
 
       fbroadcastPeersBlock();
       //finally post the RPC get work block data for the miner
