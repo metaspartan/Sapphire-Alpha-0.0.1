@@ -104,6 +104,8 @@ var Transaction = class Transaction{
         this.ticker = ticker;
         this.timestamp = txTimestamp;
         this.hash = Hash(toAddress+amount+ticker+txTimestamp);
+        this.oxdid = "";
+        this.oxtid = "";
     }
 }
 

@@ -1298,7 +1298,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
       ****/
 
       ///ORDERS REWRITE
-      log("PROCESS TRADES IN PEERS PROCESS TRADES IN PEERS")
+      log("PROCESS TRADES IN PEERS PROCESS TRADES IN PEERS");
       for(odr in frankieCoin.pendingOrders){
         console.log("these are already in the db so..... validate transact and update I guess")
         log(frankieCoin.pendingOrders[odr]["pairBuy"]);
