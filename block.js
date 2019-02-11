@@ -1096,7 +1096,7 @@ var Blockchain = class Blockchain {
           if (this.chain[i].hash !== this.chain[i].calculateHash()) {
               log("UPPER would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+Hash(this.getBlock(i+1).previousHash + this.getBlock(i+1).timestamp + this.getBlock(i+1).nonce));//previously this.getBlock(i+1).calculateHash()
               log("previoushash"+this.getBlock(i+1).previousHash+"timestamp"+this.getBlock(i+1).timestamp+"nonce"+this.getBlock(i+1).nonce);
-              log("double check calc is same"+Hash(this.getBlock(i+1).previousHash + this.getBlock(i+1).timestamp + this.getBlock(i+1).nonce)));
+              log("double check calc is same"+Hash(this.getBlock(i+1).previousHash + this.getBlock(i+1).timestamp + this.getBlock(i+1).nonce));
               ///triple check
               try {
                 var h = new BLAKE2s(32, decodeUTF8(""));
