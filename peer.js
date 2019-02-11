@@ -224,6 +224,10 @@ var addyBal = function(val){
             var replacementTx = [];
             for(ptx in incomingTx){
               for(etx in existingPendingTx){
+                //adding logic to remove orders if ox id present
+                if(incomingTx[ptx]["oxid"]){
+                  BlkDB.clearOrderById(incomingTx[ptx]["oxid"].split(":")[0],incomingTx[ptx]["oxid"].split(":")[1]);
+                }
                 if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash"]){
                   //do nothing removes this element
                 }else{
@@ -1392,6 +1396,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
                   var ticker = JSON.parse(data[obj])["pairBuy"];
                   var myblocktx = new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker);
+                  myblocktx.oxid = JSON.parse(data[obj])["transactionID"]+":"+JSON.parse(data[obj])["timestamp"];
                   console.log(JSON.stringify(myblocktx));
                   frankieCoin.createTransaction(myblocktx);
 
@@ -1402,6 +1407,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
                   var ticker2 = JSON.parse(dataSells[objs])["pairSell"];
                   var myblocktx2 = new sapphirechain.Transaction(addressFrom2, addressTo2, amount2, ticker2);
+                  myblocktx.oxid = JSON.parse(dataSells[objs])["transactionID"]+":"+JSON.parse(dataSells[objs])["timestamp"];
                   console.log(JSON.stringify(myblocktx2));
                   frankieCoin.createTransaction(myblocktx2);
                   ///////////////////////////////////REOG DELETE LOOP AND ORDERS

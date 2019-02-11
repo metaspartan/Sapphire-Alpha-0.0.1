@@ -46,8 +46,8 @@ var synchDatabaseJSON = function(callback,peer){
     if(err){
       //going to attempt to handle this exception and continue
       console.log("error in synchDatabaseJSON: "+err);
-      dat.leave();
-      dat.close();
+      //dat.leave();
+      //dat.close();
       var path = './SYNC/';
       rmdir(path, function (err, dirs, files) {
         console.log(dirs);
