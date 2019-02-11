@@ -212,7 +212,7 @@ var Block = class Block {
         this.allConfig = '';
         this.allConfigHash = '';
         //total Hash for sequencing
-        this.hashOfThisBlock = Hash(this.hash+BlkDB.getStateTrieRootHash())+":"+this.hash+":"+BlkDB.getStateTrieRootHash();
+        this.hashOfThisBlock = '';//Hash(this.hash+BlkDB.getStateTrieRootHash())+":"+this.hash+":"+BlkDB.getStateTrieRootHash();
         this.difficulty = difficulty;
       }
 
@@ -430,13 +430,8 @@ var Blockchain = class Blockchain {
 
       ///for mining transactions from outside miner
       addPendingTransactionsToMinedBLock(miningRewardAddress, minedBlock){
-
-          //MINING REWARD MOVED TO DATABASE DIRECT
-          //var minedReward = new Transaction(null, minedBlock["miner"], this.miningReward, "SFRX");
-          //this.createTransaction(minedReward);
-
-          //log("MINEDREWARD EQUALS "+JSON.stringify(minedReward));
-
+          //////////////////////////////////////////MINING REWARDS IN DATATABASE
+          ////////////////////////////////////////////////////////PENDING ORDERS
           log("PENDING ORDERS ARE WHAT????????????????????????"+JSON.stringify(this.pendingOrders));
 
           var blockTimeStamp = minedBlock["timestamp"];
@@ -445,6 +440,7 @@ var Blockchain = class Blockchain {
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
           let block = new Block((parseInt(this.getLength())+1),minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, this.pendingOmmers, minedBlock["previousHash"],minedBlock["sponsor"],minedBlock["miner"],"",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
           //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0) {
+          /////////////////////////////////////////////////DIFFICULTY ADJUSTMENT
           //block.mineBlock(this.difficulty);
           //block.difficulty = minedBlock["difficulty"];
           if(this.getLatestBlock().difficulty){
@@ -463,7 +459,9 @@ var Blockchain = class Blockchain {
           log(chalk.bgGreen('Differential is '+blockTimeDiff));
           log('Block successfully added by outside miner '+blockTimeStamp);
           log("BLOCK DIFFICULTY "+block.difficulty);
-          ////extra check
+          /////////////////////////////////////////////END DIFFICULTY ADJUSTMENT
+
+          /////////////////////////////////////////HASH VERIFICATION extra check
           try {
             var h = new BLAKE2s(32, decodeUTF8(""));
           } catch (e) {
@@ -472,7 +470,7 @@ var Blockchain = class Blockchain {
           //h.update(decodeUTF8(block.previousHash + block.timestamp + JSON.stringify(block.transactions) + JSON.stringify(block.orders) + block.nonce));
           h.update(decodeUTF8(block.previousHash + block.timestamp + block.nonce));
           log("should match the block hash "+h.hexDigest());
-          ////extra check
+          /////////////////////////////////////END HASH VERIFICATION extra check
 
           //adding a trading mechanism and if below this chain push it processes same block HINT MOVE IT TWO LINES DOWN
           //this.processTrades();
@@ -491,7 +489,7 @@ var Blockchain = class Blockchain {
           this.pendingOmmers = [];
       }
 
-      //th8s is the peers adding a block needs to be VALIDATED
+      //ths is the peers adding a block needs to be VALIDATED
       addBlockFromPeers(inBlock,callback,peerId){
         //if all that consensus stuff I am going to add....then
         //here is where I check if two things and I think make them globals
@@ -1132,5 +1130,5 @@ module.exports = {
     Block:Block,
     Blockchain:Blockchain,
     setBlockchainDB:setBlockchainDB,
-    Hash,Hash
+    Hash:Hash
 }

@@ -756,11 +756,29 @@ var addTransactions = function(transactions,blockhash,){
         });
       });
     });
+    trie.get(receipt["fromAddress"]+":"+receipt["ticker"], function (err, value) {
+      console.log("grabbing balance of from address");
+      var adjustedValue;
+      if(value){
+        console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
+        adjustedValue = parseFloat(value.toString()).toFixed(8);
+      }else{
+        adjustedValue = parseFloat(0);
+      }
+      adjustedValue -= parseFloat(receipt["toAddress"]).toFixed(8);
+      trie.put(receipt["fromAddress"]+":"+receipt["ticker"], adjustedValue, function () {
+        trie.get(receipt["fromAddress"]+":"+receipt["ticker"], function (err, value) {
+          if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
+          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+            encoding: 'binary'
+          }, function (err, value) {
+            console.log(value+" "+value.toString('hex'));
+          });
+        });
+      });
+    });
 
-
-    receipt["fromAddress"]
-    //2) change the balance for both and put
-    //3) get the trie root hash and return for hasing into the block
+    //2) get the trie root hash and return for hasing into the block
 
   }
 }

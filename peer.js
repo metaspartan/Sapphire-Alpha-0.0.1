@@ -1463,20 +1463,21 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
       }
 
-      //going to have to make this sequential
+      //////////////going to have to make this sequential in a callback or chain
       franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
       BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
-      ////////here is the database update and peers broadcast
+      frankieCoin.hashOfThisBlock = sapphirechain.Hash(frankieCoin.hash+BlkDB.getStateTrieRootHash())+":"+frankieCoin.hash+":"+BlkDB.getStateTrieRootHash();
+      ////////database update and peers broadcast
       log("[placeholder] mining stats from outside miner");
+      //NOTE: there is time to modify the hash of the block before broadcast as opposed to using hashOfthisBlock for stateroot
       log("Outside Miner Mined Block Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
-
-      BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),"1040");
+      /////////////////////////////////////////////////////block stored to level
+      BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),"1475");
       BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
       BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
-
-
+      ///////////////////////////////////////////////////////////peers broadcast
       fbroadcastPeersBlock();
-      //finally post the RPC get work block data for the miner
+      ////////////////////finally post the RPC get work block data for the miner
       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
     }
 
