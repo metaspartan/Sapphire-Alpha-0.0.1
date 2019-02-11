@@ -932,7 +932,8 @@ var clearOrderById = function(transactionID,timestamp){
 
   stream.on('data',function(data){
 
-    if(data.toString().split(":")[4] == transactionID && data.toString().split(":")[5] == timestamp){
+    //if(data.toString().split(":")[4] == transactionID && data.toString().split(":")[5] == timestamp){
+    if(data.toString().split(":")[4] == transactionID){
       putRecord("fox:"+transactionID,data);
       db.del(data).then(function(){console.log("deleting this order "+transactionID,timestamp);});
     }
