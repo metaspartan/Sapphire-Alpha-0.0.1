@@ -205,7 +205,12 @@ var addyBal = function(val){
           }else{
               console.log("SOME OTHER TRANSMISSION NOT FORMATTED CORRECTLY")
           }
-
+        }else if(JSON.parse(data)["deletableOrders"]){
+          var getDeleteableOrders = JSON.parse(data)["deletableOrders"];
+          console.log("these will be the deleted orders....%%%%%%%%%%%%%%%%%%");
+          for(oxdel in getDeleteableOrders){
+            console.log(getDeleteableOrders[oxdel]);
+          }
 ////////////////////////////////////////////////////////////incomeing peer block
         }else if(JSON.parse(data)["previousHash"]){/////////need more refinement
           //storing some variables of current chain
@@ -223,10 +228,12 @@ var addyBal = function(val){
             var existingPendingTx = frankieCoin.pendingTransactions;
             var replacementTx = [];
             for(ptx in incomingTx){
+              /****does not work this way need to rethink
               if(incomingTx[ptx]["oxdid"]){
                 console.log("we are actually in the incoming tx looking at order id deletion")
                 BlkDB.clearOrderById(incomingTx[ptx]["oxdid"],incomingTx[ptx]["oxtid"]);
               }
+              ****/
               for(etx in existingPendingTx){
                 //adding logic to remove orders if ox id present
                 if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash"]){
@@ -1260,6 +1267,12 @@ var broadcastPeersBlock = function(){
   log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
   log("------------------------------------------------------")
   broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
+  var deletedOrdersBroadcast = function(deletedOrders){
+    console.log("THIS IS WHAT I WULD BE BROADCASTING TO PEER FOR DELETED ORDERS");
+    console.log({"deletableOrders":JSON.stringify(deletedOrders)});
+    broadcastPeers({"deletableOrders":JSON.stringify(deletedOrders)});
+  }
+  setTimeout(function(){BlkDB.callDeletedOrders(deletedOrdersBroadcast)},1000);
 }
 //parent communicator callback function sent to child below
 var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
@@ -1397,8 +1410,9 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
                   var ticker = JSON.parse(data[obj])["pairBuy"];
                   var myblocktx = new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker);
-                  myblocktx.oxdid = JSON.parse(data[obj])["transactionID"];
-                  myblocktx.oxtid = JSON.parse(data[obj])["timestamp"];
+                  //does not work this way need tro rethink
+                  //myblocktx.oxdid = JSON.parse(data[obj])["transactionID"];
+                  //myblocktx.oxtid = JSON.parse(data[obj])["timestamp"];
                   console.log(JSON.stringify(myblocktx));
                   frankieCoin.createTransaction(myblocktx);
 
@@ -1409,8 +1423,9 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
                   var ticker2 = JSON.parse(dataSells[objs])["pairSell"];
                   var myblocktx2 = new sapphirechain.Transaction(addressFrom2, addressTo2, amount2, ticker2);
-                  myblocktx2.oxdid = JSON.parse(dataSells[objs])["transactionID"];
-                  myblocktx2.oxtid = JSON.parse(dataSells[objs])["timestamp"];
+                  //does not work this way need tro rethink
+                  //myblocktx2.oxdid = JSON.parse(dataSells[objs])["transactionID"];
+                  //myblocktx2.oxtid = JSON.parse(dataSells[objs])["timestamp"];
                   console.log(JSON.stringify(myblocktx2));
                   frankieCoin.createTransaction(myblocktx2);
                   ///////////////////////////////////REOG DELETE LOOP AND ORDERS

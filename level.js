@@ -935,12 +935,29 @@ var clearOrderById = function(transactionID,timestamp){
     //if(data.toString().split(":")[4] == transactionID && data.toString().split(":")[5] == timestamp){
     if(data.toString().split(":")[4] == transactionID){
       putRecord("fox:"+transactionID,data);
+      putRecord("tfox:"+transactionID,data);
       db.del(data).then(function(){console.log("deleting this order "+transactionID,timestamp);});
     }
 
   });
 
 
+}
+
+var callDeletedOrders = function(callBack){
+  var deletableOrders= [];
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    if(data.key.toString().split(":")[0] == "tfox"){
+      console.log('key = '+data.key+" value = "+data.value.toString());
+      var deleteThisOrder = {"oxdid":data.key.toString().split(":")[1],"tsdid":data.value.toString()}
+      deletableOrders.push(deleteThisOrder);
+      db.del(data).then(function(){console.log("cleared tfox order "+data.key.toString().split(":")[0]);});
+    }
+  })
+  stream.on("close",function(data){
+    callBack(deletableOrders);
+  })
 }
 
 var getOrdersBuy = function(callBack){
@@ -1446,6 +1463,7 @@ module.exports = {
     getOrdersPairSell:getOrdersPairSell,
     getOrdersPairBuyAndSell:getOrdersPairBuyAndSell,
     clearOrderById:clearOrderById,
+    callDeletedOrders:callDeletedOrders,
     buildTrade:buildTrade,
     getStateTrieRootHash:getStateTrieRootHash,
 }
