@@ -1407,7 +1407,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
                   var ticker2 = JSON.parse(dataSells[objs])["pairSell"];
                   var myblocktx2 = new sapphirechain.Transaction(addressFrom2, addressTo2, amount2, ticker2);
-                  myblocktx.oxid = JSON.parse(dataSells[objs])["transactionID"]+":"+JSON.parse(dataSells[objs])["timestamp"];
+                  myblocktx2.oxid = JSON.parse(dataSells[objs])["transactionID"]+":"+JSON.parse(dataSells[objs])["timestamp"];
                   console.log(JSON.stringify(myblocktx2));
                   frankieCoin.createTransaction(myblocktx2);
                   ///////////////////////////////////REOG DELETE LOOP AND ORDERS
