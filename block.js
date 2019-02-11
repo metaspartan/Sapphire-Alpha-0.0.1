@@ -1082,7 +1082,8 @@ var Blockchain = class Blockchain {
       }
 
       isChainValid() {
-        if(this.blockHeight < parseInt(this.chainRiser+2)){
+        //if(this.blockHeight < parseInt(this.chainRiser+2)){
+        if(this.blockHeight < 2){
           //returning true because early moiners are not hacking chain in first rider but realistically should be checked
           return true;
         }
@@ -1093,9 +1094,9 @@ var Blockchain = class Blockchain {
           log("current block get bock "+JSON.stringify(this.getBlock(i+1)));
           const currentBlock = this.chain[i];
           if (this.chain[i].hash !== this.chain[i].calculateHash()) {
-              log("UPPER would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+this.getBlock(i+1).calculateHash());
+              log("UPPER would be returning false here: cb hash "+this.chain[i].hash+" calcHash "+Hash(this.getBlock(i+1).previousHash + this.getBlock(i+1).timestamp + this.getBlock(i+1).nonce));//previously this.getBlock(i+1).calculateHash()
               log("previoushash"+this.getBlock(i+1).previousHash+"timestamp"+this.getBlock(i+1).timestamp+"nonce"+this.getBlock(i+1).nonce);
-              log("double check calc is same"+this.getBlock(i+1).calculateHash());
+              log("double check calc is same"+Hash(this.getBlock(i+1).previousHash + this.getBlock(i+1).timestamp + this.getBlock(i+1).nonce)));
               ///triple check
               try {
                 var h = new BLAKE2s(32, decodeUTF8(""));
