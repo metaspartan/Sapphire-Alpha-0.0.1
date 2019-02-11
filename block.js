@@ -436,10 +436,11 @@ var Blockchain = class Blockchain {
 
           var blockTimeStamp = minedBlock["timestamp"];
           console.log("UGGGGHHHHHHH THE BLOCK HEIGHT IS "+this.blockHeight);
+
           log("BBBBBBBBBBBBBBBBB block time stamp"+minedBlock["timestamp"]+" LAST BLOCK TIME STAMPING "+this.getLatestBlock().timestamp+"MINED  BLOCK PREV HASH "+minedBlock["previousHash"]+" LAST BLOCK HASH "+this.getLatestBlock().hash);
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
-          let block = new Block((parseInt(this.getLength())+1),minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, this.pendingOmmers, minedBlock["previousHash"],minedBlock["sponsor"],minedBlock["miner"],"",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
-          //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0) {
+          //constructor(blockheight, timestamp, transactions, orders, ommers, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 4) {
+          let block = new Block((parseInt(this.getLength())+1),minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, this.pendingOmmers, minedBlock["previousHash"],minedBlock["sponsor"],minedBlock["miner"],"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
           /////////////////////////////////////////////////DIFFICULTY ADJUSTMENT
           //block.mineBlock(this.difficulty);
           //block.difficulty = minedBlock["difficulty"];
@@ -449,7 +450,7 @@ var Blockchain = class Blockchain {
 
           if(blockTimeDiff < 5){
             //temporary difficulty setting stopped at 6
-            if(minedBlock["difficulty"] < 6){
+            if(minedBlock["difficulty"] < 5){
               block.difficulty = parseFloat(block.difficulty+1);
               console.log("BLOCK DIFF "+block.difficulty);
             }
