@@ -1083,7 +1083,7 @@ var Blockchain = class Blockchain {
 
       isChainValid() {
         //if(this.blockHeight < parseInt(this.chainRiser+2)){
-        if(this.blockHeight < 2){
+        if(this.blockHeight < 3){
           //returning true because early moiners are not hacking chain in first rider but realistically should be checked
           return true;
         }
