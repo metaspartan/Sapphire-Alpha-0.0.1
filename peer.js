@@ -1482,7 +1482,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
       BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
       BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
       ///////////////////////////////////////////////////////////peers broadcast
-      setTimeout(function(){fbroadcastPeersBlock();},500);
+      fbroadcastPeersBlock();
       ////////////////////finally post the RPC get work block data for the miner
       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
     }

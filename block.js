@@ -447,7 +447,7 @@ var Blockchain = class Blockchain {
           if(this.getLatestBlock().difficulty){
             this.difficulty = this.getLatestBlock().difficulty;
           }
-
+          ///DIFFICULTY IS PRETTY MUCH AT 5 UNTIL I FINISH TESTINF
           if(blockTimeDiff < 5){
             //temporary difficulty setting stopped at 6
             if(minedBlock["difficulty"] < 5){
@@ -455,7 +455,10 @@ var Blockchain = class Blockchain {
               console.log("BLOCK DIFF "+block.difficulty);
             }
           }else{
-            block.difficulty = parseFloat(block.difficulty-1);
+            if(minedBlock["difficulty"] > 5){
+              block.difficulty = parseFloat(block.difficulty-1);
+              console.log("BLOCK DIFF "+block.difficulty);
+            }
           }
           log(chalk.bgGreen('Differential is '+blockTimeDiff));
           log('Block successfully added by outside miner '+blockTimeStamp);
