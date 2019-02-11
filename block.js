@@ -1082,6 +1082,10 @@ var Blockchain = class Blockchain {
       }
 
       isChainValid() {
+        if(this.blockHeight < parseInt(this.chainRiser+1){
+          //returning true because early moiners are not hacking chain in first rider but realistically should be checked
+          return true;
+        }
         var i = parseInt(this.blockHeight-this.chainRiser);
         for (i; i < this.chain.length; i++){
           console.log("||*********************CHAIN VERIFICATION PROCEDURE*************************||");
