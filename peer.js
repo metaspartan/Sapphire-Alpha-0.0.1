@@ -209,7 +209,7 @@ var addyBal = function(val){
           var getDeleteableOrders = JSON.parse(data)["deletableOrders"];
           console.log("these will be the deleted orders....%%%%%%%%%%%%%%%%%%");
           for(oxdel in getDeleteableOrders){
-            console.log(getDeleteableOrders[oxdel]);
+            console.log(JSON.stringify(getDeleteableOrders[oxdel]));
           }
 ////////////////////////////////////////////////////////////incomeing peer block
         }else if(JSON.parse(data)["previousHash"]){/////////need more refinement
@@ -1272,7 +1272,7 @@ var broadcastPeersBlock = function(){
     console.log({"deletableOrders":JSON.stringify(deletedOrders)});
     broadcastPeers({"deletableOrders":JSON.stringify(deletedOrders)});
   }
-  setTimeout(function(){BlkDB.callDeletedOrders(deletedOrdersBroadcast)},1000);
+  //setTimeout(function(){BlkDB.callDeletedOrders(deletedOrdersBroadcast)},1000);
 }
 //parent communicator callback function sent to child below
 var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
