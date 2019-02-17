@@ -158,8 +158,12 @@ var Hash = function(inputs) {
 
 var Block = class Block {
 
-    constructor(blockheight, timestamp, transactions, orders, ommers, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 4) {
-
+    constructor(
+      blockheight,
+      timestamp, transactions, orders, ommers, previousHash = '',
+      sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '',
+      nonce = 0, difficulty = 4
+    ) {
         log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
         if(egemBRHash == ''){
@@ -197,7 +201,7 @@ var Block = class Block {
           this.egemBackReferenceBlockHash = currentEgemBlockHash;
         }
         //this will be the data tranche for the genesis block
-        this.data = '';
+        this.data = data;
         //sponsor and miner are entagled
         this.sponsor = sponsor;//osoese contract address
         this.miner = miner;//osoese original wallet

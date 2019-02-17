@@ -24,6 +24,9 @@ const sha256 = require('crypto-js/sha256');
 const chalk = require('chalk');
 const log = console.log;
 
+//////////////////////////////////////////////////this node private comm account
+const privateCom = require('./privateCom.js');
+
 ////////////////////////////////////////////////////calls the level db interface
 var BlkDB = require('./level.js');
 
