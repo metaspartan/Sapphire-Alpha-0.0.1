@@ -1453,7 +1453,7 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
           });
         });
         ///////the debit side
-        trie.get(receipt["fromAddress"]+":"+receipt["ticker"], function (err, value) {
+        trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[4], function (err, value) {
           console.log("grabbing balance of from address");
           var adjustedValue;
           if(value){
