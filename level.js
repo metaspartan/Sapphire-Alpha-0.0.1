@@ -1363,12 +1363,13 @@ var dumpToJsonFIleRange = function(cb,peer,start){
 
     }else if(data.key.toString().split(":")[0] == "tx"){
       //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+      if(JSON.parse(data.value.toString())["timsetamp"] != 1521339498){
+        var thisRowKey = data.key.toString();
+        var thisRowValue = data.value.toString();
+        var thisRow = {[thisRowKey]:thisRowValue};
 
-      var thisRowKey = data.key.toString();
-      var thisRowValue = data.value.toString();
-      var thisRow = {[thisRowKey]:thisRowValue};
-
-      jsonSynch.push(thisRow);
+        jsonSynch.push(thisRow);
+      }
 
     }else if(data.key.toString().split(":")[0] == "ox"){
       //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
@@ -1430,7 +1431,7 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
       ///////////////////WILL PROBABLY HAVE TO STORE THESE AND SORT BY TIMESTAMP
       console.log("THIS SHOULD BE THE AMOUNT "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]));
       /////going to have to check decremenets also
-      if(JSON.parse(Object.values(content[row]).toString())["timestamp"] != "1521339498"){//genesis hash
+      if(JSON.parse(Object.values(content[row]).toString())["timestamp"] != 1521339498){//genesis hash
         trie.get(Object.keys(content[row]).toString().split(":")[3]+":"+Object.keys(content[row]).toString().split(":")[4], function (err, value) {
           console.log("grabbing balance of from address");
           var adjustedValue;
