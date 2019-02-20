@@ -1428,7 +1428,7 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
       console.log("TRANSACTION and key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
       ///////////////////adding to trie
       ///////////////////WILL PROBABLY HAVE TO STORE THESE AND SORT BY TIMESTAMP
-      console.log("THIS SHOULD BE THE AMOUNT "+parseFloat(Object.values(content[row])["amount"]));
+      console.log("THIS SHOULD BE THE AMOUNT "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]));
       /*****
       trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
         console.log("grabbing balance of from address");
