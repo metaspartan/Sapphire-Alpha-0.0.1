@@ -4,7 +4,7 @@ var leveldown = require('leveldown')
 var fs = require('fs')
 //web3
 var Web3 = require("web3");
-var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
+var web3 = new Web3(new Web3.providers.HttpProvider("https://rpc-2.egem.io/custom"));
 
 var Trie = require('merkle-patricia-tree');
 
@@ -810,14 +810,20 @@ var getTransactionReceiptsByAddress = function(address){
 }
 
 var getBalanceAtAddressFromTrie = function(address,callback){
+
+  //trie.get("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX", function (err, value) {
+  //  console.log("grabbing balance of from address");
+
   trie.createReadStream()
   .on('data', function (data) {
-    var yo = JSON.stringify(data["key"]);
-    var ho = JSON.stringify(data["value"]);
-    var yo1 = Buffer.from(JSON.parse(yo).data);
-    var ho1 = Buffer.from(JSON.parse(ho).data);
-    console.log("key: "+yo1+" "+yo1.toString());
-    console.log("value: "+ho1+" "+ho1.toString());
+    if(data.key.toString().split(":")[0] == address){
+      var yo = JSON.stringify(data["key"]);
+      var ho = JSON.stringify(data["value"]);
+      var yo1 = Buffer.from(JSON.parse(yo).data);
+      var ho1 = Buffer.from(JSON.parse(ho).data);
+      console.log("key: "+yo1+" "+yo1.toString());
+      console.log("value: "+ho1+" "+ho1.toString());
+    }
   })
   .on('end', function() {
     console.log('End. Trie Root is '+trie.root.toString('hex'))
@@ -1290,64 +1296,86 @@ var dumpDatCopy = function(cb,peer){
 
 }
 
-
+////////////////////////////////////////////////////////////STREAM SYNCH PROCESS
 var dumpToJsonFIle = function(cb,peer){
 
-  var jsonSynch = []
+  var countReturn = 0;
+
+  var jsonSynch = [];
   var stream = db.createReadStream();
   stream.on('data',function(data){
-    //console.log('key = '+data.key+" value = "+data.value.toString());
-
-      //console.log("here... "+data.key.toString()+" "+data.value.toString());
-      //candidate for progress bar widget
-      console.log("key... "+data.key.toString()+".....value "+data.value.toString());
-
+      //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
       var thisRowKey = data.key.toString();
       var thisRowValue = data.value.toString();
       var thisRow = {[thisRowKey]:thisRowValue};
-
       jsonSynch.push(thisRow);
-
-
   });
 
   stream.on('close',function(){
-
-    console.log("Dat Copy data stream is complete");
-
+    console.log("Dat Copy primary data stream is complete");
     //db2.close();
     if (!fs.existsSync("./SYNC")){
         fs.mkdirSync("./SYNC");
     }
-
     fs.writeFile("./SYNC/SFRX.json", JSON.stringify(jsonSynch), (err) => {
         if (err) {
             console.error(err);
             return;
         };
-        console.log("JSON synch File has been created");
+        console.log("primary JSON synch File has been created");
     });
-
-    setTimeout(function(){cb(peer)},1000);
-
+    countReturn+=1;
+    if(countReturn == 2){
+      setTimeout(function(){cb(peer)},1000);
+    }
+  });
+  //need to also export the Trie
+  var jsonSynchTrie = [];
+  var streamTrie = trie.createReadStream();
+  streamTrie.on('data',function(data){
+      //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+      var thisRowKey = data.key.toString();
+      var thisRowValue = data.value.toString();
+      var thisRow = {[thisRowKey]:thisRowValue};
+      jsonSynchTrie.push(thisRow);
+  });
+  streamTrie.on('end',function(){
+    console.log("Dat Copy accounts trie data stream is complete");
+    if (!fs.existsSync("./SYNC")){
+        fs.mkdirSync("./SYNC");
+    }
+    fs.writeFile("./SYNC/SFRXaccounts.json", JSON.stringify(jsonSynchTrie), (err) => {
+        if (err) {
+            console.error(err);
+            return;
+        };
+        console.log("accounts trie JSON synch File has been created");
+    });
+    countReturn+=1;
+    if(countReturn == 2){
+      setTimeout(function(){cb(peer)},1000);
+    }
   });
 
 }
+/////////////////////////////////////////////////////////END STREAM SYNC PROCESS
 
 var dumpToJsonFIleRange = function(cb,peer,start){
 
+  var countReturn = 0;
   var chainBlockHeight=start;
-  var jsonSynch = []
+  var jsonSynch = [];
+  //need to also export the Trie
+  var jsonSynchTrie = [];
 
   console.log(" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
 
   var stream = db.createReadStream();
+  var streamTrie = trie.createReadStream();
+
   stream.on('data',function(data){
-    //console.log("block: "+parseInt(data.key.toString().split(":")[1],16).toString(10)+" hexBlockNum: "+parseInt(chainBlockHeight))
-    //console.log('key = '+data.key+" value = "+data.value.toString());
+
     if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight))){//possible another block enters the db s no upper limit
-      //console.log("here... "+data.key.toString()+" "+data.value.toString());
-      //console.log("key... "+data.key.toString()+"  --> value "+data.value.toString());
 
       var thisRowKey = data.key.toString();
       var thisRowValue = data.value.toString();
@@ -1356,7 +1384,6 @@ var dumpToJsonFIleRange = function(cb,peer,start){
       jsonSynch.push(thisRow);
 
     }else if(data.key.toString().split(":")[0] == "tx"){
-      //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
 
       var thisRowKey = data.key.toString();
       var thisRowValue = data.value.toString();
@@ -1365,7 +1392,6 @@ var dumpToJsonFIleRange = function(cb,peer,start){
       jsonSynch.push(thisRow);
 
     }else if(data.key.toString().split(":")[0] == "ox"){
-      //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
 
       var thisRowKey = data.key.toString();
       var thisRowValue = data.value.toString();
@@ -1379,9 +1405,8 @@ var dumpToJsonFIleRange = function(cb,peer,start){
 
   stream.on('close',function(){
 
-    console.log("Dat Copy data stream is complete");
+    console.log("Dat Copy PRIMARY data stream is complete");
 
-    //db2.close();
     if (!fs.existsSync("./SYNC")){
         fs.mkdirSync("./SYNC");
     }
@@ -1391,17 +1416,49 @@ var dumpToJsonFIleRange = function(cb,peer,start){
             console.error(err);
             return;
         };
-        console.log("JSON synch File has been created");
+        console.log("range primary JSON synch File has been created");
     });
 
-    setTimeout(function(){cb(peer)},1000);
+    countReturn+=1;
+    console.log("count return value is "+countReturn);
+    if(countReturn == 2){
+      setTimeout(function(){cb(peer)},1000);
+    }
 
+  });
+
+  streamTrie.on('data',function(data){
+      console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+      var thisRowKey = data.key.toString();
+      var thisRowValue = data.value.toString();
+      var thisRow = {[thisRowKey]:thisRowValue};
+      jsonSynchTrie.push(thisRow);
+  });
+  streamTrie.on('end',function(){
+    console.log("Dat Copy accounts trie data stream is complete");
+    if (!fs.existsSync("./SYNC")){
+        fs.mkdirSync("./SYNC");
+    }
+    fs.writeFile("./SYNC/SFRXaccounts.json", JSON.stringify(jsonSynchTrie), (err) => {
+        if (err) {
+            console.error(err);
+            return;
+        };
+        console.log("accounts trie JSON synch File has been created");
+    });
+    countReturn+=1;
+    console.log("count return value is "+countReturn);
+    if(countReturn == 2){
+      setTimeout(function(){cb(peer)},1000);
+    }
   });
 
 }
 
 
 var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
+
+  var countImport = 0;
 
   var content = require('./SYNC/SFRX.json');
 
@@ -1418,8 +1475,25 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
       if (err) return console.log('Ooops!', err) // some kind of I/O error
     })
   }
+  countImport+=1;
 
-  cb(blockNum,cbChainGrab,chainRiser);
+  var contentTrie = require('./SYNC/SFRXaccounts.json');
+  for(row in contentTrie){
+
+    var rowKey = Object.keys(contentTrie[row]);
+    var rowValue = Object.values(contentTrie[row]);
+    trie.put(rowKey, rowValue, function (err) {
+      if (err) return console.log('Ooops!', err) // some kind of I/O error
+    })
+  }
+  countImport+=1;
+
+  if(countImport == 2){
+    cb(blockNum,cbChainGrab,chainRiser);
+  }else{
+    console.log("WARNING THE IMPORTS ARE NOT RUNNINF SEQUENTIALLY");
+  }
+
 
 }
 
