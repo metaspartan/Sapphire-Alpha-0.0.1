@@ -1477,10 +1477,9 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
     })
   }
   countImport+=1;
-
+  trie = new Trie(db);
   var contentTrie = require('./SYNC/SFRXaccounts.json');
   for(row in contentTrie){
-
     var rowKey = Object.keys(contentTrie[row]);
     var rowValue = Object.values(contentTrie[row]);
     trie.put(rowKey, rowValue, function (err) {
