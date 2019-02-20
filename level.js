@@ -1492,6 +1492,7 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
     })
   }
   countImport+=1;
+  /****
   trie = new Trie(db);
   var contentTrie = require('./SYNC/SFRXaccounts.json');
   for(row in contentTrie){
@@ -1501,6 +1502,7 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
       if (err) return console.log('Ooops!', err) // some kind of I/O error
     })
   }
+  ****/
   countImport+=1;
 
   if(countImport == 2){
