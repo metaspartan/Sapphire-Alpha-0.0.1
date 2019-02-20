@@ -41,7 +41,7 @@ var Transaction = class Transaction{
 // 1) Create our store
 var db = levelup(leveldown('./SFRX'));
 var statedb = levelup(leveldown('./SFRX/STATE'));
-trie = new Trie(db);
+trie = new Trie(statedb);
 
 var refresh = function(cb,blockNum,cbChainGrab,globalGenesisHash){
   //not working correctluy at the moment
