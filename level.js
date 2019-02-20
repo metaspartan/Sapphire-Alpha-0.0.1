@@ -1429,29 +1429,52 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
       ///////////////////adding to trie
       ///////////////////WILL PROBABLY HAVE TO STORE THESE AND SORT BY TIMESTAMP
       console.log("THIS SHOULD BE THE AMOUNT "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]));
-      /*****
-      trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
-        console.log("grabbing balance of from address");
-        var adjustedValue;
-        if(value){
-          console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-          adjustedValue = parseFloat(value.toString()).toFixed(8);
-        }else{
-          adjustedValue = parseFloat(0);
-        }
-        adjustedValue += parseFloat(Object.values(content[row])["amount"]).toFixed(8);
-        trie.put(receipt["toAddress"]+":"+receipt["ticker"], adjustedValue, function () {
-          trie.get(receipt["toAddress"]+":"+receipt["ticker"], function (err, value) {
-            if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-            db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
-              encoding: 'binary'
-            }, function (err, value) {
-              console.log(value+" "+value.toString('hex'));
+      /////going to have to check decremenets also
+      if(JSON.parse(Object.values(content[row]).toString())["timestamp"] != "1521339498"){//genesis hash
+        trie.get(Object.keys(content[row]).toString().split(":")[3]+":"+Object.keys(content[row]).toString().split(":")[4], function (err, value) {
+          console.log("grabbing balance of from address");
+          var adjustedValue;
+          if(value){
+            console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
+            adjustedValue = parseFloat(value.toString()).toFixed(8);
+          }else{
+            adjustedValue = parseFloat(0);
+          }
+          adjustedValue += parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8);
+          trie.put(Object.keys(content[row]).toString().split(":")[3]+":"+Object.keys(content[row]).toString().split(":")[4], adjustedValue, function () {
+            trie.get(Object.keys(content[row]).toString().split(":")[3]+":"+Object.keys(content[row]).toString().split(":")[4], function (err, value) {
+              if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
+              db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+                encoding: 'binary'
+              }, function (err, value) {
+                console.log(value+" "+value.toString('hex'));
+              });
             });
           });
         });
-      });
-      *****/
+        ///////the debit side
+        trie.get(receipt["fromAddress"]+":"+receipt["ticker"], function (err, value) {
+          console.log("grabbing balance of from address");
+          var adjustedValue;
+          if(value){
+            console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
+            adjustedValue = parseFloat(value.toString()).toFixed(8);
+          }else{
+            adjustedValue = parseFloat(0);
+          }
+          adjustedValue -= parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8);
+          trie.put(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[4], adjustedValue, function () {
+            trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[4], function (err, value) {
+              if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
+              db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+                encoding: 'binary'
+              }, function (err, value) {
+                console.log(value+" "+value.toString('hex'));
+              });
+            });
+          });
+        });
+      }
       //////////////end ADDING to trie
     }
 
