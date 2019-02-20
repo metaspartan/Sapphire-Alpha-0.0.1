@@ -39,9 +39,10 @@ var Transaction = class Transaction{
 }
 
 // 1) Create our store
+var statedb = levelup(leveldown('./SFRX/STATE'))
 var db = levelup(leveldown('./SFRX'));
-var statedb = levelup(leveldown('./SFRX/STATE'));
-trie = new Trie(statedb);
+
+trie = new Trie(db);
 
 var refresh = function(cb,blockNum,cbChainGrab,globalGenesisHash){
   //not working correctluy at the moment
@@ -176,7 +177,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX", adjustedValue.toString(), function () {
         trie.get("0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX", function (err, value) {
           if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             console.log(value+" "+value.toString('hex'));
