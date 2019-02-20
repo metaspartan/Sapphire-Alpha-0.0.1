@@ -1384,15 +1384,7 @@ var dumpToJsonFIleRange = function(cb,peer,start){
 
       jsonSynch.push(thisRow);
 
-    }else if(data.key.toString().split(":")[0] == "tx"){
-
-      var thisRowKey = data.key.toString();
-      var thisRowValue = data.value.toString();
-      var thisRow = {[thisRowKey]:thisRowValue};
-
-      jsonSynch.push(thisRow);
-
-    }else if(data.key.toString().split(":")[0] == "ox"){
+    }else if(data.key.toString().split(":")[0] != "sfblk"){
 
       var thisRowKey = data.key.toString();
       var thisRowValue = data.value.toString();
@@ -1401,6 +1393,25 @@ var dumpToJsonFIleRange = function(cb,peer,start){
       jsonSynch.push(thisRow);
 
     }
+    /*****
+    }else if(data.key.toString().split(":")[0] == "ox"){
+
+      var thisRowKey = data.key.toString();
+      var thisRowValue = data.value.toString();
+      var thisRow = {[thisRowKey]:thisRowValue};
+
+      jsonSynch.push(thisRow);
+
+    }else if(data.key.toString().split(":")[0].length == 41){
+
+      var thisRowKey = data.key.toString();
+      var thisRowValue = data.value.toString();
+      var thisRow = {[thisRowKey]:thisRowValue};
+
+      jsonSynch.push(thisRow);
+
+    }
+    *****/
   });
 
 
@@ -1429,13 +1440,16 @@ var dumpToJsonFIleRange = function(cb,peer,start){
   });
 
   streamTrie.on('data',function(data){
+      /****
       console.log("key... "+data.key.toString()+".....value "+data.value.toString());
       var thisRowKey = data.key.toString();
       var thisRowValue = data.value.toString();
       var thisRow = {[thisRowKey]:thisRowValue};
       jsonSynchTrie.push(thisRow);
+      ****/
   });
   streamTrie.on('end',function(){
+    /****
     console.log("Dat Copy accounts trie data stream is complete");
     if (!fs.existsSync("./SYNC")){
         fs.mkdirSync("./SYNC");
@@ -1447,6 +1461,7 @@ var dumpToJsonFIleRange = function(cb,peer,start){
         };
         console.log("accounts trie JSON synch File has been created");
     });
+    ****/
     countReturn+=1;
     console.log("count return value is "+countReturn);
     if(countReturn == 2){
