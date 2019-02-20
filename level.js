@@ -1427,7 +1427,9 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
     }else{
       console.log("TRANSACTION and key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
       ///////////////////adding to trie
-      /******
+      ///////////////////WILL PROBABLY HAVE TO STORE THESE AND SORT BY TIMESTAMP
+      console.log("THIS SHOULD BE THE AMOUNT "+parseFloat(Object.values(content[row])["amount"]));
+      /*****
       trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
         console.log("grabbing balance of from address");
         var adjustedValue;
@@ -1437,7 +1439,7 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
         }else{
           adjustedValue = parseFloat(0);
         }
-        adjustedValue += parseFloat(receipt["toAddress"]).toFixed(8);
+        adjustedValue += parseFloat(Object.values(content[row])["amount"]).toFixed(8);
         trie.put(receipt["toAddress"]+":"+receipt["ticker"], adjustedValue, function () {
           trie.get(receipt["toAddress"]+":"+receipt["ticker"], function (err, value) {
             if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
@@ -1449,7 +1451,7 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
           });
         });
       });
-      ******/
+      *****/
       //////////////end ADDING to trie
     }
 
