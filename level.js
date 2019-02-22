@@ -1367,7 +1367,7 @@ var dumpToJsonFIleRange = function(cb,peer,start){
         var thisRowKey = data.key.toString();
         var thisRowValue = data.value.toString();
         var thisRow = {[thisRowKey]:thisRowValue};
-
+        console.log("export tx key... "+data.key.toString()+".....value "+data.value.toString());
         jsonSynch.push(thisRow);
       }
 
@@ -1432,8 +1432,8 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
       console.log("THIS SHOULD BE THE AMOUNT "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]));
       /////going to have to check decremenets also
       if(JSON.parse(Object.values(content[row]).toString())["timestamp"] != 1521339498){//genesis hash
-        trie.get(Object.keys(content[row]).toString().split(":")[3]+":"+Object.keys(content[row]).toString().split(":")[4], function (err, value) {
-          console.log("grabbing balance of from address");
+        trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
+          console.log("grabbing balance of from address ADD "+Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3]);
           var adjustedValue;
           if(value){
             console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
@@ -1442,8 +1442,8 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
             adjustedValue = parseFloat(0);
           }
           adjustedValue += parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8);
-          trie.put(Object.keys(content[row]).toString().split(":")[3]+":"+Object.keys(content[row]).toString().split(":")[4], adjustedValue, function () {
-            trie.get(Object.keys(content[row]).toString().split(":")[3]+":"+Object.keys(content[row]).toString().split(":")[4], function (err, value) {
+          trie.put(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
+            trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
               if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
               db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
                 encoding: 'binary'
@@ -1454,8 +1454,8 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
           });
         });
         ///////the debit side
-        trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[4], function (err, value) {
-          console.log("grabbing balance of from address");
+        trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
+          console.log("grabbing balance of from address MINUS "+Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3]);
           var adjustedValue;
           if(value){
             console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
@@ -1464,8 +1464,8 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
             adjustedValue = parseFloat(0);
           }
           adjustedValue -= parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8);
-          trie.put(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[4], adjustedValue, function () {
-            trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[4], function (err, value) {
+          trie.put(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
+            trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
               if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
               db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
                 encoding: 'binary'

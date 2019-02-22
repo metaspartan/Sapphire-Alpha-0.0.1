@@ -652,6 +652,9 @@ function cliGetInput(){
     }else if(userInput == "TX"){
       BlkDB.getTransactions();
       cliGetInput();
+    }else if(userInput == "TRIE"){
+      BlkDB.getTransactions();
+      cliGetInput();
     }else if(userInput == "O"){//O is for order
       //other commands can go Here
       log("Order is processing from the database not chain");
