@@ -653,7 +653,7 @@ function cliGetInput(){
       BlkDB.getTransactions();
       cliGetInput();
     }else if(userInput == "TRIE"){
-      BlkDB.getTransactions();
+      BlkDB.getEverythingFromTrie();
       cliGetInput();
     }else if(userInput == "O"){//O is for order
       //other commands can go Here

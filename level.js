@@ -830,6 +830,23 @@ var getBalanceAtAddressFromTrie = function(address,callback){
   })
 }
 
+var getEverythingFromTrie = function(address,callback){
+  trie.createReadStream()
+  .on('data', function (data) {
+
+      var yo = JSON.stringify(data["key"]);
+      var ho = JSON.stringify(data["value"]);
+      var yo1 = Buffer.from(JSON.parse(yo).data);
+      var ho1 = Buffer.from(JSON.parse(ho).data);
+      console.log("key: "+yo1+" "+yo1.toString());
+      console.log("value: "+ho1+" "+ho1.toString());
+
+  })
+  .on('end', function() {
+    console.log('End. Trie Root is '+trie.root.toString('hex'))
+  })
+}
+
 var getBalanceAtAddress = function(address,callback){
 
     console.log("Total Balance of "+address);
@@ -1431,7 +1448,7 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
       ///////////////////WILL PROBABLY HAVE TO STORE THESE AND SORT BY TIMESTAMP
       console.log("THIS SHOULD BE THE AMOUNT "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]));
       /////going to have to check decremenets also
-      if(JSON.parse(Object.values(content[row]).toString())["timestamp"] != 1521339498){//genesis hash
+      if(Object.keys(content[row]).toString().split(":")[4] != "1521339498"){//genesis hash
         trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
           console.log("grabbing balance of from address ADD "+Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3]);
           var adjustedValue;
@@ -1528,4 +1545,5 @@ module.exports = {
     callDeletedOrders:callDeletedOrders,
     buildTrade:buildTrade,
     getStateTrieRootHash:getStateTrieRootHash,
+    getEverythingFromTrie:getEverythingFromTrie
 }
