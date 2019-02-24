@@ -12,7 +12,8 @@ const defaults = require('dat-swarm-defaults');
 const readline = require('readline');
 const getPort = require('get-port');
 var Web3 = require("web3");
-var web3 = new Web3(new Web3.providers.HttpProvider("https://rpc-2.egem.io/custom"));
+var web3 = new Web3(new Web3.providers.HttpProvider("https://lb.rpc.egem.io"));
+//var web3 = new Web3(new Web3.providers.HttpProvider("https://rpc-2.egem.io/custom"));
 var DatSyncLink = require("./datsynch.js");
 
 //genesis hash variables

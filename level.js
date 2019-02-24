@@ -4,7 +4,7 @@ var leveldown = require('leveldown')
 var fs = require('fs')
 //web3
 var Web3 = require("web3");
-var web3 = new Web3(new Web3.providers.HttpProvider("https://rpc-2.egem.io/custom"));
+var web3 = new Web3(new Web3.providers.HttpProvider("https://lb.rpc.egem.io"));
 
 var Trie = require('merkle-patricia-tree');
 
