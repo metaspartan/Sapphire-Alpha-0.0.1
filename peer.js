@@ -222,8 +222,7 @@ var addyBal = function(val){
           var incomingBLockHeight = JSON.parse(data)["blockHeight"];
           console.log("VVVVVVVVVVVVVVVVVVVVV        "+incomingBLockHeight+"        VVVVVVVVVVVVVVVVVVVV    ---->   "+frankieCoin.blockHeight);
 
-          /////////////////INCOMING BLOCK IS ANTICIPATED HEIGHT AND NOT SYNCHING
-          if((parseInt(incomingBLockHeight) == (parseInt(frankieCoin.blockHeight)+1)) && isSynching == false){
+
 
             ///////////////NEED TO REMOVE ANY MATCHED PENDING TXS FROM MEME POOL
             console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
@@ -273,7 +272,6 @@ var addyBal = function(val){
 
             log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD? "+successfulBlockAdd));
 
-            /////////////////////////////NO VERIFICATION OF INCOMING BLOCKS HERE
 
               //increment the internal peer nonce of sending party to track longest chain
               frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
@@ -293,16 +291,7 @@ var addyBal = function(val){
               BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
               //add it to the RPC for miner
               rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-
-          ////////////////else we need to just ping for a synch as it gets stuck
-          }else{
-            for (let id in peers) {
-              log(chalk.yellow("          Sending ping for chain sync to all peers              "));
-              log(chalk.red("^-----------------------------------------------------------------^"));
-              //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
-              peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
-            }
-          }
+            
 
         }else if(JSON.parse(data)["fromAddress"]){
 
