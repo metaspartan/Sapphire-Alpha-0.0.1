@@ -273,7 +273,8 @@ var addyBal = function(val){
 
             log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD? "+successfulBlockAdd));
 
-            /////////////////////////////NO VERIFICATION OF INCOMING BLOCKS HERE
+            //verfiy the previous hash in the database matches our expectations - code is incomplete atm
+            if(frankieCoin.getLatestBlock()["previousHash"] == currentChainHash && successfulBlockAdd == true){
 
               //increment the internal peer nonce of sending party to track longest chain
               frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
@@ -293,7 +294,52 @@ var addyBal = function(val){
               BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
               //add it to the RPC for miner
               rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+            }else{
+              log("otherwise need to synch because block hash is "+frankieCoin.getLatestBlock()["previousHash"]+" compared to "+currentChainHash);
+              //for now I am going to remove the next block down....until I scrape to a match
+              //DEFINITELY need some logic here to verify peer synch height and chain
+              log("which means we are REMOVING BLOCK");
+              //remove the block from the chain and db
 
+              var lastSynchBlock;
+              for (let i in frankieCoin.chain.nodes){
+                if(frankieCoin.chain.nodes[i]["id"] == peerId){
+                  lastSynchBlock = frankieCoin.chain.nodes[i]["info"]["chainlength"];
+                }
+              }
+
+              if(parseInt(frankieCoin.getLength() - 1) != lastSynchBlock){
+                log(chalk.red("V-----------------------------------------------------------------V"));
+                log(chalk.red("                CONFLICT AND BLOCK REMOVAL                         "));
+              }else{
+                log("TTTTTTTTTTTHHHHHHHHHHHIIIIIIIIIISSSSSSSSSSS IS WHERE THE SYNCH IS STUCK");
+              }
+
+              frankieCoin.incrementPeerNonce(peerId,parseInt(frankieCoin.getLength() - 1));
+              //////BECAUSE WE ARE REMOVING A BLOCK WE MAY NEED TO DELETE FROM Database
+              BlkDB.removeBlock(frankieCoin.getLength());
+              BlkDB.addNode("node:"+peerId+":peerBlockHeight",parseInt(frankieCoin.getLength() - 1));
+              frankieCoin.blockHeight-=1;
+              frankieCoin.chain.pop();
+
+
+              //going test getting into synch with these parameters
+              frankieCoin.inSynch=false;
+              ///could just send this to one peeer but
+              //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},300);
+              for (let id in peers) {
+                log(chalk.yellow("          Sending ping for chain sync to all peers              "));
+                log(chalk.red("^-----------------------------------------------------------------^"));
+                //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
+                peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
+              }
+              //we would never get the block to this point
+              //BlockchainDB.clearBlock(frankieCoin.getLength());
+              //do I need a BlkDB.clearBlock? I just did it above...
+              //okay do we need a return?
+
+            }
+            ////end if statment to skip this part
           ////////////////else we need to just ping for a synch as it gets stuck
           }else{
             for (let id in peers) {
