@@ -274,24 +274,24 @@ var addyBal = function(val){
 
 
               //increment the internal peer nonce of sending party to track longest chain
-              frankieCoin.incrementPeerNonce(peerId,frankieCoin.getLength());
-              BlkDB.addNode("node:"+peerId+":peerBlockHeight",frankieCoin.getLength());
+              frankieCoin.incrementPeerNonce(peerId,JSON.parse(data)["blockHeight"]);
+              BlkDB.addNode("node:"+peerId+":peerBlockHeight",JSON.parse(data)["blockHeight"]);
               //logging the block added to chain for console
               log(chalk.red("--------------------------------------------------------------------"));
               //log(chalk.green("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock())));//verbose
-              log(chalk.green("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock()["blockHeight"])));
-              log(chalk.green("in prev hash: ")+frankieCoin.getLatestBlock()["previousHash"]+chalk.green(" <=> chain: ")+currentChainHash);
+              log(chalk.green("block added to chain: "+JSON.stringify(JSON.parse(data)["blockHeight"])));
+              log(chalk.green("in prev hash: ")+JSON.parse(data)["previousHash"]+chalk.green(" <=> chain: ")+currentChainHash);
               log(chalk.yellow("                     SUCESSFUL BLOCK FROM PEER                      "));
               log(chalk.red("--------------------------------------------------------------------"));
               //////update the client database OR reject block and rollback the chain - code is incomplete atm
               //add it to the database
-              BlkDB.addBlock(parseInt(frankieCoin.getLength()),JSON.stringify(frankieCoin.getLatestBlock()),"202");
-              BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.getLength()));
-              BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.getLength()));
+              BlkDB.addBlock(parseInt(JSON.parse(data)["blockHeight"]),JSON.stringify(JSON.parse(data)),"202");
+              BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(JSON.parse(data)["blockHeight"]));
+              BlkDB.addChainState("cs:blockHeight",parseInt(JSON.parse(data)["blockHeight"]));
               BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
               //add it to the RPC for miner
-              rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-            
+              rpcserver.postRPCforMiner({block:JSON.parse(data)});
+
 
         }else if(JSON.parse(data)["fromAddress"]){
 
