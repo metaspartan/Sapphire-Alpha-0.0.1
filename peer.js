@@ -938,7 +938,7 @@ var frankieCoin = blockchain();
 ///////walks the chain from the start block verfying hashes and db records
 var chainWalker = function(start,callback){
   for(var i=start;i<frankieCoin.chainRiser;i++){
-    BlkDB.getBlock(i)
+    BlkDB.getBlock(i,callback)
     console.log("current block was "+i);
   }
 }
