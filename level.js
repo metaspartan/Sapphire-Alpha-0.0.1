@@ -578,7 +578,9 @@ var getBlock = function(blknum,callBack){
   var hexBlockNum = ("000000000000000" + blocknum.toString(16)).substr(-16);
     db.get("sfblk:"+hexBlockNum, function (err, value) {
       return new Promise((resolve) => {
-        if (err) return console.log('Ooops!', err) // likely the key was not found
+        if (err){
+          callBack(blknum+":"+err);
+        } // likely the key was not found
 
         // Ta da!
         console.log(hexBlockNum+": " + value)

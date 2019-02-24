@@ -292,7 +292,12 @@ var addyBal = function(val){
               //add it to the RPC for miner
               rpcserver.postRPCforMiner({block:JSON.parse(data)});
 
+              ///////running chain walet here this may move
+              var chChainWalker = function(reply){
+                console.log(reply.split(":")[0]+" "+reply.split(":")[1]);
+              }
               chainWalker(1);
+
 
 
         }else if(JSON.parse(data)["fromAddress"]){
