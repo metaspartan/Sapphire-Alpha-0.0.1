@@ -294,6 +294,7 @@ var addyBal = function(val){
 
               ///////running chain walet here this may move
               var chChainWalker = function(reply){
+                console.log("original call back called");
                 console.log(reply.split(":")[0]+" "+reply.split(":")[1]);
               }
               chainWalker(1,chChainWalker);
@@ -937,9 +938,21 @@ var frankieCoin = blockchain();
 
 ///////walks the chain from the start block verfying hashes and db records
 var chainWalker = function(start,callback){
+  var escape = false;
+  var interCallBack = function(responder){
+    console.log("inter callback called")
+    if(responder.split(":")[1] == "NotFoundError"){
+      escape = true;
+    }
+    callback(responder)
+  }
   for(var i=start;i<frankieCoin.chainRiser;i++){
-    BlkDB.getBlock(i,callback)
-    console.log("current block was "+i);
+    if(escape == false){
+      BlkDB.getBlock(i,interCallBack)
+      console.log("current block was "+i);
+    }else{
+      console.log("escape clause enacted on block"+i);
+    }
   }
 }
 ////////////////////////////////////////////////end chain walker synchronisation
