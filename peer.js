@@ -296,7 +296,7 @@ var addyBal = function(val){
               var chChainWalker = function(reply){
                 console.log(reply.split(":")[0]+" "+reply.split(":")[1]);
               }
-              chainWalker(1);
+              chainWalker(1,chChainWalker);
 
 
 
