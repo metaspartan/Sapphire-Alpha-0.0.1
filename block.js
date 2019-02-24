@@ -499,14 +499,6 @@ var Blockchain = class Blockchain {
 
       //ths is the peers adding a block needs to be VALIDATED
       addBlockFromPeers(inBlock,callback,peerId){
-        //if all that consensus stuff I am going to add....then
-        //here is where I check if two things and I think make them globals
-        //1 issync should be YES
-        //2 previous hash must match current chain top hash
-        if(this.getLatestBlock().hash == inBlock.previousHash){
-          log("----------------------------------------------------");
-          log("yes inblock prev hash of "+inBlock.previousHash+" matches the hash of chain "+this.getLatestBlock().hash);
-          log("----------------------------------------------------");
 
           //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
           var block = new Block(parseInt(inBlock.blockHeight), inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
@@ -521,6 +513,7 @@ var Blockchain = class Blockchain {
           log(chalk.blue("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
           //careful I have the ischain valid returining true on all tries
 
+/*****
         }else if(this.chain[this.chain.length - 2].hash == inBlock.previousHash && this.getLatestBlock().previousHash == inBlock.previousHash){//uncle block
           log(chalk.bgRed("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"));
           log("UNCLE previous hash matches"+inBlock.previousHash+" current prev hash "+this.getLatestBlock().previousHash);
@@ -563,7 +556,7 @@ var Blockchain = class Blockchain {
           //this case represents a problem because it is just a bad block
           //this.chain.pop();
         }
-
+******/
         if(this.isChainValid() == false){
           this.chain.pop();
           log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXX Block NOT added XXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
