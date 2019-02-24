@@ -292,6 +292,8 @@ var addyBal = function(val){
               //add it to the RPC for miner
               rpcserver.postRPCforMiner({block:JSON.parse(data)});
 
+              chainWalker(1);
+
 
         }else if(JSON.parse(data)["fromAddress"]){
 
@@ -925,6 +927,17 @@ var blockchain = function(){
 
 var frankieCoin = blockchain();
 ///////////////////////////////////////////////////////////////////my blockchain
+
+////////////////////////////////////////////////////chain walker synchtonisation
+
+///////walks the chain from the start block verfying hashes and db records
+var chainWalker = function(start,callback){
+  for(var i=start;i<frankieCoin.chainRiser;i++){
+    BlkDB.getBlock(i)
+    console.log("current block was "+i);
+  }
+}
+////////////////////////////////////////////////end chain walker synchronisation
 
 //have to load the first block into local database
 BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()),"759");

@@ -1086,6 +1086,12 @@ var Blockchain = class Blockchain {
         return true;/////////REWORKING THIS FUNCTION FOR POST BLOCK ENTRY CHECKS
       }
 
+      ///////walks the chain from the start block verfying hashes and db records
+      chainWalker(start,callback){
+
+        console.log("current block ");
+      }
+
       /////////functions for pulling blocks and processingTrades
       /////////end functons calling blocks and processingTrades
 
