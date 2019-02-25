@@ -301,7 +301,7 @@ var addyBal = function(val){
                     log(chalk.green("Sending ping for chain sync."));
                     log("------------------------------------------------------");
                     //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
-                    peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:reply.split(":")[0],MaxHeight:reply.split(":")[0],GlobalHash:globalGenesisHash}}));
+                    peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(reply.split(":")[0]-1),MaxHeight:parseInt(reply.split(":")[0]-1),GlobalHash:globalGenesisHash}}));
                   }
                 }
               }
