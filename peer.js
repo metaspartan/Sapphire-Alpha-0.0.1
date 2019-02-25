@@ -294,7 +294,7 @@ var addyBal = function(val){
 
               ///////running chain walet here this may move
               var chChainWalker = function(reply){
-                if(!isJson(reply)){
+                if(!isJSON(reply)){
                   console.log("original call back called"+reply.split(":")[0]+" "+reply.split(":")[1]);
                 }
               }
@@ -941,7 +941,7 @@ var frankieCoin = blockchain();
 var chainWalker = function(start,callback){
   var escape = false;
   var interCallBack = function(responder){
-    if(!isJson(responder)){
+    if(!isJSON(responder)){
       if(responder.split(":")[1] == "NotFoundError"){
         escape = true;
       }
