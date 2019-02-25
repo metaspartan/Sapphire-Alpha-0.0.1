@@ -580,6 +580,7 @@ var getBlock = function(blknum,callBack){
       return new Promise((resolve) => {
         if (err){
           callBack(blknum+":"+err);
+          return;
         } // likely the key was not found
 
         // Ta da!
