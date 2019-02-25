@@ -296,6 +296,13 @@ var addyBal = function(val){
               var chChainWalker = function(reply){
                 if(!isJSON(reply)){
                   console.log("original call back called"+reply.split(":")[0]+" "+reply.split(":")[1]);
+                  for (let id in peers) {
+                    log("------------------------------------------------------");
+                    log(chalk.green("Sending ping for chain sync."));
+                    log("------------------------------------------------------");
+                    //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
+                    peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:reply.split(":")[0],MaxHeight:reply.split(":")[0],GlobalHash:globalGenesisHash}}));
+                  }
                 }
               }
               chainWalker(1,chChainWalker);
