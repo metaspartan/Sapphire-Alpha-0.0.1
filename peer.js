@@ -74,7 +74,7 @@ var output = fs.readFile(filename, 'utf8', function(err, data) {
 ////////////////////////////////////////////////////////////////synching section
 var chainState = {};
 chainState.isSynching = false;
-chainState.chainWalkHeight = 1;
+chainState.chainWalkHeight = 2;
 chainState.topBlock = 0;
 //chainState.accountsTrie = 0;
 var isSynching = false;//will add numerics to this
