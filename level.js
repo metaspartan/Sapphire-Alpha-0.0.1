@@ -694,7 +694,7 @@ var blockRangeValidate = function(blockHeight,riser,callback){
       var stream = db.createReadStream();
       var dataStream = [];
       var currentBlockToValidate = blockHeight;
-      var currentBlockHash = "";
+      var currentBlockHash = "7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f";
       stream.on('data',function(data){
         dataStream.push(data)
       });
