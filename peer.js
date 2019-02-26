@@ -597,7 +597,12 @@ function cliGetInput(){
         }else{
           console.log("NOT VALID NEED TO PING AT "+replyData);
           //set ping here
-          peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(replyData),GlobalHash:globalGenesisHash}}));
+          for (let id in peers) {
+            log("------------------------------------------------------");
+            log(chalk.green("Sending ping for chain sync."));
+            log("------------------------------------------------------");
+            peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(replyData),GlobalHash:globalGenesisHash}}));
+          }
         }
       }
       BlkDB.blockRangeValidate(chainState.chainWalkHeight,parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator);
