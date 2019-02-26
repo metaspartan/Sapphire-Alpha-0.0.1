@@ -74,7 +74,7 @@ var output = fs.readFile(filename, 'utf8', function(err, data) {
 ////////////////////////////////////////////////////////////////synching section
 var chainState = {};
 chainState.isSynching = false;
-chainState.chainWalkHeight = 0;
+chainState.chainWalkHeight = 1;
 chainState.topBlock = 0;
 //chainState.accountsTrie = 0;
 var isSynching = false;//will add numerics to this
@@ -589,9 +589,17 @@ function cliGetInput(){
       }
       cliGetInput();
     }else if(userInput == "MM"){
-      //var silly = rpcserver.db.miners.fetchKey(key,value);
-      //log("got it and its "+silly);
-      impceventcaller("passing data","this my peer");
+      var cbBlockChainValidator = function(isValid,replyData){
+        if(isValid == true){
+          console.log("BLOCK HEIGHT VALIDATED TO "+replyData);
+          chainState.chainWalkHeight = replyData;
+          //set the chain state validated height;
+        }else{
+          console.log("NOT VALID NEED TO PING AT "+replyData);
+          //set ping here
+        }
+      }
+      BlkDB.blockRangeValidate(chainState.chainWalkHeight,parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator);
       cliGetInput();
     }else if(userInput == "MMM"){
       console.log("calling all orders level db");

@@ -687,6 +687,73 @@ var getBlockRange = function(blockHeight,riser,callback){
 
 }
 
+
+///////////////////////this function validates a range of blocks for chain symch
+var blockRangeValidate = function(blockHeight,riser,callback){
+
+      var stream = db.createReadStream();
+      var dataStream = [];
+      var currentBlockToValidate = blockHeight;
+      var currentBlockHash = "";
+      stream.on('data',function(data){
+        dataStream.push(data)
+      });
+
+      stream.on('close',function(){
+        console.log("Block range data stream is complete");
+
+        for(var dataItem in dataStream){
+          var thisDataItem = dataStream[dataItem];
+          if((thisDataItem.key.toString().split(":")[0] == "sfblk") && (parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)) == parseInt(currentBlockToValidate)) && (parseInt(currentBlockToValidate) <= parseInt(riser)) ){
+            console.log("top "+currentBlockToValidate);
+            console.log("second "+parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)));
+            console.log("why below 10 "+thisDataItem.key.toString());
+
+            /////perform the validation
+
+            var isValidBlock = thisDataItem.value.toString();
+            console.log("is this one und "+JSON.parse(isValidBlock)["timestamp"]);
+            var newBlockHash = Hash(currentBlockHash+JSON.parse(isValidBlock)["timestamp"]+JSON.parse(isValidBlock)["nonce"]);//this.previousHash + this.timestamp + this.nonce
+            console.log("comparing "+JSON.parse(isValidBlock)["hash"]+" to "+newBlockHash);
+            if(JSON.parse(isValidBlock)["hash"] == newBlockHash){
+              //set the state validated height
+              callback(true,parseInt(JSON.parse(isValidBlock)["blockHeight"]));
+            }else{
+              callback(false,parseInt(JSON.parse(isValidBlock)["blockHeight"]-1));
+            }
+            currentBlockHash = JSON.parse(isValidBlock)["hash"];
+            console.log("VALIDATING BLOCK PREV HASH and NUMBER "+JSON.parse(isValidBlock)["blockHeight"]+JSON.parse(isValidBlock)["previousHash"]+JSON.parse(isValidBlock)["hash"]);
+            console.log("here... "+thisDataItem.key.toString()+" "+thisDataItem.value.toString());
+            ///end perform the validation
+
+            currentBlockToValidate++;
+          }
+        }
+
+        /***
+        if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight))){//possible another block enters the db s no upper limit
+
+          var isValidBlock = data.value.toString();
+          var newBlockHash = Hash(currentBlockHash+JSON.parse(isValidBlock)["timestamp"]+JSON.parse(isValidBlock)["nonce"]);//this.previousHash + this.timestamp + this.nonce
+          console.log("comparing "+JSON.parse(isValidBlock)["hash"]+" to "+newBlockHash);
+          if(JSON.parse(isValidBlock)["hash"] == newBlockHash){
+            //set the state validated height
+            callback(true,parseInt(JSON.parse(isValidBlock)["blockHeight"]));
+          }else{
+            callback(false,parseInt(JSON.parse(isValidBlock)["blockHeight"]-1));
+          }
+          currentBlockHash = JSON.parse(isValidBlock)["hash"];
+          console.log("VALIDATING BLOCK PREV HASH and NUMBER "+JSON.parse(isValidBlock)["blockHeight"]+JSON.parse(isValidBlock)["previousHash"]+JSON.parse(isValidBlock)["hash"]);
+          console.log("here... "+data.key.toString()+" "+data.value.toString());
+
+        }
+        ***/
+
+      });
+
+}
+//////////////////////////////////////////////////////////end blockRangeValidate
+
 var getBlockchain2 = function(limit,callback,hashKey){
 
   db.get(hashKey, function (err, value) {
@@ -1531,6 +1598,7 @@ module.exports = {
     getBlockchain:getBlockchain,
     getBlockStream:getBlockStream,
     getBlockRange:getBlockRange,
+    blockRangeValidate:blockRangeValidate,
     clearDatabase:clearDatabase,
     addTransactions:addTransactions,
     getTransactions:getTransactions,
