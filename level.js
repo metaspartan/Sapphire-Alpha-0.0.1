@@ -704,7 +704,7 @@ var blockRangeValidate = function(blockHeight,riser,callback){
 
         for(var dataItem in dataStream){
           var thisDataItem = dataStream[dataItem];
-          if((thisDataItem.key.toString().split(":")[0] == "sfblk") && (parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)) == parseInt(currentBlockToValidate)) && (parseInt(currentBlockToValidate) <= parseInt(riser)) ){
+          if((thisDataItem.key.toString().split(":")[0] == "sfblk") && (parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)) == parseInt(currentBlockToValidate)) && (parseInt(currentBlockToValidate) < parseInt(riser)) ){
             console.log("top "+currentBlockToValidate);
             console.log("second "+parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)));
             console.log("why below 10 "+thisDataItem.key.toString());
