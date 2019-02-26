@@ -689,12 +689,12 @@ var getBlockRange = function(blockHeight,riser,callback){
 
 
 ///////////////////////this function validates a range of blocks for chain symch
-var blockRangeValidate = function(blockHeight,riser,callback){
+var blockRangeValidate = function(blockHeight,riser,callback,blockHash){
 
       var stream = db.createReadStream();
       var dataStream = [];
       var currentBlockToValidate = blockHeight;
-      var currentBlockHash = "7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f";
+      var currentBlockHash = ;
       stream.on('data',function(data){
         dataStream.push(data)
       });
@@ -717,9 +717,9 @@ var blockRangeValidate = function(blockHeight,riser,callback){
             console.log("comparing "+JSON.parse(isValidBlock)["hash"]+" to "+newBlockHash);
             if(JSON.parse(isValidBlock)["hash"] == newBlockHash){
               //set the state validated height
-              callback(true,parseInt(JSON.parse(isValidBlock)["blockHeight"]));
+              callback(true,parseInt(JSON.parse(isValidBlock)["blockHeight"]),JSON.parse(isValidBlock)["hash"]);
             }else{
-              callback(false,parseInt(JSON.parse(isValidBlock)["blockHeight"]-1));
+              callback(false,parseInt(JSON.parse(isValidBlock)["blockHeight"]-1),"");
             }
             currentBlockHash = JSON.parse(isValidBlock)["hash"];
             console.log("VALIDATING BLOCK PREV HASH and NUMBER "+JSON.parse(isValidBlock)["blockHeight"]+JSON.parse(isValidBlock)["previousHash"]+JSON.parse(isValidBlock)["hash"]);

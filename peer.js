@@ -75,6 +75,7 @@ var output = fs.readFile(filename, 'utf8', function(err, data) {
 var chainState = {};
 chainState.isSynching = false;
 chainState.chainWalkHeight = 1;
+chainState.chainWalkHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f';
 chainState.topBlock = 0;
 //chainState.accountsTrie = 0;
 var isSynching = false;//will add numerics to this
@@ -589,10 +590,11 @@ function cliGetInput(){
       }
       cliGetInput();
     }else if(userInput == "MM"){
-      var cbBlockChainValidator = function(isValid,replyData){
+      var cbBlockChainValidator = function(isValid,replyData,replyHash){
         if(isValid == true){
-          console.log("BLOCK HEIGHT VALIDATED TO "+replyData);
+          console.log("BLOCK HEIGHT VALIDATED TO "+replyData,replyHash);
           chainState.chainWalkHeight = replyData;
+          chainState.chainWalkHash = replyHash;
           //set the chain state validated height;
         }else{
           console.log("NOT VALID NEED TO PING AT "+replyData);
@@ -605,7 +607,7 @@ function cliGetInput(){
           }
         }
       }
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash);
       cliGetInput();
     }else if(userInput == "MMM"){
       console.log("calling all orders level db");
