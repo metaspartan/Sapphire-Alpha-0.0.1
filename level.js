@@ -695,6 +695,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash){
       var dataStream = [];
       var currentBlockToValidate = blockHeight;
       var currentBlockHash = blockHash;
+
       stream.on('data',function(data){
         dataStream.push(data)
       });
@@ -730,7 +731,10 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash){
             currentBlockToValidate++;
           }
         }
-
+        if(currentBlockToValidate == blockHeight){
+          console.log("ping it");
+          callback(blockHeight,"");
+        }
         console.log("Block range data stream is complete");
 
         /***
