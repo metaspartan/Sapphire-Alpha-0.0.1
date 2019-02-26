@@ -605,7 +605,7 @@ function cliGetInput(){
           }
         }
       }
-      BlkDB.blockRangeValidate(chainState.chainWalkHeight,parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator);
       cliGetInput();
     }else if(userInput == "MMM"){
       console.log("calling all orders level db");
