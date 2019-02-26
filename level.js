@@ -700,7 +700,6 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash){
       });
 
       stream.on('close',function(){
-        console.log("Block range data stream is complete");
 
         for(var dataItem in dataStream){
           var thisDataItem = dataStream[dataItem];
@@ -731,6 +730,8 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash){
             currentBlockToValidate++;
           }
         }
+
+        console.log("Block range data stream is complete");
 
         /***
         if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight))){//possible another block enters the db s no upper limit
