@@ -155,9 +155,20 @@ var addyBal = function(val){
       //connSeq--
     })
 
+    conn.on('end',function(){
+      console.log("data stream ended ");
+    });
+    var incomingBufferArray = [];
     conn.on('data', data => {
       // Here we handle incomming messages
-      console.log("type of is "+typeof(data));
+
+
+      incomingBufferArray.push(data);
+
+
+      console.log("incoming buffer array is "+incomingBufferArray);
+
+      console.log("type of is "+typeof(data)+JSON.stringify(data));
       log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
       // callback returning verified uncles post processing probably needs a rename
       var sendBackUncle = function(msg,peerId){
@@ -353,9 +364,15 @@ var addyBal = function(val){
                   console.log("calling dat synch")
                   DatSyncLink.synchDatabaseJSON(setDatSynch,datpeer);
                 }
+
+                var cbGetStream = function(jsonStream,streamToPeerID){
+                  streamToPeerID.conn.write(JSON.stringify(jsonStream));
+                  //setting up some streams to try this out
+                }
                 //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
                 //BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
-                BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"]);
+                BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser)
+                //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
 
 
                 //pongBack = true;//not sure about this since this is a stream
