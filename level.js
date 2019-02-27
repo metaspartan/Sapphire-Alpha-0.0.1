@@ -1637,6 +1637,80 @@ var dumpToStreamFIleRange = function(cb,peer,start,end){
 
 }
 
+var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,content){
+
+
+  for(row in content){
+
+
+    var rowKey = Object.keys(content[row]);
+    var rowValue = Object.values(content[row]);
+    db.put(rowKey, rowValue, function (err) {
+      if (err) return console.log('Ooops!', err) // some kind of I/O error
+    })
+
+    if(Object.keys(content[row]).toString().split(":")[0] != "tx"){
+      console.log("key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
+    }else{
+      console.log("TRANSACTION and key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
+      ///////////////////adding to trie
+      ///////////////////WILL PROBABLY HAVE TO STORE THESE AND SORT BY TIMESTAMP
+      console.log("THIS SHOULD BE THE AMOUNT "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]));
+      /////going to have to check decremenets also
+      if(Object.keys(content[row]).toString().split(":")[4] != "1521339498"){//genesis hash
+        trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
+          console.log("grabbing balance of from address ADD "+Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3]);
+          var adjustedValue;
+          if(value){
+            console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
+            adjustedValue = parseFloat(value.toString()).toFixed(8);
+          }else{
+            adjustedValue = parseFloat(0);
+          }
+          adjustedValue += parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8);
+          trie.put(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
+            trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
+              if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
+              db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+                encoding: 'binary'
+              }, function (err, value) {
+                console.log(value+" "+value.toString('hex'));
+              });
+            });
+          });
+        });
+        ///////the debit side
+        trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
+          console.log("grabbing balance of from address MINUS "+Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3]);
+          var adjustedValue;
+          if(value){
+            console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
+            adjustedValue = parseFloat(value.toString()).toFixed(8);
+          }else{
+            adjustedValue = parseFloat(0);
+          }
+          adjustedValue -= parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8);
+          trie.put(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
+            trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
+              if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
+              db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+                encoding: 'binary'
+              }, function (err, value) {
+                console.log(value+" "+value.toString('hex'));
+              });
+            });
+          });
+        });
+      }
+      //////////////end ADDING to trie
+    }
+
+  }
+
+  cb(blockNum,cbChainGrab,chainRiser);
+
+}
+
 var getStateTrieRootHash = function(){
   return trie.root.toString('hex');
 }
@@ -1650,6 +1724,7 @@ module.exports = {
     dumpToJsonFIleRange:dumpToJsonFIleRange,
     dumpToStreamFIleRange:dumpToStreamFIleRange,
     importFromJSONFile:importFromJSONFile,
+    importFromJSONStream:importFromJSONStream,
     addChainParams:addChainParams,
     getChainParams:getChainParams,
     getChainParamsBlockHeight:getChainParamsBlockHeight,

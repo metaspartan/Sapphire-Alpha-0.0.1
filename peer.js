@@ -157,16 +157,37 @@ var addyBal = function(val){
 
     conn.on('end',function(){
       console.log("data stream ended ");
+      //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
+
+
+
+      console.log("Importing the data file to the db and then calling the memory synch");
+      setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,16,cbChainGrab,frankieCoin.chainRiser,incomingBufferArray);},2000);
+      //setting this here and heed more intake checks
+      frankieCoin.blockHeight = parseInt(16);
+      //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
+      var cbBlockMemLoad = function(blockNum,cbChainGrab,chainRiser){
+        setTimeout(function(){ChainGrabRefresh(blockNum,cbChainGrab,chainRiser);},3000)
+      }
+
     });
+
     var incomingBufferArray = [];
+    conn.on('readable',function(){
+
+      console.log("ILL BEEEEEEEEEEEEEEEEEE RIGHT ON BRO WE HAVE FIGURED OUT THE STREAM IS READABLE "+this.readableHighWaterMark);
+
+      let chunk;
+      while (null !== (chunk = this.read())) {
+        console.log(`Received ${chunk.length} bytes of data.`);
+        incomingBufferArray.push(chunk);
+      }
+
+    });
+
+
     conn.on('data', data => {
       // Here we handle incomming messages
-
-
-      incomingBufferArray.push(data);
-
-
-      setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},7000);
 
       console.log("type of is "+typeof(data)+JSON.stringify(data));
       log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
@@ -367,6 +388,7 @@ var addyBal = function(val){
 
                 var cbGetStream = function(jsonStream,streamToPeerID){
                   streamToPeerID.conn.write(JSON.stringify(jsonStream));
+                  streamToPeerID.conn.end();
                   //setting up some streams to try this out
                 }
                 //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
