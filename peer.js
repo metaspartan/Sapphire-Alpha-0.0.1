@@ -161,6 +161,8 @@ var addyBal = function(val){
       console.log("data stream ended ");
       //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
 
+      console.log(JSON.stringify(incomingBufferArray));
+
 
 
       console.log("Importing the data file to the db and then calling the memory synch");
