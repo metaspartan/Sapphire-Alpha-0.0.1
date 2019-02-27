@@ -155,6 +155,8 @@ var addyBal = function(val){
       //connSeq--
     })
 
+    var incomingBufferArray = [];
+
     conn.on('end',function(){
       console.log("data stream ended ");
       //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
@@ -172,7 +174,7 @@ var addyBal = function(val){
 
     });
 
-    var incomingBufferArray = [];
+
     conn.on('readable',function(){
 
       console.log("ILL BEEEEEEEEEEEEEEEEEE RIGHT ON BRO WE HAVE FIGURED OUT THE STREAM IS READABLE "+this.readableHighWaterMark);
@@ -189,8 +191,8 @@ var addyBal = function(val){
     conn.on('data', data => {
       // Here we handle incomming messages
 
-      console.log("type of is "+typeof(data)+JSON.stringify(data));
-      log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
+      //console.log("type of is "+typeof(data)+JSON.stringify(data));
+      //log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
       // callback returning verified uncles post processing probably needs a rename
       var sendBackUncle = function(msg,peerId){
         peers[peerId].conn.write(JSON.stringify(msg));
