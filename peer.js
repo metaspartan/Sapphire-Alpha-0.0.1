@@ -166,7 +166,7 @@ var addyBal = function(val){
       incomingBufferArray.push(data);
 
 
-      console.log("incoming buffer array is "+incomingBufferArray);
+      setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},7000);
 
       console.log("type of is "+typeof(data)+JSON.stringify(data));
       log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
