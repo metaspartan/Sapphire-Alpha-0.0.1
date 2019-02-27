@@ -162,7 +162,7 @@ var addyBal = function(val){
 
 
       console.log("Importing the data file to the db and then calling the memory synch");
-      setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,16,cbChainGrab,frankieCoin.chainRiser,incomingBufferArray);},2000);
+      setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,16,cbChainGrab,frankieCoin.chainRiser,incomingBufferArray.toString());},2000);
       //setting this here and heed more intake checks
       frankieCoin.blockHeight = parseInt(16);
       //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
