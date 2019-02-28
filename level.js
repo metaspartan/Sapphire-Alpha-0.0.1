@@ -1643,7 +1643,8 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
 
   try {
       var content = JSON.parse(JSON.stringify(incontent));
-      //console.log(content)
+      content = JSON.parse(content);
+      console.log(content);
   } catch (e) {
       return false;
   }
