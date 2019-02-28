@@ -1650,7 +1650,7 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
 
   for(row in content){
 
-    console.log(content[row]);
+    console.log("I AM INSIDE THE FOR "+content[row]);
 
     var rowKey = Object.keys(content[row]);
     var rowValue = Object.values(content[row]);
