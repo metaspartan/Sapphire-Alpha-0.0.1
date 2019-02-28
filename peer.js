@@ -365,21 +365,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               //add it to the RPC for miner
               rpcserver.postRPCforMiner({block:JSON.parse(data)});
 
-              ///////running chain walet here this may move
-              var chChainWalker = function(reply){
-                if(!isJSON(reply)){
-                  console.log("original call back called"+reply.split(":")[0]+" "+reply.split(":")[1]);
-                  for (let id in peers) {
-                    log("------------------------------------------------------");
-                    log(chalk.green("Sending ping for chain sync."));
-                    log("------------------------------------------------------");
-                    //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
-                    peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(reply.split(":")[0]-1),MaxHeight:parseInt(reply.split(":")[0]-1),GlobalHash:globalGenesisHash}}));
-                  }
-                }
-              }
-              //chainWalker(1,chChainWalker);
-              //Imight change the below call to use chainWaleter
+
               BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash);
 
 
@@ -442,15 +428,15 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
                 }
                 BlkDB.getBlock(parseInt(peerBlockHeight),pongBackBlock);
                 pongBack = true;
-              }else if(frankieCoin.getLength() == parseInt(peerBlockHeight)){
+              }else if(frankieCoin.blockHeight == parseInt(peerBlockHeight)){
                 //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
                 peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
                 pongBack = true;
-              }else if((peerBlockHeight > frankieCoin.getLength()) && (peerBlockHeight == (frankieCoin.getLength()+1))){
+              }else if((peerBlockHeight > frankieCoin.blockHeight) && (peerBlockHeight == (frankieCoin.blockHeight+1))){
                 //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
                 peerBlockHeight--;
                 pongBack = true;
-              }else if(peerBlockHeight > (frankieCoin.getLength()+2)){
+              }else if(peerBlockHeight > (frankieCoin.blockHeight+2)){
 
                 pongBack = false;
                 //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
