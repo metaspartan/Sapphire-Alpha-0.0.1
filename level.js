@@ -1641,6 +1641,8 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
 
   console.log("WHATTTTTTTTT IS MY CONNNNNNETTTTTEEEEENNNNNTTTTT "+incontent);
 
+  console.log(Object.keys(incontent))
+
   try {
       var content = JSON.parse(incontent[0]);
       content = JSON.parse(content[0])
