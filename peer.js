@@ -155,18 +155,19 @@ var addyBal = function(val){
       //connSeq--
     })
 
+    var incomingStream = "";
     var incomingBufferArray = [];
 
     conn.on('end',function(){
       console.log("data stream ended ");
       //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
 
-      console.log(incomingBufferArray);
+      console.log("this is on end "+incomingStream);
 
 
 
       console.log("Importing the data file to the db and then calling the memory synch");
-      setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,16,cbChainGrab,frankieCoin.chainRiser,incomingBufferArray);},2000);
+      setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,16,cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
       //setting this here and heed more intake checks
       frankieCoin.blockHeight = parseInt(16);
       //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
@@ -184,7 +185,8 @@ var addyBal = function(val){
       let chunk;
       while (null !== (chunk = this.read())) {
         console.log(`Received ${chunk.length} bytes of data.`);
-        incomingBufferArray.push(chunk);
+        incomingStream+=chunk.toString()
+        incomingBufferArray.push(chunk.toString());
       }
 
     });
