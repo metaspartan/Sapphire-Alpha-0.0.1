@@ -1648,7 +1648,7 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
 
   var tmpFileName = "sf"+Date.now()+".json";
 
-  fs.writeFile("./SYNC/"+tmpFileName, JSON.stringify(incontent), (err) => {
+  fs.writeFile("./SYNC/"+tmpFileName, incontent, (err) => {
       if (err) {
           console.error(err);
           return;
