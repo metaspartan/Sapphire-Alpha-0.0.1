@@ -393,7 +393,7 @@ var addyBal = function(val){
                 }
 
                 var cbGetStream = function(jsonStream,streamToPeerID){
-                  streamToPeerID.conn.write(JSON.stringify(jsonStream));
+                  streamToPeerID.conn.write(jsonStream);
                   streamToPeerID.conn.end();
                   //setting up some streams to try this out
                 }
