@@ -196,9 +196,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
 
       console.log("Importing the data file to the db and then calling the memory synch");
-      setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,16,cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
+      setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
       //setting this here and heed more intake checks
-      frankieCoin.blockHeight = parseInt(16);
+      frankieCoin.blockHeight = parseInt(chainState.chainWalkHeight);
       //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
       var cbBlockMemLoad = function(blockNum,cbChainGrab,chainRiser){
         setTimeout(function(){ChainGrabRefresh(blockNum,cbChainGrab,chainRiser);},3000)
