@@ -1641,14 +1641,24 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
 
   console.log("WHATTTTTTTTT IS MY CONNNNNNETTTTTEEEEENNNNNTTTTT "+incontent);
 
-  console.log(Object.keys(incontent))
 
-  try {
-      var content = JSON.parse(incontent[0]);
-      content = JSON.parse(content[0])
-  } catch (e) {
-      return false;
+  if (!fs.existsSync("./SYNC")){
+      fs.mkdirSync("./SYNC");
   }
+
+  var tmpFileName = "sf"+Date.now()+".json";
+
+  fs.writeFile("./SYNC/"+tmpFileName, JSON.stringify(incontent), (err) => {
+      if (err) {
+          console.error(err);
+          return;
+      };
+      console.log("JSON synch File has been created");
+  });
+
+  var content = require("./SYNC/"+tmpFileName);
+
+  console.log(Object.keys(content))
 
   for(row in content){
 
