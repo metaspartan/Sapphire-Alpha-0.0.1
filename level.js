@@ -1631,7 +1631,7 @@ var dumpToStreamFIleRange = function(cb,peer,start,end){
     for(thisRowKey in jsonSynch){
 
     }
-    cb(jsonSynch,peer)
+    cb(JSON.stringify(jsonSynch),peer)
 
   });
 
@@ -1639,15 +1639,13 @@ var dumpToStreamFIleRange = function(cb,peer,start,end){
 
 var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,content){
 
-  console.log("WHATTTTTTTTT IS MY CONNNNNNETTTTTEEEEENNNNNTTTTT "+content.toString());
+  console.log("WHATTTTTTTTT IS MY CONNNNNNETTTTTEEEEENNNNNTTTTT "+content);
 
   try {
-      content = JSON.stringify(JSON.parse(content));
+      content = JSON.parse(content.toString());
   } catch (e) {
       return false;
   }
-
-  content = JSON.parse(content);
 
   for(row in content){
 
