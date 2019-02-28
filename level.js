@@ -1637,11 +1637,11 @@ var dumpToStreamFIleRange = function(cb,peer,start,end){
 
 }
 
-var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent){
+var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,content){
 
-  
 
-  for(row in incontent){
+
+  for(row in content){
 
     console.log("I AM INSIDE THE FOR "+content[row]);
 
