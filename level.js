@@ -1639,28 +1639,9 @@ var dumpToStreamFIleRange = function(cb,peer,start,end){
 
 var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent){
 
-  console.log("WHATTTTTTTTT IS MY CONNNNNNETTTTTEEEEENNNNNTTTTT "+incontent);
+  
 
-
-  if (!fs.existsSync("./SYNC")){
-      fs.mkdirSync("./SYNC");
-  }
-
-  var tmpFileName = "sf"+Date.now()+".json";
-
-  fs.writeFile("./SYNC/"+tmpFileName, incontent, (err) => {
-      if (err) {
-          console.error(err);
-          return;
-      };
-      console.log("JSON synch File has been created");
-  });
-
-  var content = require("./SYNC/"+tmpFileName);
-
-  console.log(Object.keys(content))
-
-  for(row in content){
+  for(row in incontent){
 
     console.log("I AM INSIDE THE FOR "+content[row]);
 
