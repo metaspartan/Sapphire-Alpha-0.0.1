@@ -1637,19 +1637,20 @@ var dumpToStreamFIleRange = function(cb,peer,start,end){
 
 }
 
-var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,content){
+var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent){
 
-  console.log("WHATTTTTTTTT IS MY CONNNNNNETTTTTEEEEENNNNNTTTTT "+content);
+  console.log("WHATTTTTTTTT IS MY CONNNNNNETTTTTEEEEENNNNNTTTTT "+incontent);
 
   try {
-      content = JSON.parse(content[0]);
+      var content = JSON.parse(incontent[0]);
+      content = JSON.parse(content[0])
   } catch (e) {
       return false;
   }
 
   for(row in content){
 
-    console.log(JSON.stringify(content[row]));
+    console.log(content[row]);
 
     var rowKey = Object.keys(content[row]);
     var rowValue = Object.values(content[row]);
