@@ -1642,12 +1642,12 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,content){
   console.log("WHATTTTTTTTT IS MY CONNNNNNETTTTTEEEEENNNNNTTTTT "+content);
 
   try {
-      content = JSON.parse(JSON.stringify(content));
+      content = JSON.parse(content)[0];
   } catch (e) {
       return false;
   }
 
-  for(row in JSON.parse(content)){
+  for(row in JSON.parse(JSON.stringify(content))){
 
     console.log(JSON.stringify(content[row]));
 
