@@ -1643,13 +1643,14 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
 
   try {
       var content = JSON.parse(JSON.stringify(incontent));
+      //console.log(content)
   } catch (e) {
       return false;
   }
 
   console.log("WHATTTTTTTTT IS MY CONNNNNNETTTTTEEEEENNNNNTTTTT "+Object.keys(content));
 
-  for(row in incontent){
+  for(row in content){
 
     console.log("I AM INSIDE THE FOR "+content[row]);
 
