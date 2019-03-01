@@ -220,7 +220,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
     conn.on('readable',function(){
 
-      console.log("ILL BEEEEEEEEEEEEEEEEEE RIGHT ON BRO WE HAVE FIGURED OUT THE STREAM IS READABLE "+this.readableHighWaterMark);
+      console.log("BLOCK STREAM "+this.readableHighWaterMark);
 
       let chunk;
       while (null !== (chunk = this.read())) {
@@ -433,12 +433,19 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
                 //pongBack = true;//not sure about this since this is a stream
               }else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
-                //peers[peerId].conn.write(JSON.stringify(frankieCoin.getBlock(parseInt(peerBlockHeight))));
-                var pongBackBlock = function(blockData){
-                  peers[peerId].conn.write(blockData.toString());
+                //okay this is a legitimate pong
+                if(chainState.synchronized > peerBlockHeight){
+                  var pongBackBlock = function(blockData){
+                    peers[peerId].conn.write(blockData.toString());
+                  }
+                  BlkDB.getBlock(parseInt(peerBlockHeight),pongBackBlock);
+                  pongBack = true;
+                }else{
+                  console.log("you are not synchronized to the peers and we should call a block synch");
+                  //call chainWalker
+                  chainWalker(peerBlockHeight);
                 }
-                BlkDB.getBlock(parseInt(peerBlockHeight),pongBackBlock);
-                pongBack = true;
+
               }else if(frankieCoin.blockHeight == parseInt(peerBlockHeight)){
                 //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
                 peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
@@ -549,7 +556,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
             ChainSynchHashCheck(peerBlockHeight,JSON.parse(data)["ChainSyncPong"]["MaxHeight"]);
             //if chain is not synched ping back to synched peer
-            if(frankieCoin.inSynch==true && frankieCoin.inSynchBlockHeight == frankieCoin.longestPeerBlockHeight){
+            if(peerBlockHeight == chainState.synchronized){
+            //if(frankieCoin.inSynch==true && frankieCoin.inSynchBlockHeight == frankieCoin.longestPeerBlockHeight){
               peers[peerId].conn.write("---------------------------------");
               peers[peerId].conn.write("THIS PEER IS NOW SYNCHED");
               peers[peerId].conn.write("---------------------------------");
@@ -1033,25 +1041,16 @@ var frankieCoin = blockchain();
 ////////////////////////////////////////////////////chain walker synchtonisation
 
 ///////walks the chain from the start block verfying hashes and db records
-var chainWalker = function(start,callback){
-  var escape = false;
-  var interCallBack = function(responder){
-    if(!isJSON(responder)){
-      if(responder.split(":")[1] == "NotFoundError"){
-        escape = true;
-      }
+var chainWalker = function(syncpoint){
+  console.log(" --|{-------------- CHAIN WALKER ---------------}|-- ");
+  console.log("a peer has identified you are out of sync at block "+syncpoint);
+  setTimeout(function(){
+    //console.log(frankieCoin.blockHeight);
+    if(frankieCoin.blockHeight > 1){
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(syncpoint),cbBlockChainValidatorStartUp,chainState.chainWalkHash);
+
     }
-    console.log("inter callback called")
-    callback(responder)
-  }
-  for(var i=start;i<frankieCoin.chainRiser;i++){
-    if(escape == false){
-      BlkDB.getBlock(i,interCallBack)
-      console.log("current block was "+i);
-    }else{
-      console.log("escape clause enacted on block"+i);
-    }
-  }
+  },1000);
 }
 ////////////////////////////////////////////////end chain walker synchronisation
 
