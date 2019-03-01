@@ -652,6 +652,7 @@ function cliGetInput(){
       }
       cliGetInput();
     }else if(userInput == "MM"){
+      console.log("chain state chain walk height is "+chainState.chainWalkHeight);
       BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash);
       cliGetInput();
     }else if(userInput == "MMM"){
