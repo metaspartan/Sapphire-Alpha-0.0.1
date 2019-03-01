@@ -159,7 +159,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       log("------------------------------------------------------");
       log(chalk.green("Sending ping for chain sync."));
       log("------------------------------------------------------");
-      peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(replyData),GlobalHash:globalGenesisHash}}));
+      peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(stateChain.synchronized),GlobalHash:globalGenesisHash}}));
     }
   }
 }
@@ -1099,7 +1099,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   }else{
     log("are you synched UP? "+frankieCoin.isChainSynch(peerMaxHeight).toString())
   }
-  log("3333333333    "+longestPeer+""+peerMaxHeight+""+frankieCoin.getLength()+"    333333333");
+  log("3333333333    "+longestPeer+" "+peerMaxHeight+" "+frankieCoin.getLength()+"    333333333");
   if(longestPeer == peerMaxHeight && peerMaxHeight == frankieCoin.getLength()){
     log("------------------------------------------------------")
     log(chalk.green("MOST COMPLETE SYNC"))
