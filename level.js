@@ -691,6 +691,8 @@ var getBlockRange = function(blockHeight,riser,callback){
 ///////////////////////this function validates a range of blocks for chain symch
 var blockRangeValidate = function(blockHeight,riser,callback,blockHash){
 
+      console.log("RISER: "+riser);
+
       var stream = db.createReadStream();
       var dataStream = [];
       var currentBlockToValidate = blockHeight;
@@ -707,9 +709,9 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash){
           if((thisDataItem.key.toString().split(":")[0] == "sfblk") && (parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)) == parseInt(currentBlockToValidate)) && (parseInt(currentBlockToValidate) <= parseInt(riser)) ){
 
 
-            //console.log("top "+currentBlockToValidate);
-            //console.log("second "+parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)));
-            //console.log("why below 10 "+thisDataItem.key.toString());
+            console.log("top "+currentBlockToValidate+" current hash "+currentBlockHash);
+            console.log("second "+parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)));
+            console.log("why below 10 "+thisDataItem.key.toString());
 
             /////perform the validation
 
@@ -735,7 +737,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash){
           //console.log("ping it "+currentBlockToValidate);
           callback(false,parseInt(currentBlockToValidate-1),"");
         }
-        console.log("Block range data stream is complete");
+        console.log("Block range validator data stream is complete");
 
         /***
         if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight))){//possible another block enters the db s no upper limit
