@@ -443,7 +443,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
                 }else{
                   console.log("you are not synchronized to the peers and we should call a block synch");
                   //call chainWalker
-                  chainWalker(peerBlockHeight);
+                  chainWalker(peerBlockHeight,cbBlockChainValidatorStartUp);
                 }
 
               }else if(frankieCoin.blockHeight == parseInt(peerBlockHeight)){
@@ -1041,7 +1041,7 @@ var frankieCoin = blockchain();
 ////////////////////////////////////////////////////chain walker synchtonisation
 
 ///////walks the chain from the start block verfying hashes and db records
-var chainWalker = function(syncpoint){
+var chainWalker = function(syncpoint,cbBlockChainValidatorStartUp){
   console.log(" --|{-------------- CHAIN WALKER ---------------}|-- ");
   console.log("a peer has identified you are out of sync at block "+syncpoint);
   setTimeout(function(){
@@ -1135,6 +1135,7 @@ var cbChainGrab = function(data) {
     }else{
       //block existed
       log("block exists in chain data: "+JSON.parse(data[obj])["blockHeight"]);
+      frankieCoin.blockHeight = parseInt(JSON.parse(data[obj])["blockHeight"]);
     }
     blockHeightPtr++;
   }
