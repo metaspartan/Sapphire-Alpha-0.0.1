@@ -562,7 +562,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               peers[peerId].conn.write("THIS PEER IS NOW SYNCHED");
               peers[peerId].conn.write("---------------------------------");
             }else{
-              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},300);
+              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
             }
 
           }else{
@@ -874,7 +874,7 @@ function cliGetInput(){
         log(chalk.green("Sending ping for chain sync."));
         log("------------------------------------------------------");
         //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
-        peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
+        peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
       }
       cliGetInput();
     }else if(userInput == "N"){//N is for Node info
@@ -897,7 +897,7 @@ function cliGetInput(){
           log("------------------------------------------------------");
           log(chalk.green("Sending ping for chain sync."));
           log("------------------------------------------------------");
-          peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
+          peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
         }
       }
       setTimeout(function(peers){reindexChain(peers);},200)
