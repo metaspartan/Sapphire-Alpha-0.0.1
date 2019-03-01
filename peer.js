@@ -1135,7 +1135,7 @@ var cbChainGrab = function(data) {
     }else{
       //block existed
       log("block exists in chain data: "+JSON.parse(data[obj])["blockHeight"]);
-      frankieCoin.blockHeight = parseInt(JSON.parse(data[obj])["blockHeight"]);
+      //frankieCoin.blockHeight = parseInt(JSON.parse(data[obj])["blockHeight"]);
     }
     blockHeightPtr++;
   }
@@ -1211,6 +1211,8 @@ var cbChainGrab = function(data) {
     }
   });
   *****/
+
+  console.log("FRANKIE COIN BLOCK HEIGHT = "+frankieCoin.blockHeight);
   BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
   BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
   console.log("about to send this to rpc "+JSON.stringify({block:frankieCoin.getLatestBlock()}))
