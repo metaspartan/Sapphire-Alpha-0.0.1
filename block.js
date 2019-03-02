@@ -500,7 +500,7 @@ var Blockchain = class Blockchain {
       //ths is the peers adding a block needs to be VALIDATED
       addBlockFromPeers(inBlock,callback,peerId){
 
-          if(inBlock.blockHeight == getLatestBlock().blockHeight){//per check for block integrity
+          if(inBlock.blockHeight == this.getLatestBlock().blockHeight){//per check for block integrity
 
             console.log("XYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZ");
             console.log("THIS IS AN UNCLE");
