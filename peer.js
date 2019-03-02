@@ -718,6 +718,7 @@ function cliGetInput(){
       },1000)
       cliGetInput();
     }else if(userInput == "INFO"){
+      console.log("chain riser is "+frankieCoin.chainRiser)
       console.log("chain state chain walk height is "+chainState.chainWalkHeight);
       console.log("chain state synchronized equals "+chainState.synchronized);
       console.log("blockchain height is "+frankieCoin.blockHeight);
