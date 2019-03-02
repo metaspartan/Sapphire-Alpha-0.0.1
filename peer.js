@@ -127,6 +127,45 @@ var addyBal = function(val){
 /////////////////////////////////////////////////////end callback for address balances
 
 //////////////////////////////////////////////////////////////////CHAIN VAIDATOR
+var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
+  if(isValid == true){
+    if(chainState.chainWalkHeight == replyData){
+      console.log("this point was already reached which means its stuck here ...pinging");
+      for (let id in peers) {
+        log("------------------------------------------------------");
+        log(chalk.green("Sending ping for chain sync."));
+        log("------------------------------------------------------");
+        //peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(replyData),GlobalHash:globalGenesisHash}}));
+      }
+    }
+    chainState.chainWalkHeight = replyData;
+    chainState.chainWalkHash = replyHash;
+
+    if( (parseInt(replyData) == parseInt(chainState.chainWalkHeight)) && (parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight)) ){
+      console.log("do we even enter (load)?");
+      chainState.synchronized = parseInt(replyData);
+    }else{
+      console.log("do we enter the else ?");
+      console.log(parseInt(replyData) == parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight));
+      console.log("AND THE VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
+    }
+    console.log("VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
+    console.log("BLOCK HEIGHT VALIDATED TO "+replyData,replyHash);
+    //set the chain state validated height;
+  }else{
+    console.log("NOT VALID NEED TO PING AT "+replyData);
+    //set ping here
+    for (let id in peers) {
+      log("------------------------------------------------------");
+      log(chalk.green("Sending ping for chain sync."));
+      log("------------------------------------------------------");
+      //peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(replyData),GlobalHash:globalGenesisHash}}));
+    }
+  }
+}
+/////////////////////////////////////////////////////////////END CHAIN VALIDATOR
+
+//////////////////////////////////////////////////////////////////CHAIN VAIDATOR
 var cbBlockChainValidator = function(isValid,replyData,replyHash){
   if(isValid == true){
     if(chainState.chainWalkHeight == replyData){
@@ -1140,44 +1179,7 @@ var cbChainGrab = function(data) {
     blockHeightPtr++;
   }
   log(chalk.blue("BlocHeightPtr: "+ chalk.green(blockHeightPtr)));
-  //////////////////////////////////////////////////////////////////CHAIN VAIDATOR
-  var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
-    if(isValid == true){
-      if(chainState.chainWalkHeight == replyData){
-        console.log("this point was already reached which means its stuck here ...pinging");
-        for (let id in peers) {
-          log("------------------------------------------------------");
-          log(chalk.green("Sending ping for chain sync."));
-          log("------------------------------------------------------");
-          //peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(replyData),GlobalHash:globalGenesisHash}}));
-        }
-      }
-      chainState.chainWalkHeight = replyData;
-      chainState.chainWalkHash = replyHash;
 
-      if( (parseInt(replyData) == parseInt(chainState.chainWalkHeight)) && (parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight)) ){
-        console.log("do we even enter (load)?");
-        chainState.synchronized = parseInt(replyData);
-      }else{
-        console.log("do we enter the else ?");
-        console.log(parseInt(replyData) == parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight));
-        console.log("AND THE VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
-      }
-      console.log("VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
-      console.log("BLOCK HEIGHT VALIDATED TO "+replyData,replyHash);
-      //set the chain state validated height;
-    }else{
-      console.log("NOT VALID NEED TO PING AT "+replyData);
-      //set ping here
-      for (let id in peers) {
-        log("------------------------------------------------------");
-        log(chalk.green("Sending ping for chain sync."));
-        log("------------------------------------------------------");
-        //peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(replyData),GlobalHash:globalGenesisHash}}));
-      }
-    }
-  }
-  /////////////////////////////////////////////////////////////END CHAIN VALIDATOR
   setTimeout(function(){
     //console.log(frankieCoin.blockHeight);
     if(frankieCoin.blockHeight > 1){
