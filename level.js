@@ -113,6 +113,25 @@ var getChainStateParam = function(state,cb){
   });
 }
 
+var getChainStateCheckPoint = function(blockNum,hash,cb){
+  db.get("cs:"+blockNum+":"+hash, function(err, value){
+    if(value){
+      return true;
+    }else{
+      return false;
+    }
+  })
+}
+
+var getCheckPoints = function(){
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    if(data.key.toString().split(":")[0] == "cs"){
+      console.log('key = '+data.key+" value = "+data.value.toString());
+    }
+  })
+}
+
 var addNode = function(key, value){
   console.log("Adding Node as follows key: "+key.toString()+" - value:"+ value.toString())
   //node:id:
@@ -1740,8 +1759,10 @@ module.exports = {
     addChainParams:addChainParams,
     getChainParams:getChainParams,
     getChainParamsBlockHeight:getChainParamsBlockHeight,
+    getCheckPoints:getCheckPoints,
     addChainState:addChainState,
     getChainStateParam:getChainStateParam,
+    getChainStateCheckPoint:getChainStateCheckPoint,
     addNode:addNode,
     getNodes:getNodes,
     addBlock:addBlock,
