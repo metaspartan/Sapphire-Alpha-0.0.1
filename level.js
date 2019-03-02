@@ -1439,7 +1439,7 @@ var dumpToJsonFIle = function(cb,peer){
 var dumpToJsonFIleRange = function(cb,peer,start,end){
 
   var chainBlockHeight=start;
-  var chainRiser=end || 10;
+  var chainRiser=end;
   var jsonSynch = []
 
   console.log(" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
@@ -1585,7 +1585,7 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
 var dumpToStreamFIleRange = function(cb,peer,start,end){
 
   var chainBlockHeight=start;
-  var chainRiser=end || 10;
+  var chainRiser=end;
   var jsonSynch = []
 
   console.log(" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
