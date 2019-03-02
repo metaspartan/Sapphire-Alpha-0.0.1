@@ -252,7 +252,7 @@ var Blockchain = class Blockchain {
 
           this.chain = [this.createGenesisBlock()];
           this.id = 663;
-          this.chainRiser = 10//1 - 100,101-200,etc. blocks in memory
+          this.chainRiser = 35//1 - 100,101-200,etc. blocks in memory
           //adding in the peers connectivity
           this.nodes = [];
           //difficulty adjusts
