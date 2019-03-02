@@ -280,7 +280,7 @@ var Blockchain = class Blockchain {
 
       }
 
-      registerNode(id,ip,port) {
+      registerNode(id,ip,port){
 
           if (!this.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
 
@@ -294,13 +294,13 @@ var Blockchain = class Blockchain {
 
       }
 
-      retrieveNodes() {
+      retrieveNodes(){
 
         return this.nodes;
 
       }
 
-      incrementPeerNonce(nodeId,len) {
+      incrementPeerNonce(nodeId,len){
 
         for (let i in this.nodes){
           if(this.nodes[i]["id"] == nodeId){
@@ -311,7 +311,7 @@ var Blockchain = class Blockchain {
 
       }
 
-      incrementPeerMaxHeight(nodeId,max) {
+      incrementPeerMaxHeight(nodeId,max){
 
         for (let i in this.nodes){
           if(this.nodes[i]["id"] == nodeId){
@@ -322,7 +322,7 @@ var Blockchain = class Blockchain {
 
       }
 
-      incrementPeerSynch(nodeId,synch) {
+      incrementPeerSynch(nodeId,synch){
 
         for (let i in this.nodes){
           if(this.nodes[i]["id"] == nodeId){
@@ -333,7 +333,7 @@ var Blockchain = class Blockchain {
 
       }
 
-      createGenesisBlock() {
+      createGenesisBlock(){
           log("Generation of Genesis Block "+genesisBLK()+" Processing Complete");
           //genBlock.hash = genesisBLK();
           log(chalk.bgGreen(genBlock.timestamp));
@@ -341,7 +341,7 @@ var Blockchain = class Blockchain {
           //return new Block(Date.parse("2018-02-18 02:18:18"), [], []);//original block creation
       }
 
-      getBlock(num) {
+      getBlock(num){
           console.log("chain blockheight "+this.blockHeight);
           console.log("chain riser "+this.chainRiser);
           console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
@@ -350,11 +350,11 @@ var Blockchain = class Blockchain {
           return this.chain[parseInt(num) - 1];
       }
 
-      getLatestBlock() {
+      getLatestBlock(){
           return this.chain[this.chain.length - 1];
       }
 
-      getOmmersAtBlock(num) {
+      getOmmersAtBlock(num){
           return this.chain[parseInt(num) - 1]["ommers"];
       }
 
@@ -500,71 +500,83 @@ var Blockchain = class Blockchain {
       //ths is the peers adding a block needs to be VALIDATED
       addBlockFromPeers(inBlock,callback,peerId){
 
-          //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-          var block = new Block(parseInt(inBlock.blockHeight), inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
-          log(chalk.blue("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
-          this.chain.push(block);
-          this.blockHeight = inBlock.blockHeight;
-          //this.chain.blockHeight += 1;
-          log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
-          if(this.chain.length > this.chainRiser){
-            this.chain.shift();
-          }
-          log(chalk.blue("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
-          //careful I have the ischain valid returining true on all tries
+          if(inBlock.blockHeight == getLatestBlock().blockHeight){//per check for block integrity
 
-/*****
-        }else if(this.chain[this.chain.length - 2].hash == inBlock.previousHash && this.getLatestBlock().previousHash == inBlock.previousHash){//uncle block
-          log(chalk.bgRed("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"));
-          log("UNCLE previous hash matches"+inBlock.previousHash+" current prev hash "+this.getLatestBlock().previousHash);
-          log(chalk.bgRed("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"));
-          //since this is an UNCLE we need to check the timestamp to see who won ....
-          if(this.getLatestBlock().timestamp < inBlock.timestamp){
-            //proceed to not add a block and just log an ommer
-            log(chalk.bgRed("ADDING OMMER TO CHAIN peer block is OMMER chain block REMAINS "+inBlock.timestamp+" PREV HASH "+inBlock.previousHash));
-            var tmpOmmer = new Ommer(inBlock.timestamp,inBlock.previousHash,inBlock.nonce,inBlock.hash,inBlock.miner,inBlock.sponsor)
-            this.addOmmer(tmpOmmer);
-            //and return the last block to the sending peer...
-            callback({"uncle":{"blockNumber":parseInt(this.chain.length-1),"block":inBlock}},peerId);
-          }else if(this.getLatestBlock().timestamp >= inBlock.timestamp){
-            //proceed to add the block and remove the latest block log as ommer and return the last block as ommer
-            var returnBlock = this.getLatestBlock();
-            log(chalk.bgRed("ADDING OMMER TO CHAIN peer block is VALID and OVER WRITES chain block "+inBlock.timestamp+" PREV HASH "+inBlock.previousHash));
-            var tmpOmmer = new Ommer(returnBlock.timestamp,returnBlock.previousHash,returnBlock.nonce,returnBlock.hash,returnBlock.miner,returnBlock.sponsor);
-            this.addOmmer(tmpOmmer);
-            callback({"uncle":{"blockNumber":parseInt(this.chain.length),"block":returnBlock}},peerId);
-            this.chain.pop()
-            var block = new Block(parseInt(inBlock.blockHeight),inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
-            log(chalk.red("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
-            this.chain.push(block);
-            this.blockHeight += 1;
-            log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
-            if(this.chain.length > this.chainRiser){
-              this.chain.shift();
+            console.log("XYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZ");
+            console.log("THIS IS AN UNCLE");
+            console.log("RESOLVE BY coding weight on chain and timestamp checks");
+            console.log("XYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZXYZ");
+
+          }else{//no per check issue (not an uncle or ay off)
+
+              //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
+              var block = new Block(parseInt(inBlock.blockHeight), inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
+              log(chalk.blue("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
+              this.chain.push(block);
+              this.blockHeight = inBlock.blockHeight;
+              //this.chain.blockHeight += 1;
+              log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
+              if(this.chain.length > this.chainRiser){
+                this.chain.shift();
+              }
+              log(chalk.blue("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
+              //careful I have the ischain valid returining true on all tries
+
+    /*****
+            }else if(this.chain[this.chain.length - 2].hash == inBlock.previousHash && this.getLatestBlock().previousHash == inBlock.previousHash){//uncle block
+              log(chalk.bgRed("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"));
+              log("UNCLE previous hash matches"+inBlock.previousHash+" current prev hash "+this.getLatestBlock().previousHash);
+              log(chalk.bgRed("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu"));
+              //since this is an UNCLE we need to check the timestamp to see who won ....
+              if(this.getLatestBlock().timestamp < inBlock.timestamp){
+                //proceed to not add a block and just log an ommer
+                log(chalk.bgRed("ADDING OMMER TO CHAIN peer block is OMMER chain block REMAINS "+inBlock.timestamp+" PREV HASH "+inBlock.previousHash));
+                var tmpOmmer = new Ommer(inBlock.timestamp,inBlock.previousHash,inBlock.nonce,inBlock.hash,inBlock.miner,inBlock.sponsor)
+                this.addOmmer(tmpOmmer);
+                //and return the last block to the sending peer...
+                callback({"uncle":{"blockNumber":parseInt(this.chain.length-1),"block":inBlock}},peerId);
+              }else if(this.getLatestBlock().timestamp >= inBlock.timestamp){
+                //proceed to add the block and remove the latest block log as ommer and return the last block as ommer
+                var returnBlock = this.getLatestBlock();
+                log(chalk.bgRed("ADDING OMMER TO CHAIN peer block is VALID and OVER WRITES chain block "+inBlock.timestamp+" PREV HASH "+inBlock.previousHash));
+                var tmpOmmer = new Ommer(returnBlock.timestamp,returnBlock.previousHash,returnBlock.nonce,returnBlock.hash,returnBlock.miner,returnBlock.sponsor);
+                this.addOmmer(tmpOmmer);
+                callback({"uncle":{"blockNumber":parseInt(this.chain.length),"block":returnBlock}},peerId);
+                this.chain.pop()
+                var block = new Block(parseInt(inBlock.blockHeight),inBlock.timestamp, inBlock.transactions, inBlock.orders, inBlock.ommers, inBlock.previousHash, inBlock.sponsor, inBlock.miner, inBlock.eGEMBackReferenceBlock, inBlock.data, inBlock.hash, inBlock.egemBackReferenceBlockHash, inBlock.nonce, inBlock.difficulty);
+                log(chalk.red("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
+                this.chain.push(block);
+                this.blockHeight += 1;
+                log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
+                if(this.chain.length > this.chainRiser){
+                  this.chain.shift();
+                }
+                log(chalk.red("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
+              }else{
+                log.chalk.bgRed("NO TIMESTAMPS so KILLING THE BLOCK");
+                this.chain.pop();
+              }
+              //need to return a message that returns the uncle info and uncle block reward to sending peer
+
+            }else{
+              log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+              log("no inblock prev hash of "+inBlock.previousHash+" does not match the hash of chain "+this.getLatestBlock().hash);
+              log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
+              //this case represents a problem because it is just a bad block
+              //this.chain.pop();
             }
-            log(chalk.red("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
-          }else{
-            log.chalk.bgRed("NO TIMESTAMPS so KILLING THE BLOCK");
-            this.chain.pop();
-          }
-          //need to return a message that returns the uncle info and uncle block reward to sending peer
+    ******/
+            if(this.isChainValid() == false){
+              this.chain.pop();
+              log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXX Block NOT added XXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
+              return false;
+            }else{
+              log("Block added from peers");
+              return true;
+            }
 
-        }else{
-          log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-          log("no inblock prev hash of "+inBlock.previousHash+" does not match the hash of chain "+this.getLatestBlock().hash);
-          log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-          //this case represents a problem because it is just a bad block
-          //this.chain.pop();
-        }
-******/
-        if(this.isChainValid() == false){
-          this.chain.pop();
-          log("XXXXXXXXXXXXXXXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXX Block NOT added XXXXXXXXXXXXXXXX ALERT XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX");
-          return false;
-        }else{
-          log("Block added from peers");
-          return true;
-        }
+        }///end peer check
+
       }
 
       //this is the peers adding a block needs to be VALIDATED
