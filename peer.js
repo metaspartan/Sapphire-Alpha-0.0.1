@@ -161,7 +161,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
       }
       BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
     }
-    
+
     //set the chain state validated height;
   }else{
     console.log("NOT VALID NEED TO PING AT "+replyData);
@@ -200,7 +200,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       console.log(parseInt(replyData) == parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight));
       console.log("AND THE VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
     }
-    console.log("BLOCK HEIGHT VALIDATED TO "+replyData,replyHash);
+    console.log("BLOCK HEIGHT VALIDATED TO (CW PEER VERSION)"+replyData,replyHash);
     //now that we are valid we are going to check 3 blocks back to see if it is a candidate for chain state
     if( parseInt(replyHash) > 3 && (parseInt(replyHash - 3) % parseInt(frankieCoin.chainRiser)) == 0 ){
       var checkPoint = parseInt(replyHash - 3);
