@@ -729,6 +729,9 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash){
           if((thisDataItem.key.toString().split(":")[0] == "sfblk") && (parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)) == parseInt(currentBlockToValidate)) && (parseInt(currentBlockToValidate) <= parseInt(riser)) ){
 
 
+
+
+
             console.log("top "+currentBlockToValidate+" current hash "+currentBlockHash);
             console.log("second "+parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)));
             console.log("why below 10 "+thisDataItem.key.toString());
@@ -736,6 +739,16 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash){
             /////perform the validation
 
             var isValidBlock = thisDataItem.value.toString();
+
+            //going to validate chaeckpoints
+            if(blockHeight%riser == 0){
+              db.get("cs:"+blockHeight+":"+JSON.parse(isValidBlock)["hash"],function (err, value) {
+                console.log("--------------------------------------------------");
+                console.log("Checkpoint Value Existed and is: "+value.toString());
+                console.log("--------------------------------------------------");
+              });
+            }
+
             //console.log("is this one und "+JSON.parse(isValidBlock)["timestamp"]);
             var newBlockHash = Hash(currentBlockHash+JSON.parse(isValidBlock)["timestamp"]+JSON.parse(isValidBlock)["nonce"]);//this.previousHash + this.timestamp + this.nonce
             //console.log("comparing "+JSON.parse(isValidBlock)["hash"]+" to "+newBlockHash);
