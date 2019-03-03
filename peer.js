@@ -440,7 +440,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               rpcserver.postRPCforMiner({block:JSON.parse(data)});
 
 
-              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash);
+              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
 
 
 
@@ -738,7 +738,7 @@ function cliGetInput(){
       console.log("chain state synchronized equals "+chainState.synchronized);
       console.log("blockchain height is "+frankieCoin.blockHeight);
       setTimeout(function(){
-        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash);
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
       },1000)
       cliGetInput();
     }else if(userInput == "INFO"){
@@ -1111,7 +1111,7 @@ var chainWalker = function(syncpoint,cbBlockChainValidatorStartUp){
   setTimeout(function(){
     //console.log(frankieCoin.blockHeight);
     if(frankieCoin.blockHeight > 1){
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(syncpoint),cbBlockChainValidatorStartUp,chainState.chainWalkHash);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(syncpoint),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser);
 
     }
   },1000);
@@ -1208,7 +1208,7 @@ var cbChainGrab = function(data) {
   setTimeout(function(){
     //console.log(frankieCoin.blockHeight);
     if(frankieCoin.blockHeight > 1){
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(frankieCoin.blockHeight),cbBlockChainValidatorStartUp,chainState.chainWalkHash);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(frankieCoin.blockHeight),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser);
 
     }
   },1000);

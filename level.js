@@ -708,7 +708,7 @@ var getBlockRange = function(blockHeight,riser,callback){
 
 
 ///////////////////////this function validates a range of blocks for chain symch
-var blockRangeValidate = function(blockHeight,riser,callback,blockHash){
+var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRiser){
 
       console.log("BLOCKHEIGHT: "+blockHeight);
       console.log("RISER: "+riser);
@@ -741,14 +741,17 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash){
             var isValidBlock = thisDataItem.value.toString();
 
             //going to validate chaeckpoints
-            if(blockHeight%riser == 0){
-              if(parseInt(blockHeight-riser)>0 && parseInt(blockHeight-riser)>riser){
-                var targetCheckPoint = parseInt(blockHeight-riser);
-                db.get("cs:"+blockHeight+":"+JSON.parse(isValidBlock)["hash"],function (err, value) {
+            console.log("passing thru this conditon "+currentBlockToValidate+" "+chainRiser+" "+(currentBlockToValidate%chainRiser == 0))
+            if(currentBlockToValidate%chainRiser == 0){
+              console.log("now we need this to be true "+currentBlockToValidate+" "+parseInt(currentBlockToValidate-chainRiser)+" "+parseInt(currentBlockToValidate-chainRiser)+" "+(parseInt(currentBlockToValidate-chainRiser)>0 && parseInt(currentBlockToValidate-chainRiser)>chainRiser))
+              if(parseInt(currentBlockToValidate-chainRiser) > 0 && parseInt(currentBlockToValidate-chainRiser) >= chainRiser){
+                var targetCheckPoint = parseInt(currentBlockToValidate-chainRiser);
+                db.get("cs:"+currentBlockToValidate+":"+JSON.parse(isValidBlock)["hash"],function (err, value) {
                   console.log("--------------------------------------------------");
                   console.log("Checkpoint Value Existed and is: "+value.toString());
                   console.log("--------------------------------------------------");
                 });
+
               }
             }
 
