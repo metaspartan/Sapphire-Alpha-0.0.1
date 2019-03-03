@@ -96,7 +96,6 @@ var getChainParamsBlockHeight = function(hashKey){
 }
 
 var addChainState = function(key,val){
-  console.log("WE HAVE ENTERED THE CHAIN STATE ????")
   console.log("chain state of "+key.toString()+" and value "+val.toString());
   db.put(key, val, function (err) {
     if (err) return console.log('Ooops!', err) // some kind of I/O error
@@ -127,7 +126,6 @@ var getChainStateCheckPoint = function(blockNum,hash,cb){
 var getCheckPoints = function(){
   var stream = db.createReadStream();
   stream.on('data',function(data){
-    console.log("well we are in the stream at least");
     if(data.key.toString().split(":")[0] == "cs"){
       console.log('key = '+data.key+" value = "+data.value.toString());
     }

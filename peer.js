@@ -159,7 +159,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
       var pongBackBlock = function(blockData){
         console.log("in pong back block");
         console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
-        BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
+        BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"]);
       }
       BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
     }
@@ -209,7 +209,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       var checkPoint = parseInt(replyData - 3);
       var pongBackBlock = function(blockData){
         console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
-        BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
+        BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"]);
       }
       BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
     }
