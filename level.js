@@ -742,11 +742,14 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash){
 
             //going to validate chaeckpoints
             if(blockHeight%riser == 0){
-              db.get("cs:"+blockHeight+":"+JSON.parse(isValidBlock)["hash"],function (err, value) {
-                console.log("--------------------------------------------------");
-                console.log("Checkpoint Value Existed and is: "+value.toString());
-                console.log("--------------------------------------------------");
-              });
+              if(parseInt(blockHeight-riser)>0 && parseInt(blockHeight-riser)>riser){
+                var targetCheckPoint = parseInt(blockHeight-riser);
+                db.get("cs:"+blockHeight+":"+JSON.parse(isValidBlock)["hash"],function (err, value) {
+                  console.log("--------------------------------------------------");
+                  console.log("Checkpoint Value Existed and is: "+value.toString());
+                  console.log("--------------------------------------------------");
+                });
+              }
             }
 
             //console.log("is this one und "+JSON.parse(isValidBlock)["timestamp"]);
