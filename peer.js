@@ -194,7 +194,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     chainState.chainWalkHeight = replyData;
     chainState.chainWalkHash = replyHash;
     console.log("VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
-    if( (parseInt(replyData) == parseInt(chainState.chainWalkHeight)) && (parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight)) ){
+    if( (parseInt(replyData) == parseInt(chainState.chainWalkHeight)) && (parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight) ) ){
       console.log("do we even enter (load)?");
       chainState.synchronized = parseInt(replyData);
     }else{

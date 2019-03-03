@@ -126,6 +126,7 @@ var getChainStateCheckPoint = function(blockNum,hash,cb){
 var getCheckPoints = function(){
   var stream = db.createReadStream();
   stream.on('data',function(data){
+    console.log("well we are in the stream at least");
     if(data.key.toString().split(":")[0] == "cs"){
       console.log('key = '+data.key+" value = "+data.value.toString());
     }
