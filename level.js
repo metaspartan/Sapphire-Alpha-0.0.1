@@ -746,10 +746,16 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
               console.log("now we need this to be true "+currentBlockToValidate+" "+parseInt(currentBlockToValidate-chainRiser)+" "+parseInt(currentBlockToValidate-chainRiser)+" "+(parseInt(currentBlockToValidate-chainRiser)>0 && parseInt(currentBlockToValidate-chainRiser)>chainRiser))
               if(parseInt(currentBlockToValidate-chainRiser) > 0 && parseInt(currentBlockToValidate-chainRiser) >= chainRiser){
                 var targetCheckPoint = parseInt(currentBlockToValidate-chainRiser);
-                db.get("cs:"+currentBlockToValidate+":"+JSON.parse(isValidBlock)["hash"],function (err, value) {
-                  console.log("--------------------------------------------------");
-                  console.log("Checkpoint Value Existed and is: "+value.toString());
-                  console.log("--------------------------------------------------");
+                var riserAgo = dataStream[dataItem-chainRiser].value.toString();
+                console.log(" YES THIS IS MY CHECK cs:"+parseInt(currentBlockToValidate-chainRiser)+":"+JSON.parse(riserAgo)["hash"]);
+                db.get("cs:"+parseInt(currentBlockToValidate-chainRiser)+":"+JSON.parse(riserAgo)["hash"],function (err, value) {
+                  if(err){
+                    callback(false,parseInt(JSON.parse(currentBlockToValidate-chainRiser)["blockHeight"]-1),"");
+                  }else{
+                    console.log("--------------------------------------------------");
+                    console.log("Checkpoint Value Existed and is: "+value.toString());
+                    console.log("--------------------------------------------------");
+                  }
                 });
 
               }
