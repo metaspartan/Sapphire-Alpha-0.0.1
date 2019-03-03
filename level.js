@@ -96,6 +96,7 @@ var getChainParamsBlockHeight = function(hashKey){
 }
 
 var addChainState = function(key,val){
+  console.log("WE HAVE ENTERED THE CHAIN STATE ????")
   console.log("chain state of "+key.toString()+" and value "+val.toString());
   db.put(key, val, function (err) {
     if (err) return console.log('Ooops!', err) // some kind of I/O error
