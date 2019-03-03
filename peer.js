@@ -155,10 +155,11 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     //now that we are valid we are going to check 3 blocks back to see if it is a candidate for chain state
     console.log("TRUE OR FALSE? "+parseInt(replyData)+" "+(parseInt(replyData) > 3)+" "+(parseInt(replyData - 3))+" "+parseInt(frankieCoin.chainRiser))
     if( parseInt(replyData) > 3 && (parseInt(replyData - 3) % parseInt(frankieCoin.chainRiser)) == 0 ){
-      var checkPoint = parseInt(replyHash - 3);
+      var checkPoint = parseInt(replyData - 3);
       var pongBackBlock = function(blockData){
+        console.log("in pong back block");
         console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
-        BlkDB.addChainState("cs:"+checkPoint+":"+frankieCoin.getBlock(checkPoint)["hash"]);
+        BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
       }
       BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
     }
@@ -205,10 +206,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     //now that we are valid we are going to check 3 blocks back to see if it is a candidate for chain state
     console.log("TRUE OR FALSE? "+parseInt(replyData)+" "+(parseInt(replyData) > 3)+" "+(parseInt(replyData - 3))+" "+parseInt(frankieCoin.chainRiser))
     if( parseInt(replyData) > 3 && (parseInt(replyData - 3) % parseInt(frankieCoin.chainRiser)) == 0 ){
-      var checkPoint = parseInt(replyHash - 3);
+      var checkPoint = parseInt(replyData - 3);
       var pongBackBlock = function(blockData){
         console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
-        BlkDB.addChainState("cs:"+checkPoint+":"+frankieCoin.getBlock(checkPoint)["hash"]);
+        BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
       }
       BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
     }
