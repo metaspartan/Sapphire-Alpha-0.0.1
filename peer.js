@@ -80,11 +80,17 @@ chainState.synchronized = 1;//when we are synched at a block it gets updated
 chainState.topBlock = 0;
 var calculateCheckPoints = function(blockNum){
   //start with the offset
-  var riserOffset=parseInt(blockNum%frankieCoin.riser);
-  console.log(parseInt(blockNum%frankieCoin.riser));
+  console.log(blockNum);
+  console.log(frankieCoin.chainRiser)
+  var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));
+  console.log("RISER OFFSET "+riserOffset);
   //return this.chain[this.chain.length - 1];///getlatest
-  var checkPointBLock = frankieCoin[frankieCoin.length - parseInt(riserOffset+1)];///getCheckpoint
-  console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBLock)["blockHeight"]+" Hash "+JSON.parse(checkPointBLock)["hash"])
+  var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
+  console.log("general get length of mem chain "+frankieCoin.getIndexLength());
+  console.log(parseInt(riserOffset+1));
+  console.log(JSON.stringify(checkPointBlock));
+  checkPointBlock = JSON.stringify(checkPointBlock);
+  console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"])
 }
 //chainState.accountsTrie = 0;
 var isSynching = false;//will add numerics to this

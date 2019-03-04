@@ -351,11 +351,19 @@ var Blockchain = class Blockchain {
       }
 
       getLatestBlock(){
-          return this.chain[this.chain.length - 1];
+        return this.chain[this.chain.length - 1];
+      }
+
+      getBlockFromIndex(index){
+        return this.chain[this.chain.length - index];
+      }
+
+      getIndexLength(){
+        return this.chain.length;
       }
 
       getOmmersAtBlock(num){
-          return this.chain[parseInt(num) - 1]["ommers"];
+        return this.chain[parseInt(num) - 1]["ommers"];
       }
 
       getLength(){
