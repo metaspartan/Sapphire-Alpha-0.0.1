@@ -79,18 +79,16 @@ chainState.chainWalkHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e86600251
 chainState.synchronized = 1;//when we are synched at a block it gets updated
 chainState.topBlock = 0;
 var calculateCheckPoints = function(blockNum){
-  //start with the offset
-  console.log(blockNum);
-  console.log(frankieCoin.chainRiser)
-  var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));
-  console.log("RISER OFFSET "+riserOffset);
-  //return this.chain[this.chain.length - 1];///getlatest
+  var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
   var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
-  console.log("general get length of mem chain "+frankieCoin.getIndexLength());
-  console.log(parseInt(riserOffset+1));
-  console.log(JSON.stringify(checkPointBlock));
   checkPointBlock = JSON.stringify(checkPointBlock);
   console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"])
+  for(var i=1;i<riserOffset;i++){
+    var integralCheckPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+i));
+    integralCHeckPointBlock = JSON.stringify(integralCheckPointBlock);
+    console.log("CALCULATED INTEGRAL CHECK POINT IS "+JSON.parse(integralCHeckPointBlock)["blockHeight"]+" Hash "+JSON.parse(integralCHeckPointBlock)["hash"]);
+    console.log("CALCULATED HASH IS "+sapphirechain.Hash(JSON.parse(integralCHeckPointBlock)["previousHash"]+JSON.parse(integralCHeckPointBlock)["timestamp"]+JSON.parse(integralCHeckPointBlock)["nonce"]));
+  }
 }
 //chainState.accountsTrie = 0;
 var isSynching = false;//will add numerics to this
