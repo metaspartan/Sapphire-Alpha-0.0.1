@@ -252,7 +252,7 @@ var Blockchain = class Blockchain {
 
           this.chain = [this.createGenesisBlock()];
           this.id = 663;
-          this.chainRiser = 25;//1 - 100,101-200,etc. blocks in memory
+          this.chainRiser = 5;//1 - 100,101-200,etc. blocks in memory
           //adding in the peers connectivity
           this.nodes = [];
           //difficulty adjusts
@@ -347,7 +347,7 @@ var Blockchain = class Blockchain {
           console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
           var offset = (parseInt(this.blockHeight)-parseInt(this.chainRiser));
           var newNum = (parseInt(num)-parseInt(offset));
-          return this.chain[parseInt(num) - 1];
+          return this.chain[parseInt(newNum) - 1];
       }
 
       getLatestBlock(){
