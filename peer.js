@@ -82,13 +82,18 @@ var calculateCheckPoints = function(blockNum){
   var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
   var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
   checkPointBlock = JSON.stringify(checkPointBlock);
-  console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"])
+  console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
+  var thisBlockCheckPointHash = "";
   for(var i=1;i<riserOffset;i++){
-    var integralCheckPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+i));
+    var integralCheckPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset-i));
     integralCHeckPointBlock = JSON.stringify(integralCheckPointBlock);
     console.log("CALCULATED INTEGRAL CHECK POINT IS "+JSON.parse(integralCHeckPointBlock)["blockHeight"]+" Hash "+JSON.parse(integralCHeckPointBlock)["hash"]);
     console.log("CALCULATED HASH IS "+sapphirechain.Hash(JSON.parse(integralCHeckPointBlock)["previousHash"]+JSON.parse(integralCHeckPointBlock)["timestamp"]+JSON.parse(integralCHeckPointBlock)["nonce"]));
+    thisBlockCheckPointHash = sapphirechain.Hash(thisBlockCheckPointHash+JSON.parse(integralCHeckPointBlock)["hash"]);
+    console.log("CUMULATIVE CALCULATED HASH IS "+thisBlockCheckPointHash);
   }
+  var previousBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash}
+  console.log(JSON.stringify(previousBlockCheckPointHash));
 }
 //chainState.accountsTrie = 0;
 var isSynching = false;//will add numerics to this
