@@ -21,6 +21,11 @@ var BlkDB;
 var setBlockchainDB = function(bkd){
   BlkDB = bkd;
 }
+
+var getChainState;
+var setChainState = function(chs){
+  getChainState = chs;
+}
 ///////////////////////////////////////when fired this creates the genesis block
 var genBlock;
 var genesisBLK = function genesisBLK() {
@@ -217,6 +222,7 @@ var Block = class Block {
         this.allConfigHash = '';
         //total Hash for sequencing
         this.hashOfThisBlock = '';//Hash(this.hash+BlkDB.getStateTrieRootHash())+":"+this.hash+":"+BlkDB.getStateTrieRootHash();
+        this.chainStateHash = getChainState().currentBlockCheckPointHash;
         this.difficulty = difficulty;
       }
 
@@ -1119,5 +1125,6 @@ module.exports = {
     Block:Block,
     Blockchain:Blockchain,
     setBlockchainDB:setBlockchainDB,
+    setChainState:setChainState,
     Hash:Hash
 }
