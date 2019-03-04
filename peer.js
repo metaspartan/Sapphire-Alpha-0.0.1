@@ -78,6 +78,14 @@ chainState.chainWalkHeight = 1;
 chainState.chainWalkHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f';//block 1 hash
 chainState.synchronized = 1;//when we are synched at a block it gets updated
 chainState.topBlock = 0;
+var calculateCheckPoints = function(blockNum){
+  //start with the offset
+  var riserOffset=parseInt(blockNum%frankieCoin.riser);
+  console.log(parseInt(blockNum%frankieCoin.riser));
+  //return this.chain[this.chain.length - 1];///getlatest
+  var checkPointBLock = frankieCoin[frankieCoin.length - parseInt(riserOffset+1)];///getCheckpoint
+  console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBLock)["blockHeight"]+" Hash "+JSON.parse(checkPointBLock)["hash"])
+}
 //chainState.accountsTrie = 0;
 var isSynching = false;//will add numerics to this
 ////////////////////////////////////////////////////////////end synching section
@@ -383,7 +391,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             console.log("  chainState.topBlock: "+chainState.chainWalkHeight);
             console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
             console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-          }else{
+            if(frankieCoin.blockHeight > frankieCoin.chainRiser){
+              calculateCheckPoints(frankieCoin.blockHeight);
+            }
+          }else{/////need to move this below the block add and add the block differently to not mess with blockheight or txs
             console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
             console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
             console.log("                THIS BLOCK CHAIN STATS:             ");
@@ -397,6 +408,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             console.log("  chainState.topBlock: "+chainState.chainWalkHeight);
             console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
             console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+            if(frankieCoin.blockHeight > frankieCoin.chainRiser){
+              calculateCheckPoints(frankieCoin.blockHeight);
+            }
           }
 
             ///////////////NEED TO REMOVE ANY MATCHED PENDING TXS FROM MEME POOL
@@ -1680,6 +1694,9 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
       BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),"1475");
       BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
       BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
+      if(frankieCoin.blockHeight > frankieCoin.chainRiser){
+        calculateCheckPoints(frankieCoin.blockHeight);
+      }
       ///////////////////////////////////////////////////////////peers broadcast
       fbroadcastPeersBlock();
       ////////////////////finally post the RPC get work block data for the miner
@@ -1692,6 +1709,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
         var pongBackBlock = function(blockData){
           console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
           BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"]);
+          //BlkDB.addCheckPoint("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"],JSON.parse(blockData)["previousHash"],JSON.parse(blockData)["timestamp"],JSON.parse(blockData)["nonce"])//block.previousHash + block.timestamp + block.nonce
         }
         BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
       }

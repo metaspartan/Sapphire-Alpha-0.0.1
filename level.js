@@ -102,6 +102,13 @@ var addChainState = function(key,val){
   })
 }
 
+var addCheckPoint = function(key,hash,previousHash,timestamp,nonce){
+  console.log("chain state of "+key.toString()+" and hash "+hash.toString()+" previousHash "+previousHash+" timestamp "+timestamp+" nonce "+nonce);
+  db.put(key, val, function (err) {
+    if (err) return console.log('Ooops!', err) // some kind of I/O error
+  })
+}
+
 var getChainStateParam = function(state,cb){
   db.get("cs:"+state, function (err, value) {
     if(value){
@@ -727,9 +734,6 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
         for(var dataItem in dataStream){
           var thisDataItem = dataStream[dataItem];
           if((thisDataItem.key.toString().split(":")[0] == "sfblk") && (parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)) == parseInt(currentBlockToValidate)) && (parseInt(currentBlockToValidate) <= parseInt(riser)) ){
-
-
-
 
 
             console.log("top "+currentBlockToValidate+" current hash "+currentBlockHash);
