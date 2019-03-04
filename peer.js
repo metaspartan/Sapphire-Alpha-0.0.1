@@ -418,8 +418,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           var incomingBLockHeight = JSON.parse(data)["blockHeight"];
           console.log("VVVVVVVVVVVVVVVVVVVVV        "+incomingBLockHeight+"        VVVVVVVVVVVVVVVVVVVV    ---->   "+frankieCoin.blockHeight);
 
-          console.log("incoming "+JSON.parse(data)["chainStateHash"]);
-          console.log("chain state "+chainState.chainStateHash);
+          console.log("incoming "+JSON.stringify(JSON.parse(data)["chainStateHash"]));
+          console.log("chain state "+JSON.stringify(chainState.currentBlockCheckPointHash));
 
           if(incomingBLockHeight < frankieCoin.blockHeight){
             console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
