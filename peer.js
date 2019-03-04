@@ -79,7 +79,6 @@ chainState.chainWalkHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e86600251
 chainState.synchronized = 1;//when we are synched at a block it gets updated
 chainState.topBlock = 0;
 chainState.currentBlockCheckPointHash = {};
-chainState.badpeer = false;
 
 var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
