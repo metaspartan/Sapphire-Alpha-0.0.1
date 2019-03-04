@@ -79,10 +79,12 @@ chainState.chainWalkHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e86600251
 chainState.synchronized = 1;//when we are synched at a block it gets updated
 chainState.topBlock = 0;
 chainState.currentBlockCheckPointHash = {};
+chainState.badpeer = false;
 
-  var calculateCheckPoints = function(blockNum){
+var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
-      if(blockNum > frankieCoin.chainRiser){
+  if(blockNum > frankieCoin.chainRiser){
+
       var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
       var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
       checkPointBlock = JSON.stringify(checkPointBlock);
@@ -103,11 +105,17 @@ chainState.currentBlockCheckPointHash = {};
         console.log("CUMULATIVE CALCULATED HASH IS "+thisBlockCheckPointHash);
       }
       *****end might be removing it section*****/
+      if(source == "peer" && incomingCheckHash.split(":")[0] == blockNum && incomingCheckHash.split(":")[1] == thisBlockCheckPointHash){
+        chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash}
+        return 1;
+      }else{
+        return 2;
+      }
 
-      chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash}
       console.log(JSON.stringify(chainState.currentBlockCheckPointHash));
 
-    }else{
+  }else{
+
       if(blockNum > 1){
         var lastBLockNumber = frankieCoin.getLatestBlock()["blockHeight"];
         var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getLatestBlock()))["hash"];
@@ -116,11 +124,16 @@ chainState.currentBlockCheckPointHash = {};
         var blockNumHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f';
       }
       var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+"0000000000000000000000000000000000000000000000000000000000000000");
-      chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash}
+      if(source == "peer" && incomingCheckHash.split(":")[0] == blockNum && incomingCheckHash.split(":")[1] == thisBlockCheckPointHash){
+        chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash}
+        return 1;
+      }else{
+        return 2;
+      }
       //0000000000000000000000000000000000000000000000000000000000000000
-    }
-
   }
+
+}
 
 
 var getChainState = function(){
@@ -418,7 +431,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           var incomingBLockHeight = JSON.parse(data)["blockHeight"];
           console.log("VVVVVVVVVVVVVVVVVVVVV        "+incomingBLockHeight+"        VVVVVVVVVVVVVVVVVVVV    ---->   "+frankieCoin.blockHeight);
 
-          console.log("incoming blocknum "+JSON.parse(data)["chainStateHash"]["blockNum"]+" incoming check point hash "+JSON.parse(data)["chainStateHash"]["checkPointHash"]);
+          console.log("incoming blocknum "+JSON.parse(data)["chainStateHash"]["blockNumber"]+" incoming check point hash "+JSON.parse(data)["chainStateHash"]["checkPointHash"]);
           console.log("chain state "+JSON.stringify(chainState.currentBlockCheckPointHash));
 
           if(incomingBLockHeight < frankieCoin.blockHeight){
@@ -436,7 +449,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
             console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
             //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
-              calculateCheckPoints(frankieCoin.blockHeight);
+              calculateCheckPoints(frankieCoin.blockHeight,'peer',JSON.parse(data)["chainStateHash"]["blockNumber"]+":"+JSON.parse(data)["chainStateHash"]["checkPointHash"]).then(function(response, err){
+                if (err) console.log(err);
+                console.log("is it good? "+response);
+              })
             //}
           }else{/////need to move this below the block add and add the block differently to not mess with blockheight or txs
             console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
@@ -453,7 +469,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
             console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
             //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
-              calculateCheckPoints(frankieCoin.blockHeight);
+              calculateCheckPoints(frankieCoin.blockHeight,'peer',JSON.parse(data)["chainStateHash"]["blockNumber"]+":"+JSON.parse(data)["chainStateHash"]["checkPointHash"]).then(function(response, err){
+                if (err) console.log(err);
+                console.log("is it good? "+response);
+              })
             //}
           }
 
@@ -1739,7 +1758,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
       BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
       BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
       //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
-        calculateCheckPoints(frankieCoin.blockHeight);
+        calculateCheckPoints(frankieCoin.blockHeight,'miner','');
       //}
       ///////////////////////////////////////////////////////////peers broadcast
       fbroadcastPeersBlock();
