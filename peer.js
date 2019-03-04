@@ -369,7 +369,35 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           var incomingBLockHeight = JSON.parse(data)["blockHeight"];
           console.log("VVVVVVVVVVVVVVVVVVVVV        "+incomingBLockHeight+"        VVVVVVVVVVVVVVVVVVVV    ---->   "+frankieCoin.blockHeight);
 
-
+          if(incomingBLockHeight < frankieCoin.blockHeight){
+            console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+            console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+            console.log("         THIS BLOCK IS LOWER THAN EXPECTED!         ");
+            console.log("                                                    ");
+            console.log("  frankieCoin.blockHeight: "+frankieCoin.blockHeight);
+            console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
+            console.log("  chainState.isSynching: "+chainState.isSynching);
+            console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
+            console.log("  chainState.chainWalkHash: "+chainState.chainWalkHash);
+            console.log("  chainState.synchronized: "+chainState.synchronized);
+            console.log("  chainState.topBlock: "+chainState.chainWalkHeight);
+            console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+            console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+          }else{
+            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+            console.log("                THIS BLOCK CHAIN STATS:             ");
+            console.log("                                                    ");
+            console.log("  frankieCoin.blockHeight: "+frankieCoin.blockHeight);
+            console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
+            console.log("  chainState.isSynching: "+chainState.isSynching);
+            console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
+            console.log("  chainState.chainWalkHash: "+chainState.chainWalkHash);
+            console.log("  chainState.synchronized: "+chainState.synchronized);
+            console.log("  chainState.topBlock: "+chainState.chainWalkHeight);
+            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+          }
 
             ///////////////NEED TO REMOVE ANY MATCHED PENDING TXS FROM MEME POOL
             console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");

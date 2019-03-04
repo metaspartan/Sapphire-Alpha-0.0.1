@@ -124,6 +124,7 @@ let routes = {
                     }
                     promiseArr.push(execPromise);
                 } else {
+                    console.log(JSON.stringify(body));
                     let execPromise = Promise.resolve({
                         error: 'method not defined'
                     })
