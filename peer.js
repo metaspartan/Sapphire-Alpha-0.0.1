@@ -108,8 +108,10 @@ chainState.currentBlockCheckPointHash = {};
       console.log(JSON.stringify(chainState.currentBlockCheckPointHash));
 
     }else{
-      if(blockNum > 2){
-        var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
+      if(blockNum > 1){
+        var lastBLockNumber = frankieCoin.getLatestBlock()["blockHeight"];
+        var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getLatestBlock()))["hash"];
+        //console.log(lastBLockNumber+blockNum);
       }else{
         var blockNumHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f';
       }
