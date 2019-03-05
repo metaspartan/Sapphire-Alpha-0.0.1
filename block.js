@@ -167,7 +167,7 @@ var Block = class Block {
       blockheight,
       timestamp, transactions, orders, ommers, previousHash = '',
       sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '',
-      nonce = 0, difficulty = 4
+      nonce = 0, difficulty = 4, chainStateHash
     ) {
         log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
@@ -222,7 +222,11 @@ var Block = class Block {
         this.allConfigHash = '';
         //total Hash for sequencing
         this.hashOfThisBlock = '';//Hash(this.hash+BlkDB.getStateTrieRootHash())+":"+this.hash+":"+BlkDB.getStateTrieRootHash();
-        this.chainStateHash = getChainState().currentBlockCheckPointHash;
+        if(chainStateHash){
+          this.chainStateHash = chainStateHash;
+        }else{
+          this.chainStateHash = getChainState().currentBlockCheckPointHash;
+        }
         this.difficulty = difficulty;
       }
 
@@ -613,7 +617,7 @@ var Blockchain = class Blockchain {
           log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
         }
         //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
-        var block = new Block(parseInt(JSON.parse(dbBlock)["blockHeight"]), JSON.parse(dbBlock)["timestamp"], JSON.parse(dbBlock)["transactions"], JSON.parse(dbBlock)["orders"], JSON.parse(dbBlock)["ommers"], JSON.parse(dbBlock)["previousHash"], JSON.parse(dbBlock)["sponsor"], JSON.parse(dbBlock)["miner"], JSON.parse(dbBlock)["eGEMBackReferenceBlock"], JSON.parse(dbBlock)["data"], JSON.parse(dbBlock)["hash"], JSON.parse(dbBlock)["egemBackReferenceBlockHash"], JSON.parse(dbBlock)["nonce"], JSON.parse(dbBlock)["difficulty"]);
+        var block = new Block(parseInt(JSON.parse(dbBlock)["blockHeight"]), JSON.parse(dbBlock)["timestamp"], JSON.parse(dbBlock)["transactions"], JSON.parse(dbBlock)["orders"], JSON.parse(dbBlock)["ommers"], JSON.parse(dbBlock)["previousHash"], JSON.parse(dbBlock)["sponsor"], JSON.parse(dbBlock)["miner"], JSON.parse(dbBlock)["eGEMBackReferenceBlock"], JSON.parse(dbBlock)["data"], JSON.parse(dbBlock)["hash"], JSON.parse(dbBlock)["egemBackReferenceBlockHash"], JSON.parse(dbBlock)["nonce"], JSON.parse(dbBlock)["difficulty"],JSON.parse(dbBlock)["chainStateHash"]);
         log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
         this.chain.push(block);
         this.blockHeight = JSON.parse(dbBlock)["blockHeight"];
@@ -636,7 +640,7 @@ var Blockchain = class Blockchain {
 
         console.log("adding block from level to memory: "+chalk.green(msg));
 
-        var block = new Block(parseInt(JSON.parse(dbBlock)["blockHeight"]), JSON.parse(dbBlock)["timestamp"], JSON.parse(dbBlock)["transactions"], JSON.parse(dbBlock)["orders"], JSON.parse(dbBlock)["ommers"], JSON.parse(dbBlock)["previousHash"], JSON.parse(dbBlock)["sponsor"], JSON.parse(dbBlock)["miner"], JSON.parse(dbBlock)["eGEMBackReferenceBlock"], JSON.parse(dbBlock)["data"], JSON.parse(dbBlock)["hash"], JSON.parse(dbBlock)["egemBackReferenceBlockHash"], JSON.parse(dbBlock)["nonce"], JSON.parse(dbBlock)["difficulty"]);
+        var block = new Block(parseInt(JSON.parse(dbBlock)["blockHeight"]), JSON.parse(dbBlock)["timestamp"], JSON.parse(dbBlock)["transactions"], JSON.parse(dbBlock)["orders"], JSON.parse(dbBlock)["ommers"], JSON.parse(dbBlock)["previousHash"], JSON.parse(dbBlock)["sponsor"], JSON.parse(dbBlock)["miner"], JSON.parse(dbBlock)["eGEMBackReferenceBlock"], JSON.parse(dbBlock)["data"], JSON.parse(dbBlock)["hash"], JSON.parse(dbBlock)["egemBackReferenceBlockHash"], JSON.parse(dbBlock)["nonce"], JSON.parse(dbBlock)["difficulty"],JSON.parse(dbBlock)["chainStateHash"]);
         log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
         this.chain.push(block);
         this.blockHeight = JSON.parse(dbBlock)["blockHeight"];
