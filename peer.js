@@ -80,7 +80,7 @@ chainState.synchronized = 1;//when we are synched at a block it gets updated
 chainState.topBlock = 0;
 chainState.currentBlockCheckPointHash = {};
 
-  var calculateCheckPoints = function(blockNum,source,incomingCheckHash){
+  var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
       if(blockNum > frankieCoin.chainRiser){
       var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
@@ -104,14 +104,20 @@ chainState.currentBlockCheckPointHash = {};
       }
       *****end might be removing it section*****/
       if(source == "peer" && incomingCheckHash.split(":")[0] == blockNum && incomingCheckHash.split(":")[1] == thisBlockCheckPointHash){
-        chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash}
+        chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
+        return 1;
       }else{
-        //do something else
+        return 2;
       }
 
       console.log(JSON.stringify(chainState.currentBlockCheckPointHash));
 
     }else{
+
+      console.log("INCOMING INFORMATION FOR CALC CHK POINTS ************************************");
+      console.log(source+incomingCheckHash);
+      console.log("INCOMING INFORMATION FOR CALC CHK POINTS ************************************");
+
       if(blockNum > 1){
         var lastBLockNumber = frankieCoin.getLatestBlock()["blockHeight"];
         var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getLatestBlock()))["hash"];
@@ -120,7 +126,8 @@ chainState.currentBlockCheckPointHash = {};
         var blockNumHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f';
       }
       var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+"0000000000000000000000000000000000000000000000000000000000000000");
-      chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash}
+      chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
+      return 1;
       //0000000000000000000000000000000000000000000000000000000000000000
     }
 
