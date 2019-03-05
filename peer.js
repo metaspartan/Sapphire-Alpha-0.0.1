@@ -83,34 +83,38 @@ chainState.currentBlockCheckPointHash = {};
   var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
       if(blockNum > frankieCoin.chainRiser){
-      var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
-      var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
-      checkPointBlock = JSON.stringify(checkPointBlock);
-      console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
 
-      var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
-      console.log("blockNumHash: "+blockNumHash);
+        var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
+        var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
+        checkPointBlock = JSON.stringify(checkPointBlock);
+        console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
 
-      var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+        var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
+        console.log("blockNumHash: "+blockNumHash);
 
-      /*****not sure we need this and I might be removing it
-      for(var i=1;i<riserOffset;i++){
-        var integralCheckPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset-i));
-        integralCHeckPointBlock = JSON.stringify(integralCheckPointBlock);
-        console.log("CALCULATED INTEGRAL CHECK POINT IS "+JSON.parse(integralCHeckPointBlock)["blockHeight"]+" Hash "+JSON.parse(integralCHeckPointBlock)["hash"]);
-        console.log("CALCULATED HASH IS "+sapphirechain.Hash(JSON.parse(integralCHeckPointBlock)["previousHash"]+JSON.parse(integralCHeckPointBlock)["timestamp"]+JSON.parse(integralCHeckPointBlock)["nonce"]));
-        //thisBlockCheckPointHash = sapphirechain.Hash(thisBlockCheckPointHash+JSON.parse(integralCHeckPointBlock)["hash"]);
-        console.log("CUMULATIVE CALCULATED HASH IS "+thisBlockCheckPointHash);
-      }
-      *****end might be removing it section*****/
-      if(source == "peer" && incomingCheckHash.split(":")[0] == blockNum && incomingCheckHash.split(":")[1] == thisBlockCheckPointHash){
-        chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
-        return 1;
-      }else{
-        return 2;
-      }
+        var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
 
-      console.log(JSON.stringify(chainState.currentBlockCheckPointHash));
+        /*****not sure we need this and I might be removing it
+        for(var i=1;i<riserOffset;i++){
+          var integralCheckPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset-i));
+          integralCHeckPointBlock = JSON.stringify(integralCheckPointBlock);
+          console.log("CALCULATED INTEGRAL CHECK POINT IS "+JSON.parse(integralCHeckPointBlock)["blockHeight"]+" Hash "+JSON.parse(integralCHeckPointBlock)["hash"]);
+          console.log("CALCULATED HASH IS "+sapphirechain.Hash(JSON.parse(integralCHeckPointBlock)["previousHash"]+JSON.parse(integralCHeckPointBlock)["timestamp"]+JSON.parse(integralCHeckPointBlock)["nonce"]));
+          //thisBlockCheckPointHash = sapphirechain.Hash(thisBlockCheckPointHash+JSON.parse(integralCHeckPointBlock)["hash"]);
+          console.log("CUMULATIVE CALCULATED HASH IS "+thisBlockCheckPointHash);
+        }
+        *****end might be removing it section*****/
+        if(source == "miner"){
+          chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
+          return 1;
+        }else if(source == "peer" && incomingCheckHash.split(":")[0] == blockNum && incomingCheckHash.split(":")[1] == thisBlockCheckPointHash){
+          chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
+          return 1;
+        }else{
+          return 2;
+        }
+
+        console.log(JSON.stringify(chainState.currentBlockCheckPointHash));
 
     }else{
 
@@ -482,7 +486,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
                 if(err){
                   console.log(err);
                 }else{
-                  console.log("chain state response "+response);
+                  console.log("chain state response normal "+response);
                 }
               });
             //}
