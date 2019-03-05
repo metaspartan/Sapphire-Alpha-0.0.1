@@ -82,6 +82,8 @@ chainState.currentBlockCheckPointHash = {};
 
 var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
+  console.log("incoming data "+blockNum+" "+source+" "+incomingCheckHash)
+
   if(blockNum > frankieCoin.chainRiser){
 
       var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
