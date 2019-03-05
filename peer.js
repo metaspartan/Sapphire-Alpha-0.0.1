@@ -326,6 +326,48 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
     }
 
+    ////this does se the params
+    console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+    console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+    console.log("               STREAM SYNC CHAIN STATS:             ");
+    console.log("                                                    ");
+    console.log("  frankieCoin.blockHeight: "+frankieCoin.blockHeight);
+    console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
+    console.log("  chainState.isSynching: "+chainState.isSynching);
+    console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
+    console.log("  chainState.chainWalkHash: "+chainState.chainWalkHash);
+    console.log("  chainState.synchronized: "+chainState.synchronized);
+    console.log("  chainState.topBlock: "+chainState.chainWalkHeight);
+    console.log("  chainState.chainStateHash: "+JSON.stringify(chainState.previousBlockCheckPointHash));
+    console.log("  chainState.chainStateHash: "+JSON.stringify(chainState.currentBlockCheckPointHash));
+    console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+    console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+    if(chainState.chainWalkHeight == parseInt(frankieCoin.blockHeight-1)){
+      calculateCheckPoints(
+        parseInt(frankieCoin.blockHeight-1),
+        'miner',
+        ''
+      ).then(function(response,err){
+        if(err){
+          console.log(err);
+        }else{
+          console.log("streamed sync chain state response normal "+response);
+        }
+      });
+    }else if(chainState.chainWalkHeight == frankieCoin.blockHeight){
+      calculateCheckPoints(
+        frankieCoin.blockHeight,
+        'miner',
+        ''
+      ).then(function(response,err){
+        if(err){
+          console.log(err);
+        }else{
+          console.log("streamed in chain state response normal "+response);
+        }
+      });
+    }
+
     //set the chain state validated height;
   }else{
     console.log("NOT VALID NEED TO PING AT "+replyData);
