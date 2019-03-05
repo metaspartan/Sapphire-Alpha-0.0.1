@@ -78,6 +78,7 @@ chainState.chainWalkHeight = 1;
 chainState.chainWalkHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f';//block 1 hash
 chainState.synchronized = 1;//when we are synched at a block it gets updated
 chainState.topBlock = 0;
+chainState.previousBlockCheckPointHash = {};
 chainState.currentBlockCheckPointHash = {};
 
   var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
@@ -105,15 +106,18 @@ chainState.currentBlockCheckPointHash = {};
         }
         *****end might be removing it section*****/
         if(source == "miner"){
+          chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
           chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
           return 1;
         }else if(source == "peer" && incomingCheckHash.split(":")[0] == blockNum && incomingCheckHash.split(":")[1] == thisBlockCheckPointHash){
+          chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
           chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
           return 1;
         }else{
           return 2;
         }
 
+        console.log(JSON.stringify(chainState.previousBlockCheckPointHash))
         console.log(JSON.stringify(chainState.currentBlockCheckPointHash));
 
     }else{
@@ -130,6 +134,7 @@ chainState.currentBlockCheckPointHash = {};
         var blockNumHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f';
       }
       var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+"0000000000000000000000000000000000000000000000000000000000000000");
+      chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
       chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
       return 1;
       //0000000000000000000000000000000000000000000000000000000000000000
@@ -240,6 +245,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     console.log("  chainState.chainWalkHash: "+chainState.chainWalkHash);
     console.log("  chainState.synchronized: "+chainState.synchronized);
     console.log("  chainState.topBlock: "+chainState.chainWalkHeight);
+    console.log("  chainState.chainStateHash: "+JSON.stringify(chainState.previousBlockCheckPointHash));
     console.log("  chainState.chainStateHash: "+JSON.stringify(chainState.currentBlockCheckPointHash));
     console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
     console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
@@ -463,7 +469,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           console.log("VVVVVVVVVVVVVVVVVVVVV        "+incomingBLockHeight+"        VVVVVVVVVVVVVVVVVVVV    ---->   "+frankieCoin.blockHeight);
 
           console.log("incoming blocknum "+JSON.parse(data)["chainStateHash"]["blockNumber"]+" incoming check point hash "+JSON.parse(data)["chainStateHash"]["checkPointHash"]);
-          console.log("chain state "+JSON.stringify(chainState.currentBlockCheckPointHash));
+          console.log("chain state previous "+JSON.stringify(chainState.previousBlockCheckPointHash));
+          console.log("chain state current "+JSON.stringify(chainState.currentBlockCheckPointHash));
 
           if(incomingBLockHeight < frankieCoin.blockHeight){
             console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
@@ -896,6 +903,7 @@ function cliGetInput(){
       console.log("chain state chain walk height is "+chainState.chainWalkHeight);
       console.log("chain state synchronized equals "+chainState.synchronized);
       console.log("blockchain height is "+frankieCoin.blockHeight);
+      console.log("previousBlockCheckPointHash is "+JSON.stringify(chainState.previousBlockCheckPointHash));
       console.log("currentBlockCheckPointHash is "+JSON.stringify(chainState.currentBlockCheckPointHash));
       BlkDB.getCheckPoints();
       cliGetInput();
