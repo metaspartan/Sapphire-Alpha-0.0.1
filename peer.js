@@ -226,6 +226,9 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
         BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"]);
       }
       BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
+
+
+      
     }
 
     //set the chain state validated height;
@@ -867,6 +870,7 @@ function cliGetInput(){
       console.log("chain state chain walk height is "+chainState.chainWalkHeight);
       console.log("chain state synchronized equals "+chainState.synchronized);
       console.log("blockchain height is "+frankieCoin.blockHeight);
+      console.log("currentBlockCheckPointHash is "+JSON.stringify(chainState.currentBlockCheckPointHash));
       BlkDB.getCheckPoints();
       cliGetInput();
     }else if(userInput == "MMM"){
@@ -1317,6 +1321,7 @@ var cbChainGrab = function(data) {
       var tempBlock = data[obj];
       frankieCoin.addBlockFromDataStream(tempBlock,"sending in block "+JSON.parse(tempBlock)["blockHeight"]);
       frankieCoin.blockHeight = parseInt(JSON.parse(tempBlock)["blockHeight"]);
+
     }else{
       //block existed
       log("block exists in chain data: "+JSON.parse(data[obj])["blockHeight"]);
