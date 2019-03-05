@@ -249,18 +249,31 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     console.log("  chainState.chainStateHash: "+JSON.stringify(chainState.currentBlockCheckPointHash));
     console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
     console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-    //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
-    calculateCheckPoints(
-      frankieCoin.blockHeight,
-      'miner',
-      ''
-    ).then(function(response,err){
-      if(err){
-        console.log(err);
-      }else{
-        console.log("streamed in chain state response normal "+response);
-      }
-    });
+    if(chainState.chainWalkHeight == parseInt(frankieCoin.blockHeight-1)){
+      calculateCheckPoints(
+        parseInt(frankieCoin.blockHeight-1),
+        'miner',
+        ''
+      ).then(function(response,err){
+        if(err){
+          console.log(err);
+        }else{
+          console.log("streamed in chain state response normal "+response);
+        }
+      });
+    }else if(chainState.chainWalkHeight == frankieCoin.blockHeight){
+      calculateCheckPoints(
+        frankieCoin.blockHeight,
+        'miner',
+        ''
+      ).then(function(response,err){
+        if(err){
+          console.log(err);
+        }else{
+          console.log("streamed in chain state response normal "+response);
+        }
+      });
+    }
     //end this does set the params
 
     //set the chain state validated height;
