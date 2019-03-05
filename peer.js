@@ -577,85 +577,103 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
                 if(err){
                   console.log(err);
                 }else{
-                  console.log("chain state response normal "+response);
+                  console.log("chain state response normal "+parseInt(response));
+
+                  if(response == 1){
+
+                    ///////////////NEED TO REMOVE ANY MATCHED PENDING TXS FROM MEME POOL
+                    console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
+                    console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
+                    var incomingTx = JSON.parse(data)["transactions"];
+                    var existingPendingTx = frankieCoin.pendingTransactions;
+                    var replacementTx = [];
+                    for(ptx in incomingTx){
+                      /****does not work this way need to rethink
+                      if(incomingTx[ptx]["oxdid"]){
+                        console.log("we are actually in the incoming tx looking at order id deletion")
+                        BlkDB.clearOrderById(incomingTx[ptx]["oxdid"],incomingTx[ptx]["oxtid"]);
+                      }
+                      ****/
+                      for(etx in existingPendingTx){
+                        //adding logic to remove orders if ox id present
+                        if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash"]){
+                          //do nothing removes this element
+                        }else{
+                          replacementTx.push(existingPendingTx[etx]);
+                        }
+                      }
+                    }
+                    frankieCoin.pendingTransactions = [];
+                    frankieCoin.pendingTransactions = replacementTx;
+                    ///////////////NEED TO REMOVE ANY MATCHED PENDING OXS FROM MEME POOL
+                    console.log("RRRRRRRRRRRRRRRRRRRRR  removing oxs RRRRRRRRRRRRRRR");
+                    console.log("RRRRRRRRRRRRRRRRRRRRR  removing oxs RRRRRRRRRRRRRRR");
+                    var incomingOx = JSON.parse(data)["orders"];
+                    var existingPendingOx = frankieCoin.pendingOrders;
+                    var replacementOx = [];
+                    for(pox in incomingOx){
+                      for(eox in existingPendingOx){
+                        if(incomingOx[pox]["hash"] == existingPendingOx[eox]["hash"]){
+                          //do nothing removes this element
+                        }else{
+                          replacementOx.push(existingPendingOx[eox]);
+                        }
+                      }
+                    }
+                    frankieCoin.pendingOrders = [];
+                    frankieCoin.pendingOrders = replacementOx;
+                    ////////////////////////////////////END REMOVAL OF PENDING TX AND OX
+
+                    //first we add the block to the blockchain with call back and id of submitting peer for conflict resolution
+                    var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data),sendBackUncle,peerId);
+
+                    log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD? "+successfulBlockAdd));
+
+
+                      //increment the internal peer nonce of sending party to track longest chain
+                      frankieCoin.incrementPeerNonce(peerId,JSON.parse(data)["blockHeight"]);
+                      BlkDB.addNode("node:"+peerId+":peerBlockHeight",JSON.parse(data)["blockHeight"]);
+                      //logging the block added to chain for console
+                      log(chalk.red("--------------------------------------------------------------------"));
+                      //log(chalk.green("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock())));//verbose
+                      log(chalk.green("block added to chain: "+JSON.stringify(JSON.parse(data)["blockHeight"])));
+                      log(chalk.green("in prev hash: ")+JSON.parse(data)["previousHash"]+chalk.green(" <=> chain: ")+currentChainHash);
+                      log(chalk.yellow("                     SUCESSFUL BLOCK FROM PEER                      "));
+                      log(chalk.red("--------------------------------------------------------------------"));
+                      //////update the client database OR reject block and rollback the chain - code is incomplete atm
+                      //add it to the database
+                      BlkDB.addBlock(parseInt(JSON.parse(data)["blockHeight"]),JSON.stringify(JSON.parse(data)),"202");
+                      BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(JSON.parse(data)["blockHeight"]));
+                      BlkDB.addChainState("cs:blockHeight",parseInt(JSON.parse(data)["blockHeight"]));
+                      BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
+                      //add it to the RPC for miner
+                      rpcserver.postRPCforMiner({block:JSON.parse(data)});
+
+
+                      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+
+                      //miner call
+                      calculateCheckPoints(frankieCoin.blockHeight,'miner','');
+
+                  }else if(parseInt(response == 2)){
+
+                    console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
+                    console.log("WARNING INCOMING PEER INFORMATION DID NOT MATCH CHAIN WEIGHT BAD WARNING");
+                    console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
+                    console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
+                    console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
+                    console.log("WARNING INCOMING PEER INFORMATION DID NOT MATCH CHAIN WEIGHT BAD WARNING");
+                    console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
+                    console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
+
+                  }
+
                 }
               });
             //}
           }
 
-            ///////////////NEED TO REMOVE ANY MATCHED PENDING TXS FROM MEME POOL
-            console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
-            console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
-            var incomingTx = JSON.parse(data)["transactions"];
-            var existingPendingTx = frankieCoin.pendingTransactions;
-            var replacementTx = [];
-            for(ptx in incomingTx){
-              /****does not work this way need to rethink
-              if(incomingTx[ptx]["oxdid"]){
-                console.log("we are actually in the incoming tx looking at order id deletion")
-                BlkDB.clearOrderById(incomingTx[ptx]["oxdid"],incomingTx[ptx]["oxtid"]);
-              }
-              ****/
-              for(etx in existingPendingTx){
-                //adding logic to remove orders if ox id present
-                if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash"]){
-                  //do nothing removes this element
-                }else{
-                  replacementTx.push(existingPendingTx[etx]);
-                }
-              }
-            }
-            frankieCoin.pendingTransactions = [];
-            frankieCoin.pendingTransactions = replacementTx;
-            ///////////////NEED TO REMOVE ANY MATCHED PENDING OXS FROM MEME POOL
-            console.log("RRRRRRRRRRRRRRRRRRRRR  removing oxs RRRRRRRRRRRRRRR");
-            console.log("RRRRRRRRRRRRRRRRRRRRR  removing oxs RRRRRRRRRRRRRRR");
-            var incomingOx = JSON.parse(data)["orders"];
-            var existingPendingOx = frankieCoin.pendingOrders;
-            var replacementOx = [];
-            for(pox in incomingOx){
-              for(eox in existingPendingOx){
-                if(incomingOx[pox]["hash"] == existingPendingOx[eox]["hash"]){
-                  //do nothing removes this element
-                }else{
-                  replacementOx.push(existingPendingOx[eox]);
-                }
-              }
-            }
-            frankieCoin.pendingOrders = [];
-            frankieCoin.pendingOrders = replacementOx;
-            ////////////////////////////////////END REMOVAL OF PENDING TX AND OX
 
-            //first we add the block to the blockchain with call back and id of submitting peer for conflict resolution
-            var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data),sendBackUncle,peerId);
-
-            log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD? "+successfulBlockAdd));
-
-
-              //increment the internal peer nonce of sending party to track longest chain
-              frankieCoin.incrementPeerNonce(peerId,JSON.parse(data)["blockHeight"]);
-              BlkDB.addNode("node:"+peerId+":peerBlockHeight",JSON.parse(data)["blockHeight"]);
-              //logging the block added to chain for console
-              log(chalk.red("--------------------------------------------------------------------"));
-              //log(chalk.green("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock())));//verbose
-              log(chalk.green("block added to chain: "+JSON.stringify(JSON.parse(data)["blockHeight"])));
-              log(chalk.green("in prev hash: ")+JSON.parse(data)["previousHash"]+chalk.green(" <=> chain: ")+currentChainHash);
-              log(chalk.yellow("                     SUCESSFUL BLOCK FROM PEER                      "));
-              log(chalk.red("--------------------------------------------------------------------"));
-              //////update the client database OR reject block and rollback the chain - code is incomplete atm
-              //add it to the database
-              BlkDB.addBlock(parseInt(JSON.parse(data)["blockHeight"]),JSON.stringify(JSON.parse(data)),"202");
-              BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(JSON.parse(data)["blockHeight"]));
-              BlkDB.addChainState("cs:blockHeight",parseInt(JSON.parse(data)["blockHeight"]));
-              BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
-              //add it to the RPC for miner
-              rpcserver.postRPCforMiner({block:JSON.parse(data)});
-
-
-              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
-
-              //miner call
-              calculateCheckPoints(frankieCoin.blockHeight,'miner','');
 
 
         }else if(JSON.parse(data)["fromAddress"]){
@@ -1869,6 +1887,12 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
       BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),"1475");
       BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
       BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
+
+      chainState.chainWalkHeight = frankieCoin.blockHeight;
+      chainState.chainWalkHash = frankieCoin.getLatestBlock()["hash"];//block 1 hash
+      chainState.synchronized = frankieCoin.blockHeight;//when we are synched at a block it gets updated
+      chainState.topBlock = frankieCoin.blockHeight;
+
       //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
         calculateCheckPoints(frankieCoin.blockHeight,'miner','');
       //}
