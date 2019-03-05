@@ -447,7 +447,17 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
             console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
             //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
-              calculateCheckPoints(frankieCoin.blockHeight,'peer',JSON.parse(data)["chainStateHash"]["blockNumber"]+":"+JSON.parse(data)["chainStateHash"]["checkPointHash"]);
+              calculateCheckPoints(
+                frankieCoin.blockHeight,
+                'peer',
+                JSON.parse(data)["chainStateHash"]["blockNumber"]+":"+JSON.parse(data)["chainStateHash"]["checkPointHash"]
+              ).then(function(response,err){
+                if(err){
+                  console.log(err);
+                }else{
+                  console.log("chain state response "+response);
+                }
+              });
             //}
           }else{/////need to move this below the block add and add the block differently to not mess with blockheight or txs
             console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
@@ -464,7 +474,17 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
             console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
             //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
-              calculateCheckPoints(frankieCoin.blockHeight,'peer',JSON.parse(data)["chainStateHash"]["blockNumber"]+":"+JSON.parse(data)["chainStateHash"]["checkPointHash"]);
+              calculateCheckPoints(
+                frankieCoin.blockHeight,
+                'peer',
+                JSON.parse(data)["chainStateHash"]["blockNumber"]+":"+JSON.parse(data)["chainStateHash"]["checkPointHash"]
+              ).then(function(response,err){
+                if(err){
+                  console.log(err);
+                }else{
+                  console.log("chain state response "+response);
+                }
+              });
             //}
           }
 
