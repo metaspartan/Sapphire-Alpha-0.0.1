@@ -226,39 +226,36 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
         BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"]);
       }
       BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
-
-
-        ////this does se the params
-        console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-        console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-        console.log("                STREAM UP CHAIN STATS:             ");
-        console.log("                                                    ");
-        console.log("  frankieCoin.blockHeight: "+frankieCoin.blockHeight);
-        console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
-        console.log("  chainState.isSynching: "+chainState.isSynching);
-        console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
-        console.log("  chainState.chainWalkHash: "+chainState.chainWalkHash);
-        console.log("  chainState.synchronized: "+chainState.synchronized);
-        console.log("  chainState.topBlock: "+chainState.chainWalkHeight);
-        console.log("  chainState.chainStateHash: "+chainState.currentBlockCheckPointHash);
-        console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-        console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-        //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
-        calculateCheckPoints(
-          frankieCoin.blockHeight,
-          'miner',
-          ''
-        ).then(function(response,err){
-          if(err){
-            console.log(err);
-          }else{
-            console.log("streamed in chain state response normal "+response);
-          }
-        });
-        //end this does set the params
-      
-
     }
+
+    ////this does se the params
+    console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+    console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+    console.log("                STREAM UP CHAIN STATS:             ");
+    console.log("                                                    ");
+    console.log("  frankieCoin.blockHeight: "+frankieCoin.blockHeight);
+    console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
+    console.log("  chainState.isSynching: "+chainState.isSynching);
+    console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
+    console.log("  chainState.chainWalkHash: "+chainState.chainWalkHash);
+    console.log("  chainState.synchronized: "+chainState.synchronized);
+    console.log("  chainState.topBlock: "+chainState.chainWalkHeight);
+    console.log("  chainState.chainStateHash: "+JSON.stringify(chainState.currentBlockCheckPointHash));
+    console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+    console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+    //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
+    calculateCheckPoints(
+      frankieCoin.blockHeight,
+      'miner',
+      ''
+    ).then(function(response,err){
+      if(err){
+        console.log(err);
+      }else{
+        console.log("streamed in chain state response normal "+response);
+      }
+    });
+    //end this does set the params
 
     //set the chain state validated height;
   }else{
