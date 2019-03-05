@@ -612,6 +612,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
               BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
 
+              //miner call
+              calculateCheckPoints(frankieCoin.blockHeight,'miner','');
 
 
         }else if(JSON.parse(data)["fromAddress"]){
