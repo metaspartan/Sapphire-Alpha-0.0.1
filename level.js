@@ -2,6 +2,7 @@ var BLAKE2s = require("./blake2s.js")
 var levelup = require('levelup')
 var leveldown = require('leveldown')
 var fs = require('fs')
+const chalk = require('chalk');
 //web3
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("https://lb.rpc.egem.io"));
@@ -157,15 +158,15 @@ var getNodes = function(){
 }
 
 var addBlock = function(blknum,block,callfrom){
-  console.log("<<<<<----------------ADDS BLOCK TO LEVEL DB HERE------------>>>>>")
-  console.log("called from "+callfrom);
+  //console.log("<<<<<----------------ADDS BLOCK TO LEVEL DB HERE------------>>>>>")
+  //console.log("called from "+callfrom);
   //console.log("inside add block"+block.toString());//verbose
   var blocknum = parseInt(blknum);
   var hexBlockNum = ("000000000000000" + blocknum.toString(16)).substr(-16);
-  console.log("adding block "+blknum+" as "+hexBlockNum);
+  console.log(chalk.black.bgCyan("adding block "+blknum+" as "+hexBlockNum));
   putRecord("sfblk:"+hexBlockNum,block)
   //parseInt(hexString, 16);//this is back to number from hex
-  console.log("<<<<<----------------BLOCK REWARDS LEVEL DB HERE------------>>>>>")
+  //console.log("<<<<<----------------BLOCK REWARDS LEVEL DB HERE------------>>>>>")
 /////////////////////////////////////////////////////////CALCULATE BLOCK REWARDS
   var calcBlockReward;
   if(parseInt(blknum) < 7500001){calcBlockReward=9}//ERA1
@@ -202,7 +203,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX", adjustedValue.toString(), function () {
         trie.get("0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX", function (err, value) {
           //if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -226,7 +227,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX", adjustedValue.toString(), function () {
         trie.get("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX", function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -250,7 +251,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX", adjustedValue.toString(), function () {
         trie.get("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX", function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -274,7 +275,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX", adjustedValue.toString(), function () {
         trie.get("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX", function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -298,7 +299,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX", adjustedValue.toString(), function () {
         trie.get("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX", function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -322,7 +323,7 @@ var addBlock = function(blknum,block,callfrom){
     putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:EGEM:"+JSON.parse(block)["timestamp"]+":"+osoTxEGEM.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxEGEM));
     //1) call the existng balance for the send and receiver
     trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:EGEM", function (err, value) {
-      console.log("grabbing balance of from address");
+      //console.log("grabbing balance of from address");
       var adjustedValue = 0;
       if(value){
         console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
@@ -333,11 +334,11 @@ var addBlock = function(blknum,block,callfrom){
       parseFloat(adjustedValue = adjustedValue + parseFloat(100000)).toFixed(8);
       trie.put("0x7357589f8e367c2C31F51242fB77B350A11830F3:EGEM", adjustedValue.toString(), function () {
         trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:EGEM", function (err, value) {
-          if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
-            console.log(value+" "+value.toString('hex'));
+            //console.log(value+" "+value.toString('hex'));
           });
         });
       });
@@ -347,10 +348,10 @@ var addBlock = function(blknum,block,callfrom){
     putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:BTC:"+JSON.parse(block)["timestamp"]+":"+osoTxBTC.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxBTC));
     //1) call the existng balance for the send and receiver
     trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:BTC", function (err, value) {
-      console.log("grabbing balance of from address");
+      //console.log("grabbing balance of from address");
       var adjustedValue = 0;
       if(value){
-        console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
+        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
         adjustedValue = parseFloat(value.toString());
       }else{
         adjustedValue = 0;
@@ -359,7 +360,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0x7357589f8e367c2C31F51242fB77B350A11830F3:BTC", adjustedValue.toString(), function () {
         trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:BTC", function (err, value) {
           if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -384,7 +385,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0x7357589f8e367c2C31F51242fB77B350A11830F3:ETH", adjustedValue.toString(), function () {
         trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:ETH", function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -409,7 +410,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0x7357589f8e367c2C31F51242fB77B350A11830F3:XBI", adjustedValue.toString(), function () {
         trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:XBI", function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -436,7 +437,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX", adjustedValue.toString(), function () {
         trie.get("0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX", function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -460,7 +461,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX", adjustedValue.toString(), function () {
         trie.get("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX", function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -484,7 +485,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX", adjustedValue.toString(), function () {
         trie.get("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX", function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -508,7 +509,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX", adjustedValue.toString(), function () {
         trie.get("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX", function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -532,7 +533,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX", adjustedValue.toString(), function () {
         trie.get("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX", function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -557,7 +558,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put(JSON.parse(block)["miner"]+":SFRX", adjustedValue.toString(), function () {
         trie.get(JSON.parse(block)["miner"]+":SFRX", function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -582,7 +583,7 @@ var addBlock = function(blknum,block,callfrom){
       trie.put(JSON.parse(block)["sponsor"]+":SFRX", adjustedValue.toString(), function () {
         trie.get(JSON.parse(block)["sponsor"]+":SFRX", function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -854,7 +855,7 @@ var clearDatabase = function(){
 }
 
 var addTransactions = function(transactions,blockhash,){
-  console.log("T R A N S A C T I O N S  B E I N G  A D D E D  H E R E");
+  //console.log("T R A N S A C T I O N S  B E I N G  A D D E D  H E R E");
   transactions = JSON.parse(JSON.stringify(transactions));
   for(tranx in JSON.parse(transactions)){
     var receipt = JSON.parse(transactions)[tranx];
@@ -876,7 +877,7 @@ var addTransactions = function(transactions,blockhash,){
       trie.put(receipt["toAddress"]+":"+receipt["ticker"], adjustedValue, function () {
         trie.get(receipt["toAddress"]+":"+receipt["ticker"], function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -897,7 +898,7 @@ var addTransactions = function(transactions,blockhash,){
       trie.put(receipt["fromAddress"]+":"+receipt["ticker"], adjustedValue, function () {
         trie.get(receipt["fromAddress"]+":"+receipt["ticker"], function (err, value) {
           if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
             encoding: 'binary'
           }, function (err, value) {
             //console.log(value+" "+value.toString('hex'));
@@ -954,7 +955,7 @@ var getBalanceAtAddressFromTrie = function(address,callback){
     }
   })
   .on('end', function() {
-    console.log('End. Trie Root is '+trie.root.toString('hex'))
+    //console.log('End. Trie Root is '+trie.root.toString('hex'))
   })
 }
 
@@ -1591,7 +1592,7 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
           trie.put(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
             trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
               if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-              db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+              db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
                 encoding: 'binary'
               }, function (err, value) {
                 //console.log(value+" "+value.toString('hex'));
@@ -1613,7 +1614,7 @@ var importFromJSONFile = function(cb,blockNum,cbChainGrab,chainRiser){
           trie.put(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
             trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
               if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-              db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+              db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
                 encoding: 'binary'
               }, function (err, value) {
                 //console.log(value+" "+value.toString('hex'));
@@ -1732,7 +1733,7 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
           trie.put(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
             trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
               if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-              db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+              db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
                 encoding: 'binary'
               }, function (err, value) {
                 //console.log(value+" "+value.toString('hex'));
@@ -1754,7 +1755,7 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
           trie.put(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
             trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
               if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-              db.get(new Buffer(trie.root.toString('hex'), 'hex'), {
+              db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
                 encoding: 'binary'
               }, function (err, value) {
                 //console.log(value+" "+value.toString('hex'));

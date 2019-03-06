@@ -285,8 +285,8 @@ var Blockchain = class Blockchain {
           this.inSynchBlockHeight = 0;
           this.longestPeerBlockHeight = 0;
           //just logging the chain creation
-          log(chalk.cyan("Genesis block created!"));
-          log(chalk.blue("Chain is: "+chalk.green(JSON.stringify(this.chain))));
+          log(chalk.bgCyan("Genesis block created!"));
+          //log(chalk.blue("Chain is: "+chalk.green(JSON.stringify(this.chain))));
 
       }
 

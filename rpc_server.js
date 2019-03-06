@@ -72,7 +72,7 @@ var impcevent = function(mydata,mypeer){
 
 var globalParentComMethods = function(callback,cbIMPCBalance){
   //sets the impcparent with the function from parent
-  console.log("global parent com methods called in rpc server")
+  //console.log("global parent com methods called in rpc server")
   impcParentMethods = callback;
   impcbalanceEvent = cbIMPCBalance;
 

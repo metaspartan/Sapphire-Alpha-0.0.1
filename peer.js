@@ -391,15 +391,15 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
   //incoming connections from peers
   sw.on('connection', (conn, info) => {
 
-    log(chalk.blue(JSON.stringify(info)));
+    //log(chalk.blue(JSON.stringify(info)));
     const seq = connSeq
     const peerId = info.id.toString('hex');
 
     if(info.id != myId){
       frankieCoin.registerNode(peerId,info.host,info.port,frankieCoin.length);
       BlkDB.addNode("node:"+peerId+":connection",{"host":info.host,"port":info.port});
-      log(chalk.green("Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
-      log(chalk.green('Found & connected to peer with id: '+ chalk.blue(peerId)));
+      //log(chalk.green("Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
+      log(chalk.bgBlue('New Peer id: '+ chalk.bold(peerId)));
     }
 
     conn.on('close', () => {
@@ -1357,7 +1357,7 @@ BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()),"759");
 BlkDB.addChainParams(globalGenesisHash+":blockHeight",1);
 //BlkDB.addChainState("cs:blockHeight",1);//NEVER LOAD THIS HERE IT DEFEATS THE WHOLE PURPOSE
 BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
-log("peer chain is"+ frankieCoin.getEntireChain());
+//log("peer chain is"+ frankieCoin.getEntireChain());
 
 var franks = miner(frankieCoin);
 
