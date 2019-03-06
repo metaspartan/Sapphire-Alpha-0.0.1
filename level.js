@@ -787,7 +787,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
           //console.log("ping it "+currentBlockToValidate);
           callback(false,parseInt(currentBlockToValidate-1),"");
         }
-        console.log("Block range validator data stream is complete");
+        console.log(chalk.black.bgCyan("Block range validator data stream is complete"));
 
         /***
         if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight))){//possible another block enters the db s no upper limit
