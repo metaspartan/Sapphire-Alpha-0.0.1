@@ -772,7 +772,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
               //set the state validated height
               callback(true,parseInt(JSON.parse(isValidBlock)["blockHeight"]),JSON.parse(isValidBlock)["hash"]);
             }else{
-              removeBlock(parseInt(JSON.parse(isValidBlock)["blockHeight"])
+              removeBlock(parseInt(JSON.parse(isValidBlock)["blockHeight"]))
               callback(false,parseInt(JSON.parse(isValidBlock)["blockHeight"]-1),"");
             }
             currentBlockHash = JSON.parse(isValidBlock)["hash"];
