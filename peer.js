@@ -419,9 +419,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       console.log("data stream ended ");
       //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
 
-      console.log("this is on end "+incomingStream);
-
-
+      //console.log("this is on end "+incomingStream);
 
       console.log("Importing the data file to the db and then calling the memory synch");
       setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
@@ -1426,7 +1424,7 @@ var cbChainGrab = function(data) {
     //verify block does not exist in memory
     if(typeof frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"]) === "undefined" || frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"]) === null){
       //block not in memory
-      console.log("block does not exist "+data[obj]);
+      //console.log("block does not exist "+data[obj]);
       var tempBlock = data[obj];
       frankieCoin.addBlockFromDataStream(tempBlock,"sending in block "+JSON.parse(tempBlock)["blockHeight"]);
       frankieCoin.blockHeight = parseInt(JSON.parse(tempBlock)["blockHeight"]);
