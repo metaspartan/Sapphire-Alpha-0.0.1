@@ -314,7 +314,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       console.log(parseInt(replyData) == parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight));
       console.log("AND THE VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
     }
-    console.log("BLOCK HEIGHT VALIDATED TO (CW PEER VERSION)"+replyData,replyHash);
+    console.log(chalk.black.bgCyan("BLOCK HEIGHT VALIDATED TO (CW PEER VERSION)")+chalk.bgMagenta(replyData),chalk.bgBlue(replyHash));
     //now that we are valid we are going to check 3 blocks back to see if it is a candidate for chain state
     console.log("TRUE OR FALSE? "+parseInt(replyData)+" "+(parseInt(replyData) > 3)+" "+(parseInt(replyData - 3))+" "+parseInt(frankieCoin.chainRiser))
     if( parseInt(replyData) > 3 && (parseInt(replyData - 3) % parseInt(frankieCoin.chainRiser)) == 0 ){
@@ -327,21 +327,17 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     }
 
     ////this does se the params
-    console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-    console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-    console.log("               STREAM SYNC CHAIN STATS:             ");
-    console.log("                                                    ");
-    console.log("  frankieCoin.blockHeight: "+frankieCoin.blockHeight);
-    console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
-    console.log("  chainState.isSynching: "+chainState.isSynching);
-    console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
-    console.log("  chainState.chainWalkHash: "+chainState.chainWalkHash);
-    console.log("  chainState.synchronized: "+chainState.synchronized);
-    console.log("  chainState.topBlock: "+chainState.chainWalkHeight);
-    console.log("  chainState.chainStateHash: "+JSON.stringify(chainState.previousBlockCheckPointHash));
-    console.log("  chainState.chainStateHash: "+JSON.stringify(chainState.currentBlockCheckPointHash));
-    console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
-    console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+
+    console.log(chalk.black.bgCyan("STREAM SYNC CHAIN STATS:"));
+    console.log(chalk.bgMagenta("frankieCoin.blockHeight: ")+frankieCoin.blockHeight);
+    console.log(chalk.bgMagenta("chainState.chainWalkHeight: ")+chainState.chainWalkHeight);
+    console.log(chalk.bgMagenta("chainState.isSynching: ")+chainState.isSynching);
+    console.log(chalk.bgMagenta("chainState.chainWalkHeight: ")+chainState.chainWalkHeight);
+    console.log(chalk.bgMagenta("chainState.chainWalkHash: ")+chainState.chainWalkHash);
+    console.log(chalk.bgMagenta("chainState.synchronized: ")+chainState.synchronized);
+    console.log(chalk.bgMagenta("chainState.topBlock: ")+chainState.chainWalkHeight);
+    console.log(chalk.bgMagenta("chainState.chainStateHash: ")+JSON.stringify(chainState.previousBlockCheckPointHash));
+    console.log(chalk.bgMagenta("chainState.chainStateHash: ")+JSON.stringify(chainState.currentBlockCheckPointHash));
     if(chainState.chainWalkHeight == parseInt(frankieCoin.blockHeight-1)){
       calculateCheckPoints(
         parseInt(frankieCoin.blockHeight-1),
