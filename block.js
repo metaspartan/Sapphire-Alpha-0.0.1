@@ -600,13 +600,14 @@ var Blockchain = class Blockchain {
       //this is the peers adding a block needs to be VALIDATED
       addBlockFromDatabase(dbBlock,msg){
 
-        console.log("adding block from level to memory: "+chalk.green(msg));
+        //console.log("adding block from level to memory: "+chalk.green(msg));
+        //console.log("can we get the database data "+this.getLatestBlock().hash+" compared to "+JSON.parse(dbBlock)["blockHeight"]+" "+JSON.parse(dbBlock)["previousHash"])
 
-        console.log("can we get the database data "+this.getLatestBlock().hash+" compared to "+JSON.parse(dbBlock)["blockHeight"]+" "+JSON.parse(dbBlock)["previousHash"])
         //if all that consensus stuff I am going to add....then
         //here is where I check if two things and I think make them globals
         //1 issync should be YES
         //2 previous hash must match current chain top hash
+        /***
         if(this.getLatestBlock().hash == JSON.parse(dbBlock)["previousHash"]){
           log("----------------------------------------------------");
           log("yes DB BLOCK prev hash of "+JSON.parse(dbBlock)["previousHash"]+" matches the hash of chain "+this.getLatestBlock().hash);
@@ -615,42 +616,49 @@ var Blockchain = class Blockchain {
           log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
           log("no DB BLOCK prev hash of "+JSON.parse(dbBlock)["previousHash"]+" does not match the hash of chain "+this.getLatestBlock().hash);
           log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
-        }
+        }***/
         //passing in the hash because it is from the peer but really it should hash to same thing so verifiy thiis step int he future
         var block = new Block(parseInt(JSON.parse(dbBlock)["blockHeight"]), JSON.parse(dbBlock)["timestamp"], JSON.parse(dbBlock)["transactions"], JSON.parse(dbBlock)["orders"], JSON.parse(dbBlock)["ommers"], JSON.parse(dbBlock)["previousHash"], JSON.parse(dbBlock)["sponsor"], JSON.parse(dbBlock)["miner"], JSON.parse(dbBlock)["eGEMBackReferenceBlock"], JSON.parse(dbBlock)["data"], JSON.parse(dbBlock)["hash"], JSON.parse(dbBlock)["egemBackReferenceBlockHash"], JSON.parse(dbBlock)["nonce"], JSON.parse(dbBlock)["difficulty"],JSON.parse(dbBlock)["chainStateHash"]);
-        log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
+        //log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
         this.chain.push(block);
         this.blockHeight = JSON.parse(dbBlock)["blockHeight"];
-        log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
+        //log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
         if(this.chain.length > this.chainRiser){
           this.chain.shift();
         }
-        log(chalk.red("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
+        //log(chalk.red("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
         //careful I have the ischain valid returining true on all tries
         if(this.isChainValid() == false){
           this.chain.pop();
           log("Block is not added and will be removed")
         }else{
-          log("Block added from DATABASE")
+          //log("Block added from DATABASE")
+          //probably some other type of meter or log here
         }
       }
 
       //this is the peers adding a block needs to be VALIDATED
       addBlockFromDataStream(dbBlock,msg){
 
-        console.log("adding block from level to memory: "+chalk.green(msg));
+        //console.log("adding block from level to memory: "+chalk.green(msg));
 
         var block = new Block(parseInt(JSON.parse(dbBlock)["blockHeight"]), JSON.parse(dbBlock)["timestamp"], JSON.parse(dbBlock)["transactions"], JSON.parse(dbBlock)["orders"], JSON.parse(dbBlock)["ommers"], JSON.parse(dbBlock)["previousHash"], JSON.parse(dbBlock)["sponsor"], JSON.parse(dbBlock)["miner"], JSON.parse(dbBlock)["eGEMBackReferenceBlock"], JSON.parse(dbBlock)["data"], JSON.parse(dbBlock)["hash"], JSON.parse(dbBlock)["egemBackReferenceBlockHash"], JSON.parse(dbBlock)["nonce"], JSON.parse(dbBlock)["difficulty"],JSON.parse(dbBlock)["chainStateHash"]);
-        log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
+        //log(chalk.green("<===========chain length >>>>"+this.chain.length+"<<<< chain length============>"));
         this.chain.push(block);
         this.blockHeight = JSON.parse(dbBlock)["blockHeight"];
-        log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
+        //log(chalk.yellow("<===========chain riser >>>>"+this.chainRiser+"<<<< chain riser============>"));
         if(this.chain.length > this.chainRiser){
           this.chain.shift();
         }
-        log(chalk.red("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
+        //log(chalk.red("<===========chain blockHeight >>>>"+this.blockHeight+"<<<< chain blockHeight============>"));
         //careful I have the ischain valid returining true on all tries
-
+        if(this.isChainValid() == false){
+          this.chain.pop();
+          log("Block is not added and will be removed")
+        }else{
+          //log("Block added from DATABASE")
+          //probably some other type of meter or log here
+        }
       }
 
       createTransaction(transaction){
