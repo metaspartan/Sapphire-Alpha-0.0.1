@@ -439,7 +439,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
       let chunk;
       while (null !== (chunk = this.read())) {
-        console.log(`Received ${chunk.length} bytes of data.`);
+        //console.log(`Received ${chunk.length} bytes of data.`);
         incomingStream+=chunk.toString()
         incomingBufferArray.push(chunk.toString());
       }
