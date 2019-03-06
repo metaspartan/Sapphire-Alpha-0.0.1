@@ -88,10 +88,10 @@ chainState.currentBlockCheckPointHash = {};
         var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
         var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
         checkPointBlock = JSON.stringify(checkPointBlock);
-        console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
+        //console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
 
         var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
-        console.log("blockNumHash: "+blockNumHash);
+        //console.log("blockNumHash: "+blockNumHash);
 
         var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
 
@@ -117,8 +117,8 @@ chainState.currentBlockCheckPointHash = {};
           return 2;
         }
 
-        console.log(JSON.stringify(chainState.previousBlockCheckPointHash))
-        console.log(JSON.stringify(chainState.currentBlockCheckPointHash));
+        //console.log(JSON.stringify(chainState.previousBlockCheckPointHash))
+        //console.log(JSON.stringify(chainState.currentBlockCheckPointHash));
 
     }else{
 
@@ -224,8 +224,8 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     if( parseInt(replyData) > 3 && (parseInt(replyData - 3) % parseInt(frankieCoin.chainRiser)) == 0 ){
       var checkPoint = parseInt(replyData - 3);
       var pongBackBlock = function(blockData){
-        console.log("in pong back block");
-        console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
+        //console.log("in pong back block");
+        //console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
         BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"]);
       }
       BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
@@ -1121,10 +1121,12 @@ function cliGetInput(){
     }else if(userInput.startsWith("getBlock(")){//GETBLOCK function
       log(userInput.slice(userInput.indexOf("getBlock(")+9, userInput.indexOf(")")));
       var blocknum = userInput.slice(userInput.indexOf("getBlock(")+9, userInput.indexOf(")"));
-      log(JSON.stringify(frankieCoin.getBlock(parseInt(blocknum))));
+      console.log(chalk.yellow("-------------------------------------------------------------------------"));
+      log(chalk.blue("Block Stored in memory: ")+JSON.stringify(frankieCoin.getBlock(parseInt(blocknum))));
       BlkDB.getBlock(blocknum,cbGetBlock);
       var pongBackBlock = function(blockData){
-        console.log("this was the way to do it "+blockData.toString());
+        console.log(chalk.green("Block Stored In DB: ")+blockData.toString());
+        console.log(chalk.yellow("-------------------------------------------------------------------------"));
       }
       BlkDB.getBlock(parseInt(blocknum),pongBackBlock);
       cliGetInput();
@@ -1472,10 +1474,10 @@ var cbChainGrab = function(data) {
   });
   *****/
 
-  console.log("FRANKIE COIN BLOCK HEIGHT = "+frankieCoin.blockHeight);
+  console.log(chalk.yellow.bgBlue("CHAIN GRAB BLOCK HEIGHT: ")+chalk.bgMagenta.bold(frankieCoin.blockHeight));
   BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
   BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
-  console.log("about to send this to rpc "+JSON.stringify({block:frankieCoin.getLatestBlock()}))
+  //console.log("about to send this to rpc "+JSON.stringify({block:frankieCoin.getLatestBlock()}))
   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
 
   //need to open back up synching
@@ -1487,7 +1489,7 @@ function ChainGrab(blocknum){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
   //BlkDB.getBlockchain(99,cbChainGrab,globalGenesisHash)
   var currentHeight = function(val){
-    console.log(val);
+    //console.log(val);
     BlkDB.getBlockRange(val,frankieCoin.chainRiser,cbChainGrab)
   }
   BlkDB.getChainStateParam("blockHeight",currentHeight);
@@ -1495,7 +1497,7 @@ function ChainGrab(blocknum){
 };
 function ChainGrabRefresh(blocknum,cbChainGrab,chainRiser){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
-  console.log("called chain grab refresh with "+blocknum+cbChainGrab+chainRiser)
+  //console.log("called chain grab refresh with "+blocknum+cbChainGrab+chainRiser)
   //BlkDB.getBlockchain(99,cbChainGrab,ggHash)
   BlkDB.getBlockRange(blocknum,chainRiser,cbChainGrab)
   //maybe some other stuff like .then
@@ -1505,7 +1507,7 @@ isSynching = true;
 setTimeout(function(){ChainGrab();},3000);
 //end by now we will know if synched or not and enable or disable mining
 log("------------------------------------------------------")
-log(chalk.green("CHAIN SYNCED"))
+log(chalk.green("CHAIN SYNCED"))//not true need to edit this comment based on a parameter
 log("------------------------------------------------------")
 /////////////////////////////////////////////////////////////END synch the chain
 

@@ -19,8 +19,8 @@ var parentComEvent = function(cbOrderEvent,cbBalanceEvent,orderCallback,transact
 
 //going to replace data to rpc database for getwork from an rpc call
 var postRPCforMiner = function(blockObj){
-  console.log("block data arrived at methods and available for getwork and equals "+JSON.stringify(blockObj))
-
+  //console.log("block data for miner arrived at methods and available for getwork and equals "+JSON.stringify(blockObj))
+  console.log(chalk.yellow.bgBlue("block data for miner arrived at methods and available for getwork")); 
       return new Promise((resolve) => {
           if (typeof (blockObj) !== 'object') {
               throw new Error('was expecting an object!');

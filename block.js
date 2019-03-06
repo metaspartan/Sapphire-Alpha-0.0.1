@@ -157,7 +157,7 @@ var Hash = function(inputs) {
   };
   h.update(decodeUTF8(inputs));
   var thishash = h.hexDigest().toString();
-  log(thishash);
+  //log(thishash);
   return thishash;
 }
 
@@ -169,7 +169,7 @@ var Block = class Block {
       sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '',
       nonce = 0, difficulty = 4, chainStateHash
     ) {
-        log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
+        //log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
         if(egemBRHash == ''){
           getBlockFromEgem(currentEgemBlockCallBack);
@@ -197,7 +197,7 @@ var Block = class Block {
           this.nonce = 0;
         }
         //tie this to the main EGEM chain
-        log("Egem Chain Information : "+egemBRBlock+" "+egemBRHash+" "+currentEgemBlock+" "+currentEgemBlockHash);
+        //log("Egem Chain Information : "+egemBRBlock+" "+egemBRHash+" "+currentEgemBlock+" "+currentEgemBlockHash);
         if(egemBRBlock != '')  {
           this.eGEMBackReferenceBlock = egemBRBlock;
           this.egemBackReferenceBlockHash = egemBRHash;
@@ -352,9 +352,9 @@ var Blockchain = class Blockchain {
       }
 
       getBlock(num){
-          console.log("chain blockheight "+this.blockHeight);
-          console.log("chain riser "+this.chainRiser);
-          console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
+          console.log(chalk.yellow.bgBlue("CHAIN BLOCK HEIGHT: ")+chalk.white.bgMagenta.bold(this.blockHeight));
+          //console.log("chain riser "+this.chainRiser);
+          //console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
           var offset = (parseInt(this.blockHeight)-parseInt(this.chainRiser));
           var newNum = (parseInt(num)-parseInt(offset));
           return this.chain[parseInt(newNum) - 1];
@@ -378,12 +378,12 @@ var Blockchain = class Blockchain {
 
       getLength(){
         //return this.chain.length;
-        console.log("what does this.blockHeight equeal then??? "+parseInt(this.blockHeight));
+        //console.log("what does this.blockHeight equeal then??? "+parseInt(this.blockHeight));
         if(typeof this.blockHeight === 'undefined' || this.blockHeight === null){//if (typeof variable === 'undefined' || variable === null) {
-          console.log("WAS NULL FRANKIECOIN GET LENGTH CALLED"+this.blockHeight);
+          //console.log("WAS NULL FRANKIECOIN GET LENGTH CALLED"+this.blockHeight);
           return 1;
         }else{
-          console.log("FRANKIECOIN GET LENGTH CALLED"+this.blockHeight);
+          //console.log("FRANKIECOIN GET LENGTH CALLED"+this.blockHeight);
           return this.blockHeight;
         }
       }
@@ -783,10 +783,10 @@ var Blockchain = class Blockchain {
               //console.log("okay2"+existing+orig);
               var newbal = await parseFloat(existing + orig);
               balance["SFRX"] = newbal;
-              console.log(balance);
+              //console.log(balance);
               return balance;
             }else{
-              console.log("not yet")
+              //console.log("not yet")
               setTimeout(function(){returnTime();},700);
             }
           }

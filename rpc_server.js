@@ -96,8 +96,9 @@ var globalParentEvent = function(callback){
 //end impx event cycle
 
 var postRPCforMiner = function(data){
-  console.log("block data is rpc relayed thorugh rpc_server to methods for miner");
-  console.log("and the rpc relayed data "+JSON.stringify(data));
+  //console.log("block data is rpc relayed thorugh rpc_server to methods for miner");
+  //console.log("and the rpc relayed data "+JSON.stringify(data));
+  console.log(chalk.bgGreen.bold("RPC DATA IS ENABLED FOR MINER"));
   methods.postRPCforMiner(data);
 }
 

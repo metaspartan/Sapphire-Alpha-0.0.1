@@ -31,7 +31,7 @@ function proc(container) {
             // so to avoid interfering with the original data
             // we deep clone the object, to get our own reference
             let _obj = clone(obj);
-            log('Saving: ', _obj);
+            log(chalk.bgGreen.bold('RPC : '), _obj);
             if (!_obj.id) {
                 // assign a random number as ID if none exists
                 _obj.id = (Math.random() * 10000000) | 0;
