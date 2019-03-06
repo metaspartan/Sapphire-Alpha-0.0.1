@@ -772,6 +772,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
               //set the state validated height
               callback(true,parseInt(JSON.parse(isValidBlock)["blockHeight"]),JSON.parse(isValidBlock)["hash"]);
             }else{
+              removeBlock(parseInt(JSON.parse(isValidBlock)["blockHeight"])
               callback(false,parseInt(JSON.parse(isValidBlock)["blockHeight"]-1),"");
             }
             currentBlockHash = JSON.parse(isValidBlock)["hash"];
@@ -1659,7 +1660,7 @@ var dumpToStreamFIleRange = function(cb,peer,start,end){
         var thisRowKey = data.key.toString();
         var thisRowValue = data.value.toString();
         var thisRow = {[thisRowKey]:thisRowValue};
-        console.log("export tx key... "+data.key.toString()+".....value "+data.value.toString());
+        //console.log("export tx key... "+data.key.toString()+".....value "+data.value.toString());
         jsonSynch.push(thisRow);
       }
 
