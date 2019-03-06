@@ -329,15 +329,15 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     ////this does se the params
 
     console.log(chalk.black.bgCyan("STREAM SYNC CHAIN STATS:"));
-    console.log(chalk.bgMagenta("frankieCoin.blockHeight: ")+frankieCoin.blockHeight);
-    console.log(chalk.bgMagenta("chainState.chainWalkHeight: ")+chainState.chainWalkHeight);
-    console.log(chalk.bgMagenta("chainState.isSynching: ")+chainState.isSynching);
-    console.log(chalk.bgMagenta("chainState.chainWalkHeight: ")+chainState.chainWalkHeight);
-    console.log(chalk.bgMagenta("chainState.chainWalkHash: ")+chainState.chainWalkHash);
-    console.log(chalk.bgMagenta("chainState.synchronized: ")+chainState.synchronized);
-    console.log(chalk.bgMagenta("chainState.topBlock: ")+chainState.chainWalkHeight);
-    console.log(chalk.bgMagenta("chainState.chainStateHash: ")+JSON.stringify(chainState.previousBlockCheckPointHash));
-    console.log(chalk.bgMagenta("chainState.chainStateHash: ")+JSON.stringify(chainState.currentBlockCheckPointHash));
+    console.log(chalk.bgBlue("frankieCoin.blockHeight: ")+chalk.bgMagenta(frankieCoin.blockHeight));
+    console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.bgMagenta(chainState.chainWalkHeight));
+    console.log(chalk.bgBlue("chainState.isSynching: ")+chalk.bgMagenta(chainState.isSynching));
+    console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.bgMagenta(chainState.chainWalkHeight));
+    console.log(chalk.bgBlue("chainState.chainWalkHash: ")+chalk.bgMagenta(chainState.chainWalkHash));
+    console.log(chalk.bgBlue("chainState.synchronized: ")+chalk.bgMagenta(chainState.synchronized));
+    console.log(chalk.bgBlue("chainState.topBlock: ")+chalk.bgMagenta(chainState.chainWalkHeight));
+    console.log(chalk.bgBlue("chainState.chainStateHash: ")+chalk.bgMagenta(JSON.stringify(chainState.previousBlockCheckPointHash)));
+    console.log(chalk.bgBlue("chainState.chainStateHash: ")+chalk.bgMagenta(JSON.stringify(chainState.currentBlockCheckPointHash)));
     if(chainState.chainWalkHeight == parseInt(frankieCoin.blockHeight-1)){
       calculateCheckPoints(
         parseInt(frankieCoin.blockHeight-1),
