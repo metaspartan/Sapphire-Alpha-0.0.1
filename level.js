@@ -736,22 +736,22 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
           if((thisDataItem.key.toString().split(":")[0] == "sfblk") && (parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)) == parseInt(currentBlockToValidate)) && (parseInt(currentBlockToValidate) <= parseInt(riser)) ){
 
 
-            console.log("top "+currentBlockToValidate+" current hash "+currentBlockHash);
-            console.log("second "+parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)));
-            console.log("why below 10 "+thisDataItem.key.toString());
+            //console.log("top "+currentBlockToValidate+" current hash "+currentBlockHash);
+            //console.log("second "+parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)));
+            //console.log("why below 10 "+thisDataItem.key.toString());
 
             /////perform the validation
 
             var isValidBlock = thisDataItem.value.toString();
 
             //going to validate chaeckpoints
-            console.log("passing thru this conditon "+currentBlockToValidate+" "+chainRiser+" "+(currentBlockToValidate%chainRiser == 0))
+            //console.log("passing thru this conditon "+currentBlockToValidate+" "+chainRiser+" "+(currentBlockToValidate%chainRiser == 0))
             if(currentBlockToValidate%chainRiser == 0){
-              console.log("now we need this to be true "+currentBlockToValidate+" "+parseInt(currentBlockToValidate-chainRiser)+" "+parseInt(currentBlockToValidate-chainRiser)+" "+(parseInt(currentBlockToValidate-chainRiser)>0 && parseInt(currentBlockToValidate-chainRiser)>chainRiser))
+              //console.log("now we need this to be true "+currentBlockToValidate+" "+parseInt(currentBlockToValidate-chainRiser)+" "+parseInt(currentBlockToValidate-chainRiser)+" "+(parseInt(currentBlockToValidate-chainRiser)>0 && parseInt(currentBlockToValidate-chainRiser)>chainRiser))
               if(parseInt(currentBlockToValidate-chainRiser) > 0 && parseInt(currentBlockToValidate-chainRiser) >= chainRiser){
                 var targetCheckPoint = parseInt(currentBlockToValidate-chainRiser);
                 var riserAgo = dataStream[dataItem-chainRiser].value.toString();
-                console.log(" YES THIS IS MY CHECK cs:"+parseInt(currentBlockToValidate-chainRiser)+":"+JSON.parse(riserAgo)["hash"]);
+                //console.log(" YES THIS IS MY CHECK cs:"+parseInt(currentBlockToValidate-chainRiser)+":"+JSON.parse(riserAgo)["hash"]);
                 db.get("cs:"+parseInt(currentBlockToValidate-chainRiser)+":"+JSON.parse(riserAgo)["hash"],function (err, value) {
                   if(err){
                     callback(false,parseInt(JSON.parse(currentBlockToValidate-chainRiser)["blockHeight"]-1),"");
