@@ -1659,7 +1659,7 @@ var dumpToStreamFIleRange = function(cb,peer,start,end){
         var thisRowKey = data.key.toString();
         var thisRowValue = data.value.toString();
         var thisRow = {[thisRowKey]:thisRowValue};
-        //console.log("export tx key... "+data.key.toString()+".....value "+data.value.toString());
+        console.log("export tx key... "+data.key.toString()+".....value "+data.value.toString());
         jsonSynch.push(thisRow);
       }
 
