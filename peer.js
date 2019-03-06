@@ -435,7 +435,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
     conn.on('readable',function(){
 
-      console.log("BLOCK STREAM "+this.readableHighWaterMark);
+      //console.log("BLOCK STREAM "+this.readableHighWaterMark);
 
       let chunk;
       while (null !== (chunk = this.read())) {
