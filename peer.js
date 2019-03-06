@@ -211,18 +211,16 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     chainState.chainWalkHash = replyHash;
 
     if( (parseInt(replyData) == parseInt(chainState.chainWalkHeight)) && (parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight)) ){
-      console.log("do we even enter (load)?");
       chainState.synchronized = parseInt(replyData);
     }else{
-      console.log("do we enter the else ?");
-      console.log(parseInt(replyData) == parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight));
-      console.log("AND THE VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
+      //console.log(parseInt(replyData) == parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight));
+      //console.log("AND THE VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
     }
-    console.log("VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
-    console.log("BLOCK HEIGHT VALIDATED TO (CW STARTUP VERSION) "+replyData,replyHash);
+    //console.log("VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
+    //console.log("BLOCK HEIGHT VALIDATED TO (CW STARTUP VERSION) "+replyData,replyHash);
     //set the chain state validated height;
     //now that we are valid we are going to check 3 blocks back to see if it is a candidate for chain state
-    console.log("TRUE OR FALSE? "+parseInt(replyData)+" "+(parseInt(replyData) > 3)+" "+(parseInt(replyData - 3))+" "+parseInt(frankieCoin.chainRiser))
+    //console.log("TRUE OR FALSE? "+parseInt(replyData)+" "+(parseInt(replyData) > 3)+" "+(parseInt(replyData - 3))+" "+parseInt(frankieCoin.chainRiser))
     if( parseInt(replyData) > 3 && (parseInt(replyData - 3) % parseInt(frankieCoin.chainRiser)) == 0 ){
       var checkPoint = parseInt(replyData - 3);
       var pongBackBlock = function(blockData){
@@ -234,6 +232,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     }
 
     ////this does se the params
+    /***
     console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
     console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
     console.log("                STREAM UP CHAIN STATS:             ");
@@ -249,6 +248,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     console.log("  chainState.chainStateHash: "+JSON.stringify(chainState.currentBlockCheckPointHash));
     console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
     console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
+    ***/
     if(chainState.chainWalkHeight == parseInt(frankieCoin.blockHeight-1)){
       calculateCheckPoints(
         parseInt(frankieCoin.blockHeight-1),
@@ -257,8 +257,8 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
       ).then(function(response,err){
         if(err){
           console.log(err);
-        }else{
-          console.log("streamed in chain state response normal "+response);
+        }else if(response == 2){
+          console.log("streamed in chain state response NOT NORMAL "+response);
         }
       });
     }else if(chainState.chainWalkHeight == frankieCoin.blockHeight){
@@ -269,8 +269,8 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
       ).then(function(response,err){
         if(err){
           console.log(err);
-        }else{
-          console.log("streamed in chain state response normal "+response);
+        }else if(response == 2){
+          console.log("streamed in chain state response NOT NORMAL "+response);
         }
       });
     }
