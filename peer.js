@@ -1760,6 +1760,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
                     frankieCoin.createOrder(replacementOrder,JSON.parse(data[obj])["originationID"]);
                     BlkDB.addOrder("ox:BUY"+":"+JSON.parse(data[obj])["pairBuy"]+":"+JSON.parse(data[obj])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+                    broadcastPeers(JSON.stringify(replacementOrder));
                   }else{
                     var amount = JSON.parse(data[obj])["amount"];
                     ////////////////////////////////////replacement order seller
@@ -1787,6 +1788,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
                     frankieCoin.createOrder(replacementOrder,JSON.parse(dataSells[objs])["originationID"]);
                     BlkDB.addOrder("ox:SELL"+":"+JSON.parse(dataSells[objs])["pairBuy"]+":"+JSON.parse(dataSells[objs])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+                    broadcastPeers(JSON.stringify(replacementOrder));
                   }
 
                   var ticker = JSON.parse(data[obj])["pairBuy"];
