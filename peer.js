@@ -576,15 +576,16 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
                     console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
                     console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
                     var incomingTx = JSON.parse(data)["transactions"];
+                    console.log("INCOMING TXS ARE "+incomingTX)
                     var existingPendingTx = frankieCoin.pendingTransactions;
                     var replacementTx = [];
                     for(ptx in incomingTx){
-                      /****does not work this way need to rethink
+
                       if(incomingTx[ptx]["oxdid"]){
                         console.log("we are actually in the incoming tx looking at order id deletion")
                         BlkDB.clearOrderById(incomingTx[ptx]["oxdid"],incomingTx[ptx]["oxtid"]);
                       }
-                      ****/
+
                       for(etx in existingPendingTx){
                         //adding logic to remove orders if ox id present
                         if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash"]){
@@ -1792,8 +1793,8 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
                   var ticker = JSON.parse(data[obj])["pairBuy"];
                   var myblocktx = new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker);
                   //does not work this way need tro rethink
-                  //myblocktx.oxdid = JSON.parse(data[obj])["transactionID"];
-                  //myblocktx.oxtid = JSON.parse(data[obj])["timestamp"];
+                  myblocktx.oxdid = JSON.parse(data[obj])["transactionID"];
+                  myblocktx.oxtid = JSON.parse(data[obj])["timestamp"];
                   console.log(JSON.stringify(myblocktx));
                   frankieCoin.createTransaction(myblocktx);
 
@@ -1805,8 +1806,8 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
                   var ticker2 = JSON.parse(dataSells[objs])["pairSell"];
                   var myblocktx2 = new sapphirechain.Transaction(addressFrom2, addressTo2, amount2, ticker2);
                   //does not work this way need tro rethink
-                  //myblocktx2.oxdid = JSON.parse(dataSells[objs])["transactionID"];
-                  //myblocktx2.oxtid = JSON.parse(dataSells[objs])["timestamp"];
+                  myblocktx2.oxdid = JSON.parse(dataSells[objs])["transactionID"];
+                  myblocktx2.oxtid = JSON.parse(dataSells[objs])["timestamp"];
                   console.log(JSON.stringify(myblocktx2));
                   frankieCoin.createTransaction(myblocktx2);
                   ///////////////////////////////////REOG DELETE LOOP AND ORDERS
