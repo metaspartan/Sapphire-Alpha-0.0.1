@@ -1642,19 +1642,31 @@ var myCallbackSell = function(data) {
 
 //////////////////////////////////////////inter module parent child communicator
 
-var broadcastPeersBlock = function(){
-  //sending the block to the peers
-  log("------------------------------------------------------")
-  log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
-  log("------------------------------------------------------")
-  broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
+var broadcastPeersBlock = function(trigger,order = ''){
+  if(trigger == "block"){
+    //sending the block to the peers
+    log("------------------------------------------------------")
+    log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
+    log("------------------------------------------------------")
+    broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
+  }else if(trigger == "order"){
+    //sending the block to the peers
+    log("------------------------------------------------------")
+    log(chalk.bgGreen("BROADCASTING REPLACEMENT ORDER TO PEERS"))
+    log("------------------------------------------------------")
+    broadcastPeers(order);
+  }
+
+  /****
   var deletedOrdersBroadcast = function(deletedOrders){
-    console.log("THIS IS WHAT I WULD BE BROADCASTING TO PEER FOR DELETED ORDERS");
+    console.log("THIS IS WHAT I WOULD BE BROADCASTING TO PEER FOR DELETED ORDERS");
     console.log({"deletableOrders":JSON.stringify(deletedOrders)});
     broadcastPeers({"deletableOrders":JSON.stringify(deletedOrders)});
   }
+  ****/
   //setTimeout(function(){BlkDB.callDeletedOrders(deletedOrdersBroadcast)},1000);
 }
+
 //parent communicator callback function sent to child below
 var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
   //log("------------------------------------------------------");
@@ -1760,7 +1772,10 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
                     frankieCoin.createOrder(replacementOrder,JSON.parse(data[obj])["originationID"]);
                     BlkDB.addOrder("ox:BUY"+":"+JSON.parse(data[obj])["pairBuy"]+":"+JSON.parse(data[obj])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
-                    broadcastPeers(JSON.stringify(replacementOrder));
+                    console.log(chalk.bgRed("BROADCASTING REPLACEMENT ORDER"));
+                    console.log(JSON.stringify(replacementOrder));
+                    fbroadcastPeersBlock('order',JSON.stringify(replacementOrder));
+                    console.log(chalk.bgRed("BROADCASTING REPLACEMENT ORDER"));
                   }else{
                     var amount = JSON.parse(data[obj])["amount"];
                     ////////////////////////////////////replacement order seller
@@ -1788,7 +1803,10 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
                     frankieCoin.createOrder(replacementOrder,JSON.parse(dataSells[objs])["originationID"]);
                     BlkDB.addOrder("ox:SELL"+":"+JSON.parse(dataSells[objs])["pairBuy"]+":"+JSON.parse(dataSells[objs])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
-                    broadcastPeers(JSON.stringify(replacementOrder));
+                    console.log(chalk.bgRed("BROADCASTING REPLACEMENT ORDER"));
+                    console.log(JSON.stringify(replacementOrder));
+                    fbroadcastPeersBlock('order',JSON.stringify(replacementOrder));
+                    console.log(chalk.bgRed("BROADCASTING REPLACEMENT ORDER"));
                   }
 
                   var ticker = JSON.parse(data[obj])["pairBuy"];
@@ -1892,7 +1910,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
         calculateCheckPoints(frankieCoin.blockHeight,'miner','');
       //}
       ///////////////////////////////////////////////////////////peers broadcast
-      fbroadcastPeersBlock();
+      fbroadcastPeersBlock('block');
       ////////////////////finally post the RPC get work block data for the miner
       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
       ///////////////////////////////////////////////////chain state checkpoints
