@@ -530,7 +530,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             console.log(chalk.bgBlue("chainState.isSynching: ")+chalk.black.bgCyan(chainState.isSynching));
             console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
             console.log(chalk.bgBlue("chainState.chainWalkHash: ")+chalk.black.bgCyan(chainState.chainWalkHash));
-            console.log(chalk.bgBlue("chainState.synchronized: ")+cchalk.black.bgCyan(hainState.synchronized));
+            console.log(chalk.bgBlue("chainState.synchronized: ")+chalk.black.bgCyan(hainState.synchronized));
             console.log(chalk.bgBlue("chainState.topBlock: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
             console.log(chalk.bgRed("                                                    "));
             //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
