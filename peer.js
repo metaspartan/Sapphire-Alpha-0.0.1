@@ -579,15 +579,16 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
                     var existingPendingTx = frankieCoin.pendingTransactions;
                     var replacementTx = [];
                     for(ptx in incomingTx){
-
+                      //will be removed
+                      console.log("before the processed order check");
+                      if(incomingTx[ptx]["oxdid"]){
+                        console.log("we are actually in the incoming tx looking at order id deletion")
+                        BlkDB.clearOrderById(incomingTx[ptx]["oxdid"],incomingTx[ptx]["oxtid"]);
+                      }
                       for(etx in existingPendingTx){
                         //adding logic to remove orders if ox id present
                         if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash"]){
-                          //will be removed
-                          if(incomingTx[ptx]["oxdid"] == existingPendingTx[etx]["oxdid"]){
-                            console.log("we are actually in the incoming tx looking at order id deletion")
-                            BlkDB.clearOrderById(incomingTx[ptx]["oxdid"],incomingTx[ptx]["oxtid"]);
-                          }
+
                         }else{
                           replacementTx.push(existingPendingTx[etx]);
                         }
