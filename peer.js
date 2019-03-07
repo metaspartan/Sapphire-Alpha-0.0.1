@@ -576,7 +576,6 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
                     console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
                     console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
                     var incomingTx = JSON.parse(data)["transactions"];
-                    if(incomingTX != undefined){ console.log("INCOMING TXS ARE "+incomingTX) };
                     var existingPendingTx = frankieCoin.pendingTransactions;
                     var replacementTx = [];
                     for(ptx in incomingTx){
