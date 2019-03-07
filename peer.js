@@ -326,18 +326,18 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
     }
 
-    ////this does se the params
-
+    //show params
     console.log(chalk.black.bgCyan("STREAM SYNC CHAIN STATS:"));
-    console.log(chalk.bgBlue("frankieCoin.blockHeight: ")+chalk.bgMagenta(frankieCoin.blockHeight));
-    console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.bgMagenta(chainState.chainWalkHeight));
-    console.log(chalk.bgBlue("chainState.isSynching: ")+chalk.bgMagenta(chainState.isSynching));
-    console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.bgMagenta(chainState.chainWalkHeight));
-    console.log(chalk.bgBlue("chainState.chainWalkHash: ")+chalk.bgMagenta(chainState.chainWalkHash));
-    console.log(chalk.bgBlue("chainState.synchronized: ")+chalk.bgMagenta(chainState.synchronized));
-    console.log(chalk.bgBlue("chainState.topBlock: ")+chalk.bgMagenta(chainState.chainWalkHeight));
-    console.log(chalk.bgBlue("chainState.chainStateHash: ")+chalk.bgMagenta(JSON.stringify(chainState.previousBlockCheckPointHash)));
-    console.log(chalk.bgBlue("chainState.chainStateHash: ")+chalk.bgMagenta(JSON.stringify(chainState.currentBlockCheckPointHash)));
+    console.log(chalk.bgBlue("frankieCoin.blockHeight: ")+chalk.black.bgCyan(frankieCoin.blockHeight));
+    console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+    console.log(chalk.bgBlue("chainState.isSynching: ")+chalk.black.bgCyan(chainState.isSynching));
+    console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+    console.log(chalk.bgBlue("chainState.chainWalkHash: ")+chalk.black.bgCyan(chainState.chainWalkHash));
+    console.log(chalk.bgBlue("chainState.synchronized: ")+chalk.black.bgCyan(chainState.synchronized));
+    console.log(chalk.bgBlue("chainState.topBlock: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+    console.log(chalk.bgBlue("chainState.chainStateHash: ")+chalk.black.bgYellow(JSON.stringify(chainState.previousBlockCheckPointHash)));
+    console.log(chalk.bgBlue("chainState.chainStateHash: ")+chalk.black.bgYellow(JSON.stringify(chainState.currentBlockCheckPointHash)));
+
     if(chainState.chainWalkHeight == parseInt(frankieCoin.blockHeight-1)){
       calculateCheckPoints(
         parseInt(frankieCoin.blockHeight-1),
@@ -522,19 +522,17 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           console.log("chain state current "+JSON.stringify(chainState.currentBlockCheckPointHash));
 
           if(incomingBLockHeight < frankieCoin.blockHeight){
-            console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-            console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-            console.log("         THIS BLOCK IS LOWER THAN EXPECTED!         ");
-            console.log("                                                    ");
-            console.log("  frankieCoin.blockHeight: "+frankieCoin.blockHeight);
-            console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
-            console.log("  chainState.isSynching: "+chainState.isSynching);
-            console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
-            console.log("  chainState.chainWalkHash: "+chainState.chainWalkHash);
-            console.log("  chainState.synchronized: "+chainState.synchronized);
-            console.log("  chainState.topBlock: "+chainState.chainWalkHeight);
-            console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
-            console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+
+            console.log(chalk.bgRed("         THIS BLOCK IS LOWER THAN EXPECTED!         "));
+            console.log(chalk.bgRed("                                                    "));
+            console.log(chalk.bgBlue("frankieCoin.blockHeight: ")+chalk.black.bgCyan(frankieCoin.blockHeight));
+            console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+            console.log(chalk.bgBlue("chainState.isSynching: ")+chalk.black.bgCyan(chainState.isSynching));
+            console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+            console.log(chalk.bgBlue("chainState.chainWalkHash: ")+chalk.black.bgCyan(chainState.chainWalkHash));
+            console.log(chalk.bgBlue("chainState.synchronized: ")+cchalk.black.bgCyan(hainState.synchronized));
+            console.log(chalk.bgBlue("chainState.topBlock: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+            console.log(chalk.bgRed("                                                    "));
             //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
               calculateCheckPoints(
                 frankieCoin.blockHeight,
@@ -549,19 +547,18 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               });
             //}
           }else{/////need to move this below the block add and add the block differently to not mess with blockheight or txs
-            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-            console.log("                THIS BLOCK CHAIN STATS:             ");
-            console.log("                                                    ");
-            console.log("  frankieCoin.blockHeight: "+frankieCoin.blockHeight);
-            console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
-            console.log("  chainState.isSynching: "+chainState.isSynching);
-            console.log("  chainState.chainWalkHeight: "+chainState.chainWalkHeight);
-            console.log("  chainState.chainWalkHash: "+chainState.chainWalkHash);
-            console.log("  chainState.synchronized: "+chainState.synchronized);
-            console.log("  chainState.topBlock: "+chainState.chainWalkHeight);
-            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
-            console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
+
+            console.log(chalk.bgGreen("                THIS BLOCK CHAIN STATS:             "));
+            console.log(chalk.bgGreen("                                                    "));
+            console.log(chalk.bgBlue("  frankieCoin.blockHeight: ")+chalk.black.bgCyan(frankieCoin.blockHeight));
+            console.log(chalk.bgBlue("  chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+            console.log(chalk.bgBlue("  chainState.isSynching: ")+chalk.black.bgCyan(chainState.isSynching));
+            console.log(chalk.bgBlue("  chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+            console.log(chalk.bgBlue("  chainState.chainWalkHash: ")+chalk.black.bgCyan(chainState.chainWalkHash));
+            console.log(chalk.bgBlue("  chainState.synchronized: ")+chalk.black.bgCyan(chainState.synchronized));
+            console.log(chalk.bgBlue("  chainState.topBlock: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+            console.log(chalk.bgGreen("                                                    "));
+
             //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
               calculateCheckPoints(
                 frankieCoin.blockHeight,
@@ -968,12 +965,12 @@ function cliGetInput(){
       },1000)
       cliGetInput();
     }else if(userInput == "INFO"){
-      console.log("chain riser is "+frankieCoin.chainRiser)
-      console.log("chain state chain walk height is "+chainState.chainWalkHeight);
-      console.log("chain state synchronized equals "+chainState.synchronized);
-      console.log("blockchain height is "+frankieCoin.blockHeight);
-      console.log("previousBlockCheckPointHash is "+JSON.stringify(chainState.previousBlockCheckPointHash));
-      console.log("currentBlockCheckPointHash is "+JSON.stringify(chainState.currentBlockCheckPointHash));
+      console.log(chalk.bgBlackBright.black("chain riser is ")+chalk.bgMagenta(frankieCoin.chainRiser))
+      console.log(chalk.bgBlackBright.black("chain state chain walk height is ")+chalk.bgMagenta(chainState.chainWalkHeight));
+      console.log(chalk.bgBlackBright.black("chain state synchronized equals ")+chalk.bgMagenta(chainState.synchronized));
+      console.log(chalk.bgBlackBright.black("blockchain height is ")+chalk.bgMagenta(frankieCoin.blockHeight));
+      console.log(chalk.bgBlackBright.black("previousBlockCheckPointHash is ")+chalk.bgMagenta(JSON.stringify(chainState.previousBlockCheckPointHash)));
+      console.log(chalk.bgBlackBright.black("currentBlockCheckPointHash is ")+chalk.bgMagenta(JSON.stringify(chainState.currentBlockCheckPointHash)));
       BlkDB.getCheckPoints();
       cliGetInput();
     }else if(userInput == "MMM"){
