@@ -581,15 +581,14 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
                     var replacementTx = [];
                     for(ptx in incomingTx){
 
-                      if(incomingTx[ptx]["oxdid"]){
-                        console.log("we are actually in the incoming tx looking at order id deletion")
-                        BlkDB.clearOrderById(incomingTx[ptx]["oxdid"],incomingTx[ptx]["oxtid"]);
-                      }
-
                       for(etx in existingPendingTx){
                         //adding logic to remove orders if ox id present
                         if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash"]){
-                          //do nothing removes this element
+                          //will be removed
+                          if(incomingTx[ptx]["oxdid"] == existingPendingTx[etx]["oxdid"]){
+                            console.log("we are actually in the incoming tx looking at order id deletion")
+                            BlkDB.clearOrderById(incomingTx[ptx]["oxdid"],incomingTx[ptx]["oxtid"]);
+                          }
                         }else{
                           replacementTx.push(existingPendingTx[etx]);
                         }
