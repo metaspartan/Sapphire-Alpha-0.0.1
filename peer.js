@@ -1004,6 +1004,7 @@ function cliGetInput(){
       var secretMessage = userInput.slice(userInput.indexOf("PM(")+3, userInput.indexOf(")"));
       secretPeerID = secretMessage.split(":")[0];
       secretPeerMSG = secretMessage.split(":")[1];
+      peers[secretPeerID].conn.write("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
       cliGetInput();
     }else if(userInput == "TX"){
       BlkDB.getTransactions();
