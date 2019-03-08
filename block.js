@@ -300,6 +300,7 @@ var Blockchain = class Blockchain {
 
               var prime_length = 60;
               var key = crypto.createDiffieHellman(prime_length);
+              key = key.generateKeys('base64');
 
               var thisnode = {
                 "id":id,
