@@ -17,6 +17,8 @@ const log = console.log;
 const fs = require('fs');
 const sha256 = require('crypto-js/sha256');
 const crypto = require('crypto');
+const NodeRSA = require('node-rsa');
+
 //BlockchainDB reference
 var BlkDB;
 var setBlockchainDB = function(bkd){
@@ -297,10 +299,14 @@ var Blockchain = class Blockchain {
 
               var thisNodeSecret = crypto.randomBytes(32);
 
+              let key = new NodeRSA({b: 512});
+              key.generateKeyPair(2048, 65537);
+
               var thisnode = {
                 "id":id,
                 "info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length,"synchBlock":0},
-                "secretCode":thisNodeSecret
+                "secretCode":thisNodeSecret,
+                "key":key
               };
 
               this.nodes.push(thisnode);

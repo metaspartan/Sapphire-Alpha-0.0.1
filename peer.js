@@ -8,6 +8,7 @@
 /******************************************************************************/
 var swarm = require('discovery-swarm');
 const crypto = require('crypto');
+var assert = require('assert');
 const defaults = require('dat-swarm-defaults');
 const readline = require('readline');
 const getPort = require('get-port');
@@ -160,6 +161,7 @@ const rl = readline.createInterface({
 
 /////////////////////////////////////////////asynchronous peer connection engine
 const myId = crypto.randomBytes(32);
+
 
 const peers = {}
 // Counter for connections, used for identify connections
@@ -779,7 +781,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           log(chalk.red("THIS IS A PEER SAFE MESSAGE AND WILL BE HIDDEN"));
           log(chalk.bgRed("------------------------------------------------------"));
           var peerdata = JSON.parse(data)["peerSafe"];
-          console.log("Peer data is "+peerdata);
+          console.log("Peer data is "+JSON.stringify(peerdata));
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == true){
           console.log("Extra peer returned synch message but synch is in progress so ignoring")
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == false){
@@ -1001,6 +1003,7 @@ function cliGetInput(){
       BlkDB.getNodes();
       cliGetInput();
     }else if(userInput.startsWith("PM(")){
+
       var secretMessage = userInput.slice(userInput.indexOf("PM(")+3, userInput.indexOf(")"));
       secretPeerID = secretMessage.split(":")[0];
       secretPeerMSG = secretMessage.split(":")[1];
@@ -1008,12 +1011,24 @@ function cliGetInput(){
       console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
       for (let i in frankieCoin.nodes){
         if(peers[frankieCoin.nodes[i]["id"]].conn){
+
           var nodeSecret = frankieCoin.nodes[i]["thisNodeSecret"];
-          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+nodeSecret}}));
+
+          var nodeKey = frankieCoin.nodes[i]["key"];
+
+          const text = 'Hello RSA!';
+          const encrypted = nodeKey.encrypt(text, 'base64');
+          console.log('encrypted: ', encrypted);
+          const decrypted = nodeKey.decrypt(encrypted, 'utf8');
+          console.log('decrypted: ', decrypted);
+
+          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+nodeSecret,public:nodeKey.exportKey('components-public')}}));
           //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
         }
       }
+
       cliGetInput();
+
     }else if(userInput == "TX"){
       BlkDB.getTransactions();
       cliGetInput();
