@@ -449,7 +449,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       // Here we handle incomming messages
 
       //console.log("type of is "+typeof(data)+JSON.stringify(data));
-      log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
+      //log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
       // callback returning verified uncles post processing probably needs a rename
       var sendBackUncle = function(msg,peerId){
         peers[peerId].conn.write(JSON.stringify(msg));
