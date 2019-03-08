@@ -1008,7 +1008,7 @@ function cliGetInput(){
       console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
       for (let i in frankieCoin.nodes){
 
-        var nodeSecret = this.nodes[i]["thisNodeSecret"];
+        var nodeSecret = frankieCoin.nodes[i]["thisNodeSecret"];
         peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+nodeSecret}}));
         //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
 
