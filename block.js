@@ -16,6 +16,7 @@ const log = console.log;
 //files and crypto for hash
 const fs = require('fs');
 const sha256 = require('crypto-js/sha256');
+const crypto = require('crypto');
 //BlockchainDB reference
 var BlkDB;
 var setBlockchainDB = function(bkd){
