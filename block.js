@@ -294,13 +294,33 @@ var Blockchain = class Blockchain {
 
           if (!this.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
 
-              this.nodes.push({"id":id,"info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length,"synchBlock":0}});
+              var thisnode = {"id":id,"info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length,"synchBlock":0}};
+
+              this.nodes.push(thisnode);
 
               // Implement gossiping to share info on new nodes constantly
 
               // To complex to implement here
 
           }
+
+      }
+
+      peerSafe(nodeId,key,type,store){
+        //nodeid is the node to attach this strage
+        //key comes from the node as an encryption key
+        //type is the type of secret function to run
+        //store is where the information is kept
+        for (let i in this.nodes){
+          if(this.nodes[i]["id"] == nodeId){
+            //this.nodes[i]["info"]["chainlength"] = parseInt(this.nodes[i]["info"]["chainlength"])+1;
+            this.nodes[i]["store"]["key"] = key;
+            this.nodes[i]["store"]["type"] = type;
+            this.nodes[i]["store"]["store"] = store;
+          }
+        }
+
+
 
       }
 

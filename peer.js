@@ -774,6 +774,12 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           log("------------------------------------------------------");
           process.exit();
           exit();
+        }else if(JSON.parse(data)["peerSafe"]){//PEER SAFE MESSAGES
+          log(chalk.bgRed("------------------------------------------------------"));
+          log(chalk.red("THIS IS A PEER SAFE MESSAGE AND WILL BE HIDDEN"));
+          log(chalk.bgRed("------------------------------------------------------"));
+          var peerdata = JSON.parse(data)["peerSafe"];
+          console.log("Peer data is "+peerdata);
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == true){
           console.log("Extra peer returned synch message but synch is in progress so ignoring")
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == false){
@@ -993,6 +999,11 @@ function cliGetInput(){
         console.log(peers[id].conn);
       }
       BlkDB.getNodes();
+      cliGetInput();
+    }else if(userInput.startsWith("PM(")){
+      var secretMessage = userInput.slice(userInput.indexOf("PM(")+3, userInput.indexOf(")"));
+      secretPeerID = secretMessage.split(":")[0];
+      secretPeerMSG = secretMessage.split(":")[1];
       cliGetInput();
     }else if(userInput == "TX"){
       BlkDB.getTransactions();
