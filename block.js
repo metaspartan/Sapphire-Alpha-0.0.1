@@ -17,7 +17,6 @@ const log = console.log;
 const fs = require('fs');
 const sha256 = require('crypto-js/sha256');
 const crypto = require('crypto');
-const NodeRSA = require('node-rsa');
 
 //BlockchainDB reference
 var BlkDB;
@@ -299,8 +298,8 @@ var Blockchain = class Blockchain {
 
               var thisNodeSecret = crypto.randomBytes(32);
 
-              let key = new NodeRSA({b: 512});
-              key.generateKeyPair(2048, 65537);
+              var prime_length = 60;
+              var key = crypto.createDiffieHellman(prime_length);
 
               var thisnode = {
                 "id":id,

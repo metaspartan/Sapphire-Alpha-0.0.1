@@ -22,7 +22,6 @@
     "nano-sql": "^1.8.0",
     "node-addon-api": "^1.6.2",
     "node-ipc": "^9.1.1",
-    "node-rsa": "^1.0.5",
     "random-access-memory": "^3.1.1",
     "request": "^2.88.0",
     "rmdir": "^1.2.0",
