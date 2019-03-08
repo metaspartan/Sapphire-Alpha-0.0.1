@@ -1004,8 +1004,15 @@ function cliGetInput(){
       var secretMessage = userInput.slice(userInput.indexOf("PM(")+3, userInput.indexOf(")"));
       secretPeerID = secretMessage.split(":")[0];
       secretPeerMSG = secretMessage.split(":")[1];
+
       console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
-      broadcastPeers({"peerSafe":{"message":"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG}});
+      for (let i in this.nodes){
+
+        var nodeSecret = this.nodes[i]["thisNodeSecret"];
+        peers[this.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+nodeSecret}}));
+        //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
+
+      }
       cliGetInput();
     }else if(userInput == "TX"){
       BlkDB.getTransactions();

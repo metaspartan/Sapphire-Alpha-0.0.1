@@ -294,7 +294,13 @@ var Blockchain = class Blockchain {
 
           if (!this.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
 
-              var thisnode = {"id":id,"info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length,"synchBlock":0}};
+              var thisNodeSecret = crypto.randomBytes(32);
+
+              var thisnode = {
+                "id":id,
+                "info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length,"synchBlock":0},
+                "secretCode":thisNodeSecret
+              };
 
               this.nodes.push(thisnode);
 
