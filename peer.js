@@ -810,7 +810,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
           peerData = JSON.stringify(peerData);
 
-          console.log("Public Key"+JSON.parse(peerData)["public"]);
+          console.log("Public Key"+JSON.stringify(JSON.parse(peerData)["public"]));
           console.log("Peer data is "+JSON.stringify(peerData));
           peerPublicPair = JSON.parse(peerData)["public"];
           console.log("testing JSON parse "+JSON.parse(JSON.stringify(peerPublicPair))["data"].toString("hex"));
@@ -1091,7 +1091,9 @@ function cliGetInput(){
           encryptMessage =  new Buffer.from(encryptMessage)
 
           if(encryptMessage != ""){
-            var peerPubKey = new Buffer.from(peers[frankieCoin.nodes[i]["peerPublicPair"]])
+            var peerPubKey = frankieCoin.nodes[i]["peerPublicPair"]
+            console.log("whats up with JSON "+JSON.stringify(frankieCoin.nodes[i]));
+            console.log(peerPubKey);
             var encryptedMessageToSend = ecies.encrypt(peerPubKey,encryptMessage,options);
           }else{
             var encryptedMessageToSend = "nodata"
