@@ -783,7 +783,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           log(chalk.red("THIS IS A PEER SAFE MESSAGE AND WILL BE HIDDEN"));
           log(chalk.bgRed("------------------------------------------------------"));
           var peerdata = JSON.parse(data)["peerSafe"];
-          console.log("Public Key"+peerData["public"].toString("hex"))
+          console.log("Public Key"+peerdata["public"].toString("hex"))
           console.log("Peer data is "+JSON.stringify(peerdata));
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == true){
           console.log("Extra peer returned synch message but synch is in progress so ignoring")
