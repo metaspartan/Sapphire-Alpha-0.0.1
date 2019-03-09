@@ -406,7 +406,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       // Here we handle peer disconnection
       log(chalk.blue("Connection"+ chalk.green(seq) + "closed, peer id: " + chalk.green(peerId)))
       // If the closing connection is the last connection with the peer, removes the peer
-      if (peers[peerId].seq === seq) {
+      if ((peers[peerId]) && peers[peerId].seq === seq) {
         delete peers[peerId]
       }
       //connSeq--
@@ -782,9 +782,29 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           log(chalk.bgRed("------------------------------------------------------"));
           log(chalk.red("THIS IS A PEER SAFE MESSAGE AND WILL BE HIDDEN"));
           log(chalk.bgRed("------------------------------------------------------"));
-          var peerdata = JSON.parse(data)["peerSafe"];
-          console.log("Public Key"+JSON.parse(peerdata)["public"].toString("hex"))
-          console.log("Peer data is "+JSON.stringify(peerdata));
+          console.log("what the peer sent "+data);
+          var peerData = JSON.parse(data)["peerSafe"];
+          peerData = JSON.stringify(peerData)
+          console.log("Public Key"+JSON.parse(peerData)["public"])
+          console.log("Peer data is "+JSON.stringify(peerData));
+          peerPublicPair = JSON.parse(peerData)["public"];
+          console.log("testing JSON parse "+JSON.parse(JSON.stringify(peerPublicPair))["data"].toString("hex"));
+          for(thisNode in frankieCoin.nodes){
+            if(frankieCoin.nodes[thisNode]["id"] == peerId){
+              frankieCoin.nodes[thisNode]["publicPair"] = peerPublicPair;
+            }
+            //time to make a safe for him
+            //////we will actually make ethereum addresses and derive the BTC for now using random and testnet
+            var keyPair = bitcoin.ECPair.makeRandom();
+            var publicAddress = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey },bitcoin.networks.testnet).address;
+            var privateKey = keyPair.toWIF(bitcoin.networks.testnet);
+            privateKey += '01';//testnet
+            console.log("private key is "+privateKey);
+            //going to require a digned transaction from the peer before I do this
+            frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC","empty");//peerSafe(nodeId,key,type,store)
+            /////end safe creation
+            console.log("THIS NODES INFO "+JSON.stringify(frankieCoin.nodes[thisNode]))
+          }
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == true){
           console.log("Extra peer returned synch message but synch is in progress so ignoring")
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == false){
@@ -1010,11 +1030,11 @@ function cliGetInput(){
       var secretMessage = userInput.slice(userInput.indexOf("PM(")+3, userInput.indexOf(")"));
       secretPeerID = secretMessage.split(":")[0];
       secretPeerMSG = secretMessage.split(":")[1];
+      secretAction = secretMessage.split(":")[2];
 
       console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
       for (let i in frankieCoin.nodes){
         if(peers[frankieCoin.nodes[i]["id"]].conn){
-
 
           var options = {
               hashName: 'sha256',
@@ -1035,9 +1055,8 @@ function cliGetInput(){
           var decryptedText = ecies.decrypt(ecdh, encryptedText, options);
           console.log(decryptedText.toString());
 
-
           //I am passing a peer safe initialization reques
-          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG,public:ecdh.getPublicKey()}}));
+          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,public:ecdh.getPublicKey()}}));
           //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
         }
       }
