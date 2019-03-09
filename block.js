@@ -17,6 +17,8 @@ const log = console.log;
 const fs = require('fs');
 const sha256 = require('crypto-js/sha256');
 const crypto = require('crypto');
+var bitcoin  = require('bitcoinjs-lib');
+const ecies = require("ecies-parity");
 
 //BlockchainDB reference
 var BlkDB;
@@ -296,17 +298,17 @@ var Blockchain = class Blockchain {
 
           if (!this.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
 
-              var thisNodeSecret = crypto.randomBytes(32);
+              var privateKeyA = crypto.randomBytes(32);
+              var publicKeyA = ecies.getPublic(privateKeyA);
 
-              var prime_length = 60;
-              var key = crypto.createDiffieHellman(prime_length);
-              key = key.generateKeys('base64');
+              var keyPair = bitcoin.ECPair.makeRandom();
 
               var thisnode = {
                 "id":id,
                 "info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length,"synchBlock":0},
                 "secretCode":thisNodeSecret,
-                "key":key
+                "privateKey":privateKeyA,
+                "publicKey":publicKeyA
               };
 
               this.nodes.push(thisnode);
