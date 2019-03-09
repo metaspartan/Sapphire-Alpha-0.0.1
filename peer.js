@@ -813,10 +813,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           console.log("Public Key"+JSON.stringify(JSON.parse(peerData)["public"]));
           console.log("Peer data is "+JSON.stringify(peerData));
           peerPublicPair = JSON.stringify(JSON.parse(peerData)["public"]);
-          console.log("testing JSON parse "+JSON.parse(JSON.stringify(peerPublicPair))["data"].toString("hex"));
+          //console.log("testing JSON parse "+JSON.parse(JSON.stringify(peerPublicPair))["data"].toString("hex"));
           for(thisNode in frankieCoin.nodes){
             if(frankieCoin.nodes[thisNode]["id"] == peerId){
-              frankieCoin.nodes[thisNode]["publicPair"] = peerPublicPair;
+              frankieCoin.nodes[thisNode]["publicPair"] = peerPublicPair.toString();
             }
             if(encryptedMessage != "nodata"){
               var ecdh = new Buffer.from(frankieCoin.nodes[thisNode]["ecdh"]);
