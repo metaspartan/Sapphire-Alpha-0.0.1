@@ -1015,7 +1015,7 @@ function cliGetInput(){
         if(peers[frankieCoin.nodes[i]["id"]].conn){
 
           var privateKeyA = frankieCoin.nodes[i]["privateKey"];
-          var publiceKeyA = frankieCoin.nodes[i]["publicKey"];
+          var publicKeyA = frankieCoin.nodes[i]["publicKey"];
 
           var privateKeyB = crypto.randomBytes(32);
           var publicKeyB = ecies.getPublic(privateKeyB);
