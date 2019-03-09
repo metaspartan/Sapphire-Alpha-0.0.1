@@ -818,9 +818,11 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             if(frankieCoin.nodes[thisNode]["id"] == peerId){
               frankieCoin.nodes[thisNode]["publicPair"] = peerPublicPair;
             }
-            var ecdh = frankieCoin.nodes[thisNode]["ecdh"]
-            var decryptedPeerMessage = ecies.decrypt(ecdh, encryptedMessage, options);
-            console.log("I DID IT IF IT DONT ERROR "+decryptedPeerMessage.toString());
+            if(encryptedMessage != "nodata"){
+              var ecdh = frankieCoin.nodes[thisNode]["ecdh"]
+              var decryptedPeerMessage = ecies.decrypt(ecdh, encryptedMessage, options);
+              console.log("I DID IT IF IT DONT ERROR "+decryptedPeerMessage.toString());
+            }
             if(secretAction == "Wallet"){
               //time to make a safe for him
               //////we will actually make ethereum addresses and derive the BTC for now using random and testnet
@@ -1086,14 +1088,17 @@ function cliGetInput(){
           console.log(encryptedText.toString("hex"));
           var decryptedText = ecies.decrypt(ecdh, encryptedText, options);
           console.log(decryptedText.toString());
+          encryptMessage =  new Buffer.from(encryptMessage)
           if(encryptMessage != ""){
-            var encryptedMessageToSend = ecies.encrypt(peers[frankieCoin.nodes[i]["id"]]["peerPublicPair"], new Buffer.from(encryptMessage), options);
+            var encryptedMessageToSend = ecies.encrypt(peers[frankieCoin.nodes[i]["peerPublicPair"]],encryptMessage,options);
+          }else{
+            var encryptedMessageToSend = "nodata"
           }
           //going to need a peerPublicPair which is only after 2nd message
 
 
           //I am passing a peer safe initialization reques
-          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,endoded:encryptedText,public:ecdh.getPublicKey()}}));
+          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,endoded:encryptedMessageToSend,public:ecdh.getPublicKey()}}));
           //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
         }
       }
