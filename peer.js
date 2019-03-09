@@ -788,6 +788,23 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           var secretPeerID = JSON.parse(data)["peerSafe"]["secretPeerID"];
           var secretPeerMSG = JSON.parse(data)["peerSafe"]["secretPeerMSG"];
           var secretAction = JSON.parse(data)["peerSafe"]["secretAction"];
+          var encryptedMessage = JSON.parse(data)["peerSafe"]["endoded"];
+          var thisPeerPublicKey = JSON.parse(data)["peerSafe"]["public"];
+
+          var options = {
+              hashName: 'sha256',
+              hashLength: 32,
+              macName: 'sha256',
+              macLength: 32,
+              curveName: 'secp256k1',
+              symmetricCypherName: 'aes-256-ecb',
+              iv: null, // iv is used in symmetric cipher, set null if cipher is in ECB mode.
+              keyFormat: 'uncompressed',
+              s1: null, // optional shared information1
+              s2: null // optional shared information2
+          }
+
+
 
           console.log("THE GUTS OF THE TX: "+secretPeerID+secretPeerMSG+secretAction);
 
@@ -801,6 +818,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             if(frankieCoin.nodes[thisNode]["id"] == peerId){
               frankieCoin.nodes[thisNode]["publicPair"] = peerPublicPair;
             }
+            var ecdh = frankieCoin.nodes[thisNode]["ecdh"]
+            var decryptedPeerMessage = ecies.decrypt(ecdh, encryptedMessage, options);
+            console.log("I DID IT IF IT DONT ERROR "+decryptedPeerMessage.toString());
             if(secretAction == "Wallet"){
               //time to make a safe for him
               //////we will actually make ethereum addresses and derive the BTC for now using random and testnet
@@ -1042,6 +1062,7 @@ function cliGetInput(){
       secretPeerID = secretMessage.split(":")[0];
       secretPeerMSG = secretMessage.split(":")[1];
       secretAction = secretMessage.split(":")[2];
+      encryptMessage = secretMessage.split(":")[3];
 
       console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
       for (let i in frankieCoin.nodes){
@@ -1065,9 +1086,14 @@ function cliGetInput(){
           console.log(encryptedText.toString("hex"));
           var decryptedText = ecies.decrypt(ecdh, encryptedText, options);
           console.log(decryptedText.toString());
+          if(encryptMessage != ""){
+            var encryptedMessageToSend = ecies.encrypt(peers[frankieCoin.nodes[i]["id"]]["peerPublicPair"], new Buffer.from(encryptMessage), options);
+          }
+          //going to need a peerPublicPair which is only after 2nd message
+
 
           //I am passing a peer safe initialization reques
-          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,public:ecdh.getPublicKey()}}));
+          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,endoded:encryptedText,public:ecdh.getPublicKey()}}));
           //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
         }
       }
