@@ -306,7 +306,6 @@ var Blockchain = class Blockchain {
               var thisnode = {
                 "id":id,
                 "info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length,"synchBlock":0},
-                "secretCode":thisNodeSecret,
                 "privateKey":privateKeyA,
                 "publicKey":publicKeyA
               };

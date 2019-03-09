@@ -1014,8 +1014,6 @@ function cliGetInput(){
       for (let i in frankieCoin.nodes){
         if(peers[frankieCoin.nodes[i]["id"]].conn){
 
-          var nodeSecret = frankieCoin.nodes[i]["thisNodeSecret"];
-
           var privateKeyA = frankieCoin.nodes[i]["privateKey"];
           var publiceKeyA = frankieCoin.nodes[i]["publiceKey"];
 
