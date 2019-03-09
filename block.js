@@ -18,7 +18,7 @@ const fs = require('fs');
 const sha256 = require('crypto-js/sha256');
 const crypto = require('crypto');
 var bitcoin  = require('bitcoinjs-lib');
-const ecies = require("ecies-parity");
+const ecies = require('standard-ecies');
 
 //BlockchainDB reference
 var BlkDB;
@@ -298,16 +298,30 @@ var Blockchain = class Blockchain {
 
           if (!this.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
 
-              var privateKeyA = crypto.randomBytes(32);
-              var publicKeyA = ecies.getPublic(privateKeyA);
+              //var privateKeyA = crypto.randomBytes(32);
+              //var publicKeyA = ecies.getPublic(privateKeyA);
+
+              var options = {
+                  hashName: 'sha256',
+                  hashLength: 32,
+                  macName: 'sha256',
+                  macLength: 32,
+                  curveName: 'secp256k1',
+                  symmetricCypherName: 'aes-256-ecb',
+                  iv: null, // iv is used in symmetric cipher, set null if cipher is in ECB mode.
+                  keyFormat: 'uncompressed',
+                  s1: null, // optional shared information1
+                  s2: null // optional shared information2
+              }
+              var ecdh = crypto.createECDH(options.curveName);
+              ecdh.generateKeys();
 
               var keyPair = bitcoin.ECPair.makeRandom();
 
               var thisnode = {
                 "id":id,
                 "info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length,"synchBlock":0},
-                "privateKey":privateKeyA,
-                "publicKey":publicKeyA
+                "ecdh":ecdh
               };
 
               this.nodes.push(thisnode);
@@ -325,6 +339,11 @@ var Blockchain = class Blockchain {
         //key comes from the node as an encryption key
         //type is the type of secret function to run
         //store is where the information is kept
+
+
+        //const arrayColumn = (this.nodes, n) => this.nodes.map(x => x[n]);//may come in handy
+        //console.log(arrayColumn(this.nodes,"id"))
+
         for (let i in this.nodes){
           if(this.nodes[i]["id"] == nodeId){
             //this.nodes[i]["info"]["chainlength"] = parseInt(this.nodes[i]["info"]["chainlength"])+1;

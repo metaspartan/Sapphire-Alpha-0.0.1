@@ -30,6 +30,7 @@
     "request": "^2.88.0",
     "rmdir": "^1.2.0",
     "socket.io-stream": "^0.9.1",
+    "standard-ecies": "^1.0.0",
     "web3": "^1.0.0-beta.35"
   },
   "description": "EGEM Sapphire Subchain Client",

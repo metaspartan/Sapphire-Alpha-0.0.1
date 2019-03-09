@@ -145,7 +145,7 @@
   <ItemGroup>
     <ClCompile Include="..\cppsrc\main.cpp"/>
     <ClCompile Include="..\cppsrc\samples\functionexample.cpp"/>
-    <ClCompile Include="C:\osoese\sapphire-alpha-0.0.1\node_modules\node-gyp\src\win_delay_load_hook.cc"/>
+    <ClCompile Include="C:\Program Files\nodejs\node_modules\npm\node_modules\node-gyp\src\win_delay_load_hook.cc"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\node_modules\node-addon-api\src\nothing.vcxproj">

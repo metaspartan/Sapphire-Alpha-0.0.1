@@ -15,7 +15,7 @@ const getPort = require('get-port');
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("https://lb.rpc.egem.io"));
 var bitcoin  = require('bitcoinjs-lib');
-const ecies = require("ecies-parity");
+const ecies = require('standard-ecies');
 //var web3 = new Web3(new Web3.providers.HttpProvider("https://rpc-2.egem.io/custom"));
 var DatSyncLink = require("./datsynch.js");
 
@@ -783,6 +783,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           log(chalk.red("THIS IS A PEER SAFE MESSAGE AND WILL BE HIDDEN"));
           log(chalk.bgRed("------------------------------------------------------"));
           var peerdata = JSON.parse(data)["peerSafe"];
+          console.log("Public Key"+peerData["public"].toString("hex"))
           console.log("Peer data is "+JSON.stringify(peerdata));
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == true){
           console.log("Extra peer returned synch message but synch is in progress so ignoring")
@@ -1014,29 +1015,29 @@ function cliGetInput(){
       for (let i in frankieCoin.nodes){
         if(peers[frankieCoin.nodes[i]["id"]].conn){
 
-          var privateKeyA = frankieCoin.nodes[i]["privateKey"];
-          var publicKeyA = frankieCoin.nodes[i]["publicKey"];
 
-          var privateKeyB = crypto.randomBytes(32);
-          var publicKeyB = ecies.getPublic(privateKeyB);
+          var options = {
+              hashName: 'sha256',
+              hashLength: 32,
+              macName: 'sha256',
+              macLength: 32,
+              curveName: 'secp256k1',
+              symmetricCypherName: 'aes-256-ecb',
+              iv: null, // iv is used in symmetric cipher, set null if cipher is in ECB mode.
+              keyFormat: 'uncompressed',
+              s1: null, // optional shared information1
+              s2: null // optional shared information2
+          }
+          var ecdh = frankieCoin.nodes[i]["ecdh"];
+          var plainText = new Buffer.from('hello world');
+          var encryptedText = ecies.encrypt(ecdh.getPublicKey(), plainText, options);
+          console.log(encryptedText.toString("hex"));
+          var decryptedText = ecies.decrypt(ecdh, encryptedText, options);
+          console.log(decryptedText.toString());
 
-          // Encrypting the message for B.
-          ecies.encrypt(publicKeyB, Buffer.from("msg to b")).then(function(encrypted) {
-            // B decrypting the message.
-            ecies.decrypt(privateKeyB, encrypted).then(function(plaintext) {
-              console.log("Message to part B:", plaintext.toString());
-            });
-          });
 
-          // Encrypting the message for A.
-          ecies.encrypt(publicKeyA, Buffer.from("msg to a")).then(function(encrypted) {
-            // A decrypting the message.
-            ecies.decrypt(privateKeyA, encrypted).then(function(plaintext) {
-              console.log("Message to part A:", plaintext.toString());
-            });
-          });
-
-          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG,public:nodeKey.exportKey('components-public')}}));
+          //I am passing a peer safe initialization reques
+          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG,public:ecdh.getPublicKey()}}));
           //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
         }
       }
