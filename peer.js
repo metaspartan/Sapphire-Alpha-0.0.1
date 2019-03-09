@@ -819,7 +819,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               frankieCoin.nodes[thisNode]["publicPair"] = peerPublicPair;
             }
             if(encryptedMessage != "nodata"){
-              var ecdh = frankieCoin.nodes[thisNode]["ecdh"]
+              var ecdh = new Buffer.from(frankieCoin.nodes[thisNode]["ecdh"]);
               var decryptedPeerMessage = ecies.decrypt(ecdh, encryptedMessage, options);
               console.log("I DID IT IF IT DONT ERROR "+decryptedPeerMessage.toString());
             }
@@ -1089,8 +1089,10 @@ function cliGetInput(){
           var decryptedText = ecies.decrypt(ecdh, encryptedText, options);
           console.log(decryptedText.toString());
           encryptMessage =  new Buffer.from(encryptMessage)
+
           if(encryptMessage != ""){
-            var encryptedMessageToSend = ecies.encrypt(peers[frankieCoin.nodes[i]["peerPublicPair"]],encryptMessage,options);
+            var peerPubKey = new Buffer.from(peers[frankieCoin.nodes[i]["peerPublicPair"]])
+            var encryptedMessageToSend = ecies.encrypt(peerPubKey,encryptMessage,options);
           }else{
             var encryptedMessageToSend = "nodata"
           }
