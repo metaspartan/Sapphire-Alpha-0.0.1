@@ -812,7 +812,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
           console.log("Public Key"+JSON.stringify(JSON.parse(peerData)["public"]));
           console.log("Peer data is "+JSON.stringify(peerData));
-          peerPublicPair = JSON.parse(peerData)["public"];
+          peerPublicPair = JSON.stringify(JSON.parse(peerData)["public"]);
           console.log("testing JSON parse "+JSON.parse(JSON.stringify(peerPublicPair))["data"].toString("hex"));
           for(thisNode in frankieCoin.nodes){
             if(frankieCoin.nodes[thisNode]["id"] == peerId){
