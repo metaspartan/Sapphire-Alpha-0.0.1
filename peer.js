@@ -1036,7 +1036,7 @@ function cliGetInput(){
             });
           });
 
-          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+nodeSecret,public:nodeKey.exportKey('components-public')}}));
+          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG,public:nodeKey.exportKey('components-public')}}));
           //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
         }
       }
