@@ -806,17 +806,17 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
 
 
-          console.log("THE GUTS OF THE TX: "+secretPeerID+secretPeerMSG+secretAction);
+          console.log("THE GUTS OF THE TX: "+secretPeerID+secretPeerMSG+secretAction+thisPeerPublicKey);
 
           peerData = JSON.stringify(peerData);
 
           console.log("Public Key"+JSON.stringify(JSON.parse(peerData)["public"]));
           console.log("Peer data is "+JSON.stringify(peerData));
-          peerPublicPair = JSON.stringify(JSON.parse(peerData)["public"]);
+          peerPublicPair = JSON.parse(peerData)["public"];
           //console.log("testing JSON parse "+JSON.parse(JSON.stringify(peerPublicPair))["data"].toString("hex"));
           for(thisNode in frankieCoin.nodes){
             if(frankieCoin.nodes[thisNode]["id"] == peerId){
-              frankieCoin.nodes[thisNode]["publicPair"] = peerPublicPair.toString();
+              frankieCoin.nodes[thisNode]["publicPair"] = peerPublicPair;
             }
             if(encryptedMessage != "nodata"){
               var ecdh = new Buffer.from(frankieCoin.nodes[thisNode]["ecdh"]);
@@ -1085,15 +1085,17 @@ function cliGetInput(){
           var ecdh = frankieCoin.nodes[i]["ecdh"];
           var plainText = new Buffer.from('hello world');
           var encryptedText = ecies.encrypt(ecdh.getPublicKey(), plainText, options);
+          console.log("the public key to text hex "+ecdh.getPublicKey().toString("hex"));
+          ecdhPubKeyHex = ecdh.getPublicKey().toString("hex");
           console.log(encryptedText.toString("hex"));
           var decryptedText = ecies.decrypt(ecdh, encryptedText, options);
           console.log(decryptedText.toString());
           encryptMessage =  new Buffer.from(encryptMessage)
 
           if(encryptMessage != ""){
-            var peerPubKey = frankieCoin.nodes[i]["peerPublicPair"]
+            var peerPubKey = new Buffer.from(frankieCoin.nodes[i]["publicPair"],"hex");
             console.log("whats up with JSON "+JSON.stringify(frankieCoin.nodes[i]));
-            console.log(peerPubKey);
+            console.log(JSON.stringify(peerPubKey));
             var encryptedMessageToSend = ecies.encrypt(peerPubKey,encryptMessage,options);
           }else{
             var encryptedMessageToSend = "nodata"
@@ -1102,7 +1104,7 @@ function cliGetInput(){
 
 
           //I am passing a peer safe initialization reques
-          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,endoded:encryptedMessageToSend,public:ecdh.getPublicKey()}}));
+          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,endoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
           //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
         }
       }
