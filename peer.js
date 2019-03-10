@@ -806,7 +806,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
 
 
-          console.log("THE GUTS OF THE TX: "+secretPeerID+secretPeerMSG+secretAction+thisPeerPublicKey);
+          console.log("THE GUTS OF THE TX: "+secretPeerID+secretPeerMSG+secretAction);
 
           peerData = JSON.stringify(peerData);
 
@@ -1093,9 +1093,11 @@ function cliGetInput(){
           encryptMessage =  new Buffer.from(encryptMessage)
 
           if(encryptMessage != ""){
-            var peerPubKey = new Buffer.from(frankieCoin.nodes[i]["publicPair"],"hex");
+            var peerPubKey = frankieCoin.nodes[i]["publicPair"];
+            console.log("PEER PUB KEY "+peerPubKey);
+            
             console.log("whats up with JSON "+JSON.stringify(frankieCoin.nodes[i]));
-            console.log(JSON.stringify(peerPubKey));
+
             var encryptedMessageToSend = ecies.encrypt(peerPubKey,encryptMessage,options);
           }else{
             var encryptedMessageToSend = "nodata"
