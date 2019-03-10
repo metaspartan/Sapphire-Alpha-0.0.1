@@ -819,9 +819,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               frankieCoin.nodes[thisNode]["publicPair"] = peerPublicPair;
             }
             if(encryptedMessage != "nodata"){
-              var ecdh = new Buffer.from(frankieCoin.nodes[thisNode]["ecdh"]);
+              var ecdh = frankieCoin.nodes[thisNode]["ecdh"];
+              console.log("public key of ecdh "+ecdh.getPublicKey().toString("hex"));
               var encryptedMessageBuffer = new Buffer.from(encryptedMessage,"hex");
-              var decryptedPeerMessage = ecies.decrypt(ecdh, encryptedMessage, options);
+              var decryptedPeerMessage = ecies.decrypt(ecdh, encryptedMessageBuffer, options);
               console.log("I DID IT IF IT DONT ERROR "+decryptedPeerMessage.toString());
             }
             if(secretAction == "Wallet"){
