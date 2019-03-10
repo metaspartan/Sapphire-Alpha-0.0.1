@@ -820,6 +820,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             }
             if(encryptedMessage != "nodata"){
               var ecdh = new Buffer.from(frankieCoin.nodes[thisNode]["ecdh"]);
+              var encryptedMessageBuffer = new Buffer.from(encryptedMessage,"hex");
               var decryptedPeerMessage = ecies.decrypt(ecdh, encryptedMessage, options);
               console.log("I DID IT IF IT DONT ERROR "+decryptedPeerMessage.toString());
             }
@@ -1068,7 +1069,7 @@ function cliGetInput(){
 
       console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
       for (let i in frankieCoin.nodes){
-        if(peers[frankieCoin.nodes[i]["id"]].conn){
+        if(peers[frankieCoin.nodes[i]["id"]]){
 
           var options = {
               hashName: 'sha256',
@@ -1093,12 +1094,13 @@ function cliGetInput(){
           encryptMessage =  new Buffer.from(encryptMessage)
 
           if(encryptMessage != ""){
-            var peerPubKey = frankieCoin.nodes[i]["publicPair"];
+            var peerPubKey = new Buffer.from(frankieCoin.nodes[i]["publicPair"],"hex");
             console.log("PEER PUB KEY "+peerPubKey);
-            
+
             console.log("whats up with JSON "+JSON.stringify(frankieCoin.nodes[i]));
 
             var encryptedMessageToSend = ecies.encrypt(peerPubKey,encryptMessage,options);
+            encryptedMessageToSend = encryptedMessageToSend.toString("hex");
           }else{
             var encryptedMessageToSend = "nodata"
           }
