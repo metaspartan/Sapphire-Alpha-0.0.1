@@ -173,7 +173,7 @@ var nodePersistance = async function(){
   var callBackNodePersistence = function(npid){
     myLastSessionId = npid;
     console.log("my last session = "+myLastSessionId);
-    if(myLastSessionId){
+    if(myLastSessionId != "notfound"){
       chainState.nodePersistantId = myLastSessionId;
       console.log("node persistantce was already set ")
     }else{

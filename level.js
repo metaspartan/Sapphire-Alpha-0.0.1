@@ -107,9 +107,13 @@ var getChainParamsBlockHeight = function(hashKey){
 
 var getChainParamsByName = function(hashKey,paramName,cb){
   db.get(hashKey+":"+paramName, function (err, value) {
-    if(err) console.log("err: "+err);
-    console.log("Chain Param "+paramName+": "+value.toString());
-    cb(value.toString());
+    if(err){
+      console.log("err: "+err);
+      cb("notfound");
+    }else{
+      console.log("Chain Param "+paramName+": "+value.toString());
+      cb(value.toString());
+    }
   });
 }
 
