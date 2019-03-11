@@ -78,7 +78,7 @@ var putRecord = function(key, val){
 }
 
 var addChainParams = function(key, value){
-  console.log("Chain Parameters Loading as follows key: "+key.toString()+" - version"+ JSON.parse(value)["version"])
+  console.log("Chain Parameters Loading as follows key: "+key.toString()+" - version"+ value)
   db.put(key, value, function (err) {
     if (err) return console.log('Ooops!', err) // some kind of I/O error
   })
@@ -90,9 +90,26 @@ var getChainParams = function(hashKey){
   });
 }
 
+var getChainParamStream = function(hashKey){
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    if(data.key.toString().split(":")[0] == hashKey){
+      console.log('key = '+data.key+" value = "+data.value.toString());
+    }
+  })
+}
+
 var getChainParamsBlockHeight = function(hashKey){
   db.get(hashKey+":blockHeight", function (err, value) {
     console.log("Chain Params "+value.toString());
+  });
+}
+
+var getChainParamsByName = function(hashKey,paramName,cb){
+  db.get(hashKey+":"+paramName, function (err, value) {
+    if(err) console.log("err: "+err);
+    console.log("Chain Param "+paramName+": "+value.toString());
+    cb(value.toString());
   });
 }
 
@@ -1789,6 +1806,8 @@ module.exports = {
     importFromJSONStream:importFromJSONStream,
     addChainParams:addChainParams,
     getChainParams:getChainParams,
+    getChainParamStream:getChainParamStream,
+    getChainParamsByName:getChainParamsByName,
     getChainParamsBlockHeight:getChainParamsBlockHeight,
     getCheckPoints:getCheckPoints,
     addChainState:addChainState,

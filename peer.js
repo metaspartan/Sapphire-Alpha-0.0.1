@@ -77,6 +77,7 @@ var output = fs.readFile(filename, 'utf8', function(err, data) {
 ////////////////////////////////////////////////////////////////synching section
 var chainState = {};//need to store in the db as chain state and put event lop for changes
 chainState.isSynching = false;
+//chainState.version = "alpha.0.0.1"
 chainState.chainWalkHeight = 1;
 chainState.chainWalkHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f';//block 1 hash
 chainState.synchronized = 1;//when we are synched at a block it gets updated
@@ -162,7 +163,30 @@ const rl = readline.createInterface({
 //////////////////////////////////////////////////////////////end CLI query init
 
 /////////////////////////////////////////////asynchronous peer connection engine
+
 const myId = crypto.randomBytes(32);
+console.log("the Node ID = "+myId);
+
+var myLastSessionId;
+var nodePersistance = async function(){
+  //var myLastSessionId = undefined
+  var callBackNodePersistence = function(npid){
+    myLastSessionId = npid;
+    console.log("my last session = "+myLastSessionId);
+    if(myLastSessionId){
+      chainState.nodePersistantId = myLastSessionId;
+      console.log("node persistantce was already set ")
+    }else{
+      chainState.nodePersistantId = crypto.randomBytes(32);
+      BlkDB.addChainParams(globalGenesisHash+":nodePersistantId",chainState.nodePersistantId);
+    }
+  }
+  console.log("making the call");
+  BlkDB.getChainParamsByName(globalGenesisHash,'nodePersistantId',callBackNodePersistence);
+
+}
+setTimeout(function(){nodePersistance()},1000);
+
 
 
 const peers = {}
@@ -804,13 +828,16 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               s2: null // optional shared information2
           }
 
-
-
-          console.log("THE GUTS OF THE TX: "+secretPeerID+secretPeerMSG+secretAction);
+          console.log(chalk.bgRed("INCOMING PS TX: "));
+          console.log("SECRET PEER ID: "+secretPeerID);
+          console.log("SECRET PEER MSG: "+secretPeerMSG);
+          console.log("SCRET PEER ACTION "+secretAction);
+          console.log("ENCRYPTED MESSAGE "+encryptedMessage);
+          console.log("MY PUBLIC KEY FROM SENDER "+thisPeerPublicKey);
 
           peerData = JSON.stringify(peerData);
 
-          console.log("Public Key"+JSON.stringify(JSON.parse(peerData)["public"]));
+          console.log("Public Key stringified and parsed"+JSON.stringify(JSON.parse(peerData)["public"]));
           console.log("Peer data is "+JSON.stringify(peerData));
           peerPublicPair = JSON.parse(peerData)["public"];
           //console.log("testing JSON parse "+JSON.parse(JSON.stringify(peerPublicPair))["data"].toString("hex"));
@@ -1247,6 +1274,7 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput.startsWith("getChainParams()")){//GETBLOCK function
       BlkDB.getChainParams(globalGenesisHash);
+      BlkDB.getChainParamStream(globalGenesisHash);
       BlkDB.getChainParamsBlockHeight(globalGenesisHash);
       cliGetInput();
     }else if(userInput == "getLength()"){
