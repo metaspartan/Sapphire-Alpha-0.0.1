@@ -846,28 +846,31 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           for(thisNode in frankieCoin.nodes){
             if(frankieCoin.nodes[thisNode]["id"] == peerId){
               frankieCoin.nodes[thisNode]["publicPair"] = peerPublicPair;
-            }
-            if(encryptedMessage != "nodata"){
-              var ecdh = frankieCoin.nodes[thisNode]["ecdh"];
-              console.log("public key of ecdh "+ecdh.getPublicKey().toString("hex"));
-              var encryptedMessageBuffer = new Buffer.from(encryptedMessage,"hex");
-              var decryptedPeerMessage = ecies.decrypt(ecdh, encryptedMessageBuffer, options);
-              console.log("I DID IT IF IT DONT ERROR "+decryptedPeerMessage.toString());
-            }
-            if(secretAction == "Wallet"){
-              //time to make a safe for him
-              //////we will actually make ethereum addresses and derive the BTC for now using random and testnet
-              var keyPair = bitcoin.ECPair.makeRandom();
-              var publicAddress = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey },bitcoin.networks.testnet).address;
-              var privateKey = keyPair.toWIF(bitcoin.networks.testnet);
-              privateKey += '01';//testnet
-              console.log("private key is "+privateKey);
-              //going to require a digned transaction from the peer before I do this
 
-              frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC","empty");//peerSafe(nodeId,key,type,store)
-              /////end safe creation
+              if(encryptedMessage != "nodata"){
+                var ecdh = frankieCoin.nodes[thisNode]["ecdh"];
+                console.log("public key of ecdh "+ecdh.getPublicKey().toString("hex"));
+                var encryptedMessageBuffer = new Buffer.from(encryptedMessage,"hex");
+                var decryptedPeerMessage = ecies.decrypt(ecdh, encryptedMessageBuffer, options);
+                console.log("I DID IT IF IT DONT ERROR "+decryptedPeerMessage.toString());
+              }
+
+              if(secretAction == "Wallet"){
+                //time to make a safe for him
+                //////we will actually make ethereum addresses and derive the BTC for now using random and testnet
+                var keyPair = bitcoin.ECPair.makeRandom();
+                var publicAddress = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey },bitcoin.networks.testnet).address;
+                var privateKey = keyPair.toWIF(bitcoin.networks.testnet);
+                privateKey += '01';//testnet
+                console.log("private key is "+privateKey);
+                //going to require a digned transaction from the peer before I do this
+
+                frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC","empty");//peerSafe(nodeId,key,type,store)
+                /////end safe creation
+              }
+              
+              console.log("THIS NODES INFO "+JSON.stringify(frankieCoin.nodes[thisNode]))
             }
-            console.log("THIS NODES INFO "+JSON.stringify(frankieCoin.nodes[thisNode]))
           }
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == true){
           console.log("Extra peer returned synch message but synch is in progress so ignoring")
