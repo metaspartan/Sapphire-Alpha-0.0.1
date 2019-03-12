@@ -926,7 +926,7 @@ var directMessage = function(secretMessage){
 
                 frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC","empty");//peerSafe(nodeId,key,type,store)
 
-                peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:keyPair.publicKey,secretAction:"DepositAddress",,public:ecdhPubKeyHex}}));
+                peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:keyPair.publicKey,secretAction:"DepositAddress",public:ecdhPubKeyHex}}));
                 //peers[frankieCoin.nodes[i]["id"]].conn.end(,,callback);
                 /////end safe creation
               }
