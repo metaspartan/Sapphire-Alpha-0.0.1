@@ -334,6 +334,14 @@ var Blockchain = class Blockchain {
 
       }
 
+      removeNode(nodeId){
+        for (let i in this.nodes){
+          if(this.nodes[i]["id"] == nodeId){
+            this.nodes.splice(i,1);
+          }
+        }
+      }
+
       peerSafe(publicPair,nodeId,storePrivatekey,type,store){
         //nodeid is the node to attach this strage
         //key comes from the node as an encryption key

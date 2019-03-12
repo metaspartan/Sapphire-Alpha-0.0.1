@@ -429,10 +429,12 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     conn.on('close', () => {
       // Here we handle peer disconnection
       log(chalk.blue("Connection"+ chalk.green(seq) + "closed, peer id: " + chalk.green(peerId)))
+      frankieCoin.removeNode(peerId);
       // If the closing connection is the last connection with the peer, removes the peer
       if ((peers[peerId]) && peers[peerId].seq === seq) {
         delete peers[peerId]
       }
+
       //connSeq--
     })
 
@@ -1096,8 +1098,9 @@ function cliGetInput(){
       encryptMessage = secretMessage.split(":")[3];
 
       console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
-      for (let i in frankieCoin.nodes){
-        if(peers[frankieCoin.nodes[i]["id"]]){
+      //for (let i in frankieCoin.nodes){
+        var i = parseInt(secretPeerID);
+        if(frankieCoin.nodes[i] && peers[frankieCoin.nodes[i]["id"]]){
 
           var options = {
               hashName: 'sha256',
@@ -1139,7 +1142,7 @@ function cliGetInput(){
           peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,endoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
           //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
         }
-      }
+      //}
 
       cliGetInput();
 
