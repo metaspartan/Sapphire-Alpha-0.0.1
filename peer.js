@@ -454,7 +454,7 @@ var directMessage = function(secretMessage){
 
 
       //I am passing a peer safe initialization reques
-      peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,endoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
+      peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
       //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
     }
   //}
@@ -872,7 +872,7 @@ var directMessage = function(secretMessage){
           var secretPeerID = JSON.parse(data)["peerSafe"]["secretPeerID"];
           var secretPeerMSG = JSON.parse(data)["peerSafe"]["secretPeerMSG"];
           var secretAction = JSON.parse(data)["peerSafe"]["secretAction"];
-          var encryptedMessage = JSON.parse(data)["peerSafe"]["endoded"];
+          var encryptedMessage = JSON.parse(data)["peerSafe"]["encoded"];
           var thisPeerPublicKey = JSON.parse(data)["peerSafe"]["public"];
 
           var options = {
@@ -926,15 +926,17 @@ var directMessage = function(secretMessage){
 
                 frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC","empty");//peerSafe(nodeId,key,type,store)
 
-                peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:keyPair.publicKey,secretAction:"DepositAddress",public:ecdhPubKeyHex}}));
+                peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:keyPair.publicKey,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                 //peers[frankieCoin.nodes[i]["id"]].conn.end(,,callback);
                 /////end safe creation
+              }else if(secretAction == "DepositAddress"){
+                console.log(secretPeerMSG);
               }
 
               console.log("THIS NODES INFO "+JSON.stringify(frankieCoin.nodes[thisNode]))
 
               ////need to construct and send reply message
-              //peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,endoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
+              //peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
             }
           }
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == true){
