@@ -187,8 +187,6 @@ var nodePersistance = async function(){
 }
 setTimeout(function(){nodePersistance()},1000);
 
-
-
 const peers = {}
 // Counter for connections, used for identify connections
 let connSeq = 0
@@ -405,6 +403,66 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
   }
 }
 /////////////////////////////////////////////////////////////END CHAIN VALIDATOR
+
+/////////////////////////////////////////////////////ENCRYPTED DIRECT MESSAGEING
+var directMessage = function(secretMessage){
+
+  secretPeerID = secretMessage.split(":")[0];//index of node to message
+  secretPeerMSG = secretMessage.split(":")[1];
+  secretAction = secretMessage.split(":")[2];//create Wallet
+  encryptMessage = secretMessage.split(":")[3];//encrypted messages to this node public
+
+  console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
+  //for (let i in frankieCoin.nodes){
+    var i = parseInt(secretPeerID);
+    if(frankieCoin.nodes[i] && peers[frankieCoin.nodes[i]["id"]]){
+
+      var options = {
+          hashName: 'sha256',
+          hashLength: 32,
+          macName: 'sha256',
+          macLength: 32,
+          curveName: 'secp256k1',
+          symmetricCypherName: 'aes-256-ecb',
+          iv: null, // iv is used in symmetric cipher, set null if cipher is in ECB mode.
+          keyFormat: 'uncompressed',
+          s1: null, // optional shared information1
+          s2: null // optional shared information2
+      }
+      var ecdh = frankieCoin.nodes[i]["ecdh"];
+      var plainText = new Buffer.from('hello world');
+      var encryptedText = ecies.encrypt(ecdh.getPublicKey(), plainText, options);
+      console.log("the public key to text hex "+ecdh.getPublicKey().toString("hex"));
+      ecdhPubKeyHex = ecdh.getPublicKey().toString("hex");
+      console.log(encryptedText.toString("hex"));
+      var decryptedText = ecies.decrypt(ecdh, encryptedText, options);
+      console.log(decryptedText.toString());
+      encryptMessage =  new Buffer.from(encryptMessage)
+
+      if(encryptMessage != ""){
+        var peerPubKey = new Buffer.from(frankieCoin.nodes[i]["publicPair"],"hex");
+        console.log("PEER PUB KEY "+peerPubKey);
+
+        console.log("whats up with JSON "+JSON.stringify(frankieCoin.nodes[i]));
+
+        var encryptedMessageToSend = ecies.encrypt(peerPubKey,encryptMessage,options);
+        encryptedMessageToSend = encryptedMessageToSend.toString("hex");
+      }else{
+        var encryptedMessageToSend = "nodata"
+      }
+      //going to need a peerPublicPair which is only after 2nd message
+
+
+      //I am passing a peer safe initialization reques
+      peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,endoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
+      //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
+    }
+  //}
+
+  cliGetInput();
+
+}
+//////////////////////////////////////////////////END ENCRYPTED DIRECT MESSAGING
 
 //////////////////////////////////////////////////////core function asynchronous
 ;(async () => {
@@ -863,13 +921,20 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
                 var privateKey = keyPair.toWIF(bitcoin.networks.testnet);
                 privateKey += '01';//testnet
                 console.log("private key is "+privateKey);
+                console.log("public key is "+keyPair.publicKey);
                 //going to require a digned transaction from the peer before I do this
 
                 frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC","empty");//peerSafe(nodeId,key,type,store)
+
+                peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:keyPair.publicKey,secretAction:"DepositAddress",,public:ecdhPubKeyHex}}));
+                //peers[frankieCoin.nodes[i]["id"]].conn.end(,,callback);
                 /////end safe creation
               }
-              
+
               console.log("THIS NODES INFO "+JSON.stringify(frankieCoin.nodes[thisNode]))
+
+              ////need to construct and send reply message
+              //peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,endoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
             }
           }
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == true){
@@ -1095,57 +1160,8 @@ function cliGetInput(){
     }else if(userInput.startsWith("PM(")){
 
       var secretMessage = userInput.slice(userInput.indexOf("PM(")+3, userInput.indexOf(")"));
-      secretPeerID = secretMessage.split(":")[0];
-      secretPeerMSG = secretMessage.split(":")[1];
-      secretAction = secretMessage.split(":")[2];
-      encryptMessage = secretMessage.split(":")[3];
 
-      console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
-      //for (let i in frankieCoin.nodes){
-        var i = parseInt(secretPeerID);
-        if(frankieCoin.nodes[i] && peers[frankieCoin.nodes[i]["id"]]){
-
-          var options = {
-              hashName: 'sha256',
-              hashLength: 32,
-              macName: 'sha256',
-              macLength: 32,
-              curveName: 'secp256k1',
-              symmetricCypherName: 'aes-256-ecb',
-              iv: null, // iv is used in symmetric cipher, set null if cipher is in ECB mode.
-              keyFormat: 'uncompressed',
-              s1: null, // optional shared information1
-              s2: null // optional shared information2
-          }
-          var ecdh = frankieCoin.nodes[i]["ecdh"];
-          var plainText = new Buffer.from('hello world');
-          var encryptedText = ecies.encrypt(ecdh.getPublicKey(), plainText, options);
-          console.log("the public key to text hex "+ecdh.getPublicKey().toString("hex"));
-          ecdhPubKeyHex = ecdh.getPublicKey().toString("hex");
-          console.log(encryptedText.toString("hex"));
-          var decryptedText = ecies.decrypt(ecdh, encryptedText, options);
-          console.log(decryptedText.toString());
-          encryptMessage =  new Buffer.from(encryptMessage)
-
-          if(encryptMessage != ""){
-            var peerPubKey = new Buffer.from(frankieCoin.nodes[i]["publicPair"],"hex");
-            console.log("PEER PUB KEY "+peerPubKey);
-
-            console.log("whats up with JSON "+JSON.stringify(frankieCoin.nodes[i]));
-
-            var encryptedMessageToSend = ecies.encrypt(peerPubKey,encryptMessage,options);
-            encryptedMessageToSend = encryptedMessageToSend.toString("hex");
-          }else{
-            var encryptedMessageToSend = "nodata"
-          }
-          //going to need a peerPublicPair which is only after 2nd message
-
-
-          //I am passing a peer safe initialization reques
-          peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,endoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
-          //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
-        }
-      //}
+      directMessage(secretMessage);
 
       cliGetInput();
 
@@ -1212,12 +1228,29 @@ function cliGetInput(){
     }else if(userInput.startsWith("signedTransaction(")){//testing signed transactions
       var signedPackage = userInput.slice(userInput.indexOf("signedTransaction(")+18, userInput.indexOf(")"));
 
-      ///////////////////////////////////////////////////////relay asap to peers
-      broadcastPeers(signedPackage);
-
-      //console.log("signed package is"+JSON.parse(signedPackage)["message"]);
       var message = JSON.parse(signedPackage)["message"];
       var send = JSON.stringify(JSON.parse(message)["send"]);
+
+      try{
+        //////////////////////////////////////////if there is an action redirect
+        var action = JSON.stringify(JSON.parse(send)["action"]).replace(/['"/]+/g, '');
+        console.log("there is an action of "+action+"on this transaction ");
+        //will eventually randomize a peer but in this case just chossing first one
+        var cbSecretSafeAddy = function(addy){
+          console.log(addy);
+        }
+        directMessage('0:0:Wallet:')
+        //return false;//temporary exit for testing
+        /////////////////////////////////////////////////////end action redirect
+      }catch{
+        ///////////////////////////////////////////////////////relay asap to peers
+        broadcastPeers(signedPackage);
+      }
+
+
+      //console.log("signed package is"+JSON.parse(signedPackage)["message"]);
+
+
       var addressFrom = JSON.stringify(JSON.parse(send)["from"]).replace(/['"/]+/g, '');
       var addressTo = JSON.stringify(JSON.parse(send)["to"]).replace(/['"/]+/g, '');
       var amount = JSON.stringify(JSON.parse(send)["amount"]).replace(/['"/]+/g, '');
