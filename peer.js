@@ -921,12 +921,13 @@ var directMessage = function(secretMessage){
                 var privateKey = keyPair.toWIF(bitcoin.networks.testnet);
                 privateKey += '01';//testnet
                 console.log("private key is "+privateKey);
-                console.log("public key is "+keyPair.publicKey);
+                //console.log("public key is "+keyPair.publicKey);
+                console.log("BTC address is: "+publicAddress);
                 //going to require a digned transaction from the peer before I do this
 
                 frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC","empty");//peerSafe(nodeId,key,type,store)
 
-                peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:keyPair.publicKey,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
+                peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                 //peers[frankieCoin.nodes[i]["id"]].conn.end(,,callback);
                 /////end safe creation
               }else if(secretAction == "DepositAddress"){
