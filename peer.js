@@ -928,6 +928,9 @@ var directMessage = function(secretMessage){
                 frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC","empty");//peerSafe(nodeId,key,type,store)
 
                 peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
+
+                BlkDB.addUpdateSafe(peerId+":"+publicAddress,JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}))
+
                 //peers[frankieCoin.nodes[i]["id"]].conn.end(,,callback);
                 /////end safe creation
               }else if(secretAction == "DepositAddress"){

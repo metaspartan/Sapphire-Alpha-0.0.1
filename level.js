@@ -178,6 +178,38 @@ var getNodes = function(){
   })
 }
 
+var addUpdateSafe = function(safeKey){
+  db.get("safe:"+safeKey.split(":")[0], function (err, value) {
+    if(err){
+      db.put("safe:"+safeKey.split(":")[0],+safeKey.split(":")[1])
+    }else{
+      db.put("safe:"+safeKey.split(":")[0],+safeKey.split(":")[1])
+    }
+  })
+}
+
+var getPeerSafe = function(safeKey,cb){
+  db.get("safe:"+safeKey.split(":")[0], function (err, value) {
+    if(err){
+      cb('nodata');
+    }else{
+      cb(value);
+    }
+  })
+}
+
+var getAllPeerSafes = function(){
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    //console.log("block: "+parseInt(data.key.toString().split(":")[1],16).toString(10)+" hexBlockNum: "+parseInt(chainBlockHeight))
+    //console.log('key = '+data.key+" value = "+data.value.toString());
+    if(data.key.toString().split(":")[0] == "safe"){//possible another block enters the db s no upper limit
+      //console.log("here... "+data.key.toString()+" "+data.value.toString());
+      console.log("key: "+data.key.toString()+" value: "+data.value.toString());
+    }
+  });
+}
+
 var addBlock = function(blknum,block,callfrom){
   //console.log("<<<<<----------------ADDS BLOCK TO LEVEL DB HERE------------>>>>>")
   //console.log("called from "+callfrom);
@@ -1818,6 +1850,8 @@ module.exports = {
     getChainStateParam:getChainStateParam,
     getChainStateCheckPoint:getChainStateCheckPoint,
     addNode:addNode,
+    addUpdateSafe:addUpdateSafe,
+    getPeerSafe:getPeerSafe,
     getNodes:getNodes,
     addBlock:addBlock,
     getBlock:getBlock,
