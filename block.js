@@ -342,7 +342,7 @@ var Blockchain = class Blockchain {
         }
       }
 
-      peerSafe(publicPair,nodeId,storePrivatekey,type,store){
+      peerSafe(publicPair,nodeId,storePrivatekey,type,egemAddress,store){
         //nodeid is the node to attach this strage
         //key comes from the node as an encryption key
         //type is the type of secret function to run
@@ -355,7 +355,7 @@ var Blockchain = class Blockchain {
         for (let i in this.nodes){
           if(this.nodes[i]["id"] == nodeId){
             //this.nodes[i]["info"]["chainlength"] = parseInt(this.nodes[i]["info"]["chainlength"])+1;
-            this.nodes[i]["store"] = {"storePrivatekey":storePrivatekey,"type":type,"store":store}
+            this.nodes[i]["store"] = {"storePrivatekey":storePrivatekey,"type":type,"egemAddress":egemAddress,"store":store}
           }
         }
 

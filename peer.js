@@ -411,6 +411,7 @@ var directMessage = function(secretMessage){
   secretPeerMSG = secretMessage.split(":")[1];
   secretAction = secretMessage.split(":")[2];//create Wallet
   encryptMessage = secretMessage.split(":")[3];//encrypted messages to this node public
+  egemAccount = secretMessage.split(":")[4];
 
   console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
   //for (let i in frankieCoin.nodes){
@@ -439,7 +440,7 @@ var directMessage = function(secretMessage){
       console.log(decryptedText.toString());
       encryptMessage =  new Buffer.from(encryptMessage)
 
-      if(encryptMessage != ""){
+      if(encryptMessage != "nodata"){
         var peerPubKey = new Buffer.from(frankieCoin.nodes[i]["publicPair"],"hex");
         console.log("PEER PUB KEY "+peerPubKey);
 
@@ -454,7 +455,7 @@ var directMessage = function(secretMessage){
 
 
       //I am passing a peer safe initialization reques
-      peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
+      peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,egemAccount:egemAccount,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
       //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
     }
   //}
@@ -874,6 +875,7 @@ var directMessage = function(secretMessage){
           var secretAction = JSON.parse(data)["peerSafe"]["secretAction"];
           var encryptedMessage = JSON.parse(data)["peerSafe"]["encoded"];
           var thisPeerPublicKey = JSON.parse(data)["peerSafe"]["public"];
+          var egemAccount = JSON.parse(data)["peerSafe"]["egemAccount"]
 
           var options = {
               hashName: 'sha256',
@@ -916,6 +918,7 @@ var directMessage = function(secretMessage){
               if(secretAction == "Wallet"){
                 //time to make a safe for him
                 //////we will actually make ethereum addresses and derive the BTC for now using random and testnet
+
                 var keyPair = bitcoin.ECPair.makeRandom();
                 var publicAddress = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey },bitcoin.networks.testnet).address;
                 var privateKey = keyPair.toWIF(bitcoin.networks.testnet);
@@ -927,9 +930,9 @@ var directMessage = function(secretMessage){
 
                 frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC","empty");//peerSafe(nodeId,key,type,store)
 
-                peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
+                BlkDB.addUpdateSafe(peerId+":"+publicAddress,JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,public:ecdhPubKeyHex}))
 
-                BlkDB.addUpdateSafe(peerId+":"+publicAddress,JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}))
+                peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
 
                 //peers[frankieCoin.nodes[i]["id"]].conn.end(,,callback);
                 /////end safe creation
@@ -1172,7 +1175,8 @@ function cliGetInput(){
       cliGetInput();
 
     }else if(userInput == "TX"){
-      BlkDB.getTransactions();
+      //BlkDB.getTransactions();
+      BlkDB.getAllPeerSafes();
       cliGetInput();
     }else if(userInput == "TRIE"){
       BlkDB.getEverythingFromTrie();
@@ -1238,20 +1242,13 @@ function cliGetInput(){
       var send = JSON.stringify(JSON.parse(message)["send"]);
 
       try{
-        //////////////////////////////////////////if there is an action redirect
         var action = JSON.stringify(JSON.parse(send)["action"]).replace(/['"/]+/g, '');
-        console.log("there is an action of "+action+"on this transaction ");
-        //will eventually randomize a peer but in this case just chossing first one
-        var cbSecretSafeAddy = function(addy){
-          console.log(addy);
-        }
-        directMessage('0:0:Wallet:')
-        //return false;//temporary exit for testing
-        /////////////////////////////////////////////////////end action redirect
       }catch{
         ///////////////////////////////////////////////////////relay asap to peers
         broadcastPeers(signedPackage);
       }
+
+
 
 
       //console.log("signed package is"+JSON.parse(signedPackage)["message"]);
@@ -1263,6 +1260,22 @@ function cliGetInput(){
       var ticker = JSON.stringify(JSON.parse(send)["ticker"]).replace(/['"/]+/g, '');
       var validatedSender = web3.eth.accounts.recover(JSON.parse(signedPackage)["message"],JSON.parse(signedPackage)["signature"]);
       if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
+
+        //////////////////////////////////////////if there is an action redirect
+        if(action){
+          if(action == "Wallet"){
+            console.log("there is an action of "+action+"on this transaction ");
+            //will eventually randomize a peer but in this case just chossing first one
+            var cbSecretSafeAddy = function(addy){
+              console.log(addy);
+            }
+            directMessage('0:0:Wallet:nodata:'+validatedSender.toLowerCase())//node index:
+          }else if(action == "Transaction"){
+
+          }
+        }
+        /////////////////////////////////////////////////////end action redirect
+
         ///need to alidate that this wallet has the funds to send
         frankieCoin.createTransaction(new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker));
         console.log("This legitimate signed transaction by "+validatedSender+" has been posted");

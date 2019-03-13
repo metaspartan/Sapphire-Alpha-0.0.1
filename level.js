@@ -178,12 +178,14 @@ var getNodes = function(){
   })
 }
 
-var addUpdateSafe = function(safeKey){
-  db.get("safe:"+safeKey.split(":")[0], function (err, value) {
+var addUpdateSafe = function(safeKey,peerSafeJSON){
+  db.get("safe:"+safeKey.split(":")[0]+":"+safeKey.split(":")[1], function (err, value) {
     if(err){
-      db.put("safe:"+safeKey.split(":")[0],+safeKey.split(":")[1])
+      console.log("in the error "+safeKey)
+      db.put("safe:"+safeKey.split(":")[0]+":"+safeKey.split(":")[1],peerSafeJSON)
     }else{
-      db.put("safe:"+safeKey.split(":")[0],+safeKey.split(":")[1])
+      console.log("in the normal "+safeKey)
+      db.put("safe:"+safeKey.split(":")[0]+":"+safeKey.split(":")[1],peerSafeJSON)
     }
   })
 }
@@ -1852,6 +1854,7 @@ module.exports = {
     addNode:addNode,
     addUpdateSafe:addUpdateSafe,
     getPeerSafe:getPeerSafe,
+    getAllPeerSafes:getAllPeerSafes,
     getNodes:getNodes,
     addBlock:addBlock,
     getBlock:getBlock,
