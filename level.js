@@ -191,7 +191,7 @@ var addUpdateSafe = function(safeKey,peerSafeJSON){
 }
 
 var getPeerSafe = function(safeKey,cb){
-  db.get("safe:"+safeKey.split(":")[0], function (err, value) {
+  db.get("safe:"+safeKey, function (err, value) {
     if(err){
       cb('nodata');
     }else{
