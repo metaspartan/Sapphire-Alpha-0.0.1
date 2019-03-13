@@ -919,6 +919,7 @@ var directMessage = function(secretMessage){
                 //time to make a safe for him
                 //////we will actually make ethereum addresses and derive the BTC for now using random and testnet
 
+
                 var keyPair = bitcoin.ECPair.makeRandom();
                 var publicAddress = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey },bitcoin.networks.testnet).address;
                 var privateKey = keyPair.toWIF(bitcoin.networks.testnet);
@@ -930,7 +931,7 @@ var directMessage = function(secretMessage){
 
                 frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
 
-                BlkDB.addUpdateSafe(peerId+":"+publicAddress,JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:egemAccount,public:ecdhPubKeyHex}))
+                BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:egemAccount,public:ecdhPubKeyHex}))
 
                 peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
 
