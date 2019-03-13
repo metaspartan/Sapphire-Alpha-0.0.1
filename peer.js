@@ -414,8 +414,8 @@ var directMessage = function(secretMessage){
   secretPeerMSG = secretMessage.split(":")[1];
   secretAction = secretMessage.split(":")[2];//create Wallet
   encryptMessage = secretMessage.split(":")[3];//encrypted messages to this node public
-  egemAccount = secretMessage.split(":")[4];
-  rcvEgemAccount = secretMessage.split(":")[5];
+  egemAccount = secretMessage.split(":")[4].toLowerCase();
+  rcvEgemAccount = secretMessage.split(":")[5].toLowerCase();
 
   console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
   //for (let i in frankieCoin.nodes){
@@ -1487,6 +1487,10 @@ function cliGetInput(){
       BlkDB.getChainParams(globalGenesisHash);
       BlkDB.getChainParamStream(globalGenesisHash);
       BlkDB.getChainParamsBlockHeight(globalGenesisHash);
+      cliGetInput();
+    }else if(userInput.startsWith("removeSafe(")){
+      var keyToRemove = userInput.slice(userInput.indexOf("removeSafe(")+11, userInput.indexOf(")"));
+      BlkDB.deleteSafe(keyToRemove);
       cliGetInput();
     }else if(userInput == "getLength()"){
       var currentChainLenth = frankieCoin.getLength();
