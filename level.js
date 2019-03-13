@@ -191,7 +191,7 @@ var addUpdateSafe = function(safeKey,peerSafeJSON){
 }
 
 var deleteSafe = function(safeKey){
-  db.del(data).then(function(){console.log("deleting this order "+safeKey);});
+  db.del(safeKey).then(function(){console.log("deleting this order "+safeKey);});
 }
 
 
