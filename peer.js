@@ -414,8 +414,10 @@ var directMessage = function(secretMessage){
   secretPeerMSG = secretMessage.split(":")[1];
   secretAction = secretMessage.split(":")[2];//create Wallet
   encryptMessage = secretMessage.split(":")[3];//encrypted messages to this node public
-  egemAccount = secretMessage.split(":")[4].toLowerCase();
+  egemAccount = secretMessage.split(":")[4];
   rcvEgemAccount = secretMessage.split(":")[5].toLowerCase();
+  if(egemAccount){egemAccount = egemAccount.toLowerCase()};
+  if(rcvEgemAccount){rcvEgemAccount = rcvEgemAccount.toLowerCase()};
 
   console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
   //for (let i in frankieCoin.nodes){
