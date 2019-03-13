@@ -190,6 +190,11 @@ var addUpdateSafe = function(safeKey,peerSafeJSON){
   })
 }
 
+var deleteSafe = function(safeKey){
+  db.del(data).then(function(){console.log("deleting this order "+safeKey);});
+}
+
+
 var getPeerSafe = function(safeKey,cb){
   db.get("safe:"+safeKey, function (err, value) {
     if(err){
@@ -1855,6 +1860,7 @@ module.exports = {
     addUpdateSafe:addUpdateSafe,
     getPeerSafe:getPeerSafe,
     getAllPeerSafes:getAllPeerSafes,
+    deleteSafe:deleteSafe,
     getNodes:getNodes,
     addBlock:addBlock,
     getBlock:getBlock,

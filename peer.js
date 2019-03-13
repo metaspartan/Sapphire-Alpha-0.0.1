@@ -1002,7 +1002,8 @@ var directMessage = function(secretMessage){
 
                     frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
 
-                    BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:rcvEgemAccount,public:ecdhPubKeyHex}))
+                    BlkDB.deleteSafe(peerId+":"+egemAccount+":BTC");
+                    BlkDB.addUpdateSafe(peerId+":"+rcvEgemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:rcvEgemAccount,public:ecdhPubKeyHex}))
 
                     //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }else{
@@ -1013,7 +1014,8 @@ var directMessage = function(secretMessage){
                     console.log("private key is "+privateKey);
                     console.log("BTC address is: "+publicAddress);
 
-                    BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:egemAccount,public:ecdhPubKeyHex}))
+                    BlkDB.deleteSafe(peerId+":"+egemAccount+":BTC");
+                    BlkDB.addUpdateSafe(peerId+":"+rcvEgemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:rcvEgemAccount,public:ecdhPubKeyHex}))
 
                     //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }
