@@ -15,6 +15,7 @@ const getPort = require('get-port');
 var Web3 = require("web3");
 var web3 = new Web3(new Web3.providers.HttpProvider("https://lb.rpc.egem.io"));
 var bitcoin  = require('bitcoinjs-lib');
+var bitcoinMessage = require('bitcoinjs-message');
 var cs = require('coinstring');
 const ecies = require('standard-ecies');
 
