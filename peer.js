@@ -1012,6 +1012,7 @@ var directMessage = function(secretMessage){
                     console.log(cs.encode(privateKeyHexBuf, version))
                     var testnetWIFpk = cs.encode(privateKeyHexBuf, version)
                     keyPair = bitcoin.ECPair.fromWIF(testnetWIFpk, bitcoin.networks.testnet);
+                    var message = egemAccount+" controls this address "+publicAddress;
 
 
                     ////now for messaging
