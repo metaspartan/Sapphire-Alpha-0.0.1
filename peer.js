@@ -1263,14 +1263,14 @@ function cliGetInput(){
 
         //////////////////////////////////////////if there is an action redirect
         if(action){
-          if(action == "Wallet"){
+          if(action == "deposit"){
             console.log("there is an action of "+action+"on this transaction ");
             //will eventually randomize a peer but in this case just chossing first one
             var cbSecretSafeAddy = function(addy){
               console.log(addy);
             }
             directMessage('0:0:Wallet:nodata:'+validatedSender.toLowerCase())//node index:
-          }else if(action == "Transaction"){
+          }else if(action == "transaction"){
 
           }
         }
