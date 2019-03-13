@@ -928,9 +928,9 @@ var directMessage = function(secretMessage){
                 console.log("BTC address is: "+publicAddress);
                 //going to require a digned transaction from the peer before I do this
 
-                frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC","empty");//peerSafe(nodeId,key,type,store)
+                frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
 
-                BlkDB.addUpdateSafe(peerId+":"+publicAddress,JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,public:ecdhPubKeyHex}))
+                BlkDB.addUpdateSafe(peerId+":"+publicAddress,JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:egemAccount,public:ecdhPubKeyHex}))
 
                 peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
 
@@ -1269,7 +1269,7 @@ function cliGetInput(){
             var cbSecretSafeAddy = function(addy){
               console.log(addy);
             }
-            directMessage('0:0:Wallet:nodata:'+validatedSender.toLowerCase())//node index:
+            directMessage('0:0:Wallet::'+validatedSender.toLowerCase())//node index:
           }else if(action == "transaction"){
 
           }
