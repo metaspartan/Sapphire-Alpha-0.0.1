@@ -951,7 +951,7 @@ var directMessage = function(secretMessage){
 
                     frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
 
-                    BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:egemAccount,public:ecdhPubKeyHex}))
+                    BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKeyHex,egemAccount:egemAccount,public:ecdhPubKeyHex}))
 
                     peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }else{
@@ -1008,7 +1008,7 @@ var directMessage = function(secretMessage){
                     var privateKey = JSON.parse(data)["addressPK"];
                     console.log("private key is "+privateKey);
                     console.log("BTC address is: "+publicAddress);
-                    var privateKeyHexBuf = new Buffer(privateKey, 'hex');
+                    var privateKeyHexBuf = new Buffer.from(privateKey, 'hex');
                     var version = 0xef; //Bitcoin private key
                     console.log(cs.encode(privateKeyHexBuf, version))
                     var testnetWIFpk = cs.encode(privateKeyHexBuf, version)
