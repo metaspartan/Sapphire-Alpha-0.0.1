@@ -415,7 +415,7 @@ var directMessage = function(secretMessage){
   secretAction = secretMessage.split(":")[2];//create Wallet
   encryptMessage = secretMessage.split(":")[3];//encrypted messages to this node public
   egemAccount = secretMessage.split(":")[4];
-  rcvEgemAccount = secretMessage.split(":")[5].toLowerCase();
+  rcvEgemAccount = secretMessage.split(":")[5];
   if(egemAccount){egemAccount = egemAccount.toLowerCase()};
   if(rcvEgemAccount){rcvEgemAccount = rcvEgemAccount.toLowerCase()};
 
