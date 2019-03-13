@@ -440,7 +440,7 @@ var directMessage = function(secretMessage){
       console.log(decryptedText.toString());
       encryptMessage =  new Buffer.from(encryptMessage)
 
-      if(encryptMessage != "nodata"){
+      if(encryptMessage != ""){
         var peerPubKey = new Buffer.from(frankieCoin.nodes[i]["publicPair"],"hex");
         console.log("PEER PUB KEY "+peerPubKey);
 
