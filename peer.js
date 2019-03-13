@@ -415,6 +415,7 @@ var directMessage = function(secretMessage){
   secretAction = secretMessage.split(":")[2];//create Wallet
   encryptMessage = secretMessage.split(":")[3];//encrypted messages to this node public
   egemAccount = secretMessage.split(":")[4];
+  rcvEgemAccount = secretMessage.split(":")[5];
 
   console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
   //for (let i in frankieCoin.nodes){
@@ -458,7 +459,7 @@ var directMessage = function(secretMessage){
 
 
       //I am passing a peer safe initialization reques
-      peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,egemAccount:egemAccount,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
+      peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,egemAccount:egemAccount,rcvEgemAccount:rcvEgemAccount,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
       //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
     }
   //}
@@ -878,7 +879,8 @@ var directMessage = function(secretMessage){
           var secretAction = JSON.parse(data)["peerSafe"]["secretAction"];
           var encryptedMessage = JSON.parse(data)["peerSafe"]["encoded"];
           var thisPeerPublicKey = JSON.parse(data)["peerSafe"]["public"];
-          var egemAccount = JSON.parse(data)["peerSafe"]["egemAccount"]
+          var egemAccount = JSON.parse(data)["peerSafe"]["egemAccount"];
+          var rcvEgemAccount = JSON.parse(data)["peerSafe"]["rcvEgemAccount"];
 
           var options = {
               hashName: 'sha256',
@@ -969,6 +971,55 @@ var directMessage = function(secretMessage){
 
                 //peers[frankieCoin.nodes[i]["id"]].conn.end(,,callback);
                 /////end safe creation
+              }else if(secretAction == "Transact"){
+
+                var ticker = "BTC"//temporarily just doing BTC
+                var cbPeerSafeExistance = function(data){
+                  console.log("SEARCH RETURNED WITH "+data)
+                  if(data == "nodata"){
+                    var keyPair = bitcoin.ECPair.makeRandom();
+                    //var publicAddress = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey },bitcoin.networks.testnet).address;
+                    //var privateKey = keyPair.toWIF(bitcoin.networks.testnet);
+                    var privateKeyHex = keyPair.privateKey.toString('hex');
+
+                    console.log("testnet private key "+privateKeyHex)
+                    //for compressed, append "01"
+                    privateKeyHex += '01'
+
+                    var privateKeyHexBuf = new Buffer(privateKeyHex, 'hex');
+
+                    var version = 0xef; //Bitcoin private key
+
+                    console.log(cs.encode(privateKeyHexBuf, version))
+                    var testnetWIFpk = cs.encode(privateKeyHexBuf, version)
+                    keyPair = bitcoin.ECPair.fromWIF(testnetWIFpk, bitcoin.networks.testnet);
+                    var publicAddress = address = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey, network:bitcoin.networks.testnet }).address;
+
+                    console.log("private key is "+privateKeyHex);
+                    //console.log("public key is "+keyPair.publicKey);
+                    console.log("BTC address is: "+publicAddress);
+                    //going to require a digned transaction from the peer before I do this
+
+                    frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
+
+                    BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:rcvEgemAccount,public:ecdhPubKeyHex}))
+
+                    //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
+                  }else{
+
+                    console.log("Peer Safe Existed for Coin "+ticker+" and is "+data.toString())
+                    var publicAddress = JSON.parse(data)["coinAddress"];
+                    var privateKey = JSON.parse(data)["addressPK"];
+                    console.log("private key is "+privateKey);
+                    console.log("BTC address is: "+publicAddress);
+
+                    BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:egemAccount,public:ecdhPubKeyHex}))
+
+                    //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
+                  }
+                }
+                BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker,cbPeerSafeExistance)
+
               }else if(secretAction == "SignOwner"){
                 var ticker = "BTC"//temporarily just doing BTC
                 var cbPeerSafeExistance = function(data){
@@ -1008,17 +1059,23 @@ var directMessage = function(secretMessage){
                     var privateKey = JSON.parse(data)["addressPK"];
                     console.log("private key is "+privateKey);
                     console.log("BTC address is: "+publicAddress);
-                    var privateKeyHexBuf = new Buffer.from(privateKey, 'hex');
+                    var privateKeyHexBuf = new Buffer.from(privateKey,'hex');
                     var version = 0xef; //Bitcoin private key
                     console.log(cs.encode(privateKeyHexBuf, version))
                     var testnetWIFpk = cs.encode(privateKeyHexBuf, version)
                     keyPair = bitcoin.ECPair.fromWIF(testnetWIFpk, bitcoin.networks.testnet);
+                    var privateKeyBS = keyPair.privateKey;
+                    console.log("THE PRIVATE KEY "+privateKeyBS+" PK to HEX "+privateKeyBS.toString("hex")+" PK HEX BUF "+privateKeyHexBuf);
                     var message = egemAccount+" controls this address "+publicAddress;
-
+                    console.log(message)
 
                     ////now for messaging
-                    var signature = bitcoinMessage.sign(message, privateKey, keyPair.compressed)
+                    var signature = bitcoinMessage.sign(message, privateKeyBS, keyPair.compressed)
                     console.log(signature.toString('base64'))
+
+                    var address = publicAddress;
+
+                    console.log(bitcoinMessage.verify(message, address, signature))
                     //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }
 
@@ -1361,11 +1418,11 @@ function cliGetInput(){
             var cbSecretSafeAddy = function(addy){
               console.log(addy);
             }
-            directMessage('0:0:Wallet::'+validatedSender.toLowerCase())//node index:
-          }else if(action == "transaction"){
-
+            directMessage('0:0:Wallet::'+validatedSender.toLowerCase()+":");//node index:
+          }else if(action == "transfer"){
+            directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo);//node index:
           }else if(action == "proof"){
-            directMessage('0:0:SignOwner::'+validatedSender.toLowerCase())//node index:
+            directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":");//node index:
           }
         }
         /////////////////////////////////////////////////////end action redirect
