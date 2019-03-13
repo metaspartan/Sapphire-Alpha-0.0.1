@@ -919,21 +919,34 @@ var directMessage = function(secretMessage){
                 //time to make a safe for him
                 //////we will actually make ethereum addresses and derive the BTC for now using random and testnet
 
+                var ticker = "BTC"//temporarily just doing BTC
+                var cbPeerSafeExistance = function(data){
+                  if(data != "nodata"){
+                    var keyPair = bitcoin.ECPair.makeRandom();
+                    var publicAddress = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey },bitcoin.networks.testnet).address;
+                    var privateKey = keyPair.toWIF(bitcoin.networks.testnet);
+                    privateKey += '01';//testnet
+                    console.log("private key is "+privateKey);
+                    //console.log("public key is "+keyPair.publicKey);
+                    console.log("BTC address is: "+publicAddress);
+                    //going to require a digned transaction from the peer before I do this
 
-                var keyPair = bitcoin.ECPair.makeRandom();
-                var publicAddress = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey },bitcoin.networks.testnet).address;
-                var privateKey = keyPair.toWIF(bitcoin.networks.testnet);
-                privateKey += '01';//testnet
-                console.log("private key is "+privateKey);
-                //console.log("public key is "+keyPair.publicKey);
-                console.log("BTC address is: "+publicAddress);
-                //going to require a digned transaction from the peer before I do this
+                    frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
 
-                frankieCoin.peerSafe(peerPublicPair,peerId,privateKey,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
+                    BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:egemAccount,public:ecdhPubKeyHex}))
 
-                BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:egemAccount,public:ecdhPubKeyHex}))
+                    peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
+                  }else{
+                    console.log("Peer Safe Existed for Coin "+ticker)
+                    var publicAddress = data.coinAddress;
+                    var privateKey = data.addressPK;
+                    console.log("private key is "+privateKey);
+                    console.log("BTC address is: "+publicAddress);
+                  }
+                }
+                BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker,cbPeerSafeExistance)
 
-                peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
+
 
                 //peers[frankieCoin.nodes[i]["id"]].conn.end(,,callback);
                 /////end safe creation

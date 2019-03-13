@@ -182,10 +182,10 @@ var addUpdateSafe = function(safeKey,peerSafeJSON){
   db.get("safe:"+safeKey, function (err, value) {
     if(err){
       console.log("in the error "+safeKey)
-      db.put("safe:"+safeKey.split(":")[0]+":"+safeKey.split(":")[1],peerSafeJSON)
+      db.put("safe:"+safeKey,peerSafeJSON)
     }else{
       console.log("in the normal "+safeKey)
-      db.put("safe:"+safeKey.split(":")[0]+":"+safeKey.split(":")[1],peerSafeJSON)
+      db.put("safe:"+safeKey,peerSafeJSON)
     }
   })
 }
