@@ -321,7 +321,8 @@ var Blockchain = class Blockchain {
               var thisnode = {
                 "id":id,
                 "info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length,"synchBlock":0},
-                "ecdh":ecdh
+                "ecdh":ecdh,
+                "stores":[]
               };
 
               this.nodes.push(thisnode);
@@ -354,7 +355,17 @@ var Blockchain = class Blockchain {
 
         for (let i in this.nodes){
           if(this.nodes[i]["id"] == nodeId){
-            //this.nodes[i]["info"]["chainlength"] = parseInt(this.nodes[i]["info"]["chainlength"])+1;
+            var storeExists = false;
+            for(s in this.nodes[i]["stores"]){
+              if(this.nodes[i]["stores"].type == type && this.nodes[i]["stores"].egemAddress == egemAddress){
+                storeExists = true;
+              }
+            }
+            if(storeExists == false){
+              var storesEntry = {"storePrivatekey":storePrivatekey,"type":type,"egemAddress":egemAddress,"store":store};
+              this.nodes[i]["stores"].push(storesEntry);
+            }
+            //will be removing this because its not correct
             this.nodes[i]["store"] = {"storePrivatekey":storePrivatekey,"type":type,"egemAddress":egemAddress,"store":store}
           }
         }

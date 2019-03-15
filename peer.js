@@ -461,7 +461,7 @@ var directMessage = function(secretMessage){
       //going to need a peerPublicPair which is only after 2nd message
 
 
-      //I am passing a peer safe initialization reques
+      //I am passing a peer safe initialization request
       peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,egemAccount:egemAccount,rcvEgemAccount:rcvEgemAccount,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
       //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
     }
