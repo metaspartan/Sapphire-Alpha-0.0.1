@@ -87,6 +87,7 @@ chainState.synchronized = 1;//when we are synched at a block it gets updated
 chainState.topBlock = 0;
 chainState.previousBlockCheckPointHash = {};
 chainState.currentBlockCheckPointHash = {};
+chainState.datapack = "";
 
   var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
@@ -1091,6 +1092,7 @@ var directMessage = function(secretMessage){
 
               }else if(secretAction == "DepositAddress"){
                 console.log(secretPeerMSG);
+                chainState.datapack = secretPeerMSG;
               }
 
               console.log("THIS NODES INFO "+JSON.stringify(frankieCoin.nodes[thisNode]))
@@ -2366,6 +2368,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
     //broadcastPeers(JSON.stringify({"message":order,"signature":txsignature,"transactionID":myblockorder.transactionID,"timestamp":myblockorder.timestamp}));
     //impceventcaller("This order and callback was submitted by "+egemSendingAddress)
   }else if(isJSON(childData) && JSON.parse(childData)["signedTransaction"]){
+    var actionStep = "received:wait";//RPC reply step counter
     log("Incoming Transaction over RPC");
     log(chalk.yellow(JSON.stringify(JSON.parse(childData)["signedTransaction"]["message"])));
     var tx = JSON.stringify(JSON.parse(childData)["signedTransaction"]["message"]);
@@ -2377,7 +2380,16 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
     console.log("deep transaction "+JSON.parse(parsedtx)["send"]);
     var signedPackageTx = JSON.parse(parsedtx)["send"];
     console.log("address is "+signedPackageTx["from"]);
+    console.log("action"+signedPackageTx["action"])
 
+    try{
+      var action = signedPackageTx["action"];
+      actionStep = "redirect:datapack"
+    }catch{
+      ///////////////////////////////////////////////////////relay asap to peers
+      actionStep = "proceed:ignore"
+      //broadcastPeers(signedPackage);
+    }
 
     var addressFrom = signedPackageTx["from"];
     var addressTo = signedPackageTx["to"];
@@ -2385,6 +2397,24 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
     var ticker = signedPackageTx["ticker"];
     var validatedSender = web3.eth.accounts.recover(JSON.parse(childData)["signedTransaction"]["message"],JSON.parse(childData)["signedTransaction"]["signature"]);
     if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
+
+      //////////////////////////////////////////if there is an action redirect
+      if(action){
+        if(action == "deposit"){
+          console.log("there is an action of "+action+"on this transaction ");
+          //will eventually randomize a peer but in this case just chossing first one
+          var cbSecretSafeAddy = function(addy){
+            console.log(addy);
+          }
+          directMessage('0:0:Wallet::'+validatedSender.toLowerCase()+":");//node index:
+        }else if(action == "transfer"){
+          directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo);//node index:
+        }else if(action == "proof"){
+          directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":");//node index:
+        }
+      }
+      /////////////////////////////////////////////////////end action redirect
+
       ///need to alidate that this wallet has the funds to send
       var myblocktx = new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker);
       frankieCoin.createTransaction(myblocktx);
@@ -2394,7 +2424,24 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
       console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
     }
     console.log("my confirmation to return "+"placeholder"+myblocktx.hash);
-    sendTXID("placeholder"+myblocktx.hash);
+
+    if(actionStep.split(":")[1] == "ignore"){
+      //now we have a method to get better response data
+      sendTXID("nodata:placeholder:"+myblocktx.hash);
+    }else if(actionStep.split(":")[1] == "datapack"){
+      console.log("in datapack case ...")
+      var repeatReply = function(){
+        console.log("in repeat reply")
+        if(chainState.datapack != ""){
+          sendTXID("btcAddress:"+chainState.datapack+":"+myblocktx.hash);
+          chainState.datapack = "";
+        }else{
+          console.log("waiting on data for RPC reply ...");
+          setTimeout(function(){repeatReply()},100);
+        }
+      }
+      repeatReply();
+    }
 
     //prepped up using same format as order
     //var peerTx = JSON.parse(childData)["signedTransaction"];
@@ -2402,7 +2449,10 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
     //peerTx["timestamp"] = myblockorder.timestamp;
     //broadcastPeers(JSON.stringify(peerTx));
 
-    broadcastPeers(JSON.stringify(JSON.parse(childData)["signedTransaction"]));
+    if(actionStep.split(":")[0] == "proceed"){
+      broadcastPeers(JSON.stringify(JSON.parse(childData)["signedTransaction"]));
+    }
+
     //impceventcaller("This order and callback was submitted by "+egemSendingAddress)
   }else{
     log("RCP commands were not properly formatted");
