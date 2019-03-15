@@ -1084,7 +1084,7 @@ var directMessage = function(secretMessage){
                     console.log(bitcoinMessage.verify(message, address, signature))
 
                     //chainState.datapack = signature+":"+message+":"+bitcoinMessage.verify(message, address, signature);
-                    var signatureProofReturn = signature+":"+message+":"+bitcoinMessage.verify(message, address, signature);
+                    var signatureProofReturn = signature.toString('base64')+":"+message+":"+bitcoinMessage.verify(message, address, signature);
 
                     peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:signatureProofReturn,secretAction:"DepositAddressProof",encoded:"nodata",public:ecdhPubKeyHex}}));
                     //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
@@ -1098,7 +1098,7 @@ var directMessage = function(secretMessage){
 
               }else if(secretAction == "DepositAddress" || secretAction == "DepositAddressProof"){
                 console.log(secretPeerMSG);
-                chainState.datapack = secretPeerMSG;
+                chainState.datapack = secretAction+":"+secretPeerMSG;
               }
 
               console.log("THIS NODES INFO "+JSON.stringify(frankieCoin.nodes[thisNode]))
@@ -2439,7 +2439,16 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
       var repeatReply = function(){
         console.log("in repeat reply")
         if(chainState.datapack != ""){
-          sendTXID("btcAddress:"+chainState.datapack+":"+myblocktx.hash);
+          if(chainState.datapack.split(":")[0] == "DepositAddress"){
+            chainState.datapack = chainState.datapack.replace("DepositAddress:","");
+            sendTXID("btcAddress:"+chainState.datapack+":"+myblocktx.hash);
+          }else if(chainState.datapack.split(":")[0] == "DepositAddressProof"){
+            chainState.datapack = chainState.datapack.replace("DepositAddressProof:","");
+            sendTXID("btcAddressProof:"+chainState.datapack+":"+myblocktx.hash);
+          }else{
+            sendTXID("error:"+chainState.datapack+":"+myblocktx.hash);
+          }
+
           chainState.datapack = "";
         }else{
           console.log("waiting on data for RPC reply ...");
