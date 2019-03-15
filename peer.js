@@ -1059,6 +1059,7 @@ var directMessage = function(secretMessage){
 
                     //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }else{
+
                     console.log("Peer Safe Existed for Coin "+ticker+" and is "+data.toString())
                     var publicAddress = JSON.parse(data)["coinAddress"];
                     var privateKey = JSON.parse(data)["addressPK"];
@@ -1082,8 +1083,10 @@ var directMessage = function(secretMessage){
 
                     console.log(bitcoinMessage.verify(message, address, signature))
 
-                    chainState.datapack = signature+":"+message+":"+bitcoinMessage.verify(message, address, signature);
+                    //chainState.datapack = signature+":"+message+":"+bitcoinMessage.verify(message, address, signature);
+                    var signatureProofReturn = signature+":"+message+":"+bitcoinMessage.verify(message, address, signature);
 
+                    peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:signatureProofReturn,secretAction:"DepositAddressProof",encoded:"nodata",public:ecdhPubKeyHex}}));
                     //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }
 
@@ -1093,7 +1096,7 @@ var directMessage = function(secretMessage){
                 }
                 BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker,cbPeerSafeExistance)
 
-              }else if(secretAction == "DepositAddress"){
+              }else if(secretAction == "DepositAddress" || secretAction == "DepositAddressProof"){
                 console.log(secretPeerMSG);
                 chainState.datapack = secretPeerMSG;
               }
