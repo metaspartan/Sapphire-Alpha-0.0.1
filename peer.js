@@ -1081,6 +1081,9 @@ var directMessage = function(secretMessage){
                     var address = publicAddress;
 
                     console.log(bitcoinMessage.verify(message, address, signature))
+
+                    chainState.datapack = signature+":"+message+":"+bitcoinMessage.verify(message, address, signature);
+
                     //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }
 
@@ -2400,8 +2403,8 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
       //////////////////////////////////////////if there is an action redirect
       if(action){
+        console.log("there is an action of "+action+"on this transaction ");
         if(action == "deposit"){
-          console.log("there is an action of "+action+"on this transaction ");
           //will eventually randomize a peer but in this case just chossing first one
           var cbSecretSafeAddy = function(addy){
             console.log(addy);
