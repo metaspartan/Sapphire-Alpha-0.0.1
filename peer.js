@@ -954,7 +954,7 @@ var directMessage = function(secretMessage){
                     console.log("BTC address is: "+publicAddress);
                     //going to require a digned transaction from the peer before I do this
 
-                    frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
+                    //frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
 
                     BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKeyHex,egemAccount:egemAccount,public:ecdhPubKeyHex}))
 
@@ -1003,7 +1003,7 @@ var directMessage = function(secretMessage){
                     console.log("BTC address is: "+publicAddress);
                     //going to require a digned transaction from the peer before I do this
 
-                    frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
+                    //frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
 
                     BlkDB.deleteSafe(peerId+":"+egemAccount+":BTC");
                     BlkDB.addUpdateSafe(peerId+":"+rcvEgemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:rcvEgemAccount,public:ecdhPubKeyHex}))
@@ -1053,7 +1053,7 @@ var directMessage = function(secretMessage){
                     console.log("BTC address is: "+publicAddress);
                     //going to require a digned transaction from the peer before I do this
 
-                    frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
+                    //frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
 
                     BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:egemAccount,public:ecdhPubKeyHex}))
 

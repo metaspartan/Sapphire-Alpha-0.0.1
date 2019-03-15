@@ -356,8 +356,8 @@ var Blockchain = class Blockchain {
         for (let i in this.nodes){
           if(this.nodes[i]["id"] == nodeId){
             var storeExists = false;
-            for(s in this.nodes[i]["stores"]){
-              if(this.nodes[i]["stores"].type == type && this.nodes[i]["stores"].egemAddress == egemAddress){
+            for(var s in this.nodes[i]["stores"]){
+              if(this.nodes[i]["stores"][s].type == type && this.nodes[i]["stores"][s].egemAddress == egemAddress){
                 storeExists = true;
               }
             }
