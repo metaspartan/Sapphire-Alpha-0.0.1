@@ -923,7 +923,7 @@ var directMessage = function(secretMessage){
                 console.log("I DID IT IF IT DONT ERROR "+decryptedPeerMessage.toString());
               }
 
-              console.log(secretAction+" was "+);
+              console.log(secretAction+" was ");
 
               if(secretAction == "getAllWallets"){
 
