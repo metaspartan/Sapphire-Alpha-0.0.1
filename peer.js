@@ -1463,6 +1463,8 @@ function cliGetInput(){
             directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo);//node index:
           }else if(action == "proof"){
             directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":");//node index:
+          }else if(action == "listlockedunspent"){
+            directMessage('0:0:getAllWallets::'+validatedSender.toLowerCase()+":");//node index:
           }
         }
         /////////////////////////////////////////////////////end action redirect
