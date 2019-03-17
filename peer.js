@@ -418,7 +418,7 @@ var directMessage = function(secretMessage){
   egemAccount = secretMessage.split(":")[4];
   rcvEgemAccount = secretMessage.split(":")[5];
   if(egemAccount){egemAccount = egemAccount.toLowerCase()};
-  if(rcvEgemAccount){rcvEgemAccount = rcvEgemAccount.toLowerCase()};
+  //if(rcvEgemAccount){rcvEgemAccount = rcvEgemAccount.toLowerCase()};
 
   console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
   //for (let i in frankieCoin.nodes){
@@ -1443,7 +1443,7 @@ function cliGetInput(){
           if(action == "deposit"){
             directMessage('0:0:Wallet::'+validatedSender.toLowerCase()+":");//node index:
           }else if(action == "transfer"){
-            directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo);//node index:
+            directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo.toLowerCase());//node index:
           }else if(action == "proof"){
             directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":"+coinEGEMAddress);//node index:
           }else if(action == "listlockedunspent"){
@@ -2429,7 +2429,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
         if(action == "deposit"){
           directMessage('0:0:Wallet::'+validatedSender.toLowerCase()+":");//node index:
         }else if(action == "transfer"){
-          directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo);//node index:
+          directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo.toLowerCase());//node index:
         }else if(action == "proof"){
           directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":"+coinEGEMAddress);//node index:
         }else if(action == "listlockedunspent"){
