@@ -933,46 +933,25 @@ var directMessage = function(secretMessage){
                 var cbPeerSafeExistance = function(data){
 
                   //need to loop thru return now
-                  var allPeerSafes = data;
-                  console.log(allPeerSafes);
+                  console.log("length of returned"+data.length)
 
-                  console.log("SEARCH RETURNED WITH "+data)
-                  if(data == "nodata"){
-                    var keyPair = bitcoin.ECPair.makeRandom();
-                    //var publicAddress = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey },bitcoin.networks.testnet).address;
-                    //var privateKey = keyPair.toWIF(bitcoin.networks.testnet);
-                    var privateKeyHex = keyPair.privateKey.toString('hex');
-
-                    console.log("testnet private key "+privateKeyHex)
-                    //for compressed, append "01"
-                    privateKeyHex += '01'
-
-                    var privateKeyHexBuf = new Buffer(privateKeyHex, 'hex');
-
-                    var version = 0xef; //Bitcoin private key
-
-                    console.log(cs.encode(privateKeyHexBuf, version))
-                    var testnetWIFpk = cs.encode(privateKeyHexBuf, version)
-                    keyPair = bitcoin.ECPair.fromWIF(testnetWIFpk, bitcoin.networks.testnet);
-                    var publicAddress = address = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey, network:bitcoin.networks.testnet }).address;
-
-                    console.log("private key is "+privateKeyHex);
-                    //console.log("public key is "+keyPair.publicKey);
-                    console.log("BTC address is: "+publicAddress);
-                    //going to require a digned transaction from the peer before I do this
-
-                    //frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
-
-                    BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKeyHex,egemAccount:egemAccount,public:ecdhPubKeyHex}))
-
-                    peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
+                  if(data.length > 0){
+                    var allPeerSafes = data;
+                    console.log(allPeerSafes);
                   }else{
+                    console.log("There are no unspent txo available for this addresss on this coin")
+                  }
+
+                  if(data == "nodata"){
+                  }else{
+                    /***
                     console.log("Peer Safe Existed for Coin "+ticker+" and is "+data.toString())
                     var publicAddress = JSON.parse(data)["coinAddress"];
                     var privateKey = JSON.parse(data)["addressPK"];
                     console.log("private key is "+privateKey);
                     console.log("BTC address is: "+publicAddress);
                     peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
+                    ***/
                   }
                 }
                 BlkDB.getPeerSafeAccounts(peerId+":"+egemAccount+":"+ticker,cbPeerSafeExistance)
@@ -1008,9 +987,13 @@ var directMessage = function(secretMessage){
                     console.log("BTC address is: "+publicAddress);
                     //going to require a digned transaction from the peer before I do this
 
+                    var blake2sAddress = sapphirechain.Hash(publicAddress);
+                    console.log("Blake2s: "+blake2sAddress);
+
+
                     //frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
 
-                    BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKeyHex,egemAccount:egemAccount,public:ecdhPubKeyHex}))
+                    BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC:"+blake2sAddress,JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKeyHex,egemAccount:egemAccount,public:ecdhPubKeyHex}))
 
                     peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }else{
@@ -1453,11 +1436,6 @@ function cliGetInput(){
         //////////////////////////////////////////if there is an action redirect
         if(action){
           if(action == "deposit"){
-            console.log("there is an action of "+action+"on this transaction ");
-            //will eventually randomize a peer but in this case just chossing first one
-            var cbSecretSafeAddy = function(addy){
-              console.log(addy);
-            }
             directMessage('0:0:Wallet::'+validatedSender.toLowerCase()+":");//node index:
           }else if(action == "transfer"){
             directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo);//node index:
@@ -1627,7 +1605,7 @@ function cliGetInput(){
       log(userInput.slice(userInput.indexOf("Hash(")+5, userInput.indexOf(")")));
       var hashText = userInput.slice(userInput.indexOf("Hash(")+5, userInput.indexOf(")"));
       log("HASHING THIS TEXT: "+hashText);
-      sapphirechain.Hash(hashText);
+      console.log(sapphirechain.Hash(hashText));
       cliGetInput();
     }else if(userInput.startsWith("getOmmer(")){//GETBLOCK function
       log(userInput.slice(userInput.indexOf("getOmmer(")+9, userInput.indexOf(")")));
@@ -2438,10 +2416,6 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
       if(action){
         console.log("there is an action of "+action+"on this transaction ");
         if(action == "deposit"){
-          //will eventually randomize a peer but in this case just chossing first one
-          var cbSecretSafeAddy = function(addy){
-            console.log(addy);
-          }
           directMessage('0:0:Wallet::'+validatedSender.toLowerCase()+":");//node index:
         }else if(action == "transfer"){
           directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo);//node index:
