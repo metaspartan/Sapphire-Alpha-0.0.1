@@ -926,6 +926,8 @@ var directMessage = function(secretMessage){
 
               if(secretAction == "getAllWallets"){
 
+                console.log("we have an action to pull list locked unspent transaction outputs");
+
                 var ticker = "BTC"//temporarily just doing BTC
                 var cbPeerSafeExistance = function(data){
 
