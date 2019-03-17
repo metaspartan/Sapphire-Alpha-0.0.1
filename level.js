@@ -205,6 +205,25 @@ var getPeerSafe = function(safeKey,cb){
   })
 }
 
+var getPeerSafeAccounts = function(safeKey,cb){
+  var stream = db.createReadStream();
+  var listLockedUnspents = []
+  stream.on('data',function(data){
+    //console.log("block: "+parseInt(data.key.toString().split(":")[1],16).toString(10)+" hexBlockNum: "+parseInt(chainBlockHeight))
+    //console.log('key = '+data.key+" value = "+data.value.toString());
+    if(data.key.toString().split(":")[0] == safeKey){//possible another block enters the db s no upper limit
+      //console.log("here... "+data.key.toString()+" "+data.value.toString());
+      console.log("key: "+data.key.toString()+" value: "+data.value.toString());
+      listLockedUnspents[data.key.toString()]=data.value.toString()
+    }
+  });
+
+  stream.on('close',function(){
+    cb(listLockedUnspents);
+  });
+
+}
+
 var getAllPeerSafes = function(){
   var stream = db.createReadStream();
   stream.on('data',function(data){
@@ -997,6 +1016,37 @@ var getTransactionReceiptsByAddress = function(address){
   })
 
 }
+
+////////////////////////////////////////////////////////////////ALL BALANCE TREE
+var addAllBalanceRecord = function(address,ticker,amount){
+  var currentBalance = 0;
+  db.get("abal:"+address+":"+ticker,function(err,value){
+    if(err){
+      currentBalance = 0;
+    }else{
+      currentBalance = value.toString();
+    }
+  })
+  currentBalance+=amount;
+  putRecord("abal:"+address+":"+ticker,currentBalance);
+}
+
+var getBalanceAtAddressAllBalance = function(address,callback){
+  console.log("Balances for Address "+address+" in ALL BALANCE: ");
+  var allBalances = []
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    if(data.key.toString().split(":")[0] == "abal" && data.key.toString().split(":")[1] == address){
+      //balances from new all balance tree
+      console.log('key = '+data.key+" value = "+data.value.toString());
+      allBalances.push(data.value.toString());
+    }
+  })
+  stream.on("close",function(data){
+    callBack(allBalances);
+  })
+}
+////////////////////////////////////////////////////////////END ALL BALANCE TREE
 
 var getBalanceAtAddressFromTrie = function(address,callback){
 
@@ -1859,6 +1909,7 @@ module.exports = {
     addNode:addNode,
     addUpdateSafe:addUpdateSafe,
     getPeerSafe:getPeerSafe,
+    getPeerSafeAccounts:getPeerSafeAccounts,
     getAllPeerSafes:getAllPeerSafes,
     deleteSafe:deleteSafe,
     getNodes:getNodes,
