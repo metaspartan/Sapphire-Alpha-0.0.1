@@ -1105,7 +1105,8 @@ var directMessage = function(secretMessage){
                   }
 
                 }
-                BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker,cbPeerSafeExistance)
+                var blakeCoinAddress = sapphirechain.Hash(rcvEgemAccount);
+                BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker+":"+blakeCoinAddress,cbPeerSafeExistance)
 
               }else if(secretAction == "DepositAddress" || secretAction == "DepositAddressProof"){
                 console.log(secretPeerMSG);
@@ -1420,7 +1421,11 @@ function cliGetInput(){
         broadcastPeers(signedPackage);
       }
 
-
+      try{
+        var coinEGEMAddress = JSON.stringify(JSON.parse(send)["address"]).replace(/['"/]+/g, '');
+      }catch{
+        //do noting right now
+      }
 
 
       //console.log("signed package is"+JSON.parse(signedPackage)["message"]);
@@ -1440,7 +1445,7 @@ function cliGetInput(){
           }else if(action == "transfer"){
             directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo);//node index:
           }else if(action == "proof"){
-            directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":");//node index:
+            directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":"+coinEGEMAddress);//node index:
           }else if(action == "listlockedunspent"){
             directMessage('0:0:getAllWallets::'+validatedSender.toLowerCase()+":");//node index:
           }
@@ -2405,6 +2410,12 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
       //broadcastPeers(signedPackage);
     }
 
+    try{
+      var coinEGEMAddress = signedPackageTx["address"];
+    }catch{
+      //do nothing right now
+    }
+
     var addressFrom = signedPackageTx["from"];
     var addressTo = signedPackageTx["to"];
     var amount = signedPackageTx["amount"];
@@ -2420,7 +2431,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
         }else if(action == "transfer"){
           directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo);//node index:
         }else if(action == "proof"){
-          directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":");//node index:
+          directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":"+coinEGEMAddress);//node index:
         }else if(action == "listlockedunspent"){
           directMessage('0:0:getAllWallets::'+validatedSender.toLowerCase()+":");//node index:
         }
