@@ -939,7 +939,9 @@ let connSeq = 0
 
                   if(data.length > 0){
                     var allPeerSafes = data;
+                    console.log("IIIIIIIIIIIIIIIII")
                     console.log("keys "+Object.keys(allPeerSafes)+" and "+Object.values(allPeerSafes));
+                    console.log("IIIIIIIIIIIIIIIII")
                     var returnSafes = []
                     for(safe in allPeerSafes){
                       var addy = {"btcAddy":JSON.parse(JSON.stringify(allPeerSafes[safe]))["coinAddress"]};
