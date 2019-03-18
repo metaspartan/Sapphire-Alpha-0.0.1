@@ -942,9 +942,9 @@ let connSeq = 0
                     console.log(allPeerSafes);
                     var returnSafes = []
                     for(safe in allPeerSafes){
-                      var addy = {"btcAddy":JSON.parse(allPeerSafes[safe])["coinAddress"]};
+                      var addy = {"btcAddy":JSON.parse(JSON.stringify(allPeerSafes[safe]))["coinAddress"]};
                       console.log("in addy yup "+JSON.stringify(addy)+" and "+JSON.stringify(allPeerSafes[safe]));
-                      returnSafes.push(JSON.stringify(addy));
+                      returnSafes.push(addy);
                     }
 
                     peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:returnSafes,secretAction:"DepositAddressList",encoded:"nodata",public:ecdhPubKeyHex}}));
