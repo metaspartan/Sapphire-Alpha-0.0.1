@@ -215,7 +215,8 @@ var getPeerSafeAccounts = function(safeKey,cb){
     if(data.key.toString().includes(safeKey)){//possible another block enters the db s no upper limit
       //console.log("here... "+data.key.toString()+" "+data.value.toString());
       console.log("key: "+data.key.toString()+" value: "+data.value.toString());
-      listLockedUnspents[data.key.toString()]=data.value.toString()
+      var thisSafeAccount = {[data.key.toString()]:data.value.toString()}
+      listLockedUnspents.push(thisSafeAccount);
     }
   });
 
