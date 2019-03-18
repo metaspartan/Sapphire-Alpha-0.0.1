@@ -207,7 +207,8 @@ var getPeerSafe = function(safeKey,cb){
 
 var getPeerSafeAccounts = function(safeKey,cb){
   var stream = db.createReadStream();
-  var listLockedUnspents = []
+  var listLockedUnspents = [];
+  console.log(safeKey);
   stream.on('data',function(data){
     //console.log("block: "+parseInt(data.key.toString().split(":")[1],16).toString(10)+" hexBlockNum: "+parseInt(chainBlockHeight))
     //console.log('key = '+data.key+" value = "+data.value.toString());
