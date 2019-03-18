@@ -89,6 +89,7 @@ chainState.previousBlockCheckPointHash = {};
 chainState.currentBlockCheckPointHash = {};
 chainState.datapack = "";
 chainState.nodePersistantId;
+chainState.peerNonce = 0;
 
   var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
@@ -197,29 +198,6 @@ var getConnectionConfig = async function(){
 
 //const myId = crypto.randomBytes(32);
 //console.log("the Node ID = "+myId);
-
-var myLastSessionId;
-var nodePersistance = async function(){
-  //var myLastSessionId = undefined
-  var callBackNodePersistence = function(npid){
-    myLastSessionId = npid;
-    console.log("my last session = "+myLastSessionId);
-    if(myLastSessionId != "notfound"){
-      chainState.nodePersistantId = myLastSessionId;
-      console.log("node persistantce was already set ")
-    }else{
-      chainState.nodePersistantId = crypto.randomBytes(32);
-      BlkDB.addChainParams(globalGenesisHash+":nodePersistantId",chainState.nodePersistantId);
-    }
-  }
-  console.log("making the call");
-  BlkDB.getChainParamsByName(globalGenesisHash,'nodePersistantId',callBackNodePersistence);
-
-}
-//nodePersistance();
-
-
-
 
 /////////////////////////////simple function to test JSON input and avoid errors
 function isJSON(str) {
@@ -962,6 +940,14 @@ let connSeq = 0
                   if(data.length > 0){
                     var allPeerSafes = data;
                     console.log(allPeerSafes);
+                    var returnSafes = []
+                    for(safe in allPeerSafes){
+                      var addy = {"btcAddy":allPeerSafes[safe].coinAddress};
+                      console.log("in addy "+addy);
+                      returnSafes.push(addy);
+                    }
+
+                    peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:returnSafes,secretAction:"DepositAddressList",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }else{
                     console.log("There are no unspent txo available for this addresss on this coin")
                   }
@@ -2484,6 +2470,9 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
             chainState.datapack = chainState.datapack.replace("DepositAddress:","");
             sendTXID("btcAddress:"+chainState.datapack+":"+myblocktx.hash);
           }else if(chainState.datapack.split(":")[0] == "DepositAddressProof"){
+            chainState.datapack = chainState.datapack.replace("DepositAddressProof:","");
+            sendTXID("btcAddressProof:"+chainState.datapack+":"+myblocktx.hash);
+          }else if(chainState.datapack.split(":")[0] == "DepositAddressList"){
             chainState.datapack = chainState.datapack.replace("DepositAddressProof:","");
             sendTXID("btcAddressProof:"+chainState.datapack+":"+myblocktx.hash);
           }else{

@@ -296,6 +296,9 @@ var Blockchain = class Blockchain {
 
       registerNode(id,ip,port){
 
+          var nodeFromStorage = BlkDB.getNodeById(id);
+          console.log("NODE FROM STORAGE "+JSON.stringify(nodeFromStorage));
+
           if (!this.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
 
               //var privateKeyA = crypto.randomBytes(32);
