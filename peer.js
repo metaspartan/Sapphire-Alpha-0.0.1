@@ -168,8 +168,34 @@ const rl = readline.createInterface({
 
 /////////////////////////////////////////////asynchronous peer connection engine
 
-const myId = crypto.randomBytes(32);
-console.log("the Node ID = "+myId);
+var getConnectionConfig = async function(){
+  return new Promise(function(resolve, reject) {
+    var callBackNodePersistence = function(npid){
+      myLastSessionId = npid;
+      console.log("my last session = "+myLastSessionId);
+      if(myLastSessionId != "notfound"){
+        chainState.nodePersistantId = myLastSessionId;
+        console.log("node persistantce was already set ")
+      }else{
+        chainState.nodePersistantId = crypto.randomBytes(32);
+        BlkDB.addChainParams(globalGenesisHash+":nodePersistantId",chainState.nodePersistantId);
+      }
+      //network related connections
+      const config = defaults({
+        // peer-id
+        id: chainState.nodePersistantId,
+      })
+
+      const sw = swarm(config);
+      resolve(sw);
+    }
+    console.log("making the call");
+    BlkDB.getChainParamsByName(globalGenesisHash,'nodePersistantId',callBackNodePersistence);
+  })
+}
+
+//const myId = crypto.randomBytes(32);
+//console.log("the Node ID = "+myId);
 
 var myLastSessionId;
 var nodePersistance = async function(){
@@ -189,19 +215,10 @@ var nodePersistance = async function(){
   BlkDB.getChainParamsByName(globalGenesisHash,'nodePersistantId',callBackNodePersistence);
 
 }
-setTimeout(function(){nodePersistance()},1000);
+//nodePersistance();
 
-const peers = {}
-// Counter for connections, used for identify connections
-let connSeq = 0
 
-//network related connections
-const config = defaults({
-  // peer-id
-  id: myId,
-})
 
-const sw = swarm(config);
 
 /////////////////////////////simple function to test JSON input and avoid errors
 function isJSON(str) {
@@ -472,9 +489,15 @@ var directMessage = function(secretMessage){
 }
 //////////////////////////////////////////////////END ENCRYPTED DIRECT MESSAGING
 
+
+const peers = {}
+// Counter for connections, used for identify connections
+let connSeq = 0
 //////////////////////////////////////////////////////core function asynchronous
 ;(async () => {
   const port = await getPort()//grab available random port for peer connections
+
+  const sw = await getConnectionConfig();
 
   sw.listen(port)//peers
   sw.join('egem-sfrx') // can be any id/name/hash
