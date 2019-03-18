@@ -942,8 +942,8 @@ let connSeq = 0
                     console.log(allPeerSafes);
                     var returnSafes = []
                     for(safe in allPeerSafes){
-                      var addy = {"btcAddy":allPeerSafes[safe]["coinAddress"]};
-                      console.log("in addy yup "+JSON.stringify(addy)+" and "+allPeerSafes[safe]);
+                      var addy = {"btcAddy":JSON.parse(allPeerSafes[safe])["coinAddress"]};
+                      console.log("in addy yup "+JSON.stringify(addy)+" and "+JSON.stringify(allPeerSafes[safe]));
                       returnSafes.push(JSON.stringify(addy));
                     }
 
