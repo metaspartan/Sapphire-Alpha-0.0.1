@@ -938,7 +938,7 @@ let connSeq = 0
                   console.log("length of returned"+data.length)
 
                   if(data.length > 0){
-                    var allPeerSafes = Object.values(data);
+                    var allPeerSafes = Object.values(Object.values(data));
                     console.log(allPeerSafes);
                     var returnSafes = []
                     for(safe in allPeerSafes){
