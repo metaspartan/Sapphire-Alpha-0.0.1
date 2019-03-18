@@ -1118,7 +1118,7 @@ let connSeq = 0
                 var blakeCoinAddress = sapphirechain.Hash(rcvEgemAccount);
                 BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker+":"+blakeCoinAddress,cbPeerSafeExistance)
 
-              }else if(secretAction == "DepositAddress" || secretAction == "DepositAddressProof"){
+              }else if(secretAction == "DepositAddress" || secretAction == "DepositAddressProof" || secretAction == "DepositAddressList"){
                 console.log(secretPeerMSG);
                 chainState.datapack = secretAction+":"+secretPeerMSG;
               }
@@ -2473,8 +2473,8 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
             chainState.datapack = chainState.datapack.replace("DepositAddressProof:","");
             sendTXID("btcAddressProof:"+chainState.datapack+":"+myblocktx.hash);
           }else if(chainState.datapack.split(":")[0] == "DepositAddressList"){
-            chainState.datapack = chainState.datapack.replace("DepositAddressProof:","");
-            sendTXID("btcAddressProof:"+chainState.datapack+":"+myblocktx.hash);
+            chainState.datapack = chainState.datapack.replace("DepositAddressList:","");
+            sendTXID("btcAddressList:"+chainState.datapack+":"+myblocktx.hash);
           }else{
             sendTXID("error:"+chainState.datapack+":"+myblocktx.hash);
           }
