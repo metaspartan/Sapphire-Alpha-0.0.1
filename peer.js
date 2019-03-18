@@ -88,6 +88,7 @@ chainState.topBlock = 0;
 chainState.previousBlockCheckPointHash = {};
 chainState.currentBlockCheckPointHash = {};
 chainState.datapack = "";
+chainState.nodePersistantId;
 
   var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
@@ -508,7 +509,7 @@ let connSeq = 0
     const seq = connSeq
     const peerId = info.id.toString('hex');
 
-    if(info.id != myId){
+    if(info.id != chainState.nodePersistantId){
       frankieCoin.registerNode(peerId,info.host,info.port,frankieCoin.length);
       BlkDB.addNode("node:"+peerId+":connection",{"host":info.host,"port":info.port});
       //log(chalk.green("Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
