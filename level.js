@@ -240,7 +240,7 @@ var getPeerSafeAccounts = function(safeKey,cb){
       //console.log("here... "+data.key.toString()+" "+data.value.toString());
       console.log("key: "+data.key.toString()+" value: "+data.value.toString());
       var thisSafeAccount = {[data.key.toString()]:data.value.toString()}
-      listLockedUnspents.push(thisSafeAccount);
+      listLockedUnspents.push(JSON.stringify(thisSafeAccount));
     }
   });
 
