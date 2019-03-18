@@ -211,7 +211,7 @@ var getPeerSafeAccounts = function(safeKey,cb){
   stream.on('data',function(data){
     //console.log("block: "+parseInt(data.key.toString().split(":")[1],16).toString(10)+" hexBlockNum: "+parseInt(chainBlockHeight))
     //console.log('key = '+data.key+" value = "+data.value.toString());
-    if(data.key.toString().split(":")[0] == safeKey){//possible another block enters the db s no upper limit
+    if(data.key.toString().includes(safeKey)){//possible another block enters the db s no upper limit
       //console.log("here... "+data.key.toString()+" "+data.value.toString());
       console.log("key: "+data.key.toString()+" value: "+data.value.toString());
       listLockedUnspents[data.key.toString()]=data.value.toString()
