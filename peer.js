@@ -1080,6 +1080,7 @@ let connSeq = 0
                     //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }
                 }
+                console.log("what I send in to get it "+peerId+":"+egemAccount+":"+ticker+":"+rcvBTCAccount,cbPeerSafeExistance)
                 BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker+":"+rcvBTCAccount,cbPeerSafeExistance)
 
               }else if(secretAction == "SignOwner"){
