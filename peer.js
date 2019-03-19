@@ -887,6 +887,11 @@ let connSeq = 0
           var egemAccount = JSON.parse(data)["peerSafe"]["egemAccount"];
           var rcvEgemAccount = JSON.parse(data)["peerSafe"]["rcvEgemAccount"];
 
+          if(rcvEgemAccount.includes("|")){
+            var rcvBTCAccount = rcvEgemAccount.split("|")[1];
+            rcvEgemAccount = rcvEgemAccount.split("|")[0];
+          }
+
           var options = {
               hashName: 'sha256',
               hashLength: 32,
@@ -1053,11 +1058,12 @@ let connSeq = 0
                     //console.log("public key is "+keyPair.publicKey);
                     console.log("BTC address is: "+publicAddress);
                     //going to require a digned transaction from the peer before I do this
+                    rcvBTCAccount = sapphirecoin.Hash(rcvBTCAccount);
 
                     //frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
 
-                    BlkDB.deleteSafe(peerId+":"+egemAccount+":BTC");
-                    BlkDB.addUpdateSafe(peerId+":"+rcvEgemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:rcvEgemAccount,public:ecdhPubKeyHex}))
+                    BlkDB.deleteSafe(peerId+":"+egemAccount+":BTC:"+rcvBTCAccount);
+                    BlkDB.addUpdateSafe(peerId+":"+rcvEgemAccount+":BTC:"+rcvBTCAccount,JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:rcvEgemAccount,public:ecdhPubKeyHex}))
 
                     //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }else{
@@ -1068,8 +1074,8 @@ let connSeq = 0
                     console.log("private key is "+privateKey);
                     console.log("BTC address is: "+publicAddress);
 
-                    BlkDB.deleteSafe(peerId+":"+egemAccount+":BTC");
-                    BlkDB.addUpdateSafe(peerId+":"+rcvEgemAccount+":BTC",JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:rcvEgemAccount,public:ecdhPubKeyHex}))
+                    BlkDB.deleteSafe(peerId+":"+egemAccount+":BTC:"+rcvBTCAccount);
+                    BlkDB.addUpdateSafe(peerId+":"+rcvEgemAccount+":BTC:"+rcvBTCAccount,JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKey,egemAccount:rcvEgemAccount,public:ecdhPubKeyHex}))
 
                     //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }
@@ -1457,7 +1463,7 @@ function cliGetInput(){
           if(action == "deposit"){
             directMessage('0:0:Wallet::'+validatedSender.toLowerCase()+":");//node index:
           }else if(action == "transfer"){
-            directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo.toLowerCase());//node index:
+            directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo.toLowerCase()+"|"+coinEGEMAddress);//node index:
           }else if(action == "proof"){
             directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":"+coinEGEMAddress);//node index:
           }else if(action == "listlockedunspent"){
@@ -2443,7 +2449,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
         if(action == "deposit"){
           directMessage('0:0:Wallet::'+validatedSender.toLowerCase()+":");//node index:
         }else if(action == "transfer"){
-          directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo.toLowerCase());//node index:
+          directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo.toLowerCase()+"|"+coinEGEMAddress);//node index:
         }else if(action == "proof"){
           directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":"+coinEGEMAddress);//node index:
         }else if(action == "listlockedunspent"){
@@ -2477,6 +2483,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
             chainState.datapack = chainState.datapack.replace("DepositAddressProof:","");
             sendTXID("btcAddressProof:"+chainState.datapack+":"+myblocktx.hash);
           }else if(chainState.datapack.split(":")[0] == "DepositAddressList"){
+            //changed the return data profile to use a pipe beause colon interfered with JSON
             chainState.datapack = chainState.datapack.replace("DepositAddressList:","");
             sendTXID("btcAddressList|"+chainState.datapack+"|"+myblocktx.hash);
           }else{
