@@ -1058,7 +1058,7 @@ let connSeq = 0
                     //console.log("public key is "+keyPair.publicKey);
                     console.log("BTC address is: "+publicAddress);
                     //going to require a digned transaction from the peer before I do this
-                    rcvBTCAccount = sapphirechain.Hash(rcvBTCAccount);
+
 
                     //frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
 
@@ -1080,7 +1080,8 @@ let connSeq = 0
                     //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }
                 }
-                console.log("what I send in to get it "+peerId+":"+egemAccount+":"+ticker+":"+rcvBTCAccount,cbPeerSafeExistance)
+                rcvBTCAccount = sapphirechain.Hash(rcvBTCAccount);
+                console.log("what I send in to get it "+peerId+":"+egemAccount+":"+ticker+":"+rcvBTCAccount)
                 BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker+":"+rcvBTCAccount,cbPeerSafeExistance)
 
               }else if(secretAction == "SignOwner"){
