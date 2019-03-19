@@ -938,7 +938,7 @@ let connSeq = 0
                   console.log("length of returned"+data.length)
 
                   if(data.length > 0){
-                    var allPeerSafes = Object.values(data);
+                    var allPeerSafes = data;
                     console.log("IIIIIIIIIIIIIIIII")
                     console.log("keys "+Object.keys(allPeerSafes)+" and "+JSON.stringify(Object.values(allPeerSafes)));
                     console.log("IIIIIIIIIIIIIIIII")
