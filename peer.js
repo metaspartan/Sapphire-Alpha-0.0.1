@@ -1465,6 +1465,7 @@ function cliGetInput(){
             directMessage('0:0:Wallet::'+validatedSender.toLowerCase()+":");//node index:
           }else if(action == "transfer"){
             directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo.toLowerCase()+"|"+coinEGEMAddress);//node index:
+            console.log("here is the first "+addressTo.toLowerCase()+"|"+coinEGEMAddress)
           }else if(action == "proof"){
             directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":"+coinEGEMAddress);//node index:
           }else if(action == "listlockedunspent"){
