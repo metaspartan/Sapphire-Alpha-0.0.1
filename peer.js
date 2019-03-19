@@ -948,7 +948,7 @@ let connSeq = 0
                       var parsedSafe = JSON.stringify(allPeerSafes[safe]);
 
                       console.log("in addy yup "+JSON.parse(parsedSafe));
-                      returnSafes.push(addy);
+                      returnSafes.push(JSON.stringify(addy));
                     }
 
                     peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:returnSafes,secretAction:"DepositAddressList",encoded:"nodata",public:ecdhPubKeyHex}}));
