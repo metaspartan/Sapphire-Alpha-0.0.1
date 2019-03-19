@@ -1058,7 +1058,7 @@ let connSeq = 0
                     //console.log("public key is "+keyPair.publicKey);
                     console.log("BTC address is: "+publicAddress);
                     //going to require a digned transaction from the peer before I do this
-                    rcvBTCAccount = sapphirecoin.Hash(rcvBTCAccount);
+                    rcvBTCAccount = sapphirechain.Hash(rcvBTCAccount);
 
                     //frankieCoin.peerSafe(peerPublicPair,peerId,privateKeyHex,"BTC",egemAccount,"empty");//peerSafe(nodeId,key,type,store)
 
