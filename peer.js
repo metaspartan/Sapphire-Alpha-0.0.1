@@ -2478,7 +2478,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
             sendTXID("btcAddressProof:"+chainState.datapack+":"+myblocktx.hash);
           }else if(chainState.datapack.split(":")[0] == "DepositAddressList"){
             chainState.datapack = chainState.datapack.replace("DepositAddressList:","");
-            sendTXID("btcAddressList:"+chainState.datapack+":"+myblocktx.hash);
+            sendTXID("btcAddressList|"+chainState.datapack+"|"+myblocktx.hash);
           }else{
             sendTXID("error:"+chainState.datapack+":"+myblocktx.hash);
           }
