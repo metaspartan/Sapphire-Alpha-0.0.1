@@ -1080,7 +1080,7 @@ let connSeq = 0
                     //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                   }
                 }
-                BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker,cbPeerSafeExistance)
+                BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker+":"+rcvBTCAccount,cbPeerSafeExistance)
 
               }else if(secretAction == "SignOwner"){
                 var ticker = "BTC"//temporarily just doing BTC
