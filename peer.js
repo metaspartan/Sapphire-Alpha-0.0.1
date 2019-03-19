@@ -887,7 +887,7 @@ let connSeq = 0
           var egemAccount = JSON.parse(data)["peerSafe"]["egemAccount"];
           var rcvEgemAccount = JSON.parse(data)["peerSafe"]["rcvEgemAccount"];
 
-          if(rcvEgemAccount.includes("|")){
+          if(rcvEgemAccount && rcvEgemAccount.includes("|")){
             var rcvBTCAccount = rcvEgemAccount.split("|")[1];
             rcvEgemAccount = rcvEgemAccount.split("|")[0];
           }
