@@ -421,6 +421,7 @@ var directMessage = function(secretMessage){
        return nodeUp.index == secretPeerID;
     });
 
+    console.log(remotePeerNode);
     console.log(remotePeerNode[0].index)
 
     //console.log(JSON.parse(JSON.stringify(remotePeerNode))["index"])
@@ -500,6 +501,9 @@ let connSeq = 0
       BlkDB.addNode("node:"+peerId+":connection",{"host":info.host,"port":info.port});
       //log(chalk.green("Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
       log(chalk.bgBlue('New Peer id: '+ chalk.bold(peerId)));
+      var tempNodeCallerID = sapphirechain.ReDuex(peerId);
+      console.log("tempcallerNodeid "+tempNodeCallerID);
+      setTimeout(function(){directMessage(tempNodeCallerID+':0:0:')},100);//opening up a portal
     }
 
     conn.on('close', () => {
