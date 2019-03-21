@@ -181,7 +181,7 @@ var getNodes = function(){
 var getNodeById =   function(nodeId){
   return new Promise(function(resolve, reject) {
     var stream = db.createReadStream();
-    //console.log("in the node storage....");
+    console.log("in the node storage....");
 
     var nodeRecords = [];
 
@@ -191,7 +191,7 @@ var getNodeById =   function(nodeId){
         console.log("get node by id");
         console.log('key = '+data.key+" value = "+data.value.toString());
         var thisRec = {[data.key.toString()]:data.value.toString()}
-        nodeRecords.push(thisRec)
+        nodeRecords.push(JSON.stringify(thisRec))
       }
     })
 

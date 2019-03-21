@@ -50,7 +50,6 @@ var BLAKE2s = require("./blake2s.js");
 var Miner = require("./miner.js");
 Miner.setSapphireChain(sapphirechain);
 
-
 var msg = "genesis message";
 var length = 32;
 var key = "ax8906hg4c";
@@ -152,7 +151,6 @@ chainState.peerNonce = 0;
 
   }
 
-
 var getChainState = function(){
   return chainState;
 }
@@ -169,7 +167,6 @@ const rl = readline.createInterface({
 //////////////////////////////////////////////////////////////end CLI query init
 
 /////////////////////////////////////////////asynchronous peer connection engine
-
 var getConnectionConfig = async function(){
   return new Promise(function(resolve, reject) {
     var callBackNodePersistence = function(npid){
@@ -275,6 +272,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     console.log("BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB");
     console.log("SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS");
     ***/
+
     if(chainState.chainWalkHeight == parseInt(frankieCoin.blockHeight-1)){
       calculateCheckPoints(
         parseInt(frankieCoin.blockHeight-1),
@@ -418,8 +416,18 @@ var directMessage = function(secretMessage){
 
   console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
   //for (let i in frankieCoin.nodes){
-    var i = parseInt(secretPeerID);
-    if(frankieCoin.nodes[i] && peers[frankieCoin.nodes[i]["id"]]){
+
+    var remotePeerNode = frankieCoin.nodes.filter(function(nodeUp) {
+       return nodeUp.index == secretPeerID;
+    });
+
+    console.log(remotePeerNode[0].index)
+
+    //console.log(JSON.parse(JSON.stringify(remotePeerNode))["index"])
+
+    //var i = parseInt(secretPeerID);
+
+    if(remotePeerNode){
 
       var options = {
           hashName: 'sha256',
@@ -433,7 +441,7 @@ var directMessage = function(secretMessage){
           s1: null, // optional shared information1
           s2: null // optional shared information2
       }
-      var ecdh = frankieCoin.nodes[i]["ecdh"];
+      var ecdh = remotePeerNode[0].ecdh;
       var plainText = new Buffer.from('hello world');
       var encryptedText = ecies.encrypt(ecdh.getPublicKey(), plainText, options);
       console.log("the public key to text hex "+ecdh.getPublicKey().toString("hex"));
@@ -444,10 +452,10 @@ var directMessage = function(secretMessage){
       encryptMessage =  new Buffer.from(encryptMessage)
 
       if(encryptMessage != ""){
-        var peerPubKey = new Buffer.from(frankieCoin.nodes[i]["publicPair"],"hex");
+        var peerPubKey = new Buffer.from(remotePeerNode[0]["publicPair"],"hex");
         console.log("PEER PUB KEY "+peerPubKey);
 
-        console.log("whats up with JSON "+JSON.stringify(frankieCoin.nodes[i]));
+        console.log("whats up with JSON "+JSON.stringify(remotePeerNode));
 
         var encryptedMessageToSend = ecies.encrypt(peerPubKey,encryptMessage,options);
         encryptedMessageToSend = encryptedMessageToSend.toString("hex");
@@ -458,7 +466,7 @@ var directMessage = function(secretMessage){
 
 
       //I am passing a peer safe initialization request
-      peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,egemAccount:egemAccount,rcvEgemAccount:rcvEgemAccount,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
+      peers[remotePeerNode[0].id].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,egemAccount:egemAccount,rcvEgemAccount:rcvEgemAccount,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
       //broadcastPeers(JSON.stringify({peerSafe:{message:"SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG+encrypted.toString(hex)}}));
     }
   //}
@@ -1015,6 +1023,11 @@ let connSeq = 0
                     BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC:"+blake2sAddress,JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKeyHex,egemAccount:egemAccount,public:ecdhPubKeyHex}))
 
                     peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
+
+                    //need to broadcast to all peer BUT this peer the encrypted information
+
+                    //end need to broadcast to all peer BUT this peer the encrypted information
+
                   }else{
                     console.log("Peer Safe Existed for Coin "+ticker+" and is "+data.toString())
                     var publicAddress = JSON.parse(data)["coinAddress"];
@@ -1022,6 +1035,11 @@ let connSeq = 0
                     console.log("private key is "+privateKey);
                     console.log("BTC address is: "+publicAddress);
                     peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
+
+                    //need to broadcast to all peer BUT this peer the encrypted information
+
+                    //end need to broadcast to all peer BUT this peer the encrypted information
+
                   }
                 }
                 BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker,cbPeerSafeExistance)
@@ -1462,15 +1480,17 @@ function cliGetInput(){
 
         //////////////////////////////////////////if there is an action redirect
         if(action){
+          //will randomize and track but for now first node also need a variable
+          var remoteNodeIndex = frankieCoin.nodes[0].index;
           if(action == "deposit"){
-            directMessage('0:0:Wallet::'+validatedSender.toLowerCase()+":");//node index:
+            directMessage(remoteNodeIndex+':0:Wallet::'+validatedSender.toLowerCase()+":");//node index:
           }else if(action == "transfer"){
-            directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo.toLowerCase()+"|"+coinEGEMAddress);//node index:
+            directMessage(remoteNodeIndex+':0:Transact::'+validatedSender.toLowerCase()+":"+addressTo.toLowerCase()+"|"+coinEGEMAddress);//node index:
             console.log("here is the first "+addressTo.toLowerCase()+"|"+coinEGEMAddress)
           }else if(action == "proof"){
-            directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":"+coinEGEMAddress);//node index:
+            directMessage(remoteNodeIndex+':0:SignOwner::'+validatedSender.toLowerCase()+":"+coinEGEMAddress);//node index:
           }else if(action == "listlockedunspent"){
-            directMessage('0:0:getAllWallets::'+validatedSender.toLowerCase()+":");//node index:
+            directMessage(remoteNodeIndex+':0:getAllWallets::'+validatedSender.toLowerCase()+":");//node index:
           }
         }
         /////////////////////////////////////////////////////end action redirect
@@ -1634,6 +1654,18 @@ function cliGetInput(){
       var hashText = userInput.slice(userInput.indexOf("Hash(")+5, userInput.indexOf(")"));
       log("HASHING THIS TEXT: "+hashText);
       console.log(sapphirechain.Hash(hashText));
+      cliGetInput();
+    }else if(userInput.startsWith("Hash8(")){//HASH FUNCTION FOR VERIFICATIONS
+      log(userInput.slice(userInput.indexOf("Hash8(")+6, userInput.indexOf(")")));
+      var hashText = userInput.slice(userInput.indexOf("Hash8(")+6, userInput.indexOf(")"));
+      log("HASHING REDUEX THIS TEXT: "+hashText);
+      console.log(sapphirechain.Hash8(hashText));
+      cliGetInput();
+    }else if(userInput.startsWith("ReDuex(")){//HASH FUNCTION FOR VERIFICATIONS
+      log(userInput.slice(userInput.indexOf("ReDuex(")+7, userInput.indexOf(")")));
+      var hashText = userInput.slice(userInput.indexOf("ReDuex(")+7, userInput.indexOf(")"));
+      log("HASHING REDUEX THIS TEXT: "+hashText);
+      console.log(sapphirechain.ReDuex(hashText));
       cliGetInput();
     }else if(userInput.startsWith("getOmmer(")){//GETBLOCK function
       log(userInput.slice(userInput.indexOf("getOmmer(")+9, userInput.indexOf(")")));
@@ -2449,14 +2481,16 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
       //////////////////////////////////////////if there is an action redirect
       if(action){
         console.log("there is an action of "+action+"on this transaction ");
+        //will randomize and track but for now first node also need a variable
+        var remoteNodeIndex = frankieCoin.nodes[0].index;
         if(action == "deposit"){
-          directMessage('0:0:Wallet::'+validatedSender.toLowerCase()+":");//node index:
+          directMessage(remoteNodeIndex+':0:Wallet::'+validatedSender.toLowerCase()+":");//node index:
         }else if(action == "transfer"){
-          directMessage('0:0:Transact::'+validatedSender.toLowerCase()+":"+addressTo.toLowerCase()+"|"+coinEGEMAddress);//node index:
+          directMessage(remoteNodeIndex+':0:Transact::'+validatedSender.toLowerCase()+":"+addressTo.toLowerCase()+"|"+coinEGEMAddress);//node index:
         }else if(action == "proof"){
-          directMessage('0:0:SignOwner::'+validatedSender.toLowerCase()+":"+coinEGEMAddress);//node index:
+          directMessage(remoteNodeIndex+':0:SignOwner::'+validatedSender.toLowerCase()+":"+coinEGEMAddress);//node index:
         }else if(action == "listlockedunspent"){
-          directMessage('0:0:getAllWallets::'+validatedSender.toLowerCase()+":");//node index:
+          directMessage(remoteNodeIndex+':0:getAllWallets::'+validatedSender.toLowerCase()+":");//node index:
         }
       }
       /////////////////////////////////////////////////////end action redirect

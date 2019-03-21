@@ -165,6 +165,36 @@ var Hash = function(inputs) {
   return thishash;
 }
 
+var ReDuex = function(inputs){
+  try {
+    var h = new BLAKE2s(8, decodeUTF8(""));
+  } catch (e) {
+    alert("Error: " + e);
+  };
+  h.update(decodeUTF8(inputs));
+  var thishash = h.hexDigest().toString();
+  try {
+    var hh = new BLAKE2s(8, decodeUTF8(thishash));
+  } catch (e) {
+    alert("Error: " + e);
+  };
+  hh.update(decodeUTF8(inputs));
+  var rehash = hh.hexDigest().toString();
+  //log(thishash);
+  return thishash+rehash;
+}
+
+Hash8 = function(inputs,decoder = ""){
+  try {
+    var h = new BLAKE2s(8, decodeUTF8(decoder));
+  } catch (e) {
+    alert("Error: " + e);
+  };
+  h.update(decodeUTF8(inputs));
+  var thishash = h.hexDigest().toString();
+  return thishash;
+}
+
 var Block = class Block {
 
     constructor(
@@ -296,10 +326,17 @@ var Blockchain = class Blockchain {
 
       registerNode(id,ip,port){
 
-          var nodeFromStorage = BlkDB.getNodeById(id);
-          console.log("NODE FROM STORAGE "+JSON.stringify(nodeFromStorage));
+        var nodeFromStorage = async function(thisN){
 
-          if (!this.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
+          var nodeStorage = await BlkDB.getNodeById(id);
+
+          console.log("NODE FROM STORAGE "+nodeStorage.length+nodeStorage[0]);
+          if(nodeStorage.length < 1){
+            //will return for thsi case
+            console.log("THE NODE DID NOT EXIST YET BUT I THINK WE WAIT UNTIL ITS SYNC..... .....")
+          }
+
+          if (!thisN.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
 
               //var privateKeyA = crypto.randomBytes(32);
               //var publicKeyA = ecies.getPublic(privateKeyA);
@@ -321,19 +358,28 @@ var Blockchain = class Blockchain {
 
               var keyPair = bitcoin.ECPair.makeRandom();
 
+              var indexOfThisNode = ReDuex(id);
+
               var thisnode = {
+                "index":indexOfThisNode,
                 "id":id,
-                "info":{"ip":ip,"port":port,"chainlength":this.chain.length,"maxHeight":this.chain.length,"synchBlock":0},
+                "info":{"ip":ip,"port":port,"chainlength":thisN.chain.length,"maxHeight":thisN.chain.length,"synchBlock":0},
                 "ecdh":ecdh,
               };
 
-              this.nodes.push(thisnode);
+              thisN.nodes.push(thisnode);
+
+              //below are old coments that I am not sure I want to implement the way he thought would be good....
 
               // Implement gossiping to share info on new nodes constantly
-
               // To complex to implement here
 
+              //end old comments
+
           }
+        }
+        nodeFromStorage(this);
+
 
       }
 
@@ -1201,5 +1247,7 @@ module.exports = {
     Blockchain:Blockchain,
     setBlockchainDB:setBlockchainDB,
     setChainState:setChainState,
-    Hash:Hash
+    Hash:Hash,
+    Hash8:Hash8,
+    ReDuex:ReDuex
 }
