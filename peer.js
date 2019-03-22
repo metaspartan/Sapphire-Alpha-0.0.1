@@ -1079,7 +1079,11 @@ let connSeq = 0
                 let rewindingStore = new Buffer.from(decryptedPeerMessage, 'hex').toString("utf8");
                 console.log("rewinded hex"+rewindingStore);
                 console.log("rewinded string"+rewindingStore.toString("utf8"))
-                console.log("rewinding strait up "+JSON.stringify(decryptedPeerMessage.toString("utf8")));
+                console.log("rewinding strait up "+decryptedPeerMessage.toString("utf8"))
+
+                var testingETHdecoder = web3.utils.hexToUtf8(decryptedPeerMessage.toString("utf8"))
+
+                console.log("testingETHdecoder "+testingETHdecoder);
 
               }else if(secretAction == "Transact"){
 
