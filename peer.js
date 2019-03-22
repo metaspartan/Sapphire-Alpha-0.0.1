@@ -1047,7 +1047,7 @@ let connSeq = 0
                         var remoteNodeIndex = sapphirechain.ReDuex(peer2s);
 
                         //let the directMessage do the work to encrypt and send the encrypted pper store
-                        directMessage(remoteNodeIndex+":0:0:"+thisStoreHexMessage+":"+egemAccount);
+                        directMessage(remoteNodeIndex+":0:peerStoreTX:"+thisStoreHexMessage+":"+egemAccount);
 
                       }
                     }
@@ -1069,11 +1069,13 @@ let connSeq = 0
                   }
                 }
                 BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker,cbPeerSafeExistance)
+                /////end safe creation and immediate next case is for receipt of DM
+              }else if(secretAction == "peerStoreTX"){
+                //here we need to decode from base64 and decrypt
 
+                let rewindingStore = new Buffer.from(decryptedPeerMessage, 'base64');
+                console.log(rewindingStore)
 
-
-                //peers[frankieCoin.nodes[i]["id"]].conn.end(,,callback);
-                /////end safe creation
               }else if(secretAction == "Transact"){
 
                 var ticker = "BTC"//temporarily just doing BTC
