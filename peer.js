@@ -1076,8 +1076,8 @@ let connSeq = 0
                 //here we need to decode from base64 and decrypt
 
                 console.log("we are in the decreypt section ...")
-                let rewindingStore = new Buffer.from(decryptedPeerMessage, 'hex');
-                console.log("rewinded 64"+rewindingStore);
+                let rewindingStore = new Buffer.from(decryptedPeerMessage, 'hex').toString("utf8");
+                console.log("rewinded hex"+rewindingStore);
                 console.log("rewinded string"+rewindingStore.toString("utf8"))
                 console.log("rewinding strait up "+decryptedPeerMessage.toString("utf8"))
 
