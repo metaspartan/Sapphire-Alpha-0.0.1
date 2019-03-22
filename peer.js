@@ -427,7 +427,7 @@ var directMessage = function(secretMessage){
 
     //var i = parseInt(secretPeerID);
 
-    if(remotePeerNode){
+    if(remotePeerNode[0]){
 
       console.log(remotePeerNode);
       console.log(remotePeerNode[0].index)
