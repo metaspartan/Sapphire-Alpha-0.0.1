@@ -1079,7 +1079,7 @@ let connSeq = 0
                 let rewindingStore = new Buffer.from(decryptedPeerMessage, 'hex');
                 console.log("rewinded 64"+rewindingStore);
                 console.log("rewinded string"+rewindingStore.toString("utf8"))
-                console.log("rewinding strait up "decryptedPeerMessage.toString("utf8"))
+                console.log("rewinding strait up "+decryptedPeerMessage.toString("utf8"))
 
               }else if(secretAction == "Transact"){
 
