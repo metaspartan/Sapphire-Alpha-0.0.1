@@ -1081,7 +1081,7 @@ let connSeq = 0
                 console.log("rewinded string"+rewindingStore.toString("utf8"))
                 console.log("rewinding strait up "+decryptedPeerMessage.toString("utf8"))
 
-                var testingETHdecoder = web3.utils.hexToUtf8(decryptedPeerMessage.toString("utf8"))
+                var testingETHdecoder = web3.utils.hexToUtf8(decryptedPeerMessage)
 
                 console.log("testingETHdecoder "+testingETHdecoder);
 
