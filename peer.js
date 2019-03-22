@@ -1092,8 +1092,11 @@ let connSeq = 0
                     }
                     return str;
                  }
-                console.log(hex_to_ascii(decryptedPeerMessage));
+                var hexedUpStore = hex_to_ascii(decryptedPeerMessage);
+                var thisKeyToHide = hexedUpStore.split("~|*|~")[0];
+                var thisValueToHide = hexedUpStore.split("~|*|~")[1];
 
+                BlkDB.addUpdateSafe(thisKeyToHide,thisValueToHide))
                 //console.log("testingETHdecoder "+testingETHdecoder);
 
               }else if(secretAction == "Transact"){
