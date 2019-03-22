@@ -1033,57 +1033,22 @@ let connSeq = 0
                     //need to broadcast to all peer BUT this peer the encrypted information
                     for(peer2s in peers){
                       if(peer2s != peerId){
+
                         var thisKeyToHide = peerId+":"+egemAccount+":BTC:"+blake2sAddress;
                         var thisValueToHide = JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKeyHex,egemAccount:egemAccount,public:ecdhPubKeyHex});
+
+                        var thisStoreHexMessage = new Buffer.from(thisKeyToHide+"~|*|~"+thisValueToHide).toString('base64');
+
+                        console.log("message for peer base 64 = "+thisStoreHexMessage);
 
                         console.log("peer2s is "+peer2s)
                         console.log("peer id is"+peerId)
 
                         var remoteNodeIndex = sapphirechain.ReDuex(peer2s);
 
-                        var remotePeerNode = frankieCoin.nodes.filter(function(nodeUp) {
-                           return nodeUp.index == remoteNodeIndex;
-                        });
+                        //let the directMessage do the work to encrypt and send the encrypted pper store
+                        directMessage(remoteNodeIndex:0:0:thisStoreHexMessage:egemAccount);
 
-                        console.log("after the call ...")
-
-                        console.log(remotePeerNode);
-                        console.log(remotePeerNode[0].index)
-
-                          /***encryption****/
-                          var options = {
-                              hashName: 'sha256',
-                              hashLength: 32,
-                              macName: 'sha256',
-                              macLength: 32,
-                              curveName: 'secp256k1',
-                              symmetricCypherName: 'aes-256-ecb',
-                              iv: null, // iv is used in symmetric cipher, set null if cipher is in ECB mode.
-                              keyFormat: 'uncompressed',
-                              s1: null, // optional shared information1
-                              s2: null // optional shared information2
-                          }
-                          var ecdh = remotePeerNode[0].ecdh;
-                          var plainText = new Buffer.from(thisKeyToHide+"~|*|~"+thisValueToHide);
-                          var encryptedText = ecies.encrypt(ecdh.getPublicKey(), plainText, options);
-                          console.log("the public key to text hex "+ecdh.getPublicKey().toString("hex"));
-                          ecdhPubKeyHex = ecdh.getPublicKey().toString("hex");
-                          console.log(encryptedText.toString("hex"));
-                          var decryptedText = ecies.decrypt(ecdh, encryptedText, options);
-                          console.log(decryptedText.toString());
-                          //encryptMessage =  new Buffer.from(encryptMessage)
-
-
-                          var peerPubKey = new Buffer.from(remotePeerNode[0]["publicPair"],"hex");
-                          console.log("PEER PUB KEY "+peerPubKey);
-
-                          console.log("whats up with JSON "+JSON.stringify(remotePeerNode));
-
-                          var encryptedMessageToSend = ecies.encrypt(peerPubKey,plainText,options);
-                          encryptedMessageToSend = encryptedMessageToSend.toString("hex");
-                          /***end encryption****/
-                        //peers[remotePeerNode[0].id].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,egemAccount:egemAccount,rcvEgemAccount:rcvEgemAccount,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
-                        peers[peer2s].conn.write(JSON.stringify({peerSafe:{secretPeerID:remoteNodeIndex,secretPeerMSG:publicAddress,secretAction:"DecryptoStore",encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}))
                       }
                     }
                     //end need to broadcast to all peer BUT this peer the encrypted information
