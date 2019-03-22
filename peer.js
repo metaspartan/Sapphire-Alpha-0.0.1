@@ -1071,16 +1071,16 @@ let connSeq = 0
                           console.log(encryptedText.toString("hex"));
                           var decryptedText = ecies.decrypt(ecdh, encryptedText, options);
                           console.log(decryptedText.toString());
-                          encryptMessage =  new Buffer.from(encryptMessage)
+                          encryptMessage =  new Buffer.from(encryptedText)
 
 
-                            var peerPubKey = new Buffer.from(remotePeerNode[0]["publicPair"],"hex");
-                            console.log("PEER PUB KEY "+peerPubKey);
+                          var peerPubKey = new Buffer.from(remotePeerNode[0]["publicPair"],"hex");
+                          console.log("PEER PUB KEY "+peerPubKey);
 
-                            console.log("whats up with JSON "+JSON.stringify(remotePeerNode));
+                          console.log("whats up with JSON "+JSON.stringify(remotePeerNode));
 
-                            var encryptedMessageToSend = ecies.encrypt(peerPubKey,encryptMessage,options);
-                            encryptedMessageToSend = encryptedMessageToSend.toString("hex");
+
+                          encryptedMessageToSend = encryptedText.toString("hex");
                           /***end encryption****/
                         //peers[remotePeerNode[0].id].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,egemAccount:egemAccount,rcvEgemAccount:rcvEgemAccount,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
                         peers[peer2s].conn.write(JSON.stringify({peerSafe:{secretPeerID:remoteNodeIndex,secretPeerMSG:publicAddress,secretAction:"DecryptoStore",encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}))
