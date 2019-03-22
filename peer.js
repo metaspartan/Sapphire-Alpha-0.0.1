@@ -1083,7 +1083,7 @@ let connSeq = 0
                             encryptedMessageToSend = encryptedMessageToSend.toString("hex");
                           /***end encryption****/
                         //peers[remotePeerNode[0].id].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,egemAccount:egemAccount,rcvEgemAccount:rcvEgemAccount,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
-                        peers[peer2s].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"",encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}))
+                        peers[peer2s].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"nodata",encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}))
                       }
                     }
                     //end need to broadcast to all peer BUT this peer the encrypted information
