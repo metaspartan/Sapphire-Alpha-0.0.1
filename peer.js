@@ -1074,7 +1074,7 @@ let connSeq = 0
                 //here we need to decode from base64 and decrypt
 
                 let rewindingStore = new Buffer.from(decryptedPeerMessage, 'base64');
-                console.log(rewindingStore)
+                console.log(rewindingStore.toString("utf8"));
 
               }else if(secretAction == "Transact"){
 
