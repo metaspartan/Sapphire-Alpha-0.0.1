@@ -1036,6 +1036,8 @@ let connSeq = 0
                         var thisKeyToHide = peerId+":"+egemAccount+":BTC:"+blake2sAddress;
                         var thisValueToHide = JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKeyHex,egemAccount:egemAccount,public:ecdhPubKeyHex});
 
+                        console.log("peer2s is "+peer2s)
+
                         var remotePeerNode = frankieCoin.nodes.filter(function(nodeUp) {
                            return nodeUp.index == peer2s;
                         });
