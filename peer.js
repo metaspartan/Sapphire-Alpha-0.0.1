@@ -1073,8 +1073,10 @@ let connSeq = 0
               }else if(secretAction == "peerStoreTX"){
                 //here we need to decode from base64 and decrypt
 
+                console.log("we are in the decreypt section ...")
                 let rewindingStore = new Buffer.from(decryptedPeerMessage, 'base64');
-                console.log(rewindingStore.toString("utf8"));
+                console.log("rewinded 64"+rewindingStore);
+                console.log("rewinded string"+rewindingStore.toString())
 
               }else if(secretAction == "Transact"){
 
