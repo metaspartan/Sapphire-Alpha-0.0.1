@@ -1083,7 +1083,7 @@ let connSeq = 0
                             encryptedMessageToSend = encryptedMessageToSend.toString("hex");
                           /***end encryption****/
                         //peers[remotePeerNode[0].id].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,egemAccount:egemAccount,rcvEgemAccount:rcvEgemAccount,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
-                        peers[peer2s].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"nodata",encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}))
+                        peers[peer2s].conn.write(JSON.stringify({peerSafe:{secretPeerID:remoteNodeIndex,secretPeerMSG:publicAddress,secretAction:"DecryptoStore",encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}))
                       }
                     }
                     //end need to broadcast to all peer BUT this peer the encrypted information
@@ -1163,7 +1163,11 @@ let connSeq = 0
                 console.log("what I send in to get it "+peerId+":"+egemAccount+":"+ticker+":"+rcvBTCAccount)
                 BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker+":"+rcvBTCAccount,cbPeerSafeExistance)
 
+              }else if(secretAction == "DecryptoStore"){
+
+
               }else if(secretAction == "SignOwner"){
+
                 var ticker = "BTC"//temporarily just doing BTC
                 var cbPeerSafeExistance = function(data){
                   console.log("SEARCH RETURNED WITH "+data)
