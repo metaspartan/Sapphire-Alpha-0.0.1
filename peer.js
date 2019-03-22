@@ -1096,7 +1096,7 @@ let connSeq = 0
                 var thisKeyToHide = hexedUpStore.split("~|*|~")[0];
                 var thisValueToHide = hexedUpStore.split("~|*|~")[1];
 
-                BlkDB.addUpdateSafe(thisKeyToHide,thisValueToHide))
+                BlkDB.addUpdateSafe(thisKeyToHide,thisValueToHide);
                 //console.log("testingETHdecoder "+testingETHdecoder);
 
               }else if(secretAction == "Transact"){
