@@ -1037,9 +1037,11 @@ let connSeq = 0
                         var thisKeyToHide = peerId+":"+egemAccount+":BTC:"+blake2sAddress;
                         var thisValueToHide = JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKeyHex,egemAccount:egemAccount,public:ecdhPubKeyHex});
 
-                        var thisStoreHexMessage = new Buffer.from(thisKeyToHide+"~|*|~"+thisValueToHide).toString('base64');
+                        var thisStoreHexMessage = new Buffer.from(thisKeyToHide+"~|*|~"+thisValueToHide).toString('hex');
 
-                        console.log("message for peer base 64 = "+thisStoreHexMessage);
+                        console.log("message for peer hex = "+thisStoreHexMessage);
+
+                        console.log("message BEFORE SENDING BACK TO = "+Beffer.from(thisStoreHexMessage,"hex").toString("utf8"));
 
                         console.log("peer2s is "+peer2s)
                         console.log("peer id is"+peerId)
@@ -1074,9 +1076,9 @@ let connSeq = 0
                 //here we need to decode from base64 and decrypt
 
                 console.log("we are in the decreypt section ...")
-                let rewindingStore = new Buffer.from(decryptedPeerMessage, 'base64');
+                let rewindingStore = new Buffer.from(decryptedPeerMessage, 'hex');
                 console.log("rewinded 64"+rewindingStore);
-                console.log("rewinded string"+rewindingStore.toString())
+                console.log("rewinded string"+rewindingStore.toString("utf8"))
 
               }else if(secretAction == "Transact"){
 
