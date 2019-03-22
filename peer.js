@@ -1039,8 +1039,10 @@ let connSeq = 0
                         console.log("peer2s is "+peer2s)
                         console.log("peer id is"+peerId)
 
+                        var remoteNodeIndex = sapphirechain.ReDuex(peer2s);
+
                         var remotePeerNode = frankieCoin.nodes.filter(function(nodeUp) {
-                           return nodeUp.index == peer2s;
+                           return nodeUp.index == remoteNodeIndex;
                         });
 
                         console.log("after the call ...")
