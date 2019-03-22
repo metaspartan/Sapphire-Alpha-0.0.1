@@ -1041,7 +1041,7 @@ let connSeq = 0
 
                         console.log("message for peer hex = "+thisStoreHexMessage);
 
-                        console.log("message BEFORE SENDING BACK TO = "+Beffer.from(thisStoreHexMessage,"hex").toString("utf8"));
+                        console.log("message BEFORE SENDING BACK TO = "+Buffer.from(thisStoreHexMessage,"hex").toString("utf8"));
 
                         console.log("peer2s is "+peer2s)
                         console.log("peer id is"+peerId)
