@@ -1047,7 +1047,7 @@ let connSeq = 0
                         var remoteNodeIndex = sapphirechain.ReDuex(peer2s);
 
                         //let the directMessage do the work to encrypt and send the encrypted pper store
-                        directMessage(remoteNodeIndex:0:0:thisStoreHexMessage:egemAccount);
+                        directMessage(remoteNodeIndex+":0:0:"+thisStoreHexMessage+":"+egemAccount);
 
                       }
                     }
