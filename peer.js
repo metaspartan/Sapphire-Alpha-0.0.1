@@ -447,18 +447,18 @@ var directMessage = function(secretMessage){
       var ecdh = remotePeerNode[0].ecdh;
       var plainText = new Buffer.from('hello world');
       var encryptedText = ecies.encrypt(ecdh.getPublicKey(), plainText, options);
-      console.log("the public key to text hex "+ecdh.getPublicKey().toString("hex"));
+      //console.log("the public key to text hex "+ecdh.getPublicKey().toString("hex"));
       ecdhPubKeyHex = ecdh.getPublicKey().toString("hex");
-      console.log(encryptedText.toString("hex"));
+      //console.log(encryptedText.toString("hex"));
       var decryptedText = ecies.decrypt(ecdh, encryptedText, options);
-      console.log(decryptedText.toString());
+      //console.log(decryptedText.toString());
       encryptMessage =  new Buffer.from(encryptMessage)
 
       if(encryptMessage != ""){
         var peerPubKey = new Buffer.from(remotePeerNode[0]["publicPair"],"hex");
-        console.log("PEER PUB KEY "+peerPubKey);
+        //console.log("PEER PUB KEY "+peerPubKey);
 
-        console.log("whats up with JSON "+JSON.stringify(remotePeerNode));
+        //console.log("whats up with JSON "+JSON.stringify(remotePeerNode));
 
         var encryptedMessageToSend = ecies.encrypt(peerPubKey,encryptMessage,options);
         encryptedMessageToSend = encryptedMessageToSend.toString("hex");
