@@ -1208,7 +1208,7 @@ let connSeq = 0
                 chainState.datapack = secretAction+":"+secretPeerMSG;
               }
 
-              console.log("THIS NODES INFO "+JSON.stringify(frankieCoin.nodes[thisNode]))
+              //console.log("THIS NODES INFO "+JSON.stringify(frankieCoin.nodes[thisNode]))
 
               ////need to construct and send reply message
               //peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
