@@ -330,7 +330,8 @@ var Blockchain = class Blockchain {
 
           var nodeStorage = await BlkDB.getNodeById(id);
 
-          console.log("NODE FROM STORAGE "+nodeStorage.length+nodeStorage[0]);
+          //console.log("NODE FROM STORAGE "+nodeStorage.length+nodeStorage[0]);
+
           if(nodeStorage.length < 1){
             //will return for thsi case
             console.log("THE NODE DID NOT EXIST YET BUT I THINK WE WAIT UNTIL ITS SYNC..... .....")
