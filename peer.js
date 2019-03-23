@@ -929,7 +929,7 @@ let connSeq = 0
           peerData = JSON.stringify(peerData);
 
           console.log("Public Key stringified and parsed"+JSON.stringify(JSON.parse(peerData)["public"]));
-          console.log("Peer data is "+JSON.stringify(peerData));
+          //console.log("Peer data is "+JSON.stringify(peerData));
           peerPublicPair = JSON.parse(peerData)["public"];
           //console.log("testing JSON parse "+JSON.parse(JSON.stringify(peerPublicPair))["data"].toString("hex"));
           for(thisNode in frankieCoin.nodes){
