@@ -890,7 +890,7 @@ let connSeq = 0
           log(chalk.bgRed("------------------------------------------------------"));
           log(chalk.red("THIS IS A PEER SAFE MESSAGE AND WILL BE HIDDEN"));
           log(chalk.bgRed("------------------------------------------------------"));
-          console.log("what the peer sent "+data);
+          //console.log("what the peer sent "+data);
           var peerData = JSON.parse(data)["peerSafe"];
 
           var secretPeerID = JSON.parse(data)["peerSafe"]["secretPeerID"];
@@ -924,7 +924,7 @@ let connSeq = 0
           console.log("SECRET PEER MSG: "+secretPeerMSG);
           console.log("SCRET PEER ACTION "+secretAction);
           console.log("ENCRYPTED MESSAGE "+encryptedMessage);
-          console.log("MY PUBLIC KEY FROM SENDER "+thisPeerPublicKey);
+          //console.log("MY PUBLIC KEY FROM SENDER "+thisPeerPublicKey);
 
           peerData = JSON.stringify(peerData);
 

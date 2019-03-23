@@ -188,8 +188,8 @@ var getNodeById =   function(nodeId){
     stream.on('data',function(data){
       //console.log('outside the if key = '+data.key+" value = "+data.value.toString());
       if(data.key.toString().split(":")[0] == "node" && data.key.toString().split(":")[1] == nodeId){
-        console.log("get node by id");
-        console.log('key = '+data.key+" value = "+data.value.toString());
+        //console.log("get node by id");
+        //console.log('key = '+data.key+" value = "+data.value.toString());
         var thisRec = {[data.key.toString()]:data.value.toString()}
         nodeRecords.push(JSON.stringify(thisRec))
       }
