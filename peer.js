@@ -414,7 +414,7 @@ var directMessage = function(secretMessage){
   if(egemAccount){egemAccount = egemAccount.toLowerCase()};
   //if(rcvEgemAccount){rcvEgemAccount = rcvEgemAccount.toLowerCase()};
 
-  console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
+  //console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
   //for (let i in frankieCoin.nodes){
 
     var remotePeerNode = frankieCoin.nodes.filter(function(nodeUp) {
@@ -504,7 +504,7 @@ let connSeq = 0
       //log(chalk.green("Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
       log(chalk.bgBlue('New Peer id: '+ chalk.bold(peerId)));
       var tempNodeCallerID = sapphirechain.ReDuex(peerId);
-      console.log("tempcallerNodeid "+tempNodeCallerID);
+      //console.log("tempcallerNodeid "+tempNodeCallerID);
       setTimeout(function(){directMessage(tempNodeCallerID+':0:0:')},100);//opening up a portal
     }
 
