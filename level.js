@@ -181,7 +181,7 @@ var getNodes = function(){
 var getNodeById =   function(nodeId){
   return new Promise(function(resolve, reject) {
     var stream = db.createReadStream();
-    console.log("in the node storage....");
+    //console.log("in the node storage....");
 
     var nodeRecords = [];
 
