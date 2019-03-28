@@ -1204,7 +1204,7 @@ let connSeq = 0
                 BlkDB.getPeerSafe(peerId+":"+egemAccount+":"+ticker+":"+blakeCoinAddress,cbPeerSafeExistance)
 
               }else if(secretAction == "DepositAddress" || secretAction == "DepositAddressProof" || secretAction == "DepositAddressList"){
-                console.log(secretPeerMSG);
+                //console.log(secretPeerMSG);
                 chainState.datapack = secretAction+":"+secretPeerMSG;
               }
 
