@@ -1118,7 +1118,7 @@ let connSeq = 0
 
                     var version = 0xef; //Bitcoin private key
 
-                    console.log(cs.encode(privateKeyHexBuf, version))
+                    //console.log(cs.encode(privateKeyHexBuf, version))
                     var testnetWIFpk = cs.encode(privateKeyHexBuf, version)
                     keyPair = bitcoin.ECPair.fromWIF(testnetWIFpk, bitcoin.networks.testnet);
                     var publicAddress = address = bitcoin.payments.p2pkh({ pubkey: keyPair.publicKey, network:bitcoin.networks.testnet }).address;
