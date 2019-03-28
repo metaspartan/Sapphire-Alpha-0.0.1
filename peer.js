@@ -887,9 +887,9 @@ let connSeq = 0
           process.exit();
           exit();
         }else if(JSON.parse(data)["peerSafe"]){//PEER SAFE MESSAGES
-          log(chalk.bgRed("------------------------------------------------------"));
-          log(chalk.red("THIS IS A PEER SAFE MESSAGE AND WILL BE HIDDEN"));
-          log(chalk.bgRed("------------------------------------------------------"));
+          //log(chalk.bgRed("------------------------------------------------------"));
+          //log(chalk.red("THIS IS A PEER SAFE MESSAGE AND WILL BE HIDDEN"));
+          //log(chalk.bgRed("------------------------------------------------------"));
           //console.log("what the peer sent "+data);
           var peerData = JSON.parse(data)["peerSafe"];
 
@@ -2513,12 +2513,18 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
     try{
       var action = signedPackageTx["action"];
-      actionStep = "redirect:datapack"
+      if(action != undefined){
+        actionStep = "redirect:datapack"
+      }else{
+        actionStep = "proceed:ignore"
+      }
     }catch{
       ///////////////////////////////////////////////////////relay asap to peers
       actionStep = "proceed:ignore"
-      //broadcastPeers(signedPackage);
+      broadcastPeers(signedPackage);
     }
+
+    console.log("action step is "+actionStep)
 
     try{
       var coinEGEMAddress = signedPackageTx["address"];
