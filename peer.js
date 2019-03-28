@@ -920,10 +920,10 @@ let connSeq = 0
           }
 
           console.log(chalk.bgRed("INCOMING PS TX: "));
-          console.log("SECRET PEER ID: "+secretPeerID);
-          console.log("SECRET PEER MSG: "+secretPeerMSG);
-          console.log("SCRET PEER ACTION "+secretAction);
-          console.log("ENCRYPTED MESSAGE "+encryptedMessage);
+          //console.log("SECRET PEER ID: "+secretPeerID);
+          //console.log("SECRET PEER MSG: "+secretPeerMSG);
+          //console.log("SCRET PEER ACTION "+secretAction);
+          //console.log("ENCRYPTED MESSAGE "+encryptedMessage);
           //console.log("MY PUBLIC KEY FROM SENDER "+thisPeerPublicKey);
 
           peerData = JSON.stringify(peerData);
