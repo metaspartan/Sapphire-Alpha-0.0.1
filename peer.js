@@ -429,8 +429,8 @@ var directMessage = function(secretMessage){
 
     if(remotePeerNode[0]){
 
-      console.log(remotePeerNode);
-      console.log(remotePeerNode[0].index)
+      //console.log(remotePeerNode);
+      //console.log(remotePeerNode[0].index)
 
       var options = {
           hashName: 'sha256',
