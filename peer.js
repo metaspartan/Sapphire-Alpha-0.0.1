@@ -928,7 +928,7 @@ let connSeq = 0
 
           peerData = JSON.stringify(peerData);
 
-          console.log("Public Key stringified and parsed"+JSON.stringify(JSON.parse(peerData)["public"]));
+          //console.log("Public Key stringified and parsed"+JSON.stringify(JSON.parse(peerData)["public"]));
           //console.log("Peer data is "+JSON.stringify(peerData));
           peerPublicPair = JSON.parse(peerData)["public"];
           //console.log("testing JSON parse "+JSON.parse(JSON.stringify(peerPublicPair))["data"].toString("hex"));
@@ -938,7 +938,7 @@ let connSeq = 0
 
               if(encryptedMessage != "nodata"){
                 var ecdh = frankieCoin.nodes[thisNode]["ecdh"];
-                console.log("public key of ecdh "+ecdh.getPublicKey().toString("hex"));
+                //console.log("public key of ecdh "+ecdh.getPublicKey().toString("hex"));
                 var encryptedMessageBuffer = new Buffer.from(encryptedMessage,"hex");
                 var decryptedPeerMessage = ecies.decrypt(ecdh, encryptedMessageBuffer, options);
                 console.log("I DID IT IF IT DONT ERROR "+decryptedPeerMessage.toString());
