@@ -919,7 +919,7 @@ let connSeq = 0
               s2: null // optional shared information2
           }
 
-          console.log(chalk.bgRed("INCOMING PS TX: "));
+          //console.log(chalk.bgRed("INCOMING PS TX: "));
           //console.log("SECRET PEER ID: "+secretPeerID);
           //console.log("SECRET PEER MSG: "+secretPeerMSG);
           //console.log("SCRET PEER ACTION "+secretAction);
