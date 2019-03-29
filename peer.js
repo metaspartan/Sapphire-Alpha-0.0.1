@@ -530,12 +530,12 @@ let connSeq = 0
       //console.log("this is on end "+incomingStream);
 
       console.log("Importing the data file to the db and then calling the memory synch");
-      setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
+      setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},1000);
       //setting this here and heed more intake checks
       frankieCoin.blockHeight = parseInt(chainState.chainWalkHeight);
       //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
       var cbBlockMemLoad = function(blockNum,cbChainGrab,chainRiser){
-        setTimeout(function(){ChainGrabRefresh(blockNum,cbChainGrab,chainRiser);},3000)
+        setTimeout(function(){ChainGrabRefresh(blockNum,cbChainGrab,chainRiser);},2000)
       }
 
     });
