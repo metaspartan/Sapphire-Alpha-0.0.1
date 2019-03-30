@@ -545,7 +545,7 @@ let connSeq = 0
       console.log("data stream ended ");
       //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
 
-      //console.log("this is on end "+incomingStream);
+      console.log("this is on end "+incomingStream);
 
       console.log("Importing the data file to the db and then calling the memory synch");
       //setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
@@ -847,8 +847,10 @@ let connSeq = 0
                 //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
                 //BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
                 //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser)
-                BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser).then(function(jsonStream){
-                  peers[peerId].conn.pipe(jsonStream);
+                var numRecordsToStream = parseInt(frankieCoin.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]);
+                BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
+                  peers[peerId].conn.write(jsonStream);
+                  //console.log("wrote this "+jsonStream);
                   peers[peerId].conn.end();
                 })
                 //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
