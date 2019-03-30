@@ -567,7 +567,8 @@ let connSeq = 0
 
       let chunk;
       while (null !== (chunk = this.read())) {
-        //console.log(`Received ${chunk.length} bytes of data.`);
+        console.log(`Received ${chunk.length} bytes of data.`);
+        console.log(chunk.toString());
         console.log("<== ");
         incomingStream+=chunk.toString()
         incomingBufferArray.push(chunk.toString());
