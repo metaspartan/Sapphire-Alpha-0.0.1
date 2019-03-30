@@ -848,7 +848,7 @@ let connSeq = 0
                 //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
                 //BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
                 //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser)
-                var numRecordsToStream = parseInt(frankieCoin.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]);
+                var numRecordsToStream = parseInt(frankieCoin.synchronized);
                 BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
                   peers[peerId].conn.write(jsonStream);
                   console.log("wrote this "+jsonStream);
@@ -1944,8 +1944,8 @@ var cbChainGrab = function(data) {
     //console.log("blockdata coming inbound "+JSON.parse(data[obj])["blockHeight"]+" vs memory "+JSON.stringify(frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"])))//verbose
     //verify block does not exist in memory
     if(typeof frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"]) === "undefined" || frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"]) === null){
-      //block not in memory
-      //console.log("block does not exist "+data[obj]);
+      block not in memory
+      console.log("block does not exist "+data[obj]);
       var tempBlock = data[obj];
       frankieCoin.addBlockFromDataStream(tempBlock,"sending in block "+JSON.parse(tempBlock)["blockHeight"]);
       frankieCoin.blockHeight = parseInt(JSON.parse(tempBlock)["blockHeight"]);
