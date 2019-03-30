@@ -561,7 +561,6 @@ let connSeq = 0
 
     });
 
-    /***
     conn.on('readable',function(){
 
       //console.log("BLOCK STREAM "+this.readableHighWaterMark);
@@ -574,23 +573,6 @@ let connSeq = 0
         incomingBufferArray.push(chunk.toString());
       }
 
-    });
-    ***/
-
-    conn.on('readable', function () {
-        var buf = this.read();
-        if (!buf) return;
-        for (; offset < buf.length; offset++) {
-            if (buf[offset] === 0x0a) {
-                console.log("<== ");
-                incomingBufferArray.push(buf.slice(0, offset).toString());
-                buf = buf.slice(offset + 1);
-                offset = 0;
-                incomingBufferArray.unshift(buf);
-                return;
-            }
-        }
-        incomingBufferArray.unshift(buf);
     });
 
 
