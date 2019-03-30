@@ -551,7 +551,7 @@ let connSeq = 0
       //setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
       //setting this here and heed more intake checks
 
-      await BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);
+      await BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,1000,incomingStream);
 
       frankieCoin.blockHeight = parseInt(chainState.chainWalkHeight);
       //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
@@ -851,7 +851,7 @@ let connSeq = 0
                 var numRecordsToStream = parseInt(frankieCoin.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]);
                 BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
                   peers[peerId].conn.write(jsonStream);
-                  //console.log("wrote this "+jsonStream);
+                  console.log("wrote this "+jsonStream);
                   peers[peerId].conn.end();
                 })
                 //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
