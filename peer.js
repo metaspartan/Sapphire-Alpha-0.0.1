@@ -846,7 +846,7 @@ let connSeq = 0
                 //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
                 //BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
                 var checkPeerHeight = parseInt(JSON.parse(data)["ChainSyncPing"]["Height"]);
-                var checkTotalHeight = ParseInt(frankieCoin.synchronized);
+                var checkTotalHeight = parseInt(frankieCoin.synchronized);
                 var sendInTheRIser = frankieCoin.chainRiser;
                 if((checkTotalHeight - checkPeerHeight) > 200){
                   sendInTheRIser = 200
