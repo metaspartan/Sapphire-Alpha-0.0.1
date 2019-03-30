@@ -561,22 +561,36 @@ let connSeq = 0
 
     });
 
+    /***
     conn.on('readable',function(){
 
       //console.log("BLOCK STREAM "+this.readableHighWaterMark);
-      var iterChnk = 0
+
       let chunk;
       while (null !== (chunk = this.read())) {
         //console.log(`Received ${chunk.length} bytes of data.`);
-        if(iterChnk % 20 == 0){
-          console.log("<== streaming "+iterChnk);
-        }
-
+        console.log("<== ");
         incomingStream+=chunk.toString()
         incomingBufferArray.push(chunk.toString());
-        iterChnk++;
       }
 
+    });
+    ***/
+
+    conn.on('readable', function () {
+        var buf = this.read();
+        if (!buf) return;
+        for (; offset < buf.length; offset++) {
+            if (buf[offset] === 0x0a) {
+                console.log("<== ");
+                incomingBufferArray.push(buf.slice(0, offset).toString());
+                buf = buf.slice(offset + 1);
+                offset = 0;
+                incomingBufferArray.unshift(buf);
+                return;
+            }
+        }
+        incomingBufferArray.unshift(buf);
     });
 
 
@@ -850,7 +864,11 @@ let connSeq = 0
                 }
                 //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
                 //BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
-                BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser)
+                //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser)
+                BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser).then(function(jsonStream){
+                  peers[peerId].conn.write(jsonStream);
+                  peers[peerId].conn.end();
+                })
                 //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
 
 

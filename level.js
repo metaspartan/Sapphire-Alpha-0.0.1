@@ -1829,6 +1829,73 @@ var dumpToStreamFIleRange = function(cb,peer,start,end){
 
 }
 
+////////////////////////////////////////////////////////////PROMISE STYLE STREAM
+var dumpToStreamBlockRange = function(cb,peer,start,end){
+
+  return new Promise(function(resolve, reject) {
+
+    var chainBlockHeight=start;
+    var chainRiser=end;
+    var jsonSynch = []
+
+    console.log(" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
+
+    var stream = db.createReadStream();
+
+    stream.on('data',function(data){
+      //console.log("block: "+parseInt(data.key.toString().split(":")[1],16).toString(10)+" hexBlockNum: "+parseInt(chainBlockHeight))
+      //console.log('key = '+data.key+" value = "+data.value.toString());
+      if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight)) && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) < parseInt(chainBlockHeight+end))){//possible another block enters the db s no upper limit
+        //console.log("here... "+data.key.toString()+" "+data.value.toString());
+        //console.log("key... "+data.key.toString()+"  --> value "+data.value.toString());
+
+        var thisRowKey = data.key.toString();
+        var thisRowValue = data.value.toString();
+        var thisRow = {[thisRowKey]:thisRowValue};
+
+        jsonSynch.push(thisRow);
+
+      }else if(data.key.toString().split(":")[0] == "tx"){
+        //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+        if(JSON.parse(data.value.toString())["timsetamp"] != 1521339498){
+          var thisRowKey = data.key.toString();
+          var thisRowValue = data.value.toString();
+          var thisRow = {[thisRowKey]:thisRowValue};
+          //console.log("export tx key... "+data.key.toString()+".....value "+data.value.toString());
+          jsonSynch.push(thisRow);
+        }
+
+      }else if(data.key.toString().split(":")[0] == "ox"){
+        //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+
+        var thisRowKey = data.key.toString();
+        var thisRowValue = data.value.toString();
+        var thisRow = {[thisRowKey]:thisRowValue};
+
+        jsonSynch.push(thisRow);
+
+      }
+    });
+
+
+    stream.on('close',function(){
+
+      console.log("The Block Sync Data Stream is Complete to "+end+" with "+jsonSynch.length+" records");
+      for(thisRowKey in jsonSynch){
+
+      }
+      resolve(JSON.stringify(jsonSynch))
+
+    });
+
+
+  });
+
+
+
+}
+////////////////////////////////////////////////////////END PROMISE STYLE STREAM
+
 var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent){
 
   try {
@@ -1925,6 +1992,7 @@ module.exports = {
     dumpToJsonFIle:dumpToJsonFIle,
     dumpToJsonFIleRange:dumpToJsonFIleRange,
     dumpToStreamFIleRange:dumpToStreamFIleRange,
+    dumpToStreamBlockRange:dumpToStreamBlockRange,
     importFromJSONFile:importFromJSONFile,
     importFromJSONStream:importFromJSONStream,
     addChainParams:addChainParams,
