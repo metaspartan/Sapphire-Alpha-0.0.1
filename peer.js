@@ -90,66 +90,77 @@ chainState.datapack = "";
 chainState.nodePersistantId;
 chainState.peerNonce = 0;
 
-  var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
+//activeping process that keeps in touch with other nodes and synch based on isSynching
+var activePing = function(){
+  if(chainState.isSynching = false){//keep in touch
+    for(peer in frankieCoin.nodes){
 
-      if(blockNum > frankieCoin.chainRiser){
-
-        var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
-        var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
-        checkPointBlock = JSON.stringify(checkPointBlock);
-        //console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
-
-        var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
-        //console.log("blockNumHash: "+blockNumHash);
-
-        var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
-
-        /*****not sure we need this and I might be removing it
-        for(var i=1;i<riserOffset;i++){
-          var integralCheckPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset-i));
-          integralCHeckPointBlock = JSON.stringify(integralCheckPointBlock);
-          console.log("CALCULATED INTEGRAL CHECK POINT IS "+JSON.parse(integralCHeckPointBlock)["blockHeight"]+" Hash "+JSON.parse(integralCHeckPointBlock)["hash"]);
-          console.log("CALCULATED HASH IS "+sapphirechain.Hash(JSON.parse(integralCHeckPointBlock)["previousHash"]+JSON.parse(integralCHeckPointBlock)["timestamp"]+JSON.parse(integralCHeckPointBlock)["nonce"]));
-          //thisBlockCheckPointHash = sapphirechain.Hash(thisBlockCheckPointHash+JSON.parse(integralCHeckPointBlock)["hash"]);
-          console.log("CUMULATIVE CALCULATED HASH IS "+thisBlockCheckPointHash);
-        }
-        *****end might be removing it section*****/
-        if(source == "miner"){
-          chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
-          chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
-          return 1;
-        }else if(source == "peer" && incomingCheckHash.split(":")[0] == blockNum && incomingCheckHash.split(":")[1] == thisBlockCheckPointHash){
-          chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
-          chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
-          return 1;
-        }else{
-          return 2;
-        }
-
-        //console.log(JSON.stringify(chainState.previousBlockCheckPointHash))
-        //console.log(JSON.stringify(chainState.currentBlockCheckPointHash));
-
-    }else{
-
-      console.log("INCOMING INFORMATION FOR CALC CHK POINTS ************************************");
-      console.log(source+incomingCheckHash);
-      console.log("INCOMING INFORMATION FOR CALC CHK POINTS ************************************");
-
-      if(blockNum > 1){
-        var lastBLockNumber = frankieCoin.getLatestBlock()["blockHeight"];
-        var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getLatestBlock()))["hash"];
-        //console.log(lastBLockNumber+blockNum);
-      }else{
-        var blockNumHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f';
-      }
-      var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+"0000000000000000000000000000000000000000000000000000000000000000");
-      chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
-      chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
-      return 1;
-      //0000000000000000000000000000000000000000000000000000000000000000
     }
+  }else{
 
   }
+}
+
+var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
+
+    if(blockNum > frankieCoin.chainRiser){
+
+      var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
+      var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
+      checkPointBlock = JSON.stringify(checkPointBlock);
+      //console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
+
+      var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
+      //console.log("blockNumHash: "+blockNumHash);
+
+      var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+
+      /*****not sure we need this and I might be removing it
+      for(var i=1;i<riserOffset;i++){
+        var integralCheckPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset-i));
+        integralCHeckPointBlock = JSON.stringify(integralCheckPointBlock);
+        console.log("CALCULATED INTEGRAL CHECK POINT IS "+JSON.parse(integralCHeckPointBlock)["blockHeight"]+" Hash "+JSON.parse(integralCHeckPointBlock)["hash"]);
+        console.log("CALCULATED HASH IS "+sapphirechain.Hash(JSON.parse(integralCHeckPointBlock)["previousHash"]+JSON.parse(integralCHeckPointBlock)["timestamp"]+JSON.parse(integralCHeckPointBlock)["nonce"]));
+        //thisBlockCheckPointHash = sapphirechain.Hash(thisBlockCheckPointHash+JSON.parse(integralCHeckPointBlock)["hash"]);
+        console.log("CUMULATIVE CALCULATED HASH IS "+thisBlockCheckPointHash);
+      }
+      *****end might be removing it section*****/
+      if(source == "miner"){
+        chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
+        chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
+        return 1;
+      }else if(source == "peer" && incomingCheckHash.split(":")[0] == blockNum && incomingCheckHash.split(":")[1] == thisBlockCheckPointHash){
+        chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
+        chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
+        return 1;
+      }else{
+        return 2;
+      }
+
+      //console.log(JSON.stringify(chainState.previousBlockCheckPointHash))
+      //console.log(JSON.stringify(chainState.currentBlockCheckPointHash));
+
+  }else{
+
+    console.log("INCOMING INFORMATION FOR CALC CHK POINTS ************************************");
+    console.log(source+incomingCheckHash);
+    console.log("INCOMING INFORMATION FOR CALC CHK POINTS ************************************");
+
+    if(blockNum > 1){
+      var lastBLockNumber = frankieCoin.getLatestBlock()["blockHeight"];
+      var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getLatestBlock()))["hash"];
+      //console.log(lastBLockNumber+blockNum);
+    }else{
+      var blockNumHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f';
+    }
+    var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+"0000000000000000000000000000000000000000000000000000000000000000");
+    chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
+    chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
+    return 1;
+    //0000000000000000000000000000000000000000000000000000000000000000
+  }
+
+}
 
 var getChainState = function(){
   return chainState;
@@ -491,6 +502,8 @@ let connSeq = 0
 
   sw.listen(port)//peers
   sw.join('egem-sfrx') // can be any id/name/hash
+  sw.maxConnections = 20;//testing this out for node organization
+
   //incoming connections from peers
   sw.on('connection', (conn, info) => {
 
@@ -507,6 +520,10 @@ let connSeq = 0
       //console.log("tempcallerNodeid "+tempNodeCallerID);
       setTimeout(function(){directMessage(tempNodeCallerID+':0:0:')},100);//opening up a portal
     }
+
+    conn.on('timeout', () => {
+      console.log("timout for "+peerId)
+    })
 
     conn.on('close', () => {
       // Here we handle peer disconnection
@@ -542,7 +559,6 @@ let connSeq = 0
       }
 
     });
-
 
     conn.on('readable',function(){
 
@@ -815,7 +831,7 @@ let connSeq = 0
                 BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
                 ***/
                 var setDatSynch = function(datSynch,reqPeer){
-                  reqPeer.conn.write(JSON.stringify({pongBlockStream:datSynch,blockHeight:frankieCoin.getLength()}));
+                  reqPeer.conn.write(JSON.stringify({pongBlockStream:datSynch,blockHeight:chainState.synchronized}));
                 }
                 var cbGetSynch = function(datpeer){
                   console.log("calling dat synch")
@@ -829,7 +845,13 @@ let connSeq = 0
                 }
                 //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
                 //BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
-                BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser)
+                var checkPeerHeight = parseInt(JSON.parse(data)["ChainSyncPing"]["Height"]);
+                var checkTotalHeight = ParseInt(frankieCoin.synchronized);
+                var sendInTheRIser = frankieCoin.chainRiser;
+                if((checkTotalHeight - checkPeerHeight) > 200){
+                  sendInTheRIser = 200
+                }
+                BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],sendInTheRIser)
                 //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
 
 
