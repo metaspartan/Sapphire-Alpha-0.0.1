@@ -162,11 +162,15 @@ var getCheckPoints = function(){
 }
 
 var addNode = function(key, value){
-  //console.log("Adding Node as follows key: "+key.toString()+" - value:"+ value.toString())
-  //node:id:
-  db.put(key, value, function (err) {
-    if (err) return console.log('Ooops!', err) // some kind of I/O error
-  })
+  return new Promise(function(resolve, reject) {
+    db.put(key, value, function (err) {
+      if (err){
+        reject(console.log('Ooops!', err));
+      }else{
+        resolve(console.log("added node "+key));
+      } // some kind of I/O error
+    })
+  });
 }
 
 var getNodes = function(){

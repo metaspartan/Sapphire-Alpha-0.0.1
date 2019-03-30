@@ -513,12 +513,13 @@ let connSeq = 0
 
     if(info.id != chainState.nodePersistantId){
       frankieCoin.registerNode(peerId,info.host,info.port,frankieCoin.length);
-      BlkDB.addNode("node:"+peerId+":connection",{"host":info.host,"port":info.port});
-      //log(chalk.green("Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
-      log(chalk.bgBlue('New Peer id: '+ chalk.bold(peerId)));
-      var tempNodeCallerID = sapphirechain.ReDuex(peerId);
-      //console.log("tempcallerNodeid "+tempNodeCallerID);
-      setTimeout(function(){directMessage(tempNodeCallerID+':0:0:')},100);//opening up a portal
+      BlkDB.addNode("node:"+peerId+":connection",{"host":info.host,"port":info.port}).then(function(){
+        //log(chalk.green("Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
+        log(chalk.bgBlue('New Peer id: '+ chalk.bold(peerId)));
+        var tempNodeCallerID = sapphirechain.ReDuex(peerId);
+        //console.log("tempcallerNodeid "+tempNodeCallerID);
+        directMessage(tempNodeCallerID+':0:0:')//this is establishing the encryption to the peer
+      });
     }
 
     conn.on('timeout', () => {
@@ -1069,8 +1070,7 @@ let connSeq = 0
                         var remoteNodeIndex = sapphirechain.ReDuex(peer2s);
 
                         //let the directMessage do the work to encrypt and send the encrypted pper store
-                        setTimeout(function(){directMessage(remoteNodeIndex+":0:peerStoreTX:"+thisStoreHexMessage+":"+egemAccount);},300)
-
+                        directMessage(remoteNodeIndex+":0:peerStoreTX:"+thisStoreHexMessage+":"+egemAccount);
 
                       }
                     }
