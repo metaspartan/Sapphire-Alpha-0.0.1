@@ -562,7 +562,7 @@ let connSeq = 0
     });
 
     conn.on('readable',function(){
-
+      console.log("are we even in here ?");
       //console.log("BLOCK STREAM "+this.readableHighWaterMark);
 
       let chunk;
