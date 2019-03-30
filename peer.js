@@ -1256,13 +1256,16 @@ let connSeq = 0
           log("------------------------------------------------------");
 
           console.log("Block Height of provider is "+providerBlockHeight);
+          if((providerBlockHeight - chainState.synchronized) > 200){
+            var sendInRiser = 200;
+          }
           console.log(mydata);//we can remove this soon
 
           //callback function to refresh db with downloaded synch then pull to memory
           var cbRefreshDB = function(){
             //passes in ChainGrab function with input params as callback when db is open
             console.log("Importing the data file to the db and then calling the memory synch");
-            setTimeout(function(){BlkDB.importFromJSONFile(ChainGrabRefresh,providerBlockHeight,cbChainGrab,frankieCoin.chainRiser);},2000);
+            setTimeout(function(){BlkDB.importFromJSONFile(ChainGrabRefresh,providerBlockHeight,cbChainGrab,sendInRiser);},2000);
             //setting this here and heed more intake checks
             frankieCoin.blockHeight = parseInt(providerBlockHeight);
             //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
