@@ -568,7 +568,7 @@ let connSeq = 0
       let chunk;
       while (null !== (chunk = this.read())) {
         //console.log(`Received ${chunk.length} bytes of data.`);
-        if(iterChnk % 100 == 0){
+        if(iterChnk % 20 == 0){
           console.log("<== streaming "+iterChnk);
         }
 
