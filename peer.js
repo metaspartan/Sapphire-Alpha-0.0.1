@@ -564,13 +564,17 @@ let connSeq = 0
     conn.on('readable',function(){
 
       //console.log("BLOCK STREAM "+this.readableHighWaterMark);
-
+      var iterChnk = 0
       let chunk;
       while (null !== (chunk = this.read())) {
         //console.log(`Received ${chunk.length} bytes of data.`);
-        console.log("<== ");
+        if(iterChnk % 100 == 0){
+          console.log("<== streaming "+iterChnk);
+        }
+
         incomingStream+=chunk.toString()
         incomingBufferArray.push(chunk.toString());
+        iterChnk++;
       }
 
     });
