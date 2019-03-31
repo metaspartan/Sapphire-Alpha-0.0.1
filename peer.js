@@ -566,7 +566,7 @@ let connSeq = 0
       let chunk;
       //while (null !== (chunk = this.read())) {
       while (chunk = this.read()) {
-        if(chunk = null){
+        if(chunk == null){
           console.log("CHUNK WAS NULL CHUNK WAS NULL")
         }else{
           console.log(`Received ${chunk.length} bytes of data.`);
