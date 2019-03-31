@@ -1884,7 +1884,7 @@ var dumpToStreamBlockRange = function(cb,peer,start,end){
       for(thisRowKey in jsonSynch){
 
       }
-      cb(JSON.stringify(jsonSynch),peer)
+      cb(jsonSynch,peer)
       resolve(JSON.stringify(jsonSynch))
 
     });
