@@ -804,7 +804,7 @@ var getBlockRange = function(blockHeight,riser,callback){
     var chainBlockHeight=blockHeight;
     chainBlockHeight-=riser;
 
-      //console.log("riser: "+riser+" blockHeight: "+blockHeight+" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
+      console.log("riser: "+riser+" blockHeight: "+blockHeight+" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
       var returner = [];
       var stream = db.createReadStream();
       stream.on('data',function(data){
