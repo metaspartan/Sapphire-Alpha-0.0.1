@@ -1915,7 +1915,10 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
 
     var rowKey = Object.keys(content[row]);
     var rowValue = Object.values(content[row]);
-    console.log("I AM INSIDE THE inserts KEY "+rowKey+" VALUE "+rowValue);
+    if(rowKey.split(":")[0] == "sfrx"){
+      console.log("I AM INSIDE THE inserts KEY "+rowKey+" VALUE "+rowValue);
+    }
+
     db.put(rowKey, rowValue, function (err) {
       if (err) return console.log('Ooops!', err) // some kind of I/O error
     })
