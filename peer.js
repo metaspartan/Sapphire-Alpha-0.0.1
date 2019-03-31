@@ -516,7 +516,7 @@ let connSeq = 0
         log(chalk.bgBlue('New Peer id: '+ chalk.bold(peerId)));
         var tempNodeCallerID = sapphirechain.ReDuex(peerId);
         //console.log("tempcallerNodeid "+tempNodeCallerID);
-        directMessage(tempNodeCallerID+':0:0:')//this is establishing the encryption to the peer
+        //directMessage(tempNodeCallerID+':0:0:')//this is establishing the encryption to the peer
       });
     }
 
