@@ -1338,7 +1338,7 @@ let connSeq = 0
             log("------------------------------------------------------");
             log(chalk.red("You are communicating with a bad actor and we must stop this connection"));
             log("------------------------------------------------------");
-            peers[peerId].write("Stop hacking me bro");
+            peers[peerId].conn.write("Stop hacking me bro");
             //peers[peerId].connection.close()//?;
           }
         }
