@@ -2026,7 +2026,7 @@ function ChainGrabRefresh(blocknum,cbChainGrab,chainRiser){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
   console.log("called chain grab refresh with blockNum "+blocknum+" chainRiser "+chainRiser)
   //BlkDB.getBlockchain(99,cbChainGrab,ggHash)
-  BlkDB.getBlockRange(blocknum,chainRiser,cbChainGrab)
+  BlkDB.getBlockRange(blocknum,chainRiser,cbChainGrab);
   //maybe some other stuff like .then
 };
 //and finally the actual call to function for synch
