@@ -564,12 +564,17 @@ let connSeq = 0
       //console.log("BLOCK STREAM "+this.readableHighWaterMark);
 
       let chunk;
-      while (null !== (chunk = this.read())) {
-        console.log(`Received ${chunk.length} bytes of data.`);
-        console.log(chunk.toString());
-        console.log("<== ");
-        incomingStream+=chunk.toString()
-        incomingBufferArray.push(chunk.toString());
+      //while (null !== (chunk = this.read())) {
+      while (chunk = this.read()) {
+        if(chunk = null){
+          console.log("CHUNK WAS NULL CHUNK WAS NULL")
+        }else{
+          console.log(`Received ${chunk.length} bytes of data.`);
+          console.log(chunk.toString());
+          console.log("<== ");
+          incomingStream+=chunk.toString()
+          incomingBufferArray.push(chunk.toString());
+        }
       }
 
     });
