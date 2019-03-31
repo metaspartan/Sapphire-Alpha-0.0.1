@@ -677,7 +677,7 @@ let connSeq = 0
                 }else if(response == 2){
                   console.log("chain state response is not normal "+response);
                   var syncTrigger = {"syncTrigger":{data}}
-                  peers[peerId].write(JSON.stringify(syncTrigger));
+                  peers[peerId].conn.write(JSON.stringify(syncTrigger));
                   //peerId
                 }else{
                   console.log("chain state response "+response);
