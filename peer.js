@@ -850,7 +850,7 @@ let connSeq = 0
                 if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 1000){
                   var numRecordsToStream = 1000
                 }else{
-                  var numRecordsToStream = parseInt(frankieCoin.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]);
+                  var numRecordsToStream = parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]);
                 }
                 BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream)
                 //var numRecordsToStream = parseInt(frankieCoin.synchronized);
