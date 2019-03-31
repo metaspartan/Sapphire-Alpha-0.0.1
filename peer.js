@@ -564,17 +564,12 @@ let connSeq = 0
       //console.log("BLOCK STREAM "+this.readableHighWaterMark);
 
       let chunk;
-      //while (null !== (chunk = this.read())) {
-      while (chunk = this.read()) {
-        if(chunk == null){
-          console.log("CHUNK WAS NULL CHUNK WAS NULL")
-        }else{
-          console.log(`Received ${chunk.length} bytes of data.`);
-          console.log(chunk.toString());
-          console.log("<== ");
-          incomingStream+=chunk.toString()
-          incomingBufferArray.push(chunk.toString());
-        }
+      while (null !== (chunk = this.read())) {
+        console.log(`Received ${chunk.length} bytes of data.`);
+        console.log(chunk.toString());
+        console.log("<== ");
+        incomingStream+=chunk.toString()
+        incomingBufferArray.push(chunk.toString());
       }
 
     });
@@ -844,6 +839,7 @@ let connSeq = 0
                 }
 
                 var cbGetStream = function(jsonStream,streamToPeerID){
+                  console.log("the streams cb condition is met");
                   streamToPeerID.conn.write(jsonStream);
                   streamToPeerID.conn.end();
                   //setting up some streams to try this out
@@ -853,9 +849,10 @@ let connSeq = 0
                 //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser)
                 var numRecordsToStream = parseInt(frankieCoin.synchronized);
                 BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
-                  peers[peerId].conn.write(jsonStream);
+                  //peers[peerId].conn.write(jsonStream);
                   //console.log("wrote this "+jsonStream);
-                  peers[peerId].conn.end();
+                  //peers[peerId].conn.end();
+                  console.log("the streams then condition is met");
                 })
                 //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
 
