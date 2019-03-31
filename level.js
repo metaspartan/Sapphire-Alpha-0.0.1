@@ -812,7 +812,7 @@ var getBlockRange = function(blockHeight,riser,callback){
         if(data.key.toString().split(":")[0] == "sfblk"){
           console.log('key = '+data.key+" value = "+data.value.toString());
         }
-        
+
         if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight))){//possible another block enters the db s no upper limit
           //console.log("here... "+data.key.toString()+" "+data.value.toString());
           returner.push(data.value.toString());
@@ -1848,6 +1848,9 @@ var dumpToStreamBlockRange = function(cb,peer,start,end){
     stream.on('data',function(data){
       //console.log("block: "+parseInt(data.key.toString().split(":")[1],16).toString(10)+" hexBlockNum: "+parseInt(chainBlockHeight))
       //console.log('key = '+data.key+" value = "+data.value.toString());
+      if(data.key.toString().split(":")[0] == "sfblk"){
+        console.log("added block "+data.key.toString());
+      }
       if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight)) && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) < parseInt(chainBlockHeight+end))){//possible another block enters the db s no upper limit
         //console.log("here... "+data.key.toString()+" "+data.value.toString());
         //console.log("key... "+data.key.toString()+"  --> value "+data.value.toString());
