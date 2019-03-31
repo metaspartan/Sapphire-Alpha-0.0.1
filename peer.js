@@ -1504,6 +1504,13 @@ function cliGetInput(){
       //Orderdb.getOrdersSell();
       //Orderdb.getAllOrders();
       cliGetInput();
+    }else if(userInput == "OOO"){//O is for order
+      //other commands can go Here
+      log("Just get everything in the database");
+      BlkDB.getAllBLocks();
+      //BlkDB.getAll();
+      console.log("all blocks");
+      cliGetInput();
     }else if(userInput == "OX"){//O is for order
       //other commands can go Here
       var cbTestBuys = function(){
