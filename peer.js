@@ -18,8 +18,6 @@ var bitcoin  = require('bitcoinjs-lib');
 var bitcoinMessage = require('bitcoinjs-message');
 var cs = require('coinstring');
 const ecies = require('standard-ecies');
-
-//var web3 = new Web3(new Web3.providers.HttpProvider("https://rpc-2.egem.io/custom"));
 var DatSyncLink = require("./datsynch.js");
 
 //genesis hash variables
@@ -851,7 +849,7 @@ let connSeq = 0
                 var numRecordsToStream = parseInt(frankieCoin.synchronized);
                 BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
                   peers[peerId].conn.write(jsonStream);
-                  console.log("wrote this "+jsonStream);
+                  //console.log("wrote this "+jsonStream);
                   peers[peerId].conn.end();
                 })
                 //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
