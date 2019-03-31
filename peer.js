@@ -516,7 +516,8 @@ let connSeq = 0
         log(chalk.bgBlue('New Peer id: '+ chalk.bold(peerId)));
         var tempNodeCallerID = sapphirechain.ReDuex(peerId);
         //console.log("tempcallerNodeid "+tempNodeCallerID);
-        //directMessage(tempNodeCallerID+':0:0:')//this is establishing the encryption to the peer
+        ///////////////WE MIGHT WANT TO RESERVE THE CALL BELOW FOR SYNCHED PEERS
+        directMessage(tempNodeCallerID+':0:0:')//this is establishing the encryption to the peer
       });
     }
 
@@ -543,13 +544,13 @@ let connSeq = 0
       console.log("data stream ended ");
       //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
 
-      console.log("this is on end "+incomingStream);
+      //console.log("this is on end "+incomingStream);
 
       console.log("Importing the data file to the db and then calling the memory synch");
-      //setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
+      setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
       //setting this here and heed more intake checks
 
-      BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,1000,incomingStream);
+      //BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);
 
       frankieCoin.blockHeight = parseInt(chainState.chainWalkHeight);
       //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
@@ -1936,8 +1937,8 @@ var callBackEntireDatabase = function(data){
 
 //the idea is to sync the chain data before progression so we start with a callback of data store limited by number of blocks
 var cbChainGrab = function(data) {
-  //console.log("chain grab callback...")
-  //log('got data: '+data.toString());//test for input
+  console.log("chain grab callback...")
+  log('got data: '+data.toString());//test for input
 
   for (obj in data){
     //log("BLOCK CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));//verbose
