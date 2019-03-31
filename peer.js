@@ -855,9 +855,9 @@ let connSeq = 0
                 //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream)
                 //var numRecordsToStream = parseInt(frankieCoin.synchronized);
                 BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
-                  //peers[peerId].conn.write(jsonStream);
+                  peers[peerId].conn.write(jsonStream);
                   //console.log("wrote this "+jsonStream);
-                  //peers[peerId].conn.end();
+                  peers[peerId].conn.end();
                   console.log("the streams then condition is met");
                 })
                 //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
