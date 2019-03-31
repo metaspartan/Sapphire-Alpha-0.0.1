@@ -1915,7 +1915,7 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
 
     var rowKey = Object.keys(content[row]);
     var rowValue = Object.values(content[row]);
-    if(rowKey.toString().split(":")[0] == "sfrx"){
+    if(rowKey.toString().split(":")[0] == "sfblk"){
       console.log("I AM INSIDE THE inserts KEY "+rowKey+" VALUE "+rowValue);
     }
 
