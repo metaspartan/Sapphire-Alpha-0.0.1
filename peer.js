@@ -820,10 +820,18 @@ let connSeq = 0
                 chainState.chainWalkHash = await frankieCoin.getLatestBlock()["hash"];//block 1 hash
                 chainState.synchronized = frankieCoin.blockHeight;//when we are synched at a block it gets updated
                 chainState.topBlock = frankieCoin.blockHeight;
+                var riserOffset = (parseInt(frankieCoin.blockHeight) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
+                var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
+                checkPointBlock = JSON.stringify(checkPointBlock);
+                console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
+                var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(frankieCoin.blockHeight)))["hash"];
+                var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+                chainState.previousBlockCheckPointHash = {"blockNumber":frankieCoin.blockHeight,"checkPointHash":thisBlockCheckPointHash};
+                chainState.currentBlockCheckPointHash = {"blockNumber":frankieCoin.blockHeight,"checkPointHash":thisBlockCheckPointHash};
               })
             }
           }).then(function() {
-            peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+            peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           });
 
           //setTimeout(function(){
