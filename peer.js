@@ -676,7 +676,7 @@ let connSeq = 0
                   console.log(err);
                 }else if(response == 2){
                   console.log("chain state response is not normal "+response);
-                  var syncTrigger = {"syncTrigger":{data}}
+                  var syncTrigger = {"syncTrigger":incomingBLockHeight,"submitCurrrentChainStateHash":JSON.parse(data)["chainStateHash"],"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
                   peers[peerId].conn.write(JSON.stringify(syncTrigger));
                   //peerId
                 }else{
@@ -805,9 +805,33 @@ let connSeq = 0
 
         }else if(JSON.parse(data)["syncTrigger"]){
 
-          console.log(chalk.bgRed(" DELETING BACK TO PREVIOUS CHECK POINT AND SYNC "));
+          //isSynching = yes
+          chainState.isSynching=true;
+          console.log(chalk.bgRed(" DELETING BACK TO PREVIOUS CHECK POINT AND SYNC "+JSON.parse(data)["syncTrigger"]));
+          console.log("SUBMITED "+JSON.parse(data)["syncTrigger"]["submitCurrrentChainStateHash"]+" PEER "+JSON.parse(data)["syncTrigger"]["peerCurrrentChainStateHash"])
+          var hairCut = (JSON.parse(data)["syncTrigger"] % frankieCoin.chainRiser);
+          var lastRiser = parseInt(JSON.parse(data)["syncTrigger"] - hairCut)
+          Promise.resolve(function(){
+            for(var i = JSON.parse(data)["syncTrigger"]; i >= lastRiser;i--){
+              (async () => {
+                await BlkDB.removeBlock(i);
+                await frankieCoin.pop();
+                chainState.chainWalkHeight = frankieCoin.blockHeight;
+                chainState.chainWalkHash = await frankieCoin.getLatestBlock()["hash"];//block 1 hash
+                chainState.synchronized = frankieCoin.blockHeight;//when we are synched at a block it gets updated
+                chainState.topBlock = frankieCoin.blockHeight;
+              })
+            }
+          }).then(function() {
+            peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          });
 
-          JSON.stringify(data);
+          //setTimeout(function(){
+          //  peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          //},2000)
+          //var deltaToRiser = parseInt(frankieCoin.chainRiser - )
+
+
 
         }else if(JSON.parse(data)["fromAddress"]){
 
