@@ -551,11 +551,12 @@ let connSeq = 0
     })
 
     conn.on('close', () => {
-      // Here we handle peer disconnection
-      log(chalk.blue("Connection"+ chalk.green(seq) + "closed, peer id: " + chalk.green(peerId)))
-      frankieCoin.removeNode(peerId);
+
       // If the closing connection is the last connection with the peer, removes the peer
       if ((peers[peerId]) && peers[peerId].seq === seq) {
+        // Here we handle peer disconnection
+        log(chalk.blue("Connection"+ chalk.green(seq) + "closed, peer id: " + chalk.green(peerId)))
+        frankieCoin.removeNode(peerId);
         delete peers[peerId]
       }
 
