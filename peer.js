@@ -524,7 +524,7 @@ let connSeq = 0
   const sw = await getConnectionConfig();
 
   sw.listen(port)//peers
-  sw.join('egem-sfrx') // can be any id/name/hash
+  sw.join('egem-sfrx-002') // can be any id/name/hash
   sw.maxConnections = 20;//testing this out for node organization
 
   //incoming connections from peers
