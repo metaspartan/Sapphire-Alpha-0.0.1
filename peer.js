@@ -579,7 +579,7 @@ let connSeq = 0
     var incomingBufferArray = [];
 
     conn.on('end',async function(){
-      console.log("data stream ended ");
+      //console.log("data stream ended ");
       //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
 
       //console.log("this is on end "+incomingStream);
@@ -599,7 +599,6 @@ let connSeq = 0
     });
 
     conn.on('readable',function(){
-      console.log("are we even in here ?");
       //console.log("BLOCK STREAM "+this.readableHighWaterMark);
 
       let chunk;
