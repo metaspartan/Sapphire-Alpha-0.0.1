@@ -113,16 +113,6 @@ var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
       var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
 
-      /*****not sure we need this and I might be removing it
-      for(var i=1;i<riserOffset;i++){
-        var integralCheckPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset-i));
-        integralCHeckPointBlock = JSON.stringify(integralCheckPointBlock);
-        console.log("CALCULATED INTEGRAL CHECK POINT IS "+JSON.parse(integralCHeckPointBlock)["blockHeight"]+" Hash "+JSON.parse(integralCHeckPointBlock)["hash"]);
-        console.log("CALCULATED HASH IS "+sapphirechain.Hash(JSON.parse(integralCHeckPointBlock)["previousHash"]+JSON.parse(integralCHeckPointBlock)["timestamp"]+JSON.parse(integralCHeckPointBlock)["nonce"]));
-        //thisBlockCheckPointHash = sapphirechain.Hash(thisBlockCheckPointHash+JSON.parse(integralCHeckPointBlock)["hash"]);
-        console.log("CUMULATIVE CALCULATED HASH IS "+thisBlockCheckPointHash);
-      }
-      *****end might be removing it section*****/
       if(source == "miner"){
         chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
         chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
@@ -201,9 +191,6 @@ var getConnectionConfig = async function(){
     BlkDB.getChainParamsByName(globalGenesisHash,'nodePersistantId',callBackNodePersistence);
   })
 }
-
-//const myId = crypto.randomBytes(32);
-//console.log("the Node ID = "+myId);
 
 /////////////////////////////simple function to test JSON input and avoid errors
 function isJSON(str) {
@@ -721,7 +708,11 @@ let connSeq = 0
                 }
               });
             //}
-          }else{/////need to move this below the block add and add the block differently to not mess with blockheight or txs
+          }else if(incomingBLockHeight > parseInt(frankieCoin.blockHeight+1)){/////need to move this below the block add and add the block differently to not mess with blockheight or txs
+            console.log(chalk.bgCyan.red("*************   ***********   ***********   *********   **************"));
+            console.log("WE ARE IGNORING INCOMING BLOCKS WHILE is synching is "+frankieCoin.isSynching);
+            console.log(chalk.bgCyan.red("*************   ***********   ***********   *********   **************"));
+          }else{
 
             console.log(chalk.bgGreen("                THIS BLOCK CHAIN STATS:             "));
             console.log(chalk.bgGreen("                                                    "));
@@ -917,7 +908,7 @@ let connSeq = 0
                   peers[peerId].conn.write(jsonStream);
                   //console.log("wrote this "+jsonStream);
                   peers[peerId].conn.end();
-                  console.log("the streams then condition is met");
+                  console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
                 })
                 //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
 
