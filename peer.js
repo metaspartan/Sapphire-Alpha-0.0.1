@@ -910,6 +910,15 @@ let connSeq = 0
                   peers[peerId].conn.end();
                   console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
                 })
+
+                setTimeout(function(){
+                  BlkDB.dumpToStreamTXOXRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
+                    peers[peerId].conn.write(jsonStream);
+                    //console.log("wrote this "+jsonStream);
+                    peers[peerId].conn.end();
+                    console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
+                  })
+                },2000)
                 //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
 
 

@@ -1855,7 +1855,45 @@ var dumpToStreamBlockRange = function(cb,peer,start,end){
 
         jsonSynch.push(thisRow);
 
-      }else if(data.key.toString().split(":")[0] == "tx"){
+      }
+
+    });
+
+
+    stream.on('close',function(){
+
+      console.log("The Block Sync Data Stream is Complete to "+end+" with "+jsonSynch.length+" records");
+      for(thisRowKey in jsonSynch){
+
+      }
+      //cb(JSON.stringify(jsonSynch),peer)
+      resolve(JSON.stringify(jsonSynch))
+
+    });
+
+
+  });
+
+
+
+}
+////////////////////////////////////////////////////////END PROMISE STYLE STREAM
+
+var dumpToStreamTXOXRange = function(cb,peer,start,end){
+
+  return new Promise(function(resolve, reject) {
+
+    var chainBlockHeight=start;
+    var chainRiser=end;
+    var jsonSynch = []
+
+    console.log(" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
+
+    var stream = db.createReadStream();
+
+    stream.on('data',function(data){
+
+      if(data.key.toString().split(":")[0] == "tx"){
         //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
         if(JSON.parse(data.value.toString())["timsetamp"] != 1521339498){
           var thisRowKey = data.key.toString();
@@ -1896,7 +1934,7 @@ var dumpToStreamBlockRange = function(cb,peer,start,end){
 
 
 }
-////////////////////////////////////////////////////////END PROMISE STYLE STREAM
+////////////////////////////////////////////////////END PROMISE STREAM TX and OX
 
 var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent){
 
@@ -1999,6 +2037,7 @@ module.exports = {
     dumpToJsonFIleRange:dumpToJsonFIleRange,
     dumpToStreamFIleRange:dumpToStreamFIleRange,
     dumpToStreamBlockRange:dumpToStreamBlockRange,
+    dumpToStreamTXOXRange:dumpToStreamTXOXRange,
     importFromJSONFile:importFromJSONFile,
     importFromJSONStream:importFromJSONStream,
     addChainParams:addChainParams,
