@@ -804,14 +804,14 @@ var getBlockRange = function(blockHeight,riser,callback){
     var chainBlockHeight=blockHeight;
     chainBlockHeight-=riser;
 
-      console.log("riser: "+riser+" blockHeight: "+blockHeight+" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
+      //console.log("riser: "+riser+" blockHeight: "+blockHeight+" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
       var returner = [];
       var stream = db.createReadStream();
       stream.on('data',function(data){
         //console.log("block: "+parseInt(data.key.toString().split(":")[1],16).toString(10)+" hexBlockNum: "+parseInt(chainBlockHeight))
-        if(data.key.toString().split(":")[0] == "sfblk"){
-          console.log('key = '+data.key+" value = "+data.value.toString());
-        }
+        //if(data.key.toString().split(":")[0] == "sfblk"){
+        //  console.log('key = '+data.key+" value = "+data.value.toString());
+        //}
 
         if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight))){//possible another block enters the db s no upper limit
           //console.log("here... "+data.key.toString()+" "+data.value.toString());
@@ -1875,7 +1875,7 @@ var dumpToStreamBlockRange = function(cb,peer,start,end){
         jsonSynch.push(thisRow);
 
       }
-      
+
     });
 
 
@@ -1916,9 +1916,9 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
 
     var rowKey = Object.keys(content[row]);
     var rowValue = Object.values(content[row]);
-    if(rowKey.toString().split(":")[0] == "sfblk"){
-      console.log("I AM INSIDE THE inserts KEY "+rowKey+" VALUE "+rowValue);
-    }
+    //if(rowKey.toString().split(":")[0] == "sfblk"){
+      //console.log("I AM INSIDE THE inserts KEY "+rowKey+" VALUE "+rowValue);
+    //}
 
     db.put(rowKey, rowValue, function (err) {
       if (err) return console.log('Ooops!', err) // some kind of I/O error

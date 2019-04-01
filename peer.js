@@ -488,6 +488,44 @@ var directMessage = function(secretMessage){
 }
 //////////////////////////////////////////////////END ENCRYPTED DIRECT MESSAGING
 
+///////////////////////////////////////////////////////////////////CHAIN CLIPPER
+var chainClipper = async function(blockHeight){//clip back to last riser from this height
+  return new Promise(async function(resolve, reject) {
+
+    var hairCut = (blockHeight % frankieCoin.chainRiser);
+    var lastRiser = parseInt(blockHeight - hairCut)
+
+    for(var i = blockHeight; i > lastRiser;i--){
+
+        await BlkDB.removeBlock(i);
+        await frankieCoin.chain.pop();
+        console.log("FRANKIECOIN BLOCKNUM BEFORE REDUCE IS "+frankieCoin.blockHeight);
+        frankieCoin.blockHeight-=1;
+        chainState.chainWalkHeight = frankieCoin.blockHeight;
+        chainState.chainWalkHash = await frankieCoin.getLatestBlock()["hash"];//block 1 hash
+        chainState.synchronized = frankieCoin.blockHeight;//when we are synched at a block it gets updated
+        chainState.topBlock = frankieCoin.blockHeight;
+        var riserOffset = (parseInt(frankieCoin.blockHeight) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
+        var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
+        checkPointBlock = JSON.stringify(checkPointBlock);
+        console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
+        console.log("FRANKIECOIN BLOCKNUM AFTER REDUCE IS "+frankieCoin.blockHeight)
+        var blockForHash = frankieCoin.getLatestBlock();
+        console.log("BLOCK FOR HASH IS "+blockForHash);
+        var blockNumHash = JSON.parse(JSON.stringify(blockForHash))["hash"];
+        var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+        chainState.previousBlockCheckPointHash = {"blockNumber":frankieCoin.blockHeight,"checkPointHash":thisBlockCheckPointHash};
+        chainState.currentBlockCheckPointHash = {"blockNumber":frankieCoin.blockHeight,"checkPointHash":thisBlockCheckPointHash};
+
+    }
+
+    if(frankieCoin.blockHeight == lastRiser){
+      resolve(lastRiser);
+    }
+
+  })
+}
+///////////////////////////////////////////////////////////////END CHAIN CLIPPER
 
 const peers = {}
 // Counter for connections, used for identify connections
@@ -567,7 +605,7 @@ let connSeq = 0
       let chunk;
       while (null !== (chunk = this.read())) {
         console.log(`Received ${chunk.length} bytes of data.`);
-        console.log(chunk.toString());
+        //console.log(chunk.toString());
         console.log("<== ");
         incomingStream+=chunk.toString()
         incomingBufferArray.push(chunk.toString());
@@ -809,30 +847,10 @@ let connSeq = 0
           chainState.isSynching=true;
           console.log(chalk.bgRed(" DELETING BACK TO PREVIOUS CHECK POINT AND SYNC "+JSON.parse(data)["syncTrigger"]));
           console.log("SUBMITED "+JSON.parse(data)["syncTrigger"]["submitCurrrentChainStateHash"]+" PEER "+JSON.parse(data)["syncTrigger"]["peerCurrrentChainStateHash"])
-          var hairCut = (JSON.parse(data)["syncTrigger"] % frankieCoin.chainRiser);
-          var lastRiser = parseInt(JSON.parse(data)["syncTrigger"] - hairCut)
-          var clipChain = Promise.resolve(function(){
-            for(var i = JSON.parse(data)["syncTrigger"]; i >= lastRiser;i--){
-              (async () => {
-                await BlkDB.removeBlock(i);
-                await frankieCoin.pop();
-                chainState.chainWalkHeight = frankieCoin.blockHeight;
-                chainState.chainWalkHash = await frankieCoin.getLatestBlock()["hash"];//block 1 hash
-                chainState.synchronized = frankieCoin.blockHeight;//when we are synched at a block it gets updated
-                chainState.topBlock = frankieCoin.blockHeight;
-                var riserOffset = (parseInt(frankieCoin.blockHeight) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
-                var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
-                checkPointBlock = JSON.stringify(checkPointBlock);
-                console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
-                var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(frankieCoin.blockHeight)))["hash"];
-                var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
-                chainState.previousBlockCheckPointHash = {"blockNumber":frankieCoin.blockHeight,"checkPointHash":thisBlockCheckPointHash};
-                chainState.currentBlockCheckPointHash = {"blockNumber":frankieCoin.blockHeight,"checkPointHash":thisBlockCheckPointHash};
-              })
-            }
-          });
-          clipChain().then(function() {
-            peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(frankieCoin.blockHeight+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          //var hairCut = (JSON.parse(data)["syncTrigger"] % frankieCoin.chainRiser);
+          //var lastRiser = parseInt(JSON.parse(data)["syncTrigger"] - hairCut)
+          chainClipper(JSON.parse(data)["syncTrigger"]).then(function(){
+            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
           });
 
           //setTimeout(function(){
@@ -1481,6 +1499,7 @@ function cliGetInput(){
       },1000)
       cliGetInput();
     }else if(userInput == "INFO"){
+      console.log("IS SYNCHING "+chainState.isSynching);
       console.log(chalk.bgBlackBright.black("chain riser is ")+chalk.bgMagenta(frankieCoin.chainRiser))
       console.log(chalk.bgBlackBright.black("chain state chain walk height is ")+chalk.bgMagenta(chainState.chainWalkHeight));
       console.log(chalk.bgBlackBright.black("chain state synchronized equals ")+chalk.bgMagenta(chainState.synchronized));
@@ -1488,6 +1507,12 @@ function cliGetInput(){
       console.log(chalk.bgBlackBright.black("previousBlockCheckPointHash is ")+chalk.bgMagenta(JSON.stringify(chainState.previousBlockCheckPointHash)));
       console.log(chalk.bgBlackBright.black("currentBlockCheckPointHash is ")+chalk.bgMagenta(JSON.stringify(chainState.currentBlockCheckPointHash)));
       BlkDB.getCheckPoints();
+      cliGetInput();
+    }else if(userInput == "CLIP"){
+      console.log("cliping chain from "+frankieCoin.blockHeight+" back one riser ");
+      chainClipper(frankieCoin.blockHeight).then(function(){
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+      });
       cliGetInput();
     }else if(userInput == "MMM"){
       console.log("calling all orders level db");
