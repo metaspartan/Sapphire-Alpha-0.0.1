@@ -392,7 +392,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       log("------------------------------------------------------");
       log(chalk.green("Sending ping for chain sync."));
       log("------------------------------------------------------");
-      peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+      //THIS PING GETS OUT OF CONTROL
+      //peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
     }
   }
 }
