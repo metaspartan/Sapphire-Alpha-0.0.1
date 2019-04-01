@@ -811,7 +811,7 @@ let connSeq = 0
           console.log("SUBMITED "+JSON.parse(data)["syncTrigger"]["submitCurrrentChainStateHash"]+" PEER "+JSON.parse(data)["syncTrigger"]["peerCurrrentChainStateHash"])
           var hairCut = (JSON.parse(data)["syncTrigger"] % frankieCoin.chainRiser);
           var lastRiser = parseInt(JSON.parse(data)["syncTrigger"] - hairCut)
-          Promise.resolve(function(){
+          var clipChain = Promise.resolve(function(){
             for(var i = JSON.parse(data)["syncTrigger"]; i >= lastRiser;i--){
               (async () => {
                 await BlkDB.removeBlock(i);
@@ -830,8 +830,9 @@ let connSeq = 0
                 chainState.currentBlockCheckPointHash = {"blockNumber":frankieCoin.blockHeight,"checkPointHash":thisBlockCheckPointHash};
               })
             }
-          }).then(function() {
-            peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          });
+          clipChain().then(function() {
+            peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(frankieCoin.blockHeight+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           });
 
           //setTimeout(function(){
