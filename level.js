@@ -1897,6 +1897,8 @@ var dumpToStreamTXOXRange = function(cb,peer,start,end){
 
     var endTimeStamp = await getBlock(parseInt(chainBlockHeight+end));
 
+    console.log(startTimeStamp+" "+endTimeStamp)
+
     var stream = db.createReadStream();
 
     console.log("TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS ")
