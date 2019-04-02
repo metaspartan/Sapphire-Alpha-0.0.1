@@ -1900,11 +1900,11 @@ var dumpToStreamTXOXRange = function(cb,peer,start,end){
       var timeStartFunction = function(blkStart){
         startTimeStamp = JSON.parse(blkStart)["timestamp"];
       }
-      getBlock(parseInt(chainBlockHeight,timeStartFunction));
+      getBlock(parseInt(chainBlockHeight),timeStartFunction);
       var timeEndFunction = function(blkEnd){
         endTimeStamp = JSON.parse(blkEnd)["timestamp"];
       }
-      getBlock(parseInt(chainBlockHeight+end,timeStartFunction));
+      getBlock(parseInt(chainBlockHeight+end),timeEndFunction);
     }
 
     await getTimeStamps();
