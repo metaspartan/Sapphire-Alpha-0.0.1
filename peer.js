@@ -166,7 +166,7 @@ const rl = readline.createInterface({
 //////////////////////////////////////////////////////////////end CLI query init
 
 /////////////////////////////////////////////asynchronous peer connection engine
-var getConnectionConfig = async function(){
+var getConnectionConfig = async function(ntwk){
   return new Promise(function(resolve, reject) {
     var callBackNodePersistence = function(npid){
       myLastSessionId = npid;
@@ -184,8 +184,8 @@ var getConnectionConfig = async function(){
         id: chainState.nodePersistantId,
       })
 
-      const sw = swarm(config);
-      resolve(sw);
+      const ntwk = swarm(config);
+      resolve(ntwk);
     }
     console.log("making the call");
     BlkDB.getChainParamsByName(globalGenesisHash,'nodePersistantId',callBackNodePersistence);
@@ -523,8 +523,8 @@ let connSeq2 = 0
   const port = await getPort()//grab available random port for peer connections
   const port2 = await getPort()
 
-  const sw = await getConnectionConfig();
-  const sw2 = await getConnectionConfig();
+  const sw = await getConnectionConfig(this);
+  const sw2 = await getConnectionConfig(this);
   sw.listen(port)//peers
   sw2.listen(port2)
   sw.join('egem-sfrx-001') // can be any id/name/hash
@@ -1476,7 +1476,7 @@ let connSeq2 = 0
       console.log("BLOCK STREAM "+this.readableHighWaterMark);
 
       let chunk;
-      while (chunk = this.read()) {
+      while (null !== (chunk = this.read())) {
         console.log(`Received ${chunk.length} bytes of data.`);
         console.log(chunk.toString());
         console.log("<== ");
@@ -1489,15 +1489,6 @@ let connSeq2 = 0
 
     conn2.on('data', data => {
       // Here we handle incomming messages
-
-      let chunk;
-      while (chunk = this.read()) {
-        console.log(`Received ${chunk.length} bytes of data.`);
-        console.log(chunk.toString());
-        console.log("<== ");
-        incomingStream2+=chunk.toString()
-        incomingBufferArray2.push(chunk.toString());
-      }
 
       //console.log("connection 2 type of is "+typeof(data)+JSON.stringify(data));
       log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
