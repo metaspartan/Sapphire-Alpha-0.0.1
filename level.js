@@ -1893,13 +1893,21 @@ var dumpToStreamTXOXRange = function(cb,peer,start,end){
 
     console.log(" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
 
-    var startTimeStampBlock = await getBlock(parseInt(chainBlockHeight));
+    var startTimeStamp;
+    var endTimeStamp;
 
-    console.log(JSON.stringify(startTimeStampBlock))
+    var getTImeStamps = async function(){
+      var timeStartFunction = function(blkStart){
+        startTimeStamp = blkStart["timestamp"];
+      }
+      getBlock(parseInt(chainBlockHeight,timeStartFunction));
+      var timeEndFunction = function(blkEnd){
+        endTimeStamp = blkEnd["timestamp"];
+      }
+      getBlock(parseInt(chainBlockHeight+end,timeStartFunction));
+    }
 
-    var endTimeStampBlock = await getBlock(parseInt(chainBlockHeight+end));
-
-    console.log(JSON.stringify(endTimeStampBlock))
+    await getTimeStamps();
 
     console.log(startTimeStamp+" "+endTimeStamp)
 
