@@ -1881,6 +1881,10 @@ var dumpToStreamBlockRange = function(cb,peer,start,end){
 
 var dumpToStreamTXOXRange = function(cb,peer,start,end){
 
+  console.log(chalk.bgRed("TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS "))
+  console.log(chalk.bgRed("TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS "))
+  console.log(chalk.bgRed("TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS "))
+
   return new Promise(async function(resolve, reject) {
 
     var chainBlockHeight=start;
