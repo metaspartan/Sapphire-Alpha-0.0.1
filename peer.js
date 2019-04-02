@@ -1496,7 +1496,7 @@ let connSeq2 = 0
     conn2.on('data', data => {
       // Here we handle incomming messages
 
-      //console.log("type of is "+typeof(data)+JSON.stringify(data));
+      console.log("connection 2 type of is "+typeof(data)+JSON.stringify(data));
       //log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
       // callback returning verified uncles post processing probably needs a rename
       var sendBackUncle = function(msg,peerId){
