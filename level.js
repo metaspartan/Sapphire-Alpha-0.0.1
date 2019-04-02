@@ -1896,7 +1896,7 @@ var dumpToStreamTXOXRange = function(cb,peer,start,end){
     var startTimeStamp;
     var endTimeStamp;
 
-    var getTImeStamps = async function(){
+    var getTimeStamps = async function(){
       var timeStartFunction = function(blkStart){
         startTimeStamp = blkStart["timestamp"];
       }
