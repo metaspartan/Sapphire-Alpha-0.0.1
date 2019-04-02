@@ -1461,7 +1461,7 @@ let connSeq2 = 0
       //console.log("data stream ended ");
       //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
 
-      //console.log("this is on end "+incomingStream);
+      console.log("CONN 2 this is on end "+incomingStream);
 
       console.log("CONN 2 Importing the data file to the db and then calling the memory synch");
       //setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
@@ -1478,7 +1478,8 @@ let connSeq2 = 0
     });
 
     conn2.on('readable',function(){
-      //console.log("BLOCK STREAM "+this.readableHighWaterMark);
+
+      console.log("BLOCK STREAM "+this.readableHighWaterMark);
 
       let chunk;
       while (null !== (chunk = this.read())) {
