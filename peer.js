@@ -1537,7 +1537,7 @@ let connSeq2 = 0
               console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" <<<<the difference");
               if(frankieCoin.getLength() == parseInt(peerBlockHeight+1)){
                 //just give me the latest block
-                peers[peerId].conn2.write(JSON.stringify(frankieCoin.getLatestBlock()));
+                peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
               }else if((frankieCoin.getLength() > parseInt(peerBlockHeight)) && (chainState.synchronized > parseInt(peerBlockHeight)) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
                 console.log("this is properly flagged for streaming");
                 /***
