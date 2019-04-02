@@ -1490,6 +1490,15 @@ let connSeq2 = 0
     conn2.on('data', data => {
       // Here we handle incomming messages
 
+      let chunk;
+      while (chunk = this.read()) {
+        console.log(`Received ${chunk.length} bytes of data.`);
+        console.log(chunk.toString());
+        console.log("<== ");
+        incomingStream2+=chunk.toString()
+        incomingBufferArray2.push(chunk.toString());
+      }
+
       //console.log("connection 2 type of is "+typeof(data)+JSON.stringify(data));
       log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
       // callback returning verified uncles post processing probably needs a rename
