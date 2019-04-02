@@ -1634,7 +1634,7 @@ let connSeq2 = 0
             ///tesst out setTimeout(function(){disconnet peers[peerId].conn.dissconnet();},1500);
           }
 
-        
+
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == true){
           console.log("Extra peer returned synch message but synch is in progress so ignoring")
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == false){

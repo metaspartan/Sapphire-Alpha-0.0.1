@@ -1881,7 +1881,7 @@ var dumpToStreamBlockRange = function(cb,peer,start,end){
 
 var dumpToStreamTXOXRange = function(cb,peer,start,end){
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(async function(resolve, reject) {
 
     var chainBlockHeight=start;
     var chainRiser=end;
@@ -1889,11 +1889,15 @@ var dumpToStreamTXOXRange = function(cb,peer,start,end){
 
     console.log(" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
 
+    var startTimeStamp = await getBlock(parseInt(chainBlockHeight));
+
+    var endTimeStamp = await getBlock(parseInt(chainBlockHeight+end));
+
     var stream = db.createReadStream();
 
     stream.on('data',function(data){
 
-      if(data.key.toString().split(":")[0] == "tx"){
+      if(data.key.toString().split(":")[0] == "tx" && data.key.toString().split(":")[4] >= startTimeStamp && data.key.toString().split(":")[4] <= endTimeStamp){
         //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
         if(JSON.parse(data.value.toString())["timsetamp"] != 1521339498){
           var thisRowKey = data.key.toString();
