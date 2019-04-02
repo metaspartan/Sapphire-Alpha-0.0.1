@@ -1893,9 +1893,9 @@ var dumpToStreamTXOXRange = function(cb,peer,start,end){
 
     console.log(" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
 
-    var startTimeStamp = await getBlock(parseInt(chainBlockHeight));
+    var startTimeStamp = await getBlock(parseInt(chainBlockHeight))["timestamp"];
 
-    var endTimeStamp = await getBlock(parseInt(chainBlockHeight+end));
+    var endTimeStamp = await getBlock(parseInt(chainBlockHeight+end))["timestamp"];
 
     console.log(startTimeStamp+" "+endTimeStamp)
 
