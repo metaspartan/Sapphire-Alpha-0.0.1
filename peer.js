@@ -1431,15 +1431,10 @@ let connSeq2 = 0
     const peerId = info.id.toString('hex');
 
     if(info.id != chainState.nodePersistantId){
-      frankieCoin.registerNode(peerId,info.host,info.port,frankieCoin.length);
-      BlkDB.addNode("node:"+peerId+":connection",{"host":info.host,"port":info.port}).then(function(){
-        //log(chalk.green("Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
-        log(chalk.bgBlue('New Peer id: '+ chalk.bold(peerId)));
-        var tempNodeCallerID = sapphirechain.ReDuex(peerId);
-        //console.log("tempcallerNodeid "+tempNodeCallerID);
-        ///////////////WE MIGHT WANT TO RESERVE THE CALL BELOW FOR SYNCHED PEERS
-        directMessage(tempNodeCallerID+':0:0:')//this is establishing the encryption to the peer
-      });
+
+        log(chalk.green("CHANNEL 2 Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
+        log(chalk.bgBlue('CHANNEL 2 Peer id: '+ chalk.bold(peerId)));
+        
     }
 
     conn2.on('timeout', () => {
