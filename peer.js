@@ -1523,7 +1523,6 @@ let connSeq2 = 0
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
           log(JSON.parse(data)["ChainSyncPing"]);
-
           if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
             log(chalk.green("Global hashes matched!"));
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
@@ -1535,10 +1534,7 @@ let connSeq2 = 0
               peerBlockHeight++;
               //returning the block
               console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" <<<<the difference");
-              if(frankieCoin.getLength() == parseInt(peerBlockHeight+1)){
-                //just give me the latest block
-                peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-              }else if((frankieCoin.getLength() > parseInt(peerBlockHeight)) && (chainState.synchronized > parseInt(peerBlockHeight)) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
+              if((frankieCoin.getLength() > parseInt(peerBlockHeight)) && (chainState.synchronized > parseInt(peerBlockHeight)) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
                 console.log("this is properly flagged for streaming");
                 /***
                 var pongBackBlockStream = function(blockData){
@@ -1714,7 +1710,7 @@ let connSeq2 = 0
               peers[peerId].conn2.write("---------------------------------");
             }else{
               console.log("NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
-              peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
             }
 
           }else{

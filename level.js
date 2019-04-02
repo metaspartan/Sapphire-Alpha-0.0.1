@@ -1895,6 +1895,8 @@ var dumpToStreamTXOXRange = function(cb,peer,start,end){
 
     var stream = db.createReadStream();
 
+    console.log("TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS TRANSACTION TRANSACTIONS ")
+
     stream.on('data',function(data){
 
       if(data.key.toString().split(":")[0] == "tx" && data.key.toString().split(":")[4] >= startTimeStamp && data.key.toString().split(":")[4] <= endTimeStamp){
@@ -1903,7 +1905,7 @@ var dumpToStreamTXOXRange = function(cb,peer,start,end){
           var thisRowKey = data.key.toString();
           var thisRowValue = data.value.toString();
           var thisRow = {[thisRowKey]:thisRowValue};
-          //console.log("export tx key... "+data.key.toString()+".....value "+data.value.toString());
+          console.log("export tx key... "+data.key.toString()+".....value "+data.value.toString());
           jsonSynch.push(thisRow);
         }
 
