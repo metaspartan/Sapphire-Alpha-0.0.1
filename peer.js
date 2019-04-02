@@ -1579,7 +1579,7 @@ let connSeq2 = 0
                     peers[peerId].conn2.end();
                     console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
                   })
-                },20000)
+                },2000)
                 //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
 
 
