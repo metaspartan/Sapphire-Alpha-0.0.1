@@ -1784,8 +1784,8 @@ let connSeq2 = 0
 
                 var cbGetStream = function(jsonStream,streamToPeerID){
                   console.log("the streams cb condition is met");
-                  //streamToPeerID.conn2.write(jsonStream);
-                  //streamToPeerID.conn2.end();
+                  streamToPeerID.conn2.write(jsonStream);
+                  streamToPeerID.conn2.end();
                   //setting up some streams to try this out
                 }
                 //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
@@ -1798,9 +1798,9 @@ let connSeq2 = 0
                 //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream)
                 //var numRecordsToStream = parseInt(frankieCoin.synchronized);
                 BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
-                  peers[peerId].conn2.write(jsonStream);
+                  //peers[peerId].conn2.write(jsonStream);
                   console.log("wrote this "+jsonStream);
-                  peers[peerId].conn2.end();
+                  //peers[peerId].conn2.end();
                   console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
                 })
 
