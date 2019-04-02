@@ -1463,7 +1463,7 @@ let connSeq2 = 0
 
       //console.log("this is on end "+incomingStream);
 
-      console.log("Importing the data file to the db and then calling the memory synch");
+      console.log("CONN 2 Importing the data file to the db and then calling the memory synch");
       //setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
       //setting this here and heed more intake checks
 
@@ -1798,7 +1798,7 @@ let connSeq2 = 0
                 //var numRecordsToStream = parseInt(frankieCoin.synchronized);
                 BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
                   peers[peerId].conn2.write(jsonStream);
-                  //console.log("wrote this "+jsonStream);
+                  console.log("wrote this "+jsonStream);
                   peers[peerId].conn2.end();
                   console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
                 })
