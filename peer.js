@@ -1446,8 +1446,8 @@ let connSeq2 = 0
       connSeq2--
     })
 
-    var incomingStream = "";
-    var incomingBufferArray = [];
+    var incomingStream2 = "";
+    var incomingBufferArray2 = [];
 
     conn2.on('end',async function(){
       console.log(chalk.bgRed("data stream ended"));
@@ -1455,13 +1455,13 @@ let connSeq2 = 0
       console.log(chalk.bgRed("data stream ended"));
       //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
 
-      console.log("CONN 2 this is on end "+incomingStream);
+      console.log("CONN 2 this is on end "+incomingStream2);
 
       console.log("CONN 2 Importing the data file to the db and then calling the memory synch");
       //setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
       //setting this here and heed more intake checks
 
-      BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);
+      BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream2);
 
       frankieCoin.blockHeight = parseInt(chainState.chainWalkHeight);
       //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
@@ -1476,12 +1476,12 @@ let connSeq2 = 0
       console.log("BLOCK STREAM "+this.readableHighWaterMark);
 
       let chunk;
-      while (null !== (chunk = this.read())) {
+      while (chunk = this.read()) {
         console.log(`Received ${chunk.length} bytes of data.`);
         console.log(chunk.toString());
         console.log("<== ");
-        incomingStream+=chunk.toString()
-        incomingBufferArray.push(chunk.toString());
+        incomingStream2+=chunk.toString()
+        incomingBufferArray2.push(chunk.toString());
       }
 
     });
