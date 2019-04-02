@@ -1450,7 +1450,9 @@ let connSeq2 = 0
     var incomingBufferArray = [];
 
     conn2.on('end',async function(){
-      //console.log("data stream ended ");
+      console.log(chalk.bgRed("data stream ended"));
+      console.log(chalk.bgRed("data stream ended"));
+      console.log(chalk.bgRed("data stream ended"));
       //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
 
       console.log("CONN 2 this is on end "+incomingStream);
@@ -1792,7 +1794,7 @@ let connSeq2 = 0
                 BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
                   peers[peerId].conn2.write(jsonStream);
                   console.log("wrote this "+jsonStream);
-                  //peers[peerId].conn2.end();
+                  peers[peerId].conn2.end();
                   console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
                 })
 
@@ -1803,7 +1805,7 @@ let connSeq2 = 0
                     peers[peerId].conn2.end();
                     console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
                   })
-                },10000)
+                },20000)
                 //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
 
 
