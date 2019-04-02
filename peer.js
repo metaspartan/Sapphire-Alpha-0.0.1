@@ -1443,14 +1443,6 @@ let connSeq2 = 0
 
     conn2.on('close', () => {
 
-      // If the closing connection is the last connection with the peer, removes the peer
-      if ((peers[peerId]) && peers[peerId].seq2 === seq2) {
-        // Here we handle peer disconnection
-        log(chalk.blue("Connection"+ chalk.green(seq2) + "closed, peer id: " + chalk.green(peerId)))
-        frankieCoin.removeNode(peerId);
-        delete peers[peerId]
-      }
-
       connSeq2--
     })
 
