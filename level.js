@@ -1946,6 +1946,7 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
       return false;
   }
 
+  console.log("IMPORT FROM JSON STREAM ...")
   //console.log("WHATTTTTTTTT IS MY CONNNNNNETTTTTEEEEENNNNNTTTTT "+Object.keys(content));
 
   for(row in content){
@@ -1954,9 +1955,9 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
 
     var rowKey = Object.keys(content[row]);
     var rowValue = Object.values(content[row]);
-    //if(rowKey.toString().split(":")[0] == "sfblk"){
-      //console.log("I AM INSIDE THE inserts KEY "+rowKey+" VALUE "+rowValue);
-    //}
+    if(rowKey.toString().split(":")[0] == "sfblk"){
+      console.log("I AM INSIDE THE inserts KEY "+rowKey+" VALUE "+rowValue);
+    }
 
     db.put(rowKey, rowValue, function (err) {
       if (err) return console.log('Ooops!', err) // some kind of I/O error
