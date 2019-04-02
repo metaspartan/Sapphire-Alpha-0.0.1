@@ -896,8 +896,8 @@ let connSeq2 = 0
 
                 var cbGetStream = function(jsonStream,streamToPeerID){
                   console.log("the streams cb condition is met");
-                  //streamToPeerID.conn2.write(jsonStream);
-                  //streamToPeerID.conn2.end();
+                  streamToPeerID.conn2.write(jsonStream);
+                  streamToPeerID.conn2.end();
                   //setting up some streams to try this out
                 }
                 //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
@@ -1775,7 +1775,7 @@ let connSeq2 = 0
                 BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
                 ***/
                 var setDatSynch = function(datSynch,reqPeer){
-                  reqPeer.conn.write(JSON.stringify({pongBlockStream:datSynch,blockHeight:chainState.synchronized}));
+                  reqPeer.conn2.write(JSON.stringify({pongBlockStream:datSynch,blockHeight:chainState.synchronized}));
                 }
                 var cbGetSynch = function(datpeer){
                   console.log("calling dat synch")
