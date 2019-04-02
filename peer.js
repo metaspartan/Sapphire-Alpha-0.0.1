@@ -392,7 +392,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       log("------------------------------------------------------");
       log(chalk.green("Sending ping for chain sync."));
       log("------------------------------------------------------");
-      peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+      peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
     }
   }
 }
@@ -1434,7 +1434,7 @@ let connSeq2 = 0
 
         log(chalk.green("CHANNEL 2 Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
         log(chalk.bgBlue('CHANNEL 2 Peer id: '+ chalk.bold(peerId)));
-        
+
     }
 
     conn2.on('timeout', () => {
