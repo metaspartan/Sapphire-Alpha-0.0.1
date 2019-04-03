@@ -1843,11 +1843,48 @@ var dumpToStreamBlockRange = function(cb,peer,start,end){
 
     console.log(" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
 
+    var startTimeStamp;
+    var endTimeStamp;
+
+    var getTimeStamps = async function(){
+      var timeStartFunction = function(blkStart){
+        startTimeStamp = JSON.parse(blkStart)["timestamp"];
+      }
+      getBlock(parseInt(chainBlockHeight),timeStartFunction);
+      var timeEndFunction = function(blkEnd){
+        endTimeStamp = JSON.parse(blkEnd)["timestamp"];
+      }
+      getBlock(parseInt(chainBlockHeight+end),timeEndFunction);
+    }
+
+    await getTimeStamps();
+
+    console.log(startTimeStamp+" "+endTimeStamp)
+
     var stream = db.createReadStream();
 
     stream.on('data',function(data){
 
       if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight)) && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) < parseInt(chainBlockHeight+end))){//possible another block enters the db s no upper limit
+
+        var thisRowKey = data.key.toString();
+        var thisRowValue = data.value.toString();
+        var thisRow = {[thisRowKey]:thisRowValue};
+
+        jsonSynch.push(thisRow);
+
+      }else if(data.key.toString().split(":")[0] == "tx" && data.key.toString().split(":")[4] >= startTimeStamp && data.key.toString().split(":")[4] <= endTimeStamp){
+        //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+        if(JSON.parse(data.value.toString())["timsetamp"] != 1521339498){
+          var thisRowKey = data.key.toString();
+          var thisRowValue = data.value.toString();
+          var thisRow = {[thisRowKey]:thisRowValue};
+          console.log("export tx key... "+data.key.toString()+".....value "+data.value.toString());
+          jsonSynch.push(thisRow);
+        }
+
+      }else if(data.key.toString().split(":")[0] == "ox"){
+        //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
 
         var thisRowKey = data.key.toString();
         var thisRowValue = data.value.toString();
