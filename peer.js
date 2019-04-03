@@ -389,7 +389,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     console.log("NOT VALID NEED TO PING AT "+replyData);
     //set ping here
     for (let id in peers) {
-      if(peers[id].conn != undefined){
+      if(peers[id].conn != "undefined"){
         log("------------------------------------------------------");
         log(chalk.green("Sending ping for chain sync."));
         log("------------------------------------------------------");
