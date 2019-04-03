@@ -1835,7 +1835,7 @@ var dumpToStreamFIleRange = function(cb,peer,start,end){
 ////////////////////////////////////////////////////////////PROMISE STYLE STREAM
 var dumpToStreamBlockRange = function(cb,peer,start,end){
 
-  return new Promise(function(resolve, reject) {
+  return new Promise(async function(resolve, reject) {
 
     var chainBlockHeight=start;
     var chainRiser=end;
