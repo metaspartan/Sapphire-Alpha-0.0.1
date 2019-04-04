@@ -1075,7 +1075,7 @@ var addAllBalanceRecord = async function(address,ticker,amount){
     if(err){
       currentBalance = 0;
     }else{
-      currentBalance = parseFloat(value);
+      currentBalance = parseFloat(value.toString());
     }
   })
   currentBalance+=parseFloat(amount).toFixed(8);
