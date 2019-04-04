@@ -2077,7 +2077,7 @@ function cliGetInput(){
       }
       BlkDB.getBalanceAtAddressFromTrie(egemAddress,addyBal2)
       var addyBal3 = function(data){
-        console.log("from the trie "+JSON.stringify(data));//do noting now
+        console.log("from the trie all balance "+JSON.stringify(data));//do noting now
       }
       BlkDB.getBalanceAtAddressAllBalance(egemAddress,addyBal3)
       cliGetInput();
