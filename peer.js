@@ -1931,6 +1931,10 @@ function cliGetInput(){
       }
       BlkDB.getOrdersPairBuy("EGEM","SFRX",cbTestBuys);
       cliGetInput();
+    }else if(userInput.startsWith("addAllBalanceRecord(")){//
+      var tempAddBalance = userInput.slice(userInput.indexOf("addAllBalanceRecord(")+20, userInput.indexOf(")"));
+      BlkDB.addAllBalanceRecord(tempAddBalance.split(":")[0],tempAddBalance.split(":")[1],parseFloat(tempAddBalance.split(":")[2]).toFixed(8));
+      cliGetInput();
     }else if(userInput.startsWith("sign(")){//Sign some data function
       var packageToSign = userInput.slice(userInput.indexOf("sign(")+5, userInput.indexOf(")"));
       console.log(packageToSign);

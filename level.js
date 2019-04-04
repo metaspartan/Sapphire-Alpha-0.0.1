@@ -2030,6 +2030,7 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
       content = JSON.parse(content);
       //console.log(content);
   } catch (e) {
+      console.log(chalk.bgRed(e+" WHAT?? <-----------"))
       return false;
   }
 
