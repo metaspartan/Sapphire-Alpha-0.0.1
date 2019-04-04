@@ -2076,6 +2076,10 @@ function cliGetInput(){
         console.log("from the trie "+JSON.stringify(data));//do noting now
       }
       BlkDB.getBalanceAtAddressFromTrie(egemAddress,addyBal2)
+      var addyBal3 = function(data){
+        console.log("from the trie "+JSON.stringify(data));//do noting now
+      }
+      BlkDB.getBalanceAtAddressAllBalance(egemAddress,addyBal3)
       cliGetInput();
     }else if(userInput.startsWith("getPendingOrders()")){
       log("---------------");
