@@ -2019,6 +2019,12 @@ var dumpToStreamTXOXRange = function(cb,peer,start,end){
 
 var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent){
 
+  console.log(chalk.blue("-----------------------"))
+  console.log(chalk.blue("import from json stream"))
+  console.log(chalk.blue("import from json stream"))
+  console.log(chalk.blue("import from json stream"))
+  console.log(chalk.blue("-----------------------"))
+
   try {
       var content = JSON.parse(JSON.stringify(incontent));
       content = JSON.parse(content);
@@ -2030,8 +2036,8 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
   console.log("IMPORT FROM JSON STREAM ...")
   console.log(chalk.bgCyan("IMPORTING ..."))
   console.log(chalk.bgRed("IMPORTING ..."))
-  console.log(chalk.bgMagenta("IMPORTING ..."))
-  console.log(chalk.bgYellow("IMPORTING ..."))
+  console.log(chalk.bgRed("IMPORTING ..."))
+  console.log(chalk.bgRed("IMPORTING ..."))
   //console.log("WHATTTTTTTTT IS MY CONNNNNNETTTTTEEEEENNNNNTTTTT "+Object.keys(content));
 
   for(row in content){
