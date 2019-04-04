@@ -1080,7 +1080,7 @@ var addAllBalanceRecord = async function(address,ticker,amount){
   })
   currentBalance=(parseFloat(currentBalance)+parseFloat(amount)).toFixed(8);
   putRecord("abal:"+address+":"+ticker,currentBalance);
-  console.log(bgMagenta("adding"))
+  console.log(chalk.bgMagenta("adding"));
   console.log(chalk.bgCyan("abal:"+address+":"+ticker+" ----> "+currentBalance));
 }
 
