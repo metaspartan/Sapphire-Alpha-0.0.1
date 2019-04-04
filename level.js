@@ -1080,6 +1080,7 @@ var addAllBalanceRecord = async function(address,ticker,amount){
   })
   currentBalance+=amount;
   putRecord("abal:"+address+":"+ticker,currentBalance);
+  console.log(chalk.bgCyan("abal:"+address+":"+ticker+" ----> "+currentBalance));
 }
 
 var getBalanceAtAddressAllBalance = function(address,callback){
