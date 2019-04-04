@@ -1078,8 +1078,8 @@ var addAllBalanceRecord = async function(address,ticker,amount){
       currentBalance = value.toString();
     }
   })
-  currentBalance=(parseFloat(currentBalance)+parseFloat(amount)).toFixed(8);
-  putRecord("abal:"+address+":"+ticker,currentBalance);
+  await currentBalance=(parseFloat(currentBalance)+parseFloat(amount)).toFixed(8);
+  await putRecord("abal:"+address+":"+ticker,currentBalance);
   console.log(chalk.bgMagenta("adding"));
   console.log(chalk.bgCyan("abal:"+address+":"+ticker+" ----> "+currentBalance));
 }
