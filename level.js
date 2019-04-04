@@ -2027,6 +2027,10 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
   }
 
   console.log("IMPORT FROM JSON STREAM ...")
+  console.log(chalk.bgCyan("IMPORTING ..."))
+  console.log(chalk.bgRed("IMPORTING ..."))
+  console.log(chalk.bgMagenta("IMPORTING ..."))
+  console.log(chalk.bgYellow("IMPORTING ..."))
   //console.log("WHATTTTTTTTT IS MY CONNNNNNETTTTTEEEEENNNNNTTTTT "+Object.keys(content));
 
   for(row in content){
