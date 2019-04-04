@@ -39,6 +39,7 @@ var Transaction = class Transaction{
     }
 }
 
+
 // 1) Create our store
 var db = levelup(leveldown('./SFRX'));
 var statedb = levelup(leveldown('./SFRX/STATE'));
@@ -320,6 +321,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(750000));
     var ridzTx = new Transaction("sapphire", "0xc393659c2918a64cdfb44d463de9c747aa4ce3f7", "750000", "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx));
     //1) call the existng balance for the send and receiver
@@ -344,6 +346,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7","SFRX",parseFloat(750000));
     var jalTx = new Transaction("sapphire", "0xA54EE4A7ab23068529b7Fec588Ec3959E384a816", "750000", "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx));
     //1) call the existng balance for the send and receiver
@@ -368,6 +371,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816","SFRX",parseFloat(750000));
     var tbatesTx = new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", "750000", "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx));
     //1) call the existng balance for the send and receiver
@@ -392,6 +396,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170","SFRX",parseFloat(750000));
     var beastTx = new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", "750000", "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx));
     //1) call the existng balance for the send and receiver
@@ -416,6 +421,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103","SFRX",parseFloat(750000));
     ////////////////////////////////////////////////////////////////EARLY SUPPORT
     /***
     var sehidTx = new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", "250000", "SFRX", JSON.parse(block)["timestamp"]);
@@ -452,6 +458,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","EGEM",parseFloat(100000));
     //new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 100000, "EGEM"),//EGEM
     var osoTxBTC = new Transaction("sapphire", "0x7357589f8e367c2C31F51242fB77B350A11830F3", "3", "BTC", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:BTC:"+JSON.parse(block)["timestamp"]+":"+osoTxBTC.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxBTC));
@@ -477,6 +484,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","BTC",parseFloat(3));
     //new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 3, "BTC"),//BTC
     var osoTxETH = new Transaction("sapphire", "0x7357589f8e367c2C31F51242fB77B350A11830F3", "10", "ETH", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:ETH:"+JSON.parse(block)["timestamp"]+":"+osoTxETH.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxETH));
@@ -502,6 +510,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","ETH",parseFloat(10));
     //new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 10, "ETH"),//ETH
     var osoTxXBI = new Transaction("sapphire", "0x7357589f8e367c2C31F51242fB77B350A11830F3", "1000", "XBI", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:XBI:"+JSON.parse(block)["timestamp"]+":"+osoTxXBI.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxXBI));
@@ -527,6 +536,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","XBI",parseFloat(1000));
     //new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 1000, "XBI"),//XBI
   }else{//perblock rewards from block 2 until
     ///////////////////////////////////////////////////////////////////CORE DEVS
@@ -554,6 +564,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(calcDevReward).toFixed(8));
     var ridzTx = new Transaction("sapphire", "0xc393659c2918a64cdfb44d463de9c747aa4ce3f7", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx));
     //1) call the existng balance for the send and receiver
@@ -578,6 +589,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7","SFRX",parseFloat(calcDevReward).toFixed(8));
     var jalTx = new Transaction("sapphire", "0xA54EE4A7ab23068529b7Fec588Ec3959E384a816", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx));
     //1) call the existng balance for the send and receiver
@@ -602,6 +614,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816","SFRX",parseFloat(calcDevReward).toFixed(8));
     var tbatesTx = new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx));
     //1) call the existng balance for the send and receiver
@@ -626,6 +639,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170","SFRX",parseFloat(calcDevReward).toFixed(8));
     var beastTx = new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx));
     //1) call the existng balance for the send and receiver
@@ -650,6 +664,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103","SFRX",parseFloat(calcDevReward).toFixed(8));
     //miner
     var minerTx = new Transaction("sapphire", JSON.parse(block)["miner"], calcMiningReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:"+JSON.parse(block)["miner"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(minerTx));
@@ -675,6 +690,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord(JSON.parse(block)["miner"],"SFRX",parseFloat(calcMiningReward).toFixed(8));
     //sponsor
     var sponsorTx = new Transaction("sapphire", JSON.parse(block)["sponsor"], calcSponsorReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx));
@@ -700,6 +716,7 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
+    addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcMiningReward).toFixed(8));
     //community DEVS
     //sapphire Node T2 SUPER NODE
     //EGEM node T1
@@ -997,6 +1014,7 @@ var addTransactions = function(transactions,blockhash,){
         });
       });
     });
+    addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]).toFixed(8));
     trie.get(receipt["fromAddress"]+":"+receipt["ticker"], function (err, value) {
       //console.log("grabbing balance of from address");
       var adjustedValue;
@@ -1018,7 +1036,7 @@ var addTransactions = function(transactions,blockhash,){
         });
       });
     });
-
+    addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]*-1).toFixed(8));
     //2) get the trie root hash and return for hasing into the block
 
   }
@@ -1051,9 +1069,9 @@ var getTransactionReceiptsByAddress = function(address){
 }
 
 ////////////////////////////////////////////////////////////////ALL BALANCE TREE
-var addAllBalanceRecord = function(address,ticker,amount){
+var addAllBalanceRecord = async function(address,ticker,amount){
   var currentBalance = 0;
-  db.get("abal:"+address+":"+ticker,function(err,value){
+  await db.get("abal:"+address+":"+ticker,function(err,value){
     if(err){
       currentBalance = 0;
     }else{
@@ -2054,6 +2072,7 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
             });
           });
         });
+        addAllBalanceRecord(Object.keys(content[row]).toString().split(":")[2],Object.keys(content[row]).toString().split(":")[3],parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8));
         ///////the debit side
         trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
           //console.log("grabbing balance of from address MINUS "+Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3]);
@@ -2077,6 +2096,7 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
           });
         });
       }
+      addAllBalanceRecord(Object.keys(content[row]).toString().split(":")[1],Object.keys(content[row]).toString().split(":")[3],parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]*-1).toFixed(8));
       //////////////end ADDING to trie
     }
 
@@ -2144,5 +2164,7 @@ module.exports = {
     callDeletedOrders:callDeletedOrders,
     buildTrade:buildTrade,
     getStateTrieRootHash:getStateTrieRootHash,
-    getEverythingFromTrie:getEverythingFromTrie
+    getEverythingFromTrie:getEverythingFromTrie,
+    addAllBalanceRecord:addAllBalanceRecord,
+    getBalanceAtAddressAllBalance:getBalanceAtAddressAllBalance
 }
