@@ -388,14 +388,18 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
   }else{
     console.log("NOT VALID NEED TO PING AT "+replyData);
     //set ping here
-    //for (let id in peers) {
-      //if(peers[id].conn != "undefined"){
+    var random = 0;//will randomize later
+    for (let id in peers) {
+      if(peers[id].conn2 != "undefined"){
         log("------------------------------------------------------");
         log(chalk.green("Sending ping for chain sync."));
         log("------------------------------------------------------");
-        peers[0].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
-      //}
-    //}
+        if(random = 0){
+          peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+        }
+        random++;
+      }
+    }
   }
 }
 /////////////////////////////////////////////////////////////END CHAIN VALIDATOR
