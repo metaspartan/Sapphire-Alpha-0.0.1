@@ -393,7 +393,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         log("------------------------------------------------------");
         log(chalk.green("Sending ping for chain sync."));
         log("------------------------------------------------------");
-        broadcastPeers2(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+        peers[0].write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
       //}
     //}
   }
