@@ -1073,15 +1073,18 @@ var addAllBalanceRecord = async function(address,ticker,amount){
   var currentBalance = 0;
   await db.get("abal:"+address+":"+ticker,function(err,value){
     if(err){
+      //console.log("why is there an error ?");
       currentBalance = 0;
+      putRecord("abal:"+address+":"+ticker,currentBalance);
     }else{
-      currentBalance = parseFloat(value.toString());
+      //console.log("cool no error "+parseFloat(value.toString()))
+      currentBalance = parseFloat(amount)+parseFloat(value.toString());
+      putRecord("abal:"+address+":"+ticker,currentBalance);
     }
+    //currentBalance+=parseFloat(amount).toFixed(8);
+    console.log(chalk.bgMagenta("adding"));
+    console.log(chalk.bgCyan("abal:"+address+":"+ticker+" ----> "+currentBalance));
   })
-  currentBalance+=parseFloat(amount).toFixed(8);
-  await putRecord("abal:"+address+":"+ticker,currentBalance);
-  console.log(chalk.bgMagenta("adding"));
-  console.log(chalk.bgCyan("abal:"+address+":"+ticker+" ----> "+currentBalance));
 }
 
 var getBalanceAtAddressAllBalance = function(address,callback){
