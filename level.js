@@ -1092,7 +1092,7 @@ var getBalanceAtAddressAllBalance = function(address,callback){
     if(data.key.toString().split(":")[0] == "abal" && data.key.toString().split(":")[1] == address){
       //balances from new all balance tree
       console.log('key = '+data.key+" value = "+data.value.toString());
-      allBalances.push(data.value);
+      allBalances.push(parseFloat(data.value.toString()).toFixed(8));
     }
   })
   stream.on("close",function(data){
