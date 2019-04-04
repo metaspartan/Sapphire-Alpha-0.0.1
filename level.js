@@ -1075,7 +1075,7 @@ var addAllBalanceRecord = async function(address,ticker,amount){
     if(err){
       currentBalance = 0;
     }else{
-      currentBalance = parseFloat(value.toString());
+      currentBalance = parseFloat(value);
     }
   })
   currentBalance+=parseFloat(amount).toFixed(8);
@@ -1092,7 +1092,7 @@ var getBalanceAtAddressAllBalance = function(address,callback){
     if(data.key.toString().split(":")[0] == "abal" && data.key.toString().split(":")[1] == address){
       //balances from new all balance tree
       console.log('key = '+data.key+" value = "+data.value.toString());
-      allBalances.push(data.value.toString());
+      allBalances.push(data.value);
     }
   })
   stream.on("close",function(data){
