@@ -1094,7 +1094,7 @@ var getBalanceAtAddressAllBalance = function(address,callback){
     }
   })
   stream.on("close",function(data){
-    callBack(allBalances);
+    callback(allBalances);
   })
 }
 ////////////////////////////////////////////////////////////END ALL BALANCE TREE
