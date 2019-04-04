@@ -2026,12 +2026,12 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
   console.log(chalk.blue("-----------------------"))
 
   try {
-      var content = incontent;
+      var content = JSON.parse(JSON.stringify(incontent));
       content = JSON.parse(content);
       //console.log(content);
   } catch (e) {
       console.log(chalk.bgRed(e+" WHAT?? <-----------"))
-      return false;
+      //return false;
   }
 
   console.log("IMPORT FROM JSON STREAM ...")
