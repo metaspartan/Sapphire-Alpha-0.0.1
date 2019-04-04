@@ -2026,7 +2026,7 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
   console.log(chalk.blue("-----------------------"))
 
   try {
-      var content = JSON.parse(JSON.stringify(incontent));
+      var content = incontent;
       content = JSON.parse(content);
       //console.log(content);
   } catch (e) {
