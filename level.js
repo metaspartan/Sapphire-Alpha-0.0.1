@@ -298,8 +298,14 @@ var addBlock = function(blknum,block,callfrom){
   if(parseInt(blknum) == 1){//premines
     ///////////////////////////////////////////////////////////////////CORE DEVS
     var osoTx = new Transaction("sapphire", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", "750000", "SFRX", JSON.parse(block)["timestamp"]);
-    putRecord("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx));
-    //1) call the existng balance for the send and receiver
+    db.get("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+      //we skip the intry
+    }).catch(async function(){
+      putRecord("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx));
+      addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(750000));
+    })
+    //whqt I had for PMT tht I removed for now - in the git updates removed 4-5-2019 for each
+    /****
     trie.get("0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX", function (err, value) {
       //console.log("grabbing balance of from address");
       var adjustedValue = 0;
@@ -321,107 +327,39 @@ var addBlock = function(blknum,block,callfrom){
         });
       });
     });
-    addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(750000));
+    ****/
     var ridzTx = new Transaction("sapphire", "0xc393659c2918a64cdfb44d463de9c747aa4ce3f7", "750000", "SFRX", JSON.parse(block)["timestamp"]);
-    putRecord("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx));
-    //1) call the existng balance for the send and receiver
-    trie.get("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(750000)).toFixed(8);
-      trie.put("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX", adjustedValue.toString(), function () {
-        trie.get("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
-    addAllBalanceRecord("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7","SFRX",parseFloat(750000));
+    db.get("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+      //we skip the intry
+    }).catch(async function(){
+      putRecord("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx));
+      addAllBalanceRecord("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7","SFRX",parseFloat(750000));
+    })
+
+
     var jalTx = new Transaction("sapphire", "0xA54EE4A7ab23068529b7Fec588Ec3959E384a816", "750000", "SFRX", JSON.parse(block)["timestamp"]);
-    putRecord("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx));
-    //1) call the existng balance for the send and receiver
-    trie.get("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(750000)).toFixed(8);
-      trie.put("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX", adjustedValue.toString(), function () {
-        trie.get("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
-    addAllBalanceRecord("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816","SFRX",parseFloat(750000));
+    db.get("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+      //we skip the intry
+    }).catch(async function(){
+      putRecord("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx));
+      addAllBalanceRecord("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816","SFRX",parseFloat(750000));
+    })
+
     var tbatesTx = new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", "750000", "SFRX", JSON.parse(block)["timestamp"]);
-    putRecord("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx));
-    //1) call the existng balance for the send and receiver
-    trie.get("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(750000)).toFixed(8);
-      trie.put("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX", adjustedValue.toString(), function () {
-        trie.get("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
-    addAllBalanceRecord("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170","SFRX",parseFloat(750000));
+    db.get("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+      //we skip the intry
+    }).catch(async function(){
+      putRecord("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx));
+      addAllBalanceRecord("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170","SFRX",parseFloat(750000));
+    })
+
     var beastTx = new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", "750000", "SFRX", JSON.parse(block)["timestamp"]);
-    putRecord("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx));
-    //1) call the existng balance for the send and receiver
-    trie.get("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(750000)).toFixed(8);
-      trie.put("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX", adjustedValue.toString(), function () {
-        trie.get("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
-    addAllBalanceRecord("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103","SFRX",parseFloat(750000));
+    db.get("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+      //we skip the intry
+    }).catch(async function(){
+      putRecord("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx));
+      addAllBalanceRecord("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103","SFRX",parseFloat(750000));
+    })
     ////////////////////////////////////////////////////////////////EARLY SUPPORT
     /***
     var sehidTx = new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", "250000", "SFRX", JSON.parse(block)["timestamp"]);
@@ -435,287 +373,63 @@ var addBlock = function(blknum,block,callfrom){
     ***/
     ////////////////////////////////////////////////////////////TESTING ACCOUNTS
     var osoTxEGEM = new Transaction("sapphire", "0x7357589f8e367c2C31F51242fB77B350A11830F3", "100000", "EGEM", JSON.parse(block)["timestamp"]);
-    putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:EGEM:"+JSON.parse(block)["timestamp"]+":"+osoTxEGEM.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxEGEM));
-    //1) call the existng balance for the send and receiver
-    trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:EGEM", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(100000)).toFixed(8);
-      trie.put("0x7357589f8e367c2C31F51242fB77B350A11830F3:EGEM", adjustedValue.toString(), function () {
-        trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:EGEM", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
-    addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","EGEM",parseFloat(100000));
-    //new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 100000, "EGEM"),//EGEM
+    db.get("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:EGEM:"+JSON.parse(block)["timestamp"]+":"+osoTxEGEM.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+      //we skip the intry
+    }).catch(async function(){
+      putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:EGEM:"+JSON.parse(block)["timestamp"]+":"+osoTxEGEM.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxEGEM));
+      addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","EGEM",parseFloat(100000));
+    })
+
     var osoTxBTC = new Transaction("sapphire", "0x7357589f8e367c2C31F51242fB77B350A11830F3", "3", "BTC", JSON.parse(block)["timestamp"]);
-    putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:BTC:"+JSON.parse(block)["timestamp"]+":"+osoTxBTC.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxBTC));
-    //1) call the existng balance for the send and receiver
-    trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:BTC", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(3)).toFixed(8);
-      trie.put("0x7357589f8e367c2C31F51242fB77B350A11830F3:BTC", adjustedValue.toString(), function () {
-        trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:BTC", function (err, value) {
-          if(value) console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
-    addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","BTC",parseFloat(3));
+    db.get("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:BTC:"+JSON.parse(block)["timestamp"]+":"+osoTxBTC.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+      //we skip the intry
+    }).catch(async function(){
+      putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:BTC:"+JSON.parse(block)["timestamp"]+":"+osoTxBTC.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxBTC));
+      addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","BTC",parseFloat(3));
+    })
+
     //new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 3, "BTC"),//BTC
     var osoTxETH = new Transaction("sapphire", "0x7357589f8e367c2C31F51242fB77B350A11830F3", "10", "ETH", JSON.parse(block)["timestamp"]);
-    putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:ETH:"+JSON.parse(block)["timestamp"]+":"+osoTxETH.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxETH));
-    //1) call the existng balance for the send and receiver
-    trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:ETH", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(10)).toFixed(8);
-      trie.put("0x7357589f8e367c2C31F51242fB77B350A11830F3:ETH", adjustedValue.toString(), function () {
-        trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:ETH", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
-    addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","ETH",parseFloat(10));
+    db.get("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:ETH:"+JSON.parse(block)["timestamp"]+":"+osoTxETH.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+      //we skip the intry
+    }).catch(async function(){
+      putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:ETH:"+JSON.parse(block)["timestamp"]+":"+osoTxETH.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxETH));
+      addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","ETH",parseFloat(10));
+    })
+
     //new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 10, "ETH"),//ETH
     var osoTxXBI = new Transaction("sapphire", "0x7357589f8e367c2C31F51242fB77B350A11830F3", "1000", "XBI", JSON.parse(block)["timestamp"]);
-    putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:XBI:"+JSON.parse(block)["timestamp"]+":"+osoTxXBI.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxXBI));
-    //1) call the existng balance for the send and receiver
-    trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:ETH", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(1000)).toFixed(8);
-      trie.put("0x7357589f8e367c2C31F51242fB77B350A11830F3:XBI", adjustedValue.toString(), function () {
-        trie.get("0x7357589f8e367c2C31F51242fB77B350A11830F3:XBI", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
-    addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","XBI",parseFloat(1000));
-    //new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 1000, "XBI"),//XBI
+    db.get("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:XBI:"+JSON.parse(block)["timestamp"]+":"+osoTxXBI.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+      //we skip the intry
+    }).catch(async function(){
+      putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:XBI:"+JSON.parse(block)["timestamp"]+":"+osoTxXBI.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxXBI));
+      addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","XBI",parseFloat(1000));
+    })
+
   }else{//perblock rewards from block 2 until
     ///////////////////////////////////////////////////////////////////CORE DEVS
     var osoTx = new Transaction("sapphire", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx));
-    //1) call the existng balance for the send and receiver
-    trie.get("0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(calcDevReward)).toFixed(8);
-      trie.put("0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX", adjustedValue.toString(), function () {
-        trie.get("0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
     addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(calcDevReward).toFixed(8));
     var ridzTx = new Transaction("sapphire", "0xc393659c2918a64cdfb44d463de9c747aa4ce3f7", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx));
-    //1) call the existng balance for the send and receiver
-    trie.get("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(calcDevReward)).toFixed(8);
-      trie.put("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX", adjustedValue.toString(), function () {
-        trie.get("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
     addAllBalanceRecord("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7","SFRX",parseFloat(calcDevReward).toFixed(8));
     var jalTx = new Transaction("sapphire", "0xA54EE4A7ab23068529b7Fec588Ec3959E384a816", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx));
-    //1) call the existng balance for the send and receiver
-    trie.get("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(calcDevReward)).toFixed(8);
-      trie.put("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX", adjustedValue.toString(), function () {
-        trie.get("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
     addAllBalanceRecord("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816","SFRX",parseFloat(calcDevReward).toFixed(8));
     var tbatesTx = new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx));
-    //1) call the existng balance for the send and receiver
-    trie.get("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(calcDevReward)).toFixed(8);
-      trie.put("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX", adjustedValue.toString(), function () {
-        trie.get("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
     addAllBalanceRecord("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170","SFRX",parseFloat(calcDevReward).toFixed(8));
     var beastTx = new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx));
-    //1) call the existng balance for the send and receiver
-    trie.get("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(calcDevReward)).toFixed(8);
-      trie.put("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX", adjustedValue.toString(), function () {
-        trie.get("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
     addAllBalanceRecord("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103","SFRX",parseFloat(calcDevReward).toFixed(8));
     //miner
     var minerTx = new Transaction("sapphire", JSON.parse(block)["miner"], calcMiningReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:"+JSON.parse(block)["miner"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(minerTx));
-    //1) call the existng balance for the send and receiver
-    trie.get(JSON.parse(block)["miner"]+":SFRX", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(calcMiningReward)).toFixed(8);
-      trie.put(JSON.parse(block)["miner"]+":SFRX", adjustedValue.toString(), function () {
-        trie.get(JSON.parse(block)["miner"]+":SFRX", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
     addAllBalanceRecord(JSON.parse(block)["miner"],"SFRX",parseFloat(calcMiningReward).toFixed(8));
     //sponsor
     var sponsorTx = new Transaction("sapphire", JSON.parse(block)["sponsor"], calcSponsorReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx));
-    //1) call the existng balance for the send and receiver
-    trie.get(JSON.parse(block)["sponsor"]+":SFRX", function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue = 0;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString());
-      }else{
-        adjustedValue = 0;
-      }
-      parseFloat(adjustedValue = adjustedValue + parseFloat(calcSponsorReward)).toFixed(8);
-      trie.put(JSON.parse(block)["sponsor"]+":SFRX", adjustedValue.toString(), function () {
-        trie.get(JSON.parse(block)["sponsor"]+":SFRX", function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
     addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcMiningReward).toFixed(8));
     //community DEVS
     //sapphire Node T2 SUPER NODE
@@ -2133,7 +1847,6 @@ var importFromJSONStream = async function(cb,blockNum,cbChainGrab,chainRiser,inc
 
             console.log(chalk.bgRed("ADDY ALL BAL ----> "+" adding to "+Object.keys(content[row]).toString().split(":")[2]+" amt: "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8)))
             await addAllBalanceRecord(balAddressTo,balTicker,balAmount);
-            setTimeout(function(){console.log("timer")},500)
             ///////the debit side
             trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
               //console.log("grabbing balance of from address MINUS "+Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3]);
