@@ -113,16 +113,6 @@ var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
       var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
 
-      /*****not sure we need this and I might be removing it
-      for(var i=1;i<riserOffset;i++){
-        var integralCheckPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset-i));
-        integralCHeckPointBlock = JSON.stringify(integralCheckPointBlock);
-        console.log("CALCULATED INTEGRAL CHECK POINT IS "+JSON.parse(integralCHeckPointBlock)["blockHeight"]+" Hash "+JSON.parse(integralCHeckPointBlock)["hash"]);
-        console.log("CALCULATED HASH IS "+sapphirechain.Hash(JSON.parse(integralCHeckPointBlock)["previousHash"]+JSON.parse(integralCHeckPointBlock)["timestamp"]+JSON.parse(integralCHeckPointBlock)["nonce"]));
-        //thisBlockCheckPointHash = sapphirechain.Hash(thisBlockCheckPointHash+JSON.parse(integralCHeckPointBlock)["hash"]);
-        console.log("CUMULATIVE CALCULATED HASH IS "+thisBlockCheckPointHash);
-      }
-      *****end might be removing it section*****/
       if(source == "miner"){
         chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
         chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
@@ -176,7 +166,7 @@ const rl = readline.createInterface({
 //////////////////////////////////////////////////////////////end CLI query init
 
 /////////////////////////////////////////////asynchronous peer connection engine
-var getConnectionConfig = async function(){
+var getConnectionConfig = async function(ntwk){
   return new Promise(function(resolve, reject) {
     var callBackNodePersistence = function(npid){
       myLastSessionId = npid;
@@ -194,16 +184,13 @@ var getConnectionConfig = async function(){
         id: chainState.nodePersistantId,
       })
 
-      const sw = swarm(config);
-      resolve(sw);
+      const ntwk = swarm(config);
+      resolve(ntwk);
     }
     console.log("making the call");
     BlkDB.getChainParamsByName(globalGenesisHash,'nodePersistantId',callBackNodePersistence);
   })
 }
-
-//const myId = crypto.randomBytes(32);
-//console.log("the Node ID = "+myId);
 
 /////////////////////////////simple function to test JSON input and avoid errors
 function isJSON(str) {
@@ -332,7 +319,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         log("------------------------------------------------------");
         log(chalk.green("Sending ping for chain sync."));
         log("------------------------------------------------------");
-        peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+        //peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
       }
     }
 
@@ -401,11 +388,17 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
   }else{
     console.log("NOT VALID NEED TO PING AT "+replyData);
     //set ping here
+    var random = 0;//will randomize later
     for (let id in peers) {
-      log("------------------------------------------------------");
-      log(chalk.green("Sending ping for chain sync."));
-      log("------------------------------------------------------");
-      peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+      if(peers[id].conn2 != "undefined"){
+        log("------------------------------------------------------");
+        log(chalk.green("Sending ping for chain sync."));
+        log("------------------------------------------------------");
+        if(random == 0){
+          peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+        }
+        random++;
+      }
     }
   }
 }
@@ -488,18 +481,60 @@ var directMessage = function(secretMessage){
 }
 //////////////////////////////////////////////////END ENCRYPTED DIRECT MESSAGING
 
+///////////////////////////////////////////////////////////////////CHAIN CLIPPER
+var chainClipper = async function(blockHeight){//clip back to last riser from this height
+  return new Promise(async function(resolve, reject) {
+
+    var hairCut = (blockHeight % frankieCoin.chainRiser);
+    var lastRiser = parseInt(blockHeight - hairCut)
+
+    for(var i = blockHeight; i > lastRiser;i--){
+
+        await BlkDB.removeBlock(i);
+        await frankieCoin.chain.pop();
+        console.log("FRANKIECOIN BLOCKNUM BEFORE REDUCE IS "+frankieCoin.blockHeight);
+        frankieCoin.blockHeight-=1;
+        chainState.chainWalkHeight = frankieCoin.blockHeight;
+        chainState.chainWalkHash = await frankieCoin.getLatestBlock()["hash"];//block 1 hash
+        chainState.synchronized = frankieCoin.blockHeight;//when we are synched at a block it gets updated
+        chainState.topBlock = frankieCoin.blockHeight;
+        var riserOffset = (parseInt(frankieCoin.blockHeight) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
+        var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
+        checkPointBlock = JSON.stringify(checkPointBlock);
+        console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
+        console.log("FRANKIECOIN BLOCKNUM AFTER REDUCE IS "+frankieCoin.blockHeight)
+        var blockForHash = frankieCoin.getLatestBlock();
+        console.log("BLOCK FOR HASH IS "+blockForHash);
+        var blockNumHash = JSON.parse(JSON.stringify(blockForHash))["hash"];
+        var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+        chainState.previousBlockCheckPointHash = {"blockNumber":frankieCoin.blockHeight,"checkPointHash":thisBlockCheckPointHash};
+        chainState.currentBlockCheckPointHash = {"blockNumber":frankieCoin.blockHeight,"checkPointHash":thisBlockCheckPointHash};
+
+    }
+
+    if(frankieCoin.blockHeight == lastRiser){
+      resolve(lastRiser);
+    }
+
+  })
+}
+///////////////////////////////////////////////////////////////END CHAIN CLIPPER
 
 const peers = {}
 // Counter for connections, used for identify connections
 let connSeq = 0
+let connSeq2 = 0
 //////////////////////////////////////////////////////core function asynchronous
 ;(async () => {
   const port = await getPort()//grab available random port for peer connections
+  const port2 = await getPort()
 
-  const sw = await getConnectionConfig();
-
+  const sw = await getConnectionConfig(this);
+  const sw2 = await getConnectionConfig(this);
   sw.listen(port)//peers
-  sw.join('egem-sfrx') // can be any id/name/hash
+  sw2.listen(port2)
+  sw.join('egem-sfrx-001') // can be any id/name/hash
+  sw2.join('egem-sfrx-002')//second teier peers
   sw.maxConnections = 20;//testing this out for node organization
 
   //incoming connections from peers
@@ -526,11 +561,12 @@ let connSeq = 0
     })
 
     conn.on('close', () => {
-      // Here we handle peer disconnection
-      log(chalk.blue("Connection"+ chalk.green(seq) + "closed, peer id: " + chalk.green(peerId)))
-      frankieCoin.removeNode(peerId);
+
       // If the closing connection is the last connection with the peer, removes the peer
       if ((peers[peerId]) && peers[peerId].seq === seq) {
+        // Here we handle peer disconnection
+        log(chalk.blue("Connection"+ chalk.green(seq) + "closed, peer id: " + chalk.green(peerId)))
+        frankieCoin.removeNode(peerId);
         delete peers[peerId]
       }
 
@@ -541,7 +577,7 @@ let connSeq = 0
     var incomingBufferArray = [];
 
     conn.on('end',async function(){
-      console.log("data stream ended ");
+      //console.log("data stream ended ");
       //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
 
       //console.log("this is on end "+incomingStream);
@@ -561,7 +597,6 @@ let connSeq = 0
     });
 
     conn.on('readable',function(){
-      console.log("are we even in here ?");
       //console.log("BLOCK STREAM "+this.readableHighWaterMark);
 
       let chunk;
@@ -663,7 +698,7 @@ let connSeq = 0
             console.log(chalk.bgBlue("chainState.isSynching: ")+chalk.black.bgCyan(chainState.isSynching));
             console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
             console.log(chalk.bgBlue("chainState.chainWalkHash: ")+chalk.black.bgCyan(chainState.chainWalkHash));
-            console.log(chalk.bgBlue("chainState.synchronized: ")+chalk.black.bgCyan(hainState.synchronized));
+            console.log(chalk.bgBlue("chainState.synchronized: ")+chalk.black.bgCyan(chainState.synchronized));
             console.log(chalk.bgBlue("chainState.topBlock: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
             console.log(chalk.bgRed("                                                    "));
             //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
@@ -674,12 +709,21 @@ let connSeq = 0
               ).then(function(response,err){
                 if(err){
                   console.log(err);
+                }else if(response == 2){
+                  console.log("chain state response is not normal "+response);
+                  var syncTrigger = {"syncTrigger":incomingBLockHeight,"submitCurrrentChainStateHash":JSON.parse(data)["chainStateHash"],"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
+                  peers[peerId].conn.write(JSON.stringify(syncTrigger));
+                  //peerId
                 }else{
                   console.log("chain state response "+response);
                 }
               });
             //}
-          }else{/////need to move this below the block add and add the block differently to not mess with blockheight or txs
+          }else if(incomingBLockHeight > parseInt(frankieCoin.blockHeight+1)){/////need to move this below the block add and add the block differently to not mess with blockheight or txs
+            console.log(chalk.bgCyan.red("*************   ***********   ***********   *********   **************"));
+            console.log("WE ARE IGNORING INCOMING BLOCKS WHILE is synching is "+frankieCoin.isSynching);
+            console.log(chalk.bgCyan.red("*************   ***********   ***********   *********   **************"));
+          }else{
 
             console.log(chalk.bgGreen("                THIS BLOCK CHAIN STATS:             "));
             console.log(chalk.bgGreen("                                                    "));
@@ -798,6 +842,23 @@ let connSeq = 0
           }
 
 
+        }else if(JSON.parse(data)["syncTrigger"]){
+
+          //isSynching = yes
+          chainState.isSynching=true;
+          console.log(chalk.bgRed(" DELETING BACK TO PREVIOUS CHECK POINT AND SYNC "+JSON.parse(data)["syncTrigger"]));
+          console.log("SUBMITED "+JSON.parse(data)["syncTrigger"]["submitCurrrentChainStateHash"]+" PEER "+JSON.parse(data)["syncTrigger"]["peerCurrrentChainStateHash"])
+          //var hairCut = (JSON.parse(data)["syncTrigger"] % frankieCoin.chainRiser);
+          //var lastRiser = parseInt(JSON.parse(data)["syncTrigger"] - hairCut)
+          chainClipper(JSON.parse(data)["syncTrigger"]).then(function(){
+            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+          });
+
+          //setTimeout(function(){
+          //  peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          //},2000)
+          //var deltaToRiser = parseInt(frankieCoin.chainRiser - )
+
 
 
         }else if(JSON.parse(data)["fromAddress"]){
@@ -841,20 +902,34 @@ let connSeq = 0
 
                 var cbGetStream = function(jsonStream,streamToPeerID){
                   console.log("the streams cb condition is met");
-                  streamToPeerID.conn.write(jsonStream);
-                  streamToPeerID.conn.end();
+                  streamToPeerID.conn2.write(jsonStream);
+                  //streamToPeerID.conn2.end();
                   //setting up some streams to try this out
                 }
                 //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
                 //BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
-                //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser)
-                var numRecordsToStream = parseInt(frankieCoin.synchronized);
+                if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 1000){
+                  var numRecordsToStream = 1000
+                }else{
+                  var numRecordsToStream = parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]);
+                }
+                //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream)
+                //var numRecordsToStream = parseInt(frankieCoin.synchronized);
                 BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
-                  //peers[peerId].conn.write(jsonStream);
+                  peers[peerId].conn2.write(jsonStream);
                   //console.log("wrote this "+jsonStream);
-                  //peers[peerId].conn.end();
-                  console.log("the streams then condition is met");
+                  //peers[peerId].conn2.end();
+                  console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
                 })
+
+                setTimeout(function(){
+                  BlkDB.dumpToStreamTXOXRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
+                    peers[peerId].conn2.write(jsonStream);
+                    //console.log("wrote this "+jsonStream);
+                    peers[peerId].conn2.end();
+                    console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
+                  })
+                },4000)
                 //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
 
 
@@ -1264,7 +1339,7 @@ let connSeq = 0
           //callback function to refresh db with downloaded synch then pull to memory
           var cbRefreshDB = function(){
             //passes in ChainGrab function with input params as callback when db is open
-            console.log("Importing the data file to the db and then calling the memory synch");
+            console.log("Importing the data file to the db and then calling the JSON FILE memory synch");
             setTimeout(function(){BlkDB.importFromJSONFile(ChainGrabRefresh,providerBlockHeight,cbChainGrab,frankieCoin.chainRiser);},2000);
             //setting this here and heed more intake checks
             frankieCoin.blockHeight = parseInt(providerBlockHeight);
@@ -1317,14 +1392,15 @@ let connSeq = 0
               peers[peerId].conn.write("THIS PEER IS NOW SYNCHED");
               peers[peerId].conn.write("---------------------------------");
             }else{
-              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
+              console.log("NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
+              //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
             }
 
           }else{
             log("------------------------------------------------------");
             log(chalk.red("You are communicating with a bad actor and we must stop this connection"));
             log("------------------------------------------------------");
-            peers[peerId].write("Stop hacking me bro");
+            peers[peerId].conn.write("Stop hacking me bro");
             //peers[peerId].connection.close()//?;
           }
         }
@@ -1353,6 +1429,332 @@ let connSeq = 0
     peers[peerId].seq = seq
     connSeq++
   })
+/////////////////////////////////////////////////////////SECOND LEVEL CONNECTION
+  sw2.on('connection', (conn2, info) => {
+
+    //log(chalk.blue(JSON.stringify(info)));
+    const seq2 = connSeq2
+    const peerId = info.id.toString('hex');
+
+    if(info.id != chainState.nodePersistantId){
+
+        log(chalk.green("CHANNEL 2 Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
+        log(chalk.bgBlue('CHANNEL 2 Peer id: '+ chalk.bold(peerId)));
+
+    }
+
+    conn2.on('timeout', () => {
+      console.log("timout for "+peerId)
+    })
+
+    conn2.on('close', () => {
+
+      connSeq2--
+    })
+
+    var incomingStream2 = "";
+    var incomingBufferArray2 = [];
+
+    conn2.on('end',async function(){
+      console.log(chalk.bgRed("data stream ended"));
+      console.log(chalk.bgRed("data stream ended"));
+      console.log(chalk.bgRed("data stream ended"));
+      //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
+
+      console.log("CONN 2 this is on end "+incomingStream2);
+
+      console.log("CONN 2 Importing the data file to the db and then calling the memory synch");
+      //setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
+      //setting this here and heed more intake checks
+
+      BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream2);
+
+      frankieCoin.blockHeight = parseInt(chainState.chainWalkHeight);
+      //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
+      var cbBlockMemLoad = function(blockNum,cbChainGrab,chainRiser){
+        setTimeout(function(){ChainGrabRefresh(blockNum,cbChainGrab,chainRiser);},3000)
+      }
+
+    });
+
+    conn2.on('readable',function(){
+
+      console.log("BLOCK STREAM "+this.readableHighWaterMark);
+
+      let chunk;
+      while (null !== (chunk = this.read())) {
+        console.log(`Received ${chunk.length} bytes of data.`);
+        console.log(chunk.toString());
+        console.log("<== ");
+        incomingStream2+=chunk.toString()
+        incomingBufferArray2.push(chunk.toString());
+      }
+
+    });
+
+
+    conn2.on('data', data => {
+      // Here we handle incomming messages
+
+      //console.log("connection 2 type of is "+typeof(data)+JSON.stringify(data));
+      log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
+      // callback returning verified uncles post processing probably needs a rename
+      var sendBackUncle = function(msg,peerId){
+        peers[peerId].conn2.write(JSON.stringify(msg));
+      }
+
+////////////////////////////////////////////begin the if block for incoming data
+      if(isJSON(data.toString())){
+
+
+
+        if(JSON.parse(data)["syncTrigger"]){
+
+          //isSynching = yes
+          chainState.isSynching=true;
+          console.log(chalk.bgRed(" DELETING BACK TO PREVIOUS CHECK POINT AND SYNC "+JSON.parse(data)["syncTrigger"]));
+          console.log("SUBMITED "+JSON.parse(data)["syncTrigger"]["submitCurrrentChainStateHash"]+" PEER "+JSON.parse(data)["syncTrigger"]["peerCurrrentChainStateHash"])
+          //var hairCut = (JSON.parse(data)["syncTrigger"] % frankieCoin.chainRiser);
+          //var lastRiser = parseInt(JSON.parse(data)["syncTrigger"] - hairCut)
+          chainClipper(JSON.parse(data)["syncTrigger"]).then(function(){
+            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+          });
+
+          //setTimeout(function(){
+          //  peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          //},2000)
+          //var deltaToRiser = parseInt(frankieCoin.chainRiser - )
+
+
+        }else if(JSON.parse(data)["ChainSyncPing"]){
+
+          log(JSON.parse(data)["ChainSyncPing"]);
+          if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
+            log(chalk.green("Global hashes matched!"));
+            frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
+            BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
+            var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
+            var pongBack = false;
+
+              //increment it by one to return the next block
+              peerBlockHeight++;
+              //returning the block
+              console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" <<<<the difference");
+              if((frankieCoin.getLength() > parseInt(peerBlockHeight)) && (chainState.synchronized > parseInt(peerBlockHeight)) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
+                console.log("this is properly flagged for streaming");
+                /***
+                var pongBackBlockStream = function(blockData){
+                  peers[peerId].conn.write(JSON.stringify({pongBlockStream:blockData}));
+                }
+                BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
+                ***/
+                var setDatSynch = function(datSynch,reqPeer){
+                  reqPeer.conn2.write(JSON.stringify({pongBlockStream:datSynch,blockHeight:chainState.synchronized}));
+                }
+                var cbGetSynch = function(datpeer){
+                  console.log("calling dat synch")
+                  DatSyncLink.synchDatabaseJSON(setDatSynch,datpeer);
+                }
+
+                var cbGetStream = function(jsonStream,streamToPeerID){
+                  console.log("the streams cb condition is met");
+                  //streamToPeerID.conn2.write(jsonStream);
+                  //streamToPeerID.conn2.end();
+                  //setting up some streams to try this out
+                }
+                //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
+                //BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
+                if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 1000){
+                  var numRecordsToStream = 1000
+                }else{
+                  var numRecordsToStream = parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]);
+                }
+                //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream)
+                //var numRecordsToStream = parseInt(frankieCoin.synchronized);
+                BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
+                  peers[peerId].conn2.write(jsonStream);
+                  console.log("wrote this "+jsonStream);
+                  peers[peerId].conn2.end();
+                  console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
+                })
+
+                /****
+                setTimeout(function(){
+                  BlkDB.dumpToStreamTXOXRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
+                    peers[peerId].conn2.write(jsonStream);
+                    //console.log("wrote this "+jsonStream);
+                    peers[peerId].conn2.end();
+                    console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
+                  })
+                },500)
+                ***/
+
+                //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
+
+
+                //pongBack = true;//not sure about this since this is a stream
+              }else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
+                //okay this is a legitimate pong
+                if(chainState.synchronized > peerBlockHeight){
+                  var pongBackBlock = function(blockData){
+                    peers[peerId].conn2.write(blockData.toString());
+                  }
+                  BlkDB.getBlock(parseInt(peerBlockHeight),pongBackBlock);
+                  pongBack = true;
+                }else{
+                  console.log("you are not synchronized to the peers and we should call a block synch");
+                  //call chainWalker
+                  chainWalker(peerBlockHeight,cbBlockChainValidatorStartUp);
+                }
+
+              }else if(frankieCoin.blockHeight == parseInt(peerBlockHeight)){
+                //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+                peers[peerId].conn2.write(JSON.stringify(frankieCoin.getLatestBlock()));
+                pongBack = true;
+              }else if((peerBlockHeight > frankieCoin.blockHeight) && (peerBlockHeight == (frankieCoin.blockHeight+1))){
+                //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+                peerBlockHeight--;
+                pongBack = true;
+              }else if(peerBlockHeight > (frankieCoin.blockHeight+2)){
+
+                pongBack = false;
+                //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
+                log("8888777766665555       THIS PEER IS NOT SYNCHED     5555666677778888");
+                log("8888777766665555       THIS PEER IS NOT SYNCHED     5555666677778888");
+                log("8888777766665555       51           51              5555666677778888");
+                log("8888777766665555                 51                 5555666677778888");
+                log("8888777766665555              ??                    5555666677778888");
+                log("8888777766665555            ??                      5555666677778888");
+                log("8888777766665555                                    5555666677778888");
+                log("8888777766665555           PEER                     5555666677778888");
+                log("8888777766665555           PEER                     5555666677778888");
+              }
+
+            //setting a delay and pong back
+            //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
+            if(peers[peerId] && pongBack == true){
+              setTimeout(function(){if(peers[peerId]){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));}},300);
+            }
+            //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+          }else{
+            log("Did not match this hash and this peer is an imposter");
+            //peers[peerId].conn.write("Don't hack me bro");
+            peers[peerId].conn2.write(JSON.stringify({"BadPeer":{Height:1337}}));
+            ///tesst out setTimeout(function(){disconnet peers[peerId].conn.dissconnet();},1500);
+          }
+
+
+        }else if(JSON.parse(data)["pongBlockStream"] && isSynching == true){
+          console.log("Extra peer returned synch message but synch is in progress so ignoring")
+        }else if(JSON.parse(data)["pongBlockStream"] && isSynching == false){
+
+          isSynching = true;
+
+          var mydata = JSON.parse(data)["pongBlockStream"];
+          var providerBlockHeight = parseInt(JSON.parse(data)["blockHeight"]);
+
+          log("------------------------------------------------------");
+          log(chalk.green("         BLOCK STREAM SYNCH          "));
+          log(chalk.yellow("              STAND BY               "));
+          log(chalk.green("         BLOCK STREAM SYNCH          "));
+          log("------------------------------------------------------");
+
+          console.log("Block Height of provider is "+providerBlockHeight);
+          console.log(mydata);//we can remove this soon
+
+          //callback function to refresh db with downloaded synch then pull to memory
+          var cbRefreshDB = function(){
+            //passes in ChainGrab function with input params as callback when db is open
+            console.log("Importing the data file to the db and then calling the JSON FILE memory synch");
+            setTimeout(function(){BlkDB.importFromJSONFile(ChainGrabRefresh,providerBlockHeight,cbChainGrab,frankieCoin.chainRiser);},2000);
+            //setting this here and heed more intake checks
+            frankieCoin.blockHeight = parseInt(providerBlockHeight);
+            //setTimeout(function(){BlkDB.refresh(ChainGrabRefresh,99,cbChainGrab,globalGenesisHash);},3000}
+            var cbBlockMemLoad = function(blockNum,cbChainGrab,chainRiser){
+              setTimeout(function(){ChainGrabRefresh(blockNum,cbChainGrab,chainRiser);},3000)
+            }
+
+
+          }
+          //1) going to import the database and callback the refresh
+          console.log("Data stream import initialized");
+          DatSyncLink.grabDataFile(mydata,cbRefreshDB);
+
+
+          ////////////////////////////////////USE TO DIRECT READ INCOMING STREAM
+          /****
+          for (obj in mydata){
+            console.log("incoming chain data from synch");
+            //log("BLOCK CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));//verbose
+            //console.log("blockdata coming inbound "+JSON.parse(data[obj])["blockHeight"]+" vs memory "+JSON.stringify(frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"])))//verbose
+            //verify block does not exist in memory
+            if(typeof frankieCoin.getBlock(JSON.parse(mydata[obj])["blockHeight"]) === "undefined" || frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"]) === null){
+              //block not in memory
+              console.log("block does not exist "+mydata[obj]);
+              var tempBlock = mydata[obj];
+              frankieCoin.addBlockFromDatabase(tempBlock,"streaming in block "+JSON.parse(tempBlock)["blockHeight"])
+              BlkDB.addBlock(parseInt(JSON.parse(tempBlock)["blockHeight"]),tempBlock,"414");
+            }else{
+              //block existed
+              log("block exists in chain data: "+JSON.parse(mydata[obj])["blockHeight"]);
+            }
+            blockHeightPtr++;
+          }
+          log(chalk.blue("BlocHeightPtr: "+ chalk.green(blockHeightPtr)));
+          ****/
+          //////////////////////END ARCHIVED USED TO DIRECT READ INCOMING STREAM
+
+        }else if(JSON.parse(data)["ChainSyncPong"]){
+          //returned block from sunched peer and parses it for db
+          log(JSON.parse(data)["ChainSyncPong"]);
+          if(JSON.parse(data)["ChainSyncPong"]["GlobalHash"] == globalGenesisHash){
+            log(chalk.green("Hash Matched good pong"))
+            var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
+            ChainSynchHashCheck(peerBlockHeight,JSON.parse(data)["ChainSyncPong"]["MaxHeight"]);
+            //if chain is not synched ping back to synched peer
+            if(peerBlockHeight == chainState.synchronized){
+            //if(frankieCoin.inSynch==true && frankieCoin.inSynchBlockHeight == frankieCoin.longestPeerBlockHeight){
+              peers[peerId].conn2.write("---------------------------------");
+              peers[peerId].conn2.write("THIS PEER IS NOW SYNCHED");
+              peers[peerId].conn2.write("---------------------------------");
+            }else{
+              console.log("NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
+              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
+            }
+
+          }else{
+            log("------------------------------------------------------");
+            log(chalk.red("You are communicating with a bad actor and we must stop this connection"));
+            log("------------------------------------------------------");
+            peers[peerId].conn2.write("Stop hacking me bro");
+            //peers[peerId].connection.close()//?;
+          }
+        }
+
+      }else{
+
+        //will repoen the GENESIS HASH NEXT
+
+        if(data.toString() == "My Genesis Hash is: "+globalGenesisHash){
+          log("the hash matched you would record that now");
+        }
+
+        if(data.toString().includes("BlockHeight ")){
+          log("Blockheight is "+data.toString());
+        }
+
+      }/////////////////////////////////////////end the if block for data inputs
+
+    })
+
+    // Save the connection
+    if (!peers[peerId]) {
+      peers[peerId] = {}
+    }
+    peers[peerId].conn2 = conn2
+    peers[peerId].seq2 = seq2
+    connSeq2++
+  })
 
 })()
 /////////////////////////////////////ending asynchronous peers connection engine
@@ -1362,6 +1764,14 @@ var broadcastPeers = function(message){
   for (let id in peers){
     if(peers[id] != "undefined"){
       peers[id].conn.write(message)
+    }
+  }
+}
+
+var broadcastPeers2 = function(message){
+  for (let id in peers){
+    if(peers[id] != "undefined"){
+      peers[id].conn2.write(message)
     }
   }
 }
@@ -1431,9 +1841,10 @@ function cliGetInput(){
       console.log("blockchain height is "+frankieCoin.blockHeight);
       setTimeout(function(){
         BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
-      },1000)
+      },30)
       cliGetInput();
     }else if(userInput == "INFO"){
+      console.log("IS SYNCHING "+chainState.isSynching);
       console.log(chalk.bgBlackBright.black("chain riser is ")+chalk.bgMagenta(frankieCoin.chainRiser))
       console.log(chalk.bgBlackBright.black("chain state chain walk height is ")+chalk.bgMagenta(chainState.chainWalkHeight));
       console.log(chalk.bgBlackBright.black("chain state synchronized equals ")+chalk.bgMagenta(chainState.synchronized));
@@ -1441,6 +1852,12 @@ function cliGetInput(){
       console.log(chalk.bgBlackBright.black("previousBlockCheckPointHash is ")+chalk.bgMagenta(JSON.stringify(chainState.previousBlockCheckPointHash)));
       console.log(chalk.bgBlackBright.black("currentBlockCheckPointHash is ")+chalk.bgMagenta(JSON.stringify(chainState.currentBlockCheckPointHash)));
       BlkDB.getCheckPoints();
+      cliGetInput();
+    }else if(userInput == "CLIP"){
+      console.log("cliping chain from "+frankieCoin.blockHeight+" back one riser ");
+      chainClipper(frankieCoin.blockHeight).then(function(){
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+      });
       cliGetInput();
     }else if(userInput == "MMM"){
       console.log("calling all orders level db");
@@ -1517,6 +1934,10 @@ function cliGetInput(){
         console.log("does nothing yet");
       }
       BlkDB.getOrdersPairBuy("EGEM","SFRX",cbTestBuys);
+      cliGetInput();
+    }else if(userInput.startsWith("addAllBalanceRecord(")){//
+      var tempAddBalance = userInput.slice(userInput.indexOf("addAllBalanceRecord(")+20, userInput.indexOf(")"));
+      BlkDB.addAllBalanceRecord(tempAddBalance.split(":")[0],tempAddBalance.split(":")[1],parseFloat(tempAddBalance.split(":")[2]).toFixed(8));
       cliGetInput();
     }else if(userInput.startsWith("sign(")){//Sign some data function
       var packageToSign = userInput.slice(userInput.indexOf("sign(")+5, userInput.indexOf(")"));
@@ -1656,13 +2077,17 @@ function cliGetInput(){
     }else if(userInput.startsWith("getBalance(")){
       log("");
       log(userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")")));
-      var egemAddress = userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")"));
+      var egemAddress = userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")")).toLowerCase();
       BlkDB.getBalanceAtAddress(egemAddress,addyBal)
       log("---------------");
       var addyBal2 = function(data){
         console.log("from the trie "+JSON.stringify(data));//do noting now
       }
       BlkDB.getBalanceAtAddressFromTrie(egemAddress,addyBal2)
+      var addyBal3 = function(data){
+        console.log("from the all balances "+JSON.stringify(data));//do noting now
+      }
+      BlkDB.getBalanceAtAddressAllBalance(egemAddress,addyBal3)
       cliGetInput();
     }else if(userInput.startsWith("getPendingOrders()")){
       log("---------------");
