@@ -1070,21 +1070,55 @@ var getTransactionReceiptsByAddress = function(address){
 
 ////////////////////////////////////////////////////////////////ALL BALANCE TREE
 var addAllBalanceRecord = async function(address,ticker,amount){
-  var currentBalance = 0;
-  await db.get("abal:"+address+":"+ticker,function(err,value){
+  return new Promise((resolve)=> {
+    //var currentBalance = 0;
+    db.get("abal:"+address.toLowerCase()+":"+ticker).then(async function(value){
+      var localBalance = await parseFloat(value.toString());
+      console.log("cool no error "+localBalance)
+      var currentBalance = parseFloat(amount)+localBalance;
+      db.put("abal:"+address.toLowerCase()+":"+ticker,currentBalance).then(async function(){
+        await db.get("abal:"+address.toLowerCase()+":"+ticker, function (err, value) {
+          if (err) return console.log('Ooops!', err) // likely the key was not found
+
+          // Ta da!
+          console.log("abal:"+address+":"+ticker+": " + value)
+          resolve(value)
+        })
+      }).catch(resolve(console.log));
+    }).catch(async function(error){
+      console.log("why is there an error ? "+address+ticker+amount+error);
+      //currentBalance = 0;
+      var currentBalance = parseFloat(amount);
+      db.put("abal:"+address.toLowerCase()+":"+ticker,currentBalance).then(async function(){
+        await db.get("abal:"+address.toLowerCase()+":"+ticker, function (err, value) {
+          if (err) return console.log('Ooops!', err) // likely the key was not found
+
+          // Ta da!
+          console.log("abal:"+address+":"+ticker+": " + value)
+          resolve(value)
+        })
+      }).catch(resolve(console.log));
+    });
+    //log(chalk.yellow("event replay through rpc server [this message for dev]"));
+  })
+
+  /*****
+  await db.get("abal:"+address+":"+ticker,async function(err,value){
     if(err){
-      //console.log("why is there an error ?");
+      console.log("why is there an error ?");
       currentBalance = 0;
-      putRecord("abal:"+address+":"+ticker,currentBalance);
+      currentBalance = parseFloat(amount);
+      await putRecord("abal:"+address+":"+ticker,currentBalance);
     }else{
-      //console.log("cool no error "+parseFloat(value.toString()))
+      console.log("cool no error "+parseFloat(value.toString()))
       currentBalance = parseFloat(amount)+parseFloat(value.toString());
-      putRecord("abal:"+address+":"+ticker,currentBalance);
+      await putRecord("abal:"+address+":"+ticker,currentBalance);
     }
     //currentBalance+=parseFloat(amount).toFixed(8);
     console.log(chalk.bgMagenta("adding"));
     console.log(chalk.bgCyan("abal:"+address+":"+ticker+" ----> "+currentBalance));
   })
+  *****/
 }
 
 var getBalanceAtAddressAllBalance = function(address,callback){
@@ -1095,7 +1129,7 @@ var getBalanceAtAddressAllBalance = function(address,callback){
     if(data.key.toString().split(":")[0] == "abal" && data.key.toString().split(":")[1] == address){
       //balances from new all balance tree
       console.log('key = '+data.key+" value = "+data.value.toString());
-      allBalances.push(parseFloat(data.value.toString()).toFixed(8));
+      allBalances.push(parseFloat(data.value.toString()));
     }
   })
   stream.on("close",function(data){
@@ -2020,7 +2054,7 @@ var dumpToStreamTXOXRange = function(cb,peer,start,end){
 }
 ////////////////////////////////////////////////////END PROMISE STREAM TX and OX
 
-var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent){
+var importFromJSONStream = async function(cb,blockNum,cbChainGrab,chainRiser,incontent,cbAbal){
 
   console.log(chalk.blue("-----------------------"))
   console.log(chalk.blue("import from json stream"))
@@ -2044,79 +2078,92 @@ var importFromJSONStream = function(cb,blockNum,cbChainGrab,chainRiser,incontent
   console.log(chalk.bgRed("IMPORTING ..."))
   //console.log("WHATTTTTTTTT IS MY CONNNNNNETTTTTEEEEENNNNNTTTTT "+Object.keys(content));
 
-  for(row in content){
+
+    for(row in content){
+
+        var rowKey = Object.keys(content[row]);
+        var rowValue = Object.values(content[row]);
+        if(rowKey.toString().split(":")[0] == "sfblk"){
+          console.log("I AM INSIDE THE inserts KEY "+rowKey+" VALUE "+rowValue);
+        }
+
+        db.put(rowKey, rowValue, function (err) {
+          if (err) return console.log('Ooops!', err) // some kind of I/O error
+        })
+
+        if(Object.keys(content[row]).toString().split(":")[0] != "tx"){
+          //console.log("key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
+        }else{
+          //console.log("TRANSACTION and key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
+          ///////////////////adding to trie
+          ///////////////////WILL PROBABLY HAVE TO STORE THESE AND SORT BY TIMESTAMP
+          //console.log("THIS SHOULD BE THE AMOUNT "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]));
+          /////going to have to check decremenets also
 
 
 
-    var rowKey = Object.keys(content[row]);
-    var rowValue = Object.values(content[row]);
-    if(rowKey.toString().split(":")[0] == "sfblk"){
-      console.log("I AM INSIDE THE inserts KEY "+rowKey+" VALUE "+rowValue);
-    }
+          if(Object.keys(content[row]).toString().split(":")[4] != "1521339498"){//genesis hash
 
-    db.put(rowKey, rowValue, function (err) {
-      if (err) return console.log('Ooops!', err) // some kind of I/O error
-    })
+            var balTicker = Object.keys(content[row]).toString().split(":")[3];
+            var balAddressTo = Object.keys(content[row]).toString().split(":")[2];
+            var balAddressFrom = Object.keys(content[row]).toString().split(":")[1];
+            var balAmount = parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8);
 
-    if(Object.keys(content[row]).toString().split(":")[0] != "tx"){
-      //console.log("key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
-    }else{
-      //console.log("TRANSACTION and key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
-      ///////////////////adding to trie
-      ///////////////////WILL PROBABLY HAVE TO STORE THESE AND SORT BY TIMESTAMP
-      //console.log("THIS SHOULD BE THE AMOUNT "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]));
-      /////going to have to check decremenets also
-      if(Object.keys(content[row]).toString().split(":")[4] != "1521339498"){//genesis hash
-        trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
-          //console.log("grabbing balance of from address ADD "+Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3]);
-          var adjustedValue;
-          if(value){
-            //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-            adjustedValue = parseFloat(value.toString()).toFixed(8);
-          }else{
-            adjustedValue = parseFloat(0);
-          }
-          adjustedValue += parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8);
-          trie.put(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
             trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
-              if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-              db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-                encoding: 'binary'
-              }, function (err, value) {
-                //console.log(value+" "+value.toString('hex'));
+              //console.log("grabbing balance of from address ADD "+Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3]);
+              var adjustedValue;
+              if(value){
+                //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
+                adjustedValue = parseFloat(parseFloat(value.toString()).toFixed(8));
+              }else{
+                adjustedValue = parseFloat(0);
+              }
+              adjustedValue += parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8);
+              trie.put(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
+                trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
+                  if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
+                  db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
+                    encoding: 'binary'
+                  }, function (err, value) {
+                    //console.log(value+" "+value.toString('hex'));
+                  });
+                });
               });
             });
-          });
-        });
-        addAllBalanceRecord(Object.keys(content[row]).toString().split(":")[2],Object.keys(content[row]).toString().split(":")[3],parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8));
-        ///////the debit side
-        trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
-          //console.log("grabbing balance of from address MINUS "+Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3]);
-          var adjustedValue;
-          if(value){
-            //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-            adjustedValue = parseFloat(value.toString()).toFixed(8);
-          }else{
-            adjustedValue = parseFloat(0);
-          }
-          adjustedValue -= parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8);
-          trie.put(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
-            trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
-              if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-              db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-                encoding: 'binary'
-              }, function (err, value) {
-                //console.log(value+" "+value.toString('hex'));
-              });
-            });
-          });
-        });
-      }
-      addAllBalanceRecord(Object.keys(content[row]).toString().split(":")[1],Object.keys(content[row]).toString().split(":")[3],parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]*-1).toFixed(8));
-      //////////////end ADDING to trie
-    }
 
-  }
+            console.log(chalk.bgRed("ADDY ALL BAL ----> "+" adding to "+Object.keys(content[row]).toString().split(":")[2]+" amt: "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8)))
+            await addAllBalanceRecord(balAddressTo,balTicker,balAmount);
+            setTimeout(function(){console.log("timer")},500)
+            ///////the debit side
+            trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
+              //console.log("grabbing balance of from address MINUS "+Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3]);
+              var adjustedValue;
+              if(value){
+                //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
+                adjustedValue = parseFloat(parseFloat(value.toString()).toFixed(8));
+              }else{
+                adjustedValue = parseFloat(0);
+              }
+              adjustedValue -= parseFloat(parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8));
+              trie.put(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
+                trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
+                  if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
+                  db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
+                    encoding: 'binary'
+                  }, function (err, value) {
+                    //console.log(value+" "+value.toString('hex'));
+                  });
+                });
+              });
+            });
+          }
+          //console.log(chalk.bgRed("ADDY ALL BAL ----> "))
+          //await addAllBalanceRecord(balAddressFrom,balTicker,parseFloat(balAmount*-1).toFixed(8));
+          //////////////end ADDING to trie
+          //process.exit();
+        }
+
+    }
 
   cb(blockNum,cbChainGrab,chainRiser);
 

@@ -2077,7 +2077,7 @@ function cliGetInput(){
     }else if(userInput.startsWith("getBalance(")){
       log("");
       log(userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")")));
-      var egemAddress = userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")"));
+      var egemAddress = userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")")).toLowerCase();
       BlkDB.getBalanceAtAddress(egemAddress,addyBal)
       log("---------------");
       var addyBal2 = function(data){
@@ -2085,7 +2085,7 @@ function cliGetInput(){
       }
       BlkDB.getBalanceAtAddressFromTrie(egemAddress,addyBal2)
       var addyBal3 = function(data){
-        console.log("from the trie all balance "+JSON.stringify(data));//do noting now
+        console.log("from the all balances "+JSON.stringify(data));//do noting now
       }
       BlkDB.getBalanceAtAddressAllBalance(egemAddress,addyBal3)
       cliGetInput();
