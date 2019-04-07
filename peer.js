@@ -1476,7 +1476,7 @@ let connSeq2 = 0
       //setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
       //setting this here and heed more intake checks
 
-      if(incomingStream.startsWith('{"blockHeight"}')){
+      if(incomingStream2.startsWith('{"blockHeight"}')){
 
         BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream2);
 
