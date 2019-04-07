@@ -1767,7 +1767,7 @@ let connSeq2 = 0
 //////////////////////////////////////////////////////////////messaging to peers
 var broadcastPeers = function(message){
   for (let id in peers){
-    if(peers[id] != "undefined"){
+    if(peers[id] && peers[id].conn != "undefined"){
       peers[id].conn.write(message)
     }
   }
@@ -1775,7 +1775,7 @@ var broadcastPeers = function(message){
 
 var broadcastPeers2 = function(message){
   for (let id in peers){
-    if(peers[id] != "undefined"){
+    if(peers[id] && peers[id].conn2 != "undefined"){
       peers[id].conn2.write(message)
     }
   }
