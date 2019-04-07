@@ -1465,18 +1465,17 @@ let connSeq2 = 0
     var incomingBufferArray2 = [];
 
     conn2.on('end',async function(){
-      console.log(chalk.bgRed("data stream ended"));
-      console.log(chalk.bgRed("data stream ended"));
-      console.log(chalk.bgRed("data stream ended"));
-      //setTimeout(function(){console.log("incoming buffer array is "+incomingBufferArray)},2000);
 
-      console.log("CONN 2 this is on end "+incomingStream2);
-
-      console.log("CONN 2 Importing the data file to the db and then calling the memory synch");
       //setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
       //setting this here and heed more intake checks
 
       if(incomingStream2.startsWith('{"blockHeight"}') || incomingStream2.startsWith('[{"ox:') || incomingStream2.startsWith('[{"tx:')){
+
+        console.log(chalk.bgRed("data stream ended"));
+        console.log(chalk.bgRed("data stream ended"));
+        console.log(chalk.bgRed("data stream ended"));
+        console.log("CONN 2 this is on end "+incomingStream2);
+        console.log("CONN 2 Importing the data file to the db and then calling the memory synch");
 
         BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream2);
 
