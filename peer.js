@@ -391,7 +391,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     var random = 0;//will randomize later
     var called = false;
     for (let id in peers) {
-      if(peers[id].conn2 != "undefined"){
+      if(peers[id].conn2 != undefined){
         log("------------------------------------------------------");
         log(chalk.green("Sending ping for chain sync."));
         log("------------------------------------------------------");
