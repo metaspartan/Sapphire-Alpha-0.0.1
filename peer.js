@@ -336,7 +336,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     //i just set the chainWalkHeight from reply data so ofc that part is equal verify why written this way
     if( (parseInt(replyData) == parseInt(chainState.chainWalkHeight)) && (parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight) ) ){
       console.log("do we even enter (load)?");
-      BlkDB.addTransactionsFromStream(JSON.parse(blockData)["transactions"],JSON.parse(blockData)["hash"],JSON.parse(blockData)["blockHeight"])
+      //BlkDB.addTransactionsFromStream(JSON.parse(blockData)["transactions"],JSON.parse(blockData)["hash"],JSON.parse(blockData)["blockHeight"])
       chainState.synchronized = parseInt(replyData);
     }else{
       console.log("do we enter the else ?");
@@ -2392,6 +2392,7 @@ var cbChainGrab = function(data) {
       console.log("block does not exist "+data[obj]);
       var tempBlock = data[obj];
       frankieCoin.addBlockFromDataStream(tempBlock,"sending in block "+JSON.parse(tempBlock)["blockHeight"]);
+      BlkDB.addTransactionsFromStream(JSON.parse(tempBlock)["transactions"],JSON.parse(tempBlock)["hash"],JSON.parse(tempBlock)["blockHeight"])
       frankieCoin.blockHeight = parseInt(JSON.parse(tempBlock)["blockHeight"]);
 
     }else{
