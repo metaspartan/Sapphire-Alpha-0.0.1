@@ -87,6 +87,9 @@ chainState.currentBlockCheckPointHash = {};
 chainState.datapack = "";
 chainState.nodePersistantId;
 chainState.peerNonce = 0;
+//now adding parameters for transactions
+chainState.transactionHeight = 0;
+chainState.transactionRootHash = '';
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activePing = function(){
@@ -312,7 +315,9 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
 
 //////////////////////////////////////////////////////////////////CHAIN VAIDATOR
 var cbBlockChainValidator = function(isValid,replyData,replyHash){
+
   if(isValid == true){
+
     if(chainState.chainWalkHeight == replyData){
       console.log("this point was already reached which means its stuck here ...pinging");
       for (let id in peers) {
@@ -325,15 +330,20 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
     chainState.chainWalkHeight = replyData;
     chainState.chainWalkHash = replyHash;
+
     console.log("VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
+
+    //i just set the chainWalkHeight from reply data so ofc that part is equal verify why written this way
     if( (parseInt(replyData) == parseInt(chainState.chainWalkHeight)) && (parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight) ) ){
       console.log("do we even enter (load)?");
+      BlkDB.addTransactionsFromStream(JSON.parse(blockData)["transactions"],JSON.parse(blockData)["hash"],JSON.parse(blockData)["blockHeight"])
       chainState.synchronized = parseInt(replyData);
     }else{
       console.log("do we enter the else ?");
       console.log(parseInt(replyData) == parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight));
       console.log("AND THE VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
     }
+
     console.log(chalk.black.bgCyan("BLOCK HEIGHT VALIDATED TO (CW PEER VERSION)")+chalk.bgMagenta(replyData),chalk.bgBlue(replyHash));
     //now that we are valid we are going to check 3 blocks back to see if it is a candidate for chain state
     console.log("TRUE OR FALSE? "+parseInt(replyData)+" "+(parseInt(replyData) > 3)+" "+(parseInt(replyData - 3))+" "+parseInt(frankieCoin.chainRiser))
@@ -825,7 +835,6 @@ let connSeq2 = 0
                       BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"],parseInt(JSON.parse(data)["blockHeight"]));
                       //add it to the RPC for miner
                       rpcserver.postRPCforMiner({block:JSON.parse(data)});
-
 
                       BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
 
