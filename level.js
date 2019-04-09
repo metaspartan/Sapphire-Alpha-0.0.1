@@ -1637,7 +1637,7 @@ var dumpToStreamBlockRange = function(cb,peer,start,end){
 
     stream.on('data',function(data){
 
-      if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight)) && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) < parseInt(chainBlockHeight+end))){//possible another block enters the db s no upper limit
+      if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight)) && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) <= parseInt(chainBlockHeight+end))){//possible another block enters the db s no upper limit
 
         var thisRowKey = data.key.toString();
         var thisRowValue = data.value.toString();
