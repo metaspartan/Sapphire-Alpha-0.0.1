@@ -1950,7 +1950,7 @@ function cliGetInput(){
       BlkDB.getCheckPoints();
       cliGetInput();
     }else if(userInput == "TXVLDY"){
-      transactionValidator(1,30);
+      transactionValidator(1,chainState.sychronized);
       cliGetInput();
     }else if(userInput == "HSHBLK"){
       BlkDB.getAllBLocksByHash();
