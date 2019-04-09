@@ -1967,6 +1967,7 @@ module.exports = {
     blockRangeValidate:blockRangeValidate,
     clearDatabase:clearDatabase,
     addTransactions:addTransactions,
+    addTransactionsFromStream:addTransactionsFromStream,
     getTransactions:getTransactions,
     getTransactionReceiptsByAddress:getTransactionReceiptsByAddress,
     getBalanceAtAddress:getBalanceAtAddress,
