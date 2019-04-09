@@ -926,8 +926,8 @@ let connSeq2 = 0
                 }
                 //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
                 //BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
-                if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 1000){
-                  var numRecordsToStream = 1000
+                if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 200){
+                  var numRecordsToStream = 200
                 }else{
                   var numRecordsToStream = parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]);
                 }
@@ -1561,8 +1561,8 @@ let connSeq2 = 0
                 }
                 //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
                 //BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
-                if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 1000){
-                  var numRecordsToStream = 1000
+                if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 200){
+                  var numRecordsToStream = 200
                 }else{
                   var numRecordsToStream = parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]);
                 }
