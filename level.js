@@ -758,23 +758,39 @@ var addTransactions = function(transactions,blockhash,blocknum){
 }
 
 /////IF THE TRANSACTIONS ARE NOT PRSENT IN THE STREAD WE ARE GOING TO ADD THEM AND VALIDATE
-var addTransactionsFromStream = function(transactions,blockhash,blknum){
+var addTransactionsFromStream = function(transactions,blockhash,blknum,block){
 
-  console.log(chalk.bgCyan("WOOOT ADDING TRANSACITONS ON VALIDATE WOOT"))
+  var hexBlockNum = ("000000000000000" + blknum.toString(16)).substr(-16);
 
-  transactions = JSON.parse(JSON.stringify(transactions));
-  for(tranx in JSON.parse(transactions)){
-    var receipt = JSON.parse(transactions)[tranx];
-    //receipts have a key of toAddress:timestamp:receipthash atm
-    putRecord("tx:"+receipt["fromAddress"]+":"+receipt["toAddress"]+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt));
-    //need to accumulate the balances and add or subtract to PMT
+  console.log(transactions+" <--"+typeof(transactions))
 
-    addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]).toFixed(8),blockhash,blocknum);
-
-    addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]*-1).toFixed(8),blockhash,blocknum);
-    //2) get the trie root hash and return for hasing into the block
-
+  for(var key in transactions) {
+    if(transactions.hasOwnProperty(key)){
+      transactions = [];
+    }else{
+      transactions = JSON.parse(JSON.stringify(transactions));
+    }
   }
+
+
+
+  console.log(chalk.bgCyan("WOOOT ADDING TRANSACITONS ON VALIDATE WOOT "+transactions+ " " +blockhash+ " " +blknum))
+
+  if(transactions.length > 0){
+    for(tranx in JSON.parse(transactions)){
+      var receipt = JSON.parse(transactions)[tranx];
+      //receipts have a key of toAddress:timestamp:receipthash atm
+      putRecord("tx:"+receipt["fromAddress"]+":"+receipt["toAddress"]+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt));
+      //need to accumulate the balances and add or subtract to PMT
+
+      addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]).toFixed(8),blockhash,blocknum);
+
+      addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]*-1).toFixed(8),blockhash,blocknum);
+      //2) get the trie root hash and return for hasing into the block
+
+    }
+  }
+
   /////////////////////////////////////////////////////////CALCULATE BLOCK REWARDS
   var calcBlockReward;
   if(parseInt(blknum) < 7500001){calcBlockReward=9}//ERA1
