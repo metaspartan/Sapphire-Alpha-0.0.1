@@ -301,7 +301,20 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
 
     //set the chain state validated height;
   }else{
-    console.log("NOT VALID NEED TO PING AT "+replyData);
+    if(replyData == "NaN"){
+      console.log("chain walk height is "+chainState.chainWalkHeight)
+    }
+    console.log("NOT VALID NEED TO PING AT "+replyData+typeof(replyData));
+    if(parseInt(replyData) > 2){
+      var clipHeight = parseInt(replyData-1)
+      chainClipperReduce(frankieCoin.blockHeight,clipHeight).then(function(){
+        console.log("clipped chain to "+clipHeight+" restart to reindex")
+        chainState.chainWalkHeight = 1;
+        chainState.synchronized = 1;
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+      });
+    }
+
     //set ping here
     for (let id in peers) {
       log("------------------------------------------------------");
@@ -396,7 +409,12 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
     //set the chain state validated height;
   }else{
-    console.log("NOT VALID NEED TO PING AT "+replyData);
+
+    if(replyData == "NaN"){
+      console.log("chain walk height is "+chainState.chainWalkHeight)
+    }
+    console.log("NOT VALID NEED TO CLIP OR PING AT "+replyData+typeof(replyData));
+
     //set ping here
     var random = 0;//will randomize later
     var called = false;
@@ -418,6 +436,34 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
   }
 }
 /////////////////////////////////////////////////////////////END CHAIN VALIDATOR
+
+///////////////////////////////////////////////////////////TRANSACTION VQLIDATOR
+var transactionValidator = async function(start,end){
+
+  var incrementor = parseInt(start);
+  console.log("TRANSACTION VALIDATION STARTING AT "+incrementor);
+  var validateThisBlock = function(){
+    return new Promise((resolve)=> {
+      var cbTxValidator = function(blockToValidate){
+        console.log(blockToValidate.toString())
+        resolve(blockToValidate.toString());
+      }
+      BlkDB.getBlock(incrementor,cbTxValidator)
+    })
+  }
+  var thisOneBlock = await validateThisBlock();
+  console.log(thisOneBlock)
+  BlkDB.addTransactionsFromStream(JSON.parse(thisOneBlock)["transactions"],JSON.parse(thisOneBlock)["hash"],JSON.parse(thisOneBlock)["blockHeight"],thisOneBlock)
+  start++;
+  if(start == end){
+    console.log("break clause reached");
+    return;
+  }else{
+    transactionValidator(start,end)
+  }
+}
+//await BlkDB.addTransactionsFromStream(JSON.parse(tempBlock)["transactions"],JSON.parse(tempBlock)["hash"],JSON.parse(tempBlock)["blockHeight"],tempBlock)
+///////////////////////////////////////////////////////////TRANSACTION VALIDATOR
 
 /////////////////////////////////////////////////////ENCRYPTED DIRECT MESSAGEING
 var directMessage = function(secretMessage){
@@ -524,6 +570,42 @@ var chainClipper = async function(blockHeight){//clip back to last riser from th
         var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
         chainState.previousBlockCheckPointHash = {"blockNumber":frankieCoin.blockHeight,"checkPointHash":thisBlockCheckPointHash};
         chainState.currentBlockCheckPointHash = {"blockNumber":frankieCoin.blockHeight,"checkPointHash":thisBlockCheckPointHash};
+
+    }
+
+    if(frankieCoin.blockHeight == lastRiser){
+      resolve(lastRiser);
+    }
+
+  })
+}
+var chainClipperReduce = async function(blockHeight,hairCut){//clip back to last riser from this height
+  return new Promise(async function(resolve, reject) {
+
+    var reduction = parseInt(blockHeight - hairCut)
+    var lastRiser = parseInt(blockHeight - reduction)
+
+    for(var i = blockHeight; i > lastRiser;i--){
+
+        await BlkDB.removeBlock(i);
+        await frankieCoin.chain.pop();
+        console.log("FRANKIECOIN BLOCKNUM BEFORE REDUCE IS "+frankieCoin.blockHeight);
+        frankieCoin.blockHeight-=1;
+        chainState.chainWalkHeight = frankieCoin.blockHeight;
+        //chainState.chainWalkHash = await frankieCoin.getLatestBlock()["hash"];//block 1 hash
+        chainState.synchronized = frankieCoin.blockHeight;//when we are synched at a block it gets updated
+        chainState.topBlock = frankieCoin.blockHeight;
+        //var riserOffset = (parseInt(frankieCoin.blockHeight) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
+        //var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
+        //checkPointBlock = JSON.stringify(checkPointBlock);
+        //console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
+        console.log("FRANKIECOIN BLOCKNUM AFTER REDUCE IS "+frankieCoin.blockHeight)
+        //var blockForHash = frankieCoin.getLatestBlock();
+        //console.log("BLOCK FOR HASH IS "+blockForHash);
+        //var blockNumHash = JSON.parse(JSON.stringify(blockForHash))["hash"];
+        //var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+        //chainState.previousBlockCheckPointHash = {"blockNumber":frankieCoin.blockHeight,"checkPointHash":thisBlockCheckPointHash};
+        //chainState.currentBlockCheckPointHash = {"blockNumber":frankieCoin.blockHeight,"checkPointHash":thisBlockCheckPointHash};
 
     }
 
@@ -1840,6 +1922,15 @@ function cliGetInput(){
       }).catch(console.log)
 
       cliGetInput();
+    }else if(userInput.startsWith("clipChainAt(")){
+      var clipHeight = userInput.slice(userInput.indexOf("clipChainAt(")+12, userInput.indexOf(")"));
+      chainClipperReduce(frankieCoin.blockHeight,clipHeight).then(function(){
+        console.log("clipped chain to "+clipHeight+" restart to reindex")
+        chainState.chainWalkHeight = 1;
+        chainState.synchronized = 1;
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+      });
+      cliGetInput();
     }else if(userInput == "MM"){
       console.log("chain state chain walk height is "+chainState.chainWalkHeight);
       console.log("chain state synchronized equals "+chainState.synchronized);
@@ -1857,6 +1948,9 @@ function cliGetInput(){
       console.log(chalk.bgBlackBright.black("previousBlockCheckPointHash is ")+chalk.bgMagenta(JSON.stringify(chainState.previousBlockCheckPointHash)));
       console.log(chalk.bgBlackBright.black("currentBlockCheckPointHash is ")+chalk.bgMagenta(JSON.stringify(chainState.currentBlockCheckPointHash)));
       BlkDB.getCheckPoints();
+      cliGetInput();
+    }else if(userInput == "TXVLDY"){
+      transactionValidator(1,30);
       cliGetInput();
     }else if(userInput == "HSHBLK"){
       BlkDB.getAllBLocksByHash();
@@ -2379,7 +2473,7 @@ var callBackEntireDatabase = function(data){
 }
 
 //the idea is to sync the chain data before progression so we start with a callback of data store limited by number of blocks
-var cbChainGrab = function(data) {
+var cbChainGrab = async function(data) {
   console.log("chain grab callback...")
   log('got data: '+data.toString());//test for input
 
@@ -2392,7 +2486,6 @@ var cbChainGrab = function(data) {
       console.log("block does not exist "+data[obj]);
       var tempBlock = data[obj];
       frankieCoin.addBlockFromDataStream(tempBlock,"sending in block "+JSON.parse(tempBlock)["blockHeight"]);
-      //BlkDB.addTransactionsFromStream(JSON.parse(tempBlock)["transactions"],JSON.parse(tempBlock)["hash"],JSON.parse(tempBlock)["blockHeight"],tempBlock)
       frankieCoin.blockHeight = parseInt(JSON.parse(tempBlock)["blockHeight"]);
 
     }else{

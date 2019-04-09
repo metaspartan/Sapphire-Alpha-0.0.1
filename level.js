@@ -774,7 +774,7 @@ var addTransactionsFromStream = function(transactions,blockhash,blknum,block){
 
 
 
-  console.log(chalk.bgCyan("WOOOT ADDING TRANSACITONS ON VALIDATE WOOT "+transactions+ " " +blockhash+ " " +blknum))
+  console.log(chalk.bgCyan.black("WOOOT ADDING TRANSACITONS ON VALIDATE WOOT "+transactions+ " " +blockhash+ " " +blknum))
 
   if(transactions.length > 0){
     for(tranx in JSON.parse(transactions)){
