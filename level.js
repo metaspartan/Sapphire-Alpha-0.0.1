@@ -143,6 +143,21 @@ var getChainStateParam = function(state,cb){
   });
 }
 
+var getTopChainStateCheckPoint = async function(blockNum,chainRiser){
+  return new Promise(async function(resolve,reject){
+    var riserOffset = (parseInt(blockNum) % parseInt(chainRiser));//keep in mind it is plus 1 for chain
+    var checkPointBlockNum = parseInt(blockNum - riserOffset);
+    console.log("got me a checkpoint of "+checkPointBlockNum);
+    var stream = db.createReadStream();
+    stream.on('data',function(data){
+      if(data.key.toString().split(":")[0] == "cs" && data.key.toString().split(":")[1] == checkPointBlockNum){
+        console.log('key = '+data.key+" value = "+data.value.toString());
+        resolve(data.value.toString());
+      }
+    })
+  })
+}
+
 var getChainStateCheckPoint = function(blockNum,hash,cb){
   db.get("cs:"+blockNum+":"+hash, function(err, value){
     if(value){
@@ -267,7 +282,7 @@ var getAllPeerSafes = function(){
   });
 }
 
-var addBlock = function(blknum,block,callfrom){
+var addBlock = function(blknum,block,blkhash,callfrom){
   //console.log("<<<<<----------------ADDS BLOCK TO LEVEL DB HERE------------>>>>>")
   //console.log("called from "+callfrom);
   //console.log("inside add block"+block.toString());//verbose
@@ -275,6 +290,7 @@ var addBlock = function(blknum,block,callfrom){
   var hexBlockNum = ("000000000000000" + blocknum.toString(16)).substr(-16);
   console.log(chalk.black.bgCyan("adding block "+blknum+" as "+hexBlockNum));
   putRecord("sfblk:"+hexBlockNum,block)
+  putRecord("hshblk:"+blkhash,blocknum)
   //parseInt(hexString, 16);//this is back to number from hex
   //console.log("<<<<<----------------BLOCK REWARDS LEVEL DB HERE------------>>>>>")
 /////////////////////////////////////////////////////////CALCULATE BLOCK REWARDS
@@ -302,7 +318,7 @@ var addBlock = function(blknum,block,callfrom){
       //we skip the intry
     }).catch(async function(){
       putRecord("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx));
-      addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(750000));
+      addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(750000),hexBlockNum);
     })
     //whqt I had for PMT tht I removed for now - in the git updates removed 4-5-2019 for each
     /****
@@ -333,7 +349,7 @@ var addBlock = function(blknum,block,callfrom){
       //we skip the intry
     }).catch(async function(){
       putRecord("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx));
-      addAllBalanceRecord("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7","SFRX",parseFloat(750000));
+      addAllBalanceRecord("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7","SFRX",parseFloat(750000),hexBlockNum);
     })
 
 
@@ -342,7 +358,7 @@ var addBlock = function(blknum,block,callfrom){
       //we skip the intry
     }).catch(async function(){
       putRecord("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx));
-      addAllBalanceRecord("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816","SFRX",parseFloat(750000));
+      addAllBalanceRecord("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816","SFRX",parseFloat(750000),hexBlockNum);
     })
 
     var tbatesTx = new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", "750000", "SFRX", JSON.parse(block)["timestamp"]);
@@ -350,7 +366,7 @@ var addBlock = function(blknum,block,callfrom){
       //we skip the intry
     }).catch(async function(){
       putRecord("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx));
-      addAllBalanceRecord("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170","SFRX",parseFloat(750000));
+      addAllBalanceRecord("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170","SFRX",parseFloat(750000),hexBlockNum);
     })
 
     var beastTx = new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", "750000", "SFRX", JSON.parse(block)["timestamp"]);
@@ -358,7 +374,7 @@ var addBlock = function(blknum,block,callfrom){
       //we skip the intry
     }).catch(async function(){
       putRecord("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx));
-      addAllBalanceRecord("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103","SFRX",parseFloat(750000));
+      addAllBalanceRecord("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103","SFRX",parseFloat(750000),hexBlockNum);
     })
     ////////////////////////////////////////////////////////////////EARLY SUPPORT
     /***
@@ -377,7 +393,7 @@ var addBlock = function(blknum,block,callfrom){
       //we skip the intry
     }).catch(async function(){
       putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:EGEM:"+JSON.parse(block)["timestamp"]+":"+osoTxEGEM.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxEGEM));
-      addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","EGEM",parseFloat(100000));
+      addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","EGEM",parseFloat(100000),hexBlockNum);
     })
 
     var osoTxBTC = new Transaction("sapphire", "0x7357589f8e367c2C31F51242fB77B350A11830F3", "3", "BTC", JSON.parse(block)["timestamp"]);
@@ -385,7 +401,7 @@ var addBlock = function(blknum,block,callfrom){
       //we skip the intry
     }).catch(async function(){
       putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:BTC:"+JSON.parse(block)["timestamp"]+":"+osoTxBTC.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxBTC));
-      addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","BTC",parseFloat(3));
+      addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","BTC",parseFloat(3),hexBlockNum);
     })
 
     //new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 3, "BTC"),//BTC
@@ -394,7 +410,7 @@ var addBlock = function(blknum,block,callfrom){
       //we skip the intry
     }).catch(async function(){
       putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:ETH:"+JSON.parse(block)["timestamp"]+":"+osoTxETH.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxETH));
-      addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","ETH",parseFloat(10));
+      addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","ETH",parseFloat(10),hexBlockNum);
     })
 
     //new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 10, "ETH"),//ETH
@@ -403,34 +419,34 @@ var addBlock = function(blknum,block,callfrom){
       //we skip the intry
     }).catch(async function(){
       putRecord("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:XBI:"+JSON.parse(block)["timestamp"]+":"+osoTxXBI.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxXBI));
-      addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","XBI",parseFloat(1000));
+      addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","XBI",parseFloat(1000),hexBlockNum);
     })
 
   }else{//perblock rewards from block 2 until
     ///////////////////////////////////////////////////////////////////CORE DEVS
     var osoTx = new Transaction("sapphire", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx));
-    addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(calcDevReward).toFixed(8));
+    addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(calcDevReward).toFixed(8),hexBlockNum);
     var ridzTx = new Transaction("sapphire", "0xc393659c2918a64cdfb44d463de9c747aa4ce3f7", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx));
-    addAllBalanceRecord("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7","SFRX",parseFloat(calcDevReward).toFixed(8));
+    addAllBalanceRecord("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7","SFRX",parseFloat(calcDevReward).toFixed(8),hexBlockNum);
     var jalTx = new Transaction("sapphire", "0xA54EE4A7ab23068529b7Fec588Ec3959E384a816", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx));
-    addAllBalanceRecord("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816","SFRX",parseFloat(calcDevReward).toFixed(8));
+    addAllBalanceRecord("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816","SFRX",parseFloat(calcDevReward).toFixed(8),hexBlockNum);
     var tbatesTx = new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx));
-    addAllBalanceRecord("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170","SFRX",parseFloat(calcDevReward).toFixed(8));
+    addAllBalanceRecord("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170","SFRX",parseFloat(calcDevReward).toFixed(8),hexBlockNum);
     var beastTx = new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx));
-    addAllBalanceRecord("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103","SFRX",parseFloat(calcDevReward).toFixed(8));
+    addAllBalanceRecord("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103","SFRX",parseFloat(calcDevReward).toFixed(8),hexBlockNum);
     //miner
     var minerTx = new Transaction("sapphire", JSON.parse(block)["miner"], calcMiningReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:"+JSON.parse(block)["miner"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(minerTx));
-    addAllBalanceRecord(JSON.parse(block)["miner"],"SFRX",parseFloat(calcMiningReward).toFixed(8));
+    addAllBalanceRecord(JSON.parse(block)["miner"],"SFRX",parseFloat(calcMiningReward).toFixed(8),hexBlockNum);
     //sponsor
     var sponsorTx = new Transaction("sapphire", JSON.parse(block)["sponsor"], calcSponsorReward, "SFRX", JSON.parse(block)["timestamp"]);
     putRecord("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx));
-    addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcMiningReward).toFixed(8));
+    addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcMiningReward).toFixed(8),hexBlockNum);
     //community DEVS
     //sapphire Node T2 SUPER NODE
     //EGEM node T1
@@ -457,6 +473,18 @@ var getBlock = function(blknum,callBack){
         callBack(value);
       })
     })
+}
+
+var getBlockByHash = function(blockHash){
+  return new Promise((resolve)=> {
+    db.get("hshblk:"+blockHash,async function (err, value) {
+      if (err) return console.log('Ooops!', err) // likely the key was not found
+
+      // Ta da!
+      console.log("hshblk:"+blockHash+": " + value)
+      resolve(value);
+    })
+  })
 }
 
 var getBlockStream = function(blknum,callBack){
@@ -496,6 +524,15 @@ var getAllBLocks = function(){
   var stream = db.createReadStream();
   stream.on('data',function(data){
     if(data.key.toString().split(":")[0] == "sfblk"){
+      console.log('key = '+data.key+" value = "+data.value.toString());
+    }
+  })
+}
+
+var getAllBLocksByHash = function(){
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    if(data.key.toString().split(":")[0] == "hshblk"){
       console.log('key = '+data.key+" value = "+data.value.toString());
     }
   })
@@ -697,7 +734,7 @@ var clearDatabase = function(){
   //db = levelup(leveldown('./SFRX'));
 }
 
-var addTransactions = function(transactions,blockhash,){
+var addTransactions = function(transactions,blockhash,blocknum){
   //console.log("T R A N S A C T I O N S  B E I N G  A D D E D  H E R E");
   transactions = JSON.parse(JSON.stringify(transactions));
   for(tranx in JSON.parse(transactions)){
@@ -706,51 +743,11 @@ var addTransactions = function(transactions,blockhash,){
     putRecord("tx:"+receipt["fromAddress"]+":"+receipt["toAddress"]+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt));
     //need to accumulate the balances and add or subtract to PMT
 
-    //1) call the existng balance for the send and receiver
-    trie.get(receipt["toAddress"]+":"+receipt["ticker"], function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString()).toFixed(8);
-      }else{
-        adjustedValue = parseFloat(0);
-      }
-      adjustedValue += parseFloat(receipt["toAddress"]).toFixed(8);
-      trie.put(receipt["toAddress"]+":"+receipt["ticker"], adjustedValue, function () {
-        trie.get(receipt["toAddress"]+":"+receipt["ticker"], function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
-    addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]).toFixed(8));
-    trie.get(receipt["fromAddress"]+":"+receipt["ticker"], function (err, value) {
-      //console.log("grabbing balance of from address");
-      var adjustedValue;
-      if(value){
-        //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-        adjustedValue = parseFloat(value.toString()).toFixed(8);
-      }else{
-        adjustedValue = parseFloat(0);
-      }
-      adjustedValue -= parseFloat(receipt["toAddress"]).toFixed(8);
-      trie.put(receipt["fromAddress"]+":"+receipt["ticker"], adjustedValue, function () {
-        trie.get(receipt["fromAddress"]+":"+receipt["ticker"], function (err, value) {
-          if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-          db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-            encoding: 'binary'
-          }, function (err, value) {
-            //console.log(value+" "+value.toString('hex'));
-          });
-        });
-      });
-    });
-    addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]*-1).toFixed(8));
+
+
+    addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]).toFixed(8),blockhash,blocknum);
+
+    addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]*-1).toFixed(8),blockhash,blocknum);
     //2) get the trie root hash and return for hasing into the block
 
   }
@@ -783,14 +780,17 @@ var getTransactionReceiptsByAddress = function(address){
 }
 
 ////////////////////////////////////////////////////////////////ALL BALANCE TREE
-var addAllBalanceRecord = async function(address,ticker,amount){
+var addAllBalanceRecord = async function(address,ticker,amount,blockhash,blocknum){
+
   return new Promise((resolve)=> {
     //var currentBalance = 0;
     db.get("abal:"+address.toLowerCase()+":"+ticker).then(async function(value){
-      var localBalance = await parseFloat(value.toString());
-      console.log("cool no error "+localBalance)
+      var localBalanceJSON = await value.toString();
+      var localBalance = await parseFloat(JSON.parse(localBalanceJSON)["balance"]);
+      console.log("cool no error "+JSON.parse(localBalance)["balance"]+" and more things "+JSON.parse(localBalanceJSON)["hash"])
       var currentBalance = parseFloat(amount)+localBalance;
-      db.put("abal:"+address.toLowerCase()+":"+ticker,currentBalance).then(async function(){
+      updatedBalanceJSON = JSON.stringify({"balance":currentBalance,"hash":"xyz"+currentBalance});
+      db.put("abal:"+address.toLowerCase()+":"+ticker,updatedBalanceJSON).then(async function(){
         await db.get("abal:"+address.toLowerCase()+":"+ticker, function (err, value) {
           if (err) return console.log('Ooops!', err) // likely the key was not found
 
@@ -803,7 +803,8 @@ var addAllBalanceRecord = async function(address,ticker,amount){
       console.log("why is there an error ? "+address+ticker+amount+error);
       //currentBalance = 0;
       var currentBalance = parseFloat(amount);
-      db.put("abal:"+address.toLowerCase()+":"+ticker,currentBalance).then(async function(){
+      updatedBalanceJSON = JSON.stringify({"balance":currentBalance,"hash":"xyz"+currentBalance});
+      db.put("abal:"+address.toLowerCase()+":"+ticker,updatedBalanceJSON).then(async function(){
         await db.get("abal:"+address.toLowerCase()+":"+ticker, function (err, value) {
           if (err) return console.log('Ooops!', err) // likely the key was not found
 
@@ -843,7 +844,7 @@ var getBalanceAtAddressAllBalance = function(address,callback){
     if(data.key.toString().split(":")[0] == "abal" && data.key.toString().split(":")[1] == address){
       //balances from new all balance tree
       console.log('key = '+data.key+" value = "+data.value.toString());
-      allBalances.push(parseFloat(data.value.toString()));
+      allBalances.push(parseFloat(JSON.parse(data.value.toString())["balance"]));
     }
   })
   stream.on("close",function(data){
@@ -1558,7 +1559,7 @@ var dumpToStreamFIleRange = function(cb,peer,start,end){
   stream.on('data',function(data){
     //console.log("block: "+parseInt(data.key.toString().split(":")[1],16).toString(10)+" hexBlockNum: "+parseInt(chainBlockHeight))
     //console.log('key = '+data.key+" value = "+data.value.toString());
-    if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight)) && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) < parseInt(chainBlockHeight+end))){//possible another block enters the db s no upper limit
+    if(data.key.toString().split(":")[0] == "sfblk" && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) > parseInt(chainBlockHeight)) && (parseInt(parseInt(data.key.toString().split(":")[1],16).toString(10)) <= parseInt(chainBlockHeight+end))){//possible another block enters the db s no upper limit
       //console.log("here... "+data.key.toString()+" "+data.value.toString());
       //console.log("key... "+data.key.toString()+"  --> value "+data.value.toString());
 
@@ -1795,87 +1796,53 @@ var importFromJSONStream = async function(cb,blockNum,cbChainGrab,chainRiser,inc
 
     for(row in content){
 
-        var rowKey = Object.keys(content[row]);
-        var rowValue = Object.values(content[row]);
-        if(rowKey.toString().split(":")[0] == "sfblk"){
-          console.log("I AM INSIDE THE inserts KEY "+rowKey+" VALUE "+rowValue);
-        }
+      var rowKey = Object.keys(content[row]);
+      var rowValue = Object.values(content[row]);
+      if(rowKey.toString().split(":")[0] == "sfblk"){
+        console.log("I AM INSIDE THE inserts KEY "+rowKey+" VALUE "+rowValue);
+      }
 
-        db.put(rowKey, rowValue, function (err) {
-          if (err) return console.log('Ooops!', err) // some kind of I/O error
-        })
+      db.put(rowKey, rowValue, function (err) {
+        if (err) return console.log('Ooops!', err) // some kind of I/O error
+      })
 
-        if(Object.keys(content[row]).toString().split(":")[0] != "tx"){
-          //console.log("key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
-        }else{
-          //console.log("TRANSACTION and key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
-          ///////////////////adding to trie
-          ///////////////////WILL PROBABLY HAVE TO STORE THESE AND SORT BY TIMESTAMP
-          //console.log("THIS SHOULD BE THE AMOUNT "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]));
-          /////going to have to check decremenets also
-
-
-
-          if(Object.keys(content[row]).toString().split(":")[4] != "1521339498"){//genesis hash
-
-            var balTicker = Object.keys(content[row]).toString().split(":")[3];
-            var balAddressTo = Object.keys(content[row]).toString().split(":")[2];
-            var balAddressFrom = Object.keys(content[row]).toString().split(":")[1];
-            var balAmount = parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8);
-
-            trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
-              //console.log("grabbing balance of from address ADD "+Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3]);
-              var adjustedValue;
-              if(value){
-                //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-                adjustedValue = parseFloat(parseFloat(value.toString()).toFixed(8));
-              }else{
-                adjustedValue = parseFloat(0);
-              }
-              adjustedValue += parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8);
-              trie.put(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
-                trie.get(Object.keys(content[row]).toString().split(":")[2]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
-                  if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-                  db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-                    encoding: 'binary'
-                  }, function (err, value) {
-                    //console.log(value+" "+value.toString('hex'));
-                  });
-                });
-              });
-            });
-
-            console.log(chalk.bgRed("ADDY ALL BAL ----> "+" adding to "+Object.keys(content[row]).toString().split(":")[2]+" amt: "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8)))
-            await addAllBalanceRecord(balAddressTo,balTicker,balAmount);
-            ///////the debit side
-            trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
-              //console.log("grabbing balance of from address MINUS "+Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3]);
-              var adjustedValue;
-              if(value){
-                //console.log("which is "+value.toString()+" trie root is "+trie.root.toString('hex'));
-                adjustedValue = parseFloat(parseFloat(value.toString()).toFixed(8));
-              }else{
-                adjustedValue = parseFloat(0);
-              }
-              adjustedValue -= parseFloat(parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8));
-              trie.put(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], adjustedValue, function () {
-                trie.get(Object.keys(content[row]).toString().split(":")[1]+":"+Object.keys(content[row]).toString().split(":")[3], function (err, value) {
-                  if(value) //console.log(value.toString()+" trie root is "+trie.root.toString('hex'))
-                  db.get(new Buffer.from(trie.root.toString('hex'), 'hex'), {
-                    encoding: 'binary'
-                  }, function (err, value) {
-                    //console.log(value+" "+value.toString('hex'));
-                  });
-                });
-              });
-            });
+      if(Object.keys(content[row]).toString().split(":")[0] != "tx"){
+        //console.log("key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
+          if(Object.keys(content[row]).toString().split(":")[0] == "sfblk"){
+            putRecord("hshblk:"+JSON.parse(Object.values(content[row]).toString())["hash"],JSON.parse(Object.values(content[row]).toString())["blockHeight"])
           }
-          //console.log(chalk.bgRed("ADDY ALL BAL ----> "))
-          //await addAllBalanceRecord(balAddressFrom,balTicker,parseFloat(balAmount*-1).toFixed(8));
-          //////////////end ADDING to trie
-          //process.exit();
-        }
+      }
 
+    }
+
+    for(row in content){
+      if(Object.keys(content[row]).toString().split(":")[0] == "tx"){
+        //console.log("TRANSACTION and key is "+Object.keys(content[row])+"value is "+Object.values(content[row]));
+        ///////////////////adding to trie
+        ///////////////////WILL PROBABLY HAVE TO STORE THESE AND SORT BY TIMESTAMP
+        //console.log("THIS SHOULD BE THE AMOUNT "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]));
+        /////going to have to check decremenets also
+
+
+
+        if(Object.keys(content[row]).toString().split(":")[4] != "1521339498"){//genesis hash
+
+          var balTicker = Object.keys(content[row]).toString().split(":")[3];
+          var balAddressTo = Object.keys(content[row]).toString().split(":")[2];
+          var balAddressFrom = Object.keys(content[row]).toString().split(":")[1];
+          var balAmount = parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8);
+          var balBlockHash =  Object.keys(content[row]).toString().split(":")[6];
+
+          await getBlockByHash(balBlockHash).then(async function(blknum){
+            console.log(chalk.bgRed("ADDY ALL BAL ----> "+" adding to "+Object.keys(content[row]).toString().split(":")[2]+" amt: "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8)))
+            await addAllBalanceRecord(balAddressTo,balTicker,balAmount,balBlockHash,blknum);
+            await addAllBalanceRecord(balAddressFrom,balTicker,parseFloat(parseFloat(balAmount*-1).toFixed(8)),balBlockHash,blknum);
+          }).catch(function(err){
+            console.log;
+          })
+
+        }
+      }
     }
 
   cb(blockNum,cbChainGrab,chainRiser);
@@ -1907,6 +1874,7 @@ module.exports = {
     addChainState:addChainState,
     getChainStateParam:getChainStateParam,
     getChainStateCheckPoint:getChainStateCheckPoint,
+    getTopChainStateCheckPoint:getTopChainStateCheckPoint,
     addNode:addNode,
     addUpdateSafe:addUpdateSafe,
     getPeerSafe:getPeerSafe,
@@ -1918,6 +1886,8 @@ module.exports = {
     addBlock:addBlock,
     getBlock:getBlock,
     removeBlock:removeBlock,
+    getBlockByHash:getBlockByHash,
+    getAllBLocksByHash:getAllBLocksByHash,
     getAllBLocks:getAllBLocks,
     getBlockchain:getBlockchain,
     getBlockStream:getBlockStream,

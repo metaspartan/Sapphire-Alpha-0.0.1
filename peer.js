@@ -819,10 +819,10 @@ let connSeq2 = 0
                       log(chalk.red("--------------------------------------------------------------------"));
                       //////update the client database OR reject block and rollback the chain - code is incomplete atm
                       //add it to the database
-                      BlkDB.addBlock(parseInt(JSON.parse(data)["blockHeight"]),JSON.stringify(JSON.parse(data)),"202");
+                      BlkDB.addBlock(parseInt(JSON.parse(data)["blockHeight"]),JSON.stringify(JSON.parse(data)),JSON.parse(data)["hash"],"202");
                       BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(JSON.parse(data)["blockHeight"]));
                       BlkDB.addChainState("cs:blockHeight",parseInt(JSON.parse(data)["blockHeight"]));
-                      BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"]);
+                      BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["transactions"]),JSON.parse(data)["hash"],parseInt(JSON.parse(data)["blockHeight"]));
                       //add it to the RPC for miner
                       rpcserver.postRPCforMiner({block:JSON.parse(data)});
 
@@ -904,10 +904,10 @@ let connSeq2 = 0
                 var setDatSynch = function(datSynch,reqPeer){
                   reqPeer.conn.write(JSON.stringify({pongBlockStream:datSynch,blockHeight:chainState.synchronized}));
                 }
-                var cbGetSynch = function(datpeer){
-                  console.log("calling dat synch")
-                  DatSyncLink.synchDatabaseJSON(setDatSynch,datpeer);
-                }
+                //var cbGetSynch = function(datpeer){
+                //  console.log("calling dat synch")
+                //  DatSyncLink.synchDatabaseJSON(setDatSynch,datpeer);
+                //}
 
                 var cbGetStream = function(jsonStream,streamToPeerID){
                   console.log("the streams cb condition is met");
@@ -1360,32 +1360,8 @@ let connSeq2 = 0
 
           }
           //1) going to import the database and callback the refresh
-          console.log("Data stream import initialized");
-          DatSyncLink.grabDataFile(mydata,cbRefreshDB);
-
-
-          ////////////////////////////////////USE TO DIRECT READ INCOMING STREAM
-          /****
-          for (obj in mydata){
-            console.log("incoming chain data from synch");
-            //log("BLOCK CHAIN SYNCH "+JSON.stringify(data[obj]["blocknum"]));//verbose
-            //console.log("blockdata coming inbound "+JSON.parse(data[obj])["blockHeight"]+" vs memory "+JSON.stringify(frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"])))//verbose
-            //verify block does not exist in memory
-            if(typeof frankieCoin.getBlock(JSON.parse(mydata[obj])["blockHeight"]) === "undefined" || frankieCoin.getBlock(JSON.parse(data[obj])["blockHeight"]) === null){
-              //block not in memory
-              console.log("block does not exist "+mydata[obj]);
-              var tempBlock = mydata[obj];
-              frankieCoin.addBlockFromDatabase(tempBlock,"streaming in block "+JSON.parse(tempBlock)["blockHeight"])
-              BlkDB.addBlock(parseInt(JSON.parse(tempBlock)["blockHeight"]),tempBlock,"414");
-            }else{
-              //block existed
-              log("block exists in chain data: "+JSON.parse(mydata[obj])["blockHeight"]);
-            }
-            blockHeightPtr++;
-          }
-          log(chalk.blue("BlocHeightPtr: "+ chalk.green(blockHeightPtr)));
-          ****/
-          //////////////////////END ARCHIVED USED TO DIRECT READ INCOMING STREAM
+          //console.log("Data stream import initialized");
+          //DatSyncLink.grabDataFile(mydata,cbRefreshDB);
 
         }else if(JSON.parse(data)["ChainSyncPong"]){
           //returned block from sunched peer and parses it for db
@@ -1563,10 +1539,10 @@ let connSeq2 = 0
                 var setDatSynch = function(datSynch,reqPeer){
                   reqPeer.conn2.write(JSON.stringify({pongBlockStream:datSynch,blockHeight:chainState.synchronized}));
                 }
-                var cbGetSynch = function(datpeer){
-                  console.log("calling dat synch")
-                  DatSyncLink.synchDatabaseJSON(setDatSynch,datpeer);
-                }
+                //var cbGetSynch = function(datpeer){
+                //  console.log("calling dat synch")
+                //  DatSyncLink.synchDatabaseJSON(setDatSynch,datpeer);
+                //}
 
                 var cbGetStream = function(jsonStream,streamToPeerID){
                   console.log("the streams cb condition is met");
@@ -1689,8 +1665,8 @@ let connSeq2 = 0
 
           }
           //1) going to import the database and callback the refresh
-          console.log("Data stream import initialized");
-          DatSyncLink.grabDataFile(mydata,cbRefreshDB);
+          //console.log("Data stream import initialized");
+          //DatSyncLink.grabDataFile(mydata,cbRefreshDB);
 
 
           ////////////////////////////////////USE TO DIRECT READ INCOMING STREAM
@@ -1831,8 +1807,8 @@ function cliGetInput(){
         //this is the most sensible place to add the block
         //this would seem to be a function that should be called from miner after meinePendingTx is called but it is better called here
 
-        BlkDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"]);
-        BlkDB.addBlock(parseInt(frankieCoin.getLength()),JSON.stringify(frankieCoin.getLatestBlock()),"469");
+        BlkDB.addTransactions(frankieCoin.getLatestBlock()["transactions"],frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
+        BlkDB.addBlock(parseInt(frankieCoin.getLength()),JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"469");
         BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.getLength()));
         BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.getLength()));
         //sending the block to the peers
@@ -1846,6 +1822,14 @@ function cliGetInput(){
         log(chalk.green("CHAIN IS NOT SYNCHED FOR MINING PLEASE WAIT"+frankieCoin.getLength()+peers[0]));
         log("------------------------------------------------------");
       }
+      cliGetInput();
+    }else if(userInput.startsWith("getBlockByHash(")){//Sign transaction
+      var blockHash = userInput.slice(userInput.indexOf("getBlockByHash(")+15, userInput.indexOf(")"));
+      BlkDB.getBlockByHash(blockHash).then(function(value){
+        var thisBlockHash = value;
+        console.log("block number for hash "+blockHash+" is "+thisBlockHash);
+      }).catch(console.log)
+
       cliGetInput();
     }else if(userInput == "MM"){
       console.log("chain state chain walk height is "+chainState.chainWalkHeight);
@@ -1865,11 +1849,17 @@ function cliGetInput(){
       console.log(chalk.bgBlackBright.black("currentBlockCheckPointHash is ")+chalk.bgMagenta(JSON.stringify(chainState.currentBlockCheckPointHash)));
       BlkDB.getCheckPoints();
       cliGetInput();
+    }else if(userInput == "HSHBLK"){
+      BlkDB.getAllBLocksByHash();
+      cliGetInput();
     }else if(userInput == "CLIP"){
       console.log("cliping chain from "+frankieCoin.blockHeight+" back one riser ");
       chainClipper(frankieCoin.blockHeight).then(function(){
         BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
       });
+      cliGetInput();
+    }else if(userInput == "CHECKPOINT"){
+      BlkDB.getTopChainStateCheckPoint(frankieCoin.blockHeight,frankieCoin.chainRiser);
       cliGetInput();
     }else if(userInput == "MMM"){
       console.log("calling all orders level db");
@@ -2317,10 +2307,10 @@ var chainWalker = function(syncpoint,cbBlockChainValidatorStartUp){
 ////////////////////////////////////////////////end chain walker synchronisation
 
 //have to load the first block into local database
-BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()),"759");
+BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"759");
 BlkDB.addChainParams(globalGenesisHash+":blockHeight",1);
 //BlkDB.addChainState("cs:blockHeight",1);//NEVER LOAD THIS HERE IT DEFEATS THE WHOLE PURPOSE
-BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
+BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
 //log("peer chain is"+ frankieCoin.getEntireChain());
 
 var franks = miner(frankieCoin);
@@ -2861,14 +2851,14 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
       //////////////going to have to make this sequential in a callback or chain
       franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
-      BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"]);
+      BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
       frankieCoin.hashOfThisBlock = sapphirechain.Hash(frankieCoin.hash+BlkDB.getStateTrieRootHash())+":"+frankieCoin.hash+":"+BlkDB.getStateTrieRootHash();
       ////////database update and peers broadcast
       log("[placeholder] mining stats from outside miner");
       //NOTE: there is time to modify the hash of the block before broadcast as opposed to using hashOfthisBlock for stateroot
       log("Outside Miner Mined Block Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
       /////////////////////////////////////////////////////block stored to level
-      BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),"1475");
+      BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"1475");
       BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
       BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
 
