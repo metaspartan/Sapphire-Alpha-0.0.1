@@ -794,7 +794,6 @@ var addTransactionsFromStream = function(transactions,blockhash,blknum,block,cbU
 
       addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]*-1).toFixed(8),blockhash,blocknum);
       //2) get the trie root hash and return for hasing into the block
-      cbUpdateChainStateTX(blocknum);
     }
   }
 
@@ -844,6 +843,8 @@ var addTransactionsFromStream = function(transactions,blockhash,blknum,block,cbU
   addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcMiningReward).toFixed(8),hexBlockNum);
   ////////////////////////////////////////////////////////////END NATIVE REWARDS
 
+  cbUpdateChainStateTX(blocknum);
+  
 }
 
 var getTransactions = function(){
