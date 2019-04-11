@@ -765,7 +765,7 @@ var addTransactions = function(transactions,blockhash,blocknum){
 }
 
 /////IF THE TRANSACTIONS ARE NOT PRSENT IN THE STREAD WE ARE GOING TO ADD THEM AND VALIDATE
-var addTransactionsFromStream = function(transactions,blockhash,blknum,block){
+var addTransactionsFromStream = function(transactions,blockhash,blknum,block,cbUpdateChainStateTX){
 
   var hexBlockNum = ("000000000000000" + blknum.toString(16)).substr(-16);
 
@@ -794,7 +794,7 @@ var addTransactionsFromStream = function(transactions,blockhash,blknum,block){
 
       addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]*-1).toFixed(8),blockhash,blocknum);
       //2) get the trie root hash and return for hasing into the block
-
+      cbUpdateChainStateTX(blocknum)
     }
   }
 

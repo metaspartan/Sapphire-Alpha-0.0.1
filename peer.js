@@ -462,7 +462,7 @@ var transactionValidator = async function(start,end){
       chainState.transactionRootHash = "tbd"
     }
   }
-  BlkDB.addTransactionsFromStream(JSON.parse(thisOneBlock)["transactions"],JSON.parse(thisOneBlock)["hash"],JSON.parse(thisOneBlock)["blockHeight"],thisOneBlock)
+  BlkDB.addTransactionsFromStream(JSON.parse(thisOneBlock)["transactions"],JSON.parse(thisOneBlock)["hash"],JSON.parse(thisOneBlock)["blockHeight"],thisOneBlock,updateChainStateTX)
   start++;
   if(start == end){
     console.log("break clause reached");
