@@ -843,8 +843,9 @@ var addTransactionsFromStream = function(transactions,blockhash,blknum,block,cbU
   addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcMiningReward).toFixed(8),hexBlockNum);
   ////////////////////////////////////////////////////////////END NATIVE REWARDS
 
-  cbUpdateChainStateTX(blocknum);
-  
+  //will eventualy add a flag for if this is update or not or not
+  cbUpdateChainStateTX(blknum);
+
 }
 
 var getTransactions = function(){
