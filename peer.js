@@ -455,12 +455,16 @@ var transactionValidator = async function(start,end){
   var thisOneBlock = await validateThisBlock();
   //console.log(thisOneBlock);
   var updateChainStateTX = function(isValidTXHeight){
+    console.log(chalk.bgGreen.black("updating chain state height to "+isValidTXHeight));
+    chainState.transactionHeight = parseInt(isValidTXHeight);
+    chainState.transactionRootHash = "tbd";
+    /***
     if(isNaN(isValidTXHeight)){
       console.log("transaction validation returned NaN");
     }else{
-      chainState.transactionHeight = parseInt(isValidTXHeight);
-      chainState.transactionRootHash = "tbd"
+
     }
+    ***/
   }
   BlkDB.addTransactionsFromStream(JSON.parse(thisOneBlock)["transactions"],JSON.parse(thisOneBlock)["hash"],JSON.parse(thisOneBlock)["blockHeight"],thisOneBlock,updateChainStateTX)
   start++;
