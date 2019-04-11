@@ -301,8 +301,9 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
 
     //set the chain state validated height;
   }else{
-    if(replyData == "NaN"){
-      console.log("chain walk height is "+chainState.chainWalkHeight)
+
+    if(replyData.NaN == true){
+      console.log("NaN chain walk height is "+chainState.chainWalkHeight)
     }
     console.log("NOT VALID NEED TO PING AT "+replyData+typeof(replyData));
     if(parseInt(replyData) > 2){
