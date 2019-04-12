@@ -282,7 +282,7 @@ var getAllPeerSafes = function(){
   });
 }
 
-var addBlock = function(blknum,block,blkhash,callfrom){
+var addBlock = function(blknum,block,blkhash,callfrom,chainRiser,blkCheckPointHash,checkPointHash){
   //console.log("<<<<<----------------ADDS BLOCK TO LEVEL DB HERE------------>>>>>")
   //console.log("called from "+callfrom);
   //console.log("inside add block"+block.toString());//verbose
@@ -311,6 +311,11 @@ var addBlock = function(blknum,block,blkhash,callfrom){
   var calcEGEMT1NodeReward = 0.005;//egem node
   var calcEGEMT2NodeReward = 0.005;//egem big bit node
 ////////////////////////////////////////////////////////////////////////PRE MINE
+
+  var blockNumHash = blkhash;
+
+  var thisBlockCheckPointHash = Hash(blkCheckPointHash+checkPointHash);
+
   if(parseInt(blknum) == 1){//premines
     ///////////////////////////////////////////////////////////////////CORE DEVS
     var osoTx = new Transaction("sapphire", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", "750000", "SFRX", JSON.parse(block)["timestamp"]);
@@ -425,7 +430,7 @@ var addBlock = function(blknum,block,blkhash,callfrom){
   }else{//perblock rewards from block 2 until
     ///////////////////////////////////////////////////////////////////CORE DEVS
     var osoTx = new Transaction("sapphire", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
-    addTransaction("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx));
+    addTransaction("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx),blknum,chainStateHash,txIndex);
     addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(calcDevReward).toFixed(8),hexBlockNum);
     var ridzTx = new Transaction("sapphire", "0xc393659c2918a64cdfb44d463de9c747aa4ce3f7", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
     addTransaction("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx));
@@ -739,33 +744,37 @@ var clearDatabase = function(){
 }
 
 //////////////////////////////////the conglamorate transation with storage nonce
-var addTransaction = function(transactionKey,transation){
-  db.put(transactionKey, transation, function (err) {
+var addTransaction = async function(transactionKey,transaction,blockNum,blkChainStateHash,txIndex){
+  var confirmationHash = await Hash(txIndex+transaction["hash"]+blockNum+blkChainStateHash);
+  transaction.confirmationHash = await confirmationHash;
+  db.put(transactionKey, transaction, function (err) {
     if (err) return console.log('Ooops!', err) // some kind of I/O error
   })
 }
 
-var addTransactions = function(transactions,blockhash,blocknum){
+var addTransactions = function(transactions,blockhash,blocknum,blkChainStateHash){
   //console.log("T R A N S A C T I O N S  B E I N G  A D D E D  H E R E");
   transactions = JSON.parse(JSON.stringify(transactions));
+  var txIndex = 0;
   for(tranx in JSON.parse(transactions)){
     var receipt = JSON.parse(transactions)[tranx];
+
     //receipts have a key of toAddress:timestamp:receipthash atm
-    addTransaction("tx:"+receipt["fromAddress"]+":"+receipt["toAddress"]+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt));
+    addTransaction("tx:"+receipt["fromAddress"]+":"+receipt["toAddress"]+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blocknum,blkChainStateHash,txIndex);
     //need to accumulate the balances and add or subtract to PMT
-
-
 
     addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]).toFixed(8),blockhash,blocknum);
 
     addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]*-1).toFixed(8),blockhash,blocknum);
     //2) get the trie root hash and return for hasing into the block
 
+    txIndex++;
+
   }
 }
 
 /////IF THE TRANSACTIONS ARE NOT PRSENT IN THE STREAD WE ARE GOING TO ADD THEM AND VALIDATE
-var addTransactionsFromStream = function(transactions,blockhash,blknum,block,cbUpdateChainStateTX){
+var addTransactionsFromStream = function(transactions,blockhash,blknum,block,cbUpdateChainStateTX,blkChainStateHash){
 
   var hexBlockNum = ("000000000000000" + blknum.toString(16)).substr(-16);
 
@@ -779,23 +788,9 @@ var addTransactionsFromStream = function(transactions,blockhash,blknum,block,cbU
     }
   }
 
+  console.log(chalk.bgCyan.black("WOOOT ADDING TRANSACITONS ON VALIDATE WOOT "+transactions+ " blockhash " +blockhash+ " blknum " +blknum+" blkChainStateHash: "+blkChainStateHash))
 
-
-  console.log(chalk.bgCyan.black("WOOOT ADDING TRANSACITONS ON VALIDATE WOOT "+transactions+ " " +blockhash+ " " +blknum))
-
-  if(transactions.length > 0){
-    for(tranx in JSON.parse(transactions)){
-      var receipt = JSON.parse(transactions)[tranx];
-      //receipts have a key of toAddress:timestamp:receipthash atm
-      addTransaction("tx:"+receipt["fromAddress"]+":"+receipt["toAddress"]+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt));
-      //need to accumulate the balances and add or subtract to PMT
-
-      addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]).toFixed(8),blockhash,blocknum);
-
-      addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]*-1).toFixed(8),blockhash,blocknum);
-      //2) get the trie root hash and return for hasing into the block
-    }
-  }
+  var txIndex = 0;
 
   /////////////////////////////////////////////////////////CALCULATE BLOCK REWARDS
   var calcBlockReward;
@@ -819,29 +814,55 @@ var addTransactionsFromStream = function(transactions,blockhash,blknum,block,cbU
   ////////////////////////////////////////////////////////////////NATIVE REWARDS
   //core devs
   var osoTx = new Transaction("sapphire", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
-  addTransaction("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx));
+  addTransaction("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(calcDevReward).toFixed(8),hexBlockNum);
+  txIndex++
   var ridzTx = new Transaction("sapphire", "0xc393659c2918a64cdfb44d463de9c747aa4ce3f7", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
-  addTransaction("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx));
+  addTransaction("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7","SFRX",parseFloat(calcDevReward).toFixed(8),hexBlockNum);
+  txIndex++
   var jalTx = new Transaction("sapphire", "0xA54EE4A7ab23068529b7Fec588Ec3959E384a816", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
-  addTransaction("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx));
+  addTransaction("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816","SFRX",parseFloat(calcDevReward).toFixed(8),hexBlockNum);
+  txIndex++
   var tbatesTx = new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
-  addTransaction("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx));
+  addTransaction("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170","SFRX",parseFloat(calcDevReward).toFixed(8),hexBlockNum);
+  txIndex++
   var beastTx = new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
-  addTransaction("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx));
+  addTransaction("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103","SFRX",parseFloat(calcDevReward).toFixed(8),hexBlockNum);
+  txIndex++
   //miner
   var minerTx = new Transaction("sapphire", JSON.parse(block)["miner"], calcMiningReward, "SFRX", JSON.parse(block)["timestamp"]);
-  addTransaction("tx:sapphire:"+JSON.parse(block)["miner"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(minerTx));
+  addTransaction("tx:sapphire:"+JSON.parse(block)["miner"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(minerTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord(JSON.parse(block)["miner"],"SFRX",parseFloat(calcMiningReward).toFixed(8),hexBlockNum);
+  txIndex++
   //sponsor
   var sponsorTx = new Transaction("sapphire", JSON.parse(block)["sponsor"], calcSponsorReward, "SFRX", JSON.parse(block)["timestamp"]);
-  addTransaction("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx));
+  addTransaction("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcMiningReward).toFixed(8),hexBlockNum);
+  txIndex++
   ////////////////////////////////////////////////////////////END NATIVE REWARDS
+
+  ////////////////////////////////////////////////////////now block TXs in order
+  if(transactions.length > 0){
+    for(tranx in JSON.parse(transactions)){
+      
+      var receipt = JSON.parse(transactions)[tranx];
+      //receipts have a key of toAddress:timestamp:receipthash atm
+      addTransaction("tx:"+receipt["fromAddress"]+":"+receipt["toAddress"]+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blknum,blkChainStateHash,txIndex);
+      //need to accumulate the balances and add or subtract to PMT
+
+      addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]).toFixed(8),blockhash,blocknum);
+
+      addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]*-1).toFixed(8),blockhash,blocknum);
+      //2) get the trie root hash and return for hasing into the block
+
+      txIndex++
+    }
+  }
+  /////////////////////////////////////////////////////////////////end block txs
 
   //will eventualy add a flag for if this is update or not or not
   cbUpdateChainStateTX(blknum);
