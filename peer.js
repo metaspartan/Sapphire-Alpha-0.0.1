@@ -466,7 +466,7 @@ var transactionValidator = async function(start,end){
     var updateChainStateTX = function(isValidTXHeight,transationCheckPointHash){
       console.log(chalk.bgGreen.black("updating chain state height to "+isValidTXHeight));
       chainState.transactionHeight = parseInt(isValidTXHeight);
-      chainState.transactionRootHash = "tbd";
+      chainState.transactionRootHash = transationCheckPointHash;
       /***
       if(isNaN(isValidTXHeight)){
         console.log("transaction validation returned NaN");
