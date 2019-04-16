@@ -157,6 +157,9 @@ var setChainStateTX = async function(validTXHeight,transationCheckPointHash){
   console.log(chalk.bgGreen.black("setting chain state height to "+validTXHeight+" with hash of "+transationCheckPointHash));
   chainState.transactionHeight = await parseInt(validTXHeight);
   chainState.transactionRootHash = await transationCheckPointHash;
+  if(validTXHeight > 1){//otherwise it resets a memory load when it loads block 1
+    BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
+  }
   //BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
   /***
   if(isNaN(isValidTXHeight)){
@@ -2826,7 +2829,7 @@ var broadcastPeersBlock = function(trigger,order = ''){
 }
 
 //parent communicator callback function sent to child below
-var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
+var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,fSetChainStateTX){
   //log("------------------------------------------------------");
   //process.stdout.clearLine();
   //process.stdout.cursorTo(0);
@@ -3067,7 +3070,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
       //NOTE: there is time to modify the hash of the block before broadcast as opposed to using hashOfthisBlock for stateroot
       log("Outside Miner Mined Block Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
       /////////////////////////////////////////////////////block stored to level
-      BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"3020",setChainStateTX,frankieCoin.chainRiser,thisBlockCheckPointHash);
+      BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"3020",fSetChainStateTX,frankieCoin.chainRiser,thisBlockCheckPointHash);
       BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
       BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
 
@@ -3319,7 +3322,7 @@ var impcevent = function(callback){
     impceventcaller = callback;
 }
 //initialize the child with the parent communcator call back function
-rpcserver.globalParentCom(impcchild,broadcastPeersBlock);
+rpcserver.globalParentCom(impcchild,broadcastPeersBlock,setChainStateTX);
 rpcserver.globalParentEvent(impcevent);
 rpcserver.globalParentComMethods(impcMethods,impcBalance);
 //////////////////////////////////////end inter module parent child communicator

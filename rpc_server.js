@@ -18,11 +18,13 @@ const PORT = process.env.NODE_PORT || 9090;
 ///////////////////////////////////////////////inter module parent communication
 var impcparent;
 var parentBroadcastPeersFunction;
+var setChainStateTX;
 //callback fuction used to set a caller to the parent called by parent on load
-var globalParentCom = function(callback,callback2){
+var globalParentCom = function(callback,callback2,callback3){
   //sets the impcparent with the function from parent
   impcparent = callback;
   parentBroadcastPeersFunction = callback2;
+  setChainStateTX = callback3;
 }
 
 var impcParentMethods;
@@ -198,7 +200,7 @@ function requestListener(request, response) {
         process.stdout.clearLine();
         process.stdout.cursorTo(0);
         process.stdout.write(chalk.blue("Reference Check: "+ chalk.green(buf.toString())));
-        impcparent(buf.toString(),parentBroadcastPeersFunction,orderConfirmationEvent,txConfirmationEvent);
+        impcparent(buf.toString(),parentBroadcastPeersFunction,orderConfirmationEvent,txConfirmationEvent,setChainStateTX);
     });
 
     // on end proceed with compute
