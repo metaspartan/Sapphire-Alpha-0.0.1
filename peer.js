@@ -154,7 +154,7 @@ var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 }
 
 var setChainStateTX = function(validTXHeight,transationCheckPointHash){
-  console.log(chalk.bgGreen.black("setting chain state height to "+validTXHeight));
+  console.log(chalk.bgGreen.black("setting chain state height to "+validTXHeight+" with hash of "+transationCheckPointHash));
   chainState.transactionHeight = parseInt(validTXHeight);
   chainState.transactionRootHash = transationCheckPointHash;
   /***
