@@ -153,10 +153,11 @@ var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
 }
 
-var setChainStateTX = function(validTXHeight,transationCheckPointHash){
+var setChainStateTX = async function(validTXHeight,transationCheckPointHash){
   console.log(chalk.bgGreen.black("setting chain state height to "+validTXHeight+" with hash of "+transationCheckPointHash));
-  chainState.transactionHeight = parseInt(validTXHeight);
-  chainState.transactionRootHash = transationCheckPointHash;
+  chainState.transactionHeight = await parseInt(validTXHeight);
+  chainState.transactionRootHash = await transationCheckPointHash;
+  //BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
   /***
   if(isNaN(isValidTXHeight)){
     console.log("transaction validation returned NaN");
@@ -483,6 +484,7 @@ var transactionValidator = async function(start,end){
         console.log(chalk.bgGreen.black("updating chain state height to "+isValidTXHeight));
         chainState.transactionHeight = parseInt(isValidTXHeight);
         chainState.transactionRootHash = transationCheckPointHash;
+        BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
         /***
         if(isNaN(isValidTXHeight)){
           console.log("transaction validation returned NaN");
@@ -509,7 +511,6 @@ var transactionValidator = async function(start,end){
   }
 
 }
-//await BlkDB.addTransactionsFromStream(JSON.parse(tempBlock)["transactions"],JSON.parse(tempBlock)["hash"],JSON.parse(tempBlock)["blockHeight"],tempBlock)
 ///////////////////////////////////////////////////////////TRANSACTION VALIDATOR
 
 /////////////////////////////////////////////////////ENCRYPTED DIRECT MESSAGEING
@@ -2632,6 +2633,13 @@ function ChainGrab(blocknum){
     BlkDB.getBlockRange(val,frankieCoin.chainRiser,cbChainGrab)
   }
   BlkDB.getChainStateParam("blockHeight",currentHeight);
+  var resetTransactionHeight = function(val){
+    console.log("setting transaction state based on "+val)
+    if(val != 0){
+      setChainStateTX(val.split(":")[0],val.split(":")[1]);
+    }
+  }
+  BlkDB.getChainStateParam("transactionHeight",resetTransactionHeight);
   //maybe some other stuff like .then
 };
 function ChainGrabRefresh(blocknum,cbChainGrab,chainRiser){
@@ -2641,9 +2649,13 @@ function ChainGrabRefresh(blocknum,cbChainGrab,chainRiser){
   BlkDB.getBlockRange(blocknum,chainRiser,cbChainGrab);
   //maybe some other stuff like .then
 };
+
+/*-------THE DYNC CALLS ON STARTUP---------------*/
 //and finally the actual call to function for synch
 isSynching = true;
 setTimeout(function(){ChainGrab();},3000);
+/*-------THE DYNC CALLS ON STARTUP---------------*/
+
 //end by now we will know if synched or not and enable or disable mining
 log("------------------------------------------------------")
 log(chalk.green("CHAIN SYNCED"))//not true need to edit this comment based on a parameter
