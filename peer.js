@@ -957,6 +957,7 @@ let connSeq2 = 0
                       log(chalk.yellow("                     SUCESSFUL BLOCK FROM PEER                      "));
                       log(chalk.red("--------------------------------------------------------------------"));
 
+                      var blockNum = JSON.parse(data)["blockHeight"];
                       //calculating this 2 times but needed at addBlock for transations to verify properly
                       var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
                       var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
@@ -3033,15 +3034,20 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID){
 
       }
 
+
+
+      //////////////going to have to make this sequential in a callback or chain
+      franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
+
       //calculating this 2 times but needed at addBlock for transations to verify properly
+      var blockNum = parseInt(frankieCoin.getLatestBlock()["blockHeight"])
       var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
       var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
       checkPointBlock = JSON.stringify(checkPointBlock);
       var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
       var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
       //end pre calculation
-      //////////////going to have to make this sequential in a callback or chain
-      franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
+
       BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]),thisBlockCheckPointHash);
       frankieCoin.hashOfThisBlock = sapphirechain.Hash(frankieCoin.hash+BlkDB.getStateTrieRootHash())+":"+frankieCoin.hash+":"+BlkDB.getStateTrieRootHash();
       ////////database update and peers broadcast
