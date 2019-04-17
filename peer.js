@@ -693,13 +693,7 @@ let connSeq2 = 0
     const peerId = info.id.toString('hex');
 
     if(info.id != Buffer.from(chainState.nodePersistantId).toString('hex')){
-      for(thisNode in frankieCoin.nodes){
-        if(frankieCoin.nodes[thisNode].id == peerId){
-          console.log("its in here "+peerId)
-        }else{
-          console.log("its just not here "+peerId+" and node is "+frankieCoin.nodes[thisNode].id)
-        }
-      }
+
       frankieCoin.registerNode(peerId,info.host,info.port,frankieCoin.length);
       BlkDB.addNode("node:"+peerId+":connection",{"host":info.host,"port":info.port}).then(function(){
         //log(chalk.green("Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
@@ -708,13 +702,7 @@ let connSeq2 = 0
         //console.log("tempcallerNodeid "+tempNodeCallerID);
         ///////////////WE MIGHT WANT TO RESERVE THE CALL BELOW FOR SYNCHED PEERS
         directMessage(tempNodeCallerID+':0:0:')//this is establishing the encryption to the peer
-        for(thisNode in frankieCoin.nodes){
-          if(frankieCoin.nodes[thisNode].id == peerId){
-            console.log("2 its in here "+peerId)
-          }else{
-            console.log("2 its just not here "+peerId+" and node is "+frankieCoin.nodes[thisNode].id)
-          }
-        }
+        
       });
     }
 
