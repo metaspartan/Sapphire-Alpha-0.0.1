@@ -337,7 +337,8 @@ var Blockchain = class Blockchain {
             console.log("THE NODE DID NOT EXIST YET BUT I THINK WE WAIT UNTIL ITS SYNC..... .....")
           }
 
-          if (!thisN.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
+          //if (!thisN.nodes.includes({"id":id,"info":{"ip":ip,"port":port}})) {
+          if (!thisN.nodes.includes({"id":id})) {
 
               //var privateKeyA = crypto.randomBytes(32);
               //var publicKeyA = ecies.getPublic(privateKeyA);
