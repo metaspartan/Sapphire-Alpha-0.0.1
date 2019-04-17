@@ -1575,8 +1575,9 @@ let connSeq2 = 0
 
     if(info.id != chainState.nodePersistantId){
 
-        log(chalk.green("CHANNEL 2 Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
-        log(chalk.bgBlue('CHANNEL 2 Peer id: '+ chalk.bold(peerId)));
+        //causes screen scroll so removing right now
+        //log(chalk.green("CHANNEL 2 Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
+        //log(chalk.bgBlue('CHANNEL 2 Peer id: '+ chalk.bold(peerId)));
 
     }
 
