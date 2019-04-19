@@ -181,9 +181,9 @@ var addNode = function(key, value){
   return new Promise(function(resolve, reject) {
     db.put(key, value, function (err) {
       if (err){
-        reject(console.log('Ooops!', err));
+        reject(console.log('Add node failed!', err));
       }else{
-        resolve(console.log("added node "+key));
+        //resolve(console.log("added node "+key));
       } // some kind of I/O error
     })
   });
@@ -498,7 +498,7 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
 
     //sponsor
     var sponsorTx = await new Transaction("sapphire", JSON.parse(block)["sponsor"], calcSponsorReward, "SFRX", JSON.parse(block)["timestamp"]);
-    await db.get("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+    db.get("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
       //we skip the intry
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx),blocknum,thisBlockCheckPointHash,txIndex);
@@ -1999,7 +1999,7 @@ var importFromJSONStream = async function(cb,blockNum,cbChainGrab,chainRiser,inc
       var rowKey = Object.keys(content[row]);
       var rowValue = Object.values(content[row]);
       if(rowKey.toString().split(":")[0] == "sfblk"){
-        console.log("I AM INSIDE THE inserts KEY "+rowKey+" VALUE "+rowValue);
+        //console.log("I AM INSIDE THE inserts KEY "+rowKey+" VALUE "+rowValue);
       }
 
       db.put(rowKey, rowValue, function (err) {

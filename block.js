@@ -1223,10 +1223,10 @@ var Blockchain = class Blockchain {
       isChainSynch(length) {
         if(this.isChainValid() && this.getLength() == length){
           //this.chain.inSynch = true;
-          log("4444444444444444     CHAIN IS SYNCH at block "+this.getLength()+"    4444444444444444444");
+          //log("4444444444444444     CHAIN IS SYNCH at block "+this.getLength()+"    4444444444444444444");
           return true;
         }else{
-          log("55555555555555555     CHAIN IS NOT SYNCH at block "+this.getLength()+"     5555555555555555555");
+          //log("55555555555555555     CHAIN IS NOT SYNCH at block "+this.getLength()+"     5555555555555555555");
           return false;
         }
       }
