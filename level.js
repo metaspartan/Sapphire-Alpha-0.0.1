@@ -513,7 +513,16 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
 
   }
 
-  cbSetChainStateTX(blocknum,txConfirmation);
+  Promise.resolve(()=>{
+    var cbGetChainStateTXHeight = function(value){
+      if(parseInt(value + 1) == blocknum){
+        cbSetChainStateTX(blocknum,txConfirmation);
+      }
+    }
+    getChainStateParam("transactionHeight");
+  });
+
+
 
 }
 
