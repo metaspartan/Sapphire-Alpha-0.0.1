@@ -508,12 +508,23 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     var random = getRandomInt(randomizer);
     var called = false;
     var i = 0;
+    for(var j=0;j<peers.length;j++){
+      if(peers[j].conn2 != undefined){
+        log("------------------------------------------------------");
+        log(chalk.green("Sending ping for chain sync."));
+        log("------------------------------------------------------");
+        if(random == j && peers[j]){
+          peers[j].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          called = true;
+        }
+      }
+    }
     for (let id in peers) {
       if(peers[id].conn2 != undefined){
         log("------------------------------------------------------");
         log(chalk.green("Sending ping for chain sync."));
         log("------------------------------------------------------");
-        if(random == i && peers[id]){
+        if(random == i && peers[id] && called == false){
           peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           called = true;
         }else if(called == false && peers[id]){
