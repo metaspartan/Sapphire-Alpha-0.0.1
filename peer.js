@@ -141,7 +141,7 @@ var activePing = function(){
   //we should get longestPeer first
   var nodesInChain = frankieCoin.retrieveNodes();
   for (let id in peers) {
-    if(peers[id].conn2 != undefined){
+    if(peers[id].conn != undefined){
       log("------------------------------------------------------");
       log(chalk.green("Sending ping for peer id "+id));
       log("------------------------------------------------------");
