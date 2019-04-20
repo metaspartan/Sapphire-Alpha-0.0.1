@@ -90,6 +90,8 @@ chainState.peerNonce = 0;
 //now adding parameters for transactions
 chainState.transactionHeight = 0;
 chainState.transactionRootHash = '';
+//activesynch
+chainState.interval = 10000;
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(){
@@ -100,15 +102,20 @@ var activeSync = function(){
     BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
   },30)
 }
-setInterval(async function(){
+
+
+var adjustedTimeout = function() {
   frankieCoin.isChainSynch(chainState.synchronized)
-  if(isSynching == false || chainState.isSynching){
+  if(isSynching == false && chainState.isSynching == false){
     //console.log("calling active sync ");
     activeSync();
   }else{
     //console.log("chain is not synching so is it sync? ")
   }
-},6000)
+  console.log("synching again in "+chainState.interval)
+  setTimeout(adjustedTimeout, chainState.interval);
+}
+setTimeout(adjustedTimeout, chainState.interval);
 
 var activePing = function(){
   //we should get longestPeer first
@@ -1121,8 +1128,10 @@ let connSeq2 = 0
                   var numRecordsToStream = 2500;
                 }else if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 1000){
                   var numRecordsToStream = 1000;
-                }else if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 250){
-                  var numRecordsToStream = 250;
+                }else if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 500){
+                  var numRecordsToStream = 500;
+                }else if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 100){
+                  var numRecordsToStream = 100;
                 }else{
                   var numRecordsToStream = parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]);
                 }
@@ -1536,6 +1545,7 @@ let connSeq2 = 0
         }else if(JSON.parse(data)["pongBlockStream"] && isSynching == false){
 
           isSynching = true;
+          chainState.isSynching = true;
 
           var mydata = JSON.parse(data)["pongBlockStream"];
           var providerBlockHeight = parseInt(JSON.parse(data)["blockHeight"]);
@@ -1703,7 +1713,7 @@ let connSeq2 = 0
 
         if(JSON.parse(data)["syncTrigger"]){
 
-          //isSynching = yes
+          isSynching = true;
           chainState.isSynching=true;
           console.log(chalk.bgRed(" DELETING BACK TO PREVIOUS CHECK POINT AND SYNC "+JSON.parse(data)["syncTrigger"]));
           console.log("SUBMITED "+JSON.parse(data)["syncTrigger"]["submitCurrrentChainStateHash"]+" PEER "+JSON.parse(data)["syncTrigger"]["peerCurrrentChainStateHash"])
@@ -1762,8 +1772,10 @@ let connSeq2 = 0
                   var numRecordsToStream = 2500;
                 }else if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 1000){
                   var numRecordsToStream = 1000;
-                }else if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 250){
-                  var numRecordsToStream = 250;
+                }else if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 500){
+                  var numRecordsToStream = 500;
+                }else if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 100){
+                  var numRecordsToStream = 100;
                 }else{
                   var numRecordsToStream = parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]);
                 }
@@ -1917,7 +1929,7 @@ let connSeq2 = 0
               peers[peerId].conn2.write("---------------------------------");
             }else{
               console.log("NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
-              setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
+              setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
             }
 
           }else{
@@ -2084,7 +2096,7 @@ function cliGetInput(){
     }else if(userInput == "TXVLDY"){
 
       var startEnd = parseInt(chainState.transactionHeight+1);
-      var topEnd = parseInt(startEnd+200);
+      var topEnd = parseInt(startEnd+500);
       console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
       if(topEnd >= chainState.synchronized){
         topEnd = chainState.synchronized
@@ -2109,15 +2121,15 @@ function cliGetInput(){
     }else if(userInput == "MMM"){
       console.log("calling all orders level db");
       //BlkDB.getAllBLocks();
-      //BlkDB.getTransactionReceiptsByAddress('o9');
+      BlkDB.getTransactionReceiptsByAddress('0xc91Fc51124bdf9E2010Eb366da97a0b67B70E1f5');
       //BlkDB.getBalanceAtAddress('0x2025ed239a8dec4de0034a252d5c5e385b73fcd0',addyBal);
       var myOrdersBuyCBTest = function(data){
         console.log("returning leveldb buy orders");
         console.log(JSON.stringify(data));
       }
       //BlkDB.getOrdersBuy(myOrdersBuyCBTest);
-      BlkDB.getOrdersBuySorted(myOrdersBuyCBTest);
-      BlkDB.getOrdersSellSorted(myOrdersBuyCBTest);
+      //BlkDB.getOrdersBuySorted(myOrdersBuyCBTest);
+      //BlkDB.getOrdersSellSorted(myOrdersBuyCBTest);
       //BlkDB.getChainParams(globalGenesisHash);
       //BlkDB.getChainParamsBlockHeight(globalGenesisHash);
       cliGetInput();
@@ -2614,8 +2626,17 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
     log("------------------------------------------------------")
     frankieCoin.inSynch = frankieCoin.isChainSynch(peerMaxHeight);
     frankieCoin.inSynchBlockHeight = peerMaxHeight;
+    chainState.isSynching = false;
+    chainState.interval = 25000;
+  }else if(parseInt(peerMaxHeight - frankieCoin.getLength()) > 2500){
+    chainState.isSynching = false;
+    chainState.interval = 10000;
+  }else if(parseInt(peerMaxHeight - frankieCoin.getLength()) > 1000){
+    chainState.isSynching = false;
+    chainState.interval = 8000;
   }else{
     log("------------------------------------------------------")
+    chainState.isSynching = false;//if I set to true here it stops
   }
 
   //this.chain.inSynch = frankieCoin.isChainSynch()
@@ -2694,6 +2715,7 @@ var cbChainGrab = async function(data) {
 
   //need to open back up synching
   isSynching = false;
+  chainState.isSynching = false;
 
 };
 //a function call for datastore
@@ -2725,6 +2747,7 @@ function ChainGrabRefresh(blocknum,cbChainGrab,chainRiser){
 /*-------THE DYNC CALLS ON STARTUP---------------*/
 //and finally the actual call to function for synch
 isSynching = true;
+
 setTimeout(function(){ChainGrab();},3000);
 /*-------THE DYNC CALLS ON STARTUP---------------*/
 
