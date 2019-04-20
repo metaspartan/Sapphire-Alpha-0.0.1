@@ -103,13 +103,32 @@ var activeSync = function(){
   },30)
 }
 
+var tranSynch = function(){
+  var startEnd = parseInt(chainState.transactionHeight+1);
+  var topEnd = parseInt(startEnd+500);
+  console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
+  if(topEnd >= chainState.synchronized){
+    topEnd = chainState.synchronized
+  }
 
+  transactionValidator(parseInt(startEnd),parseInt(topEnd));
+}
+
+//maybe turn slowCounter into chainstate var
+var slowCounter = 0;
 var adjustedTimeout = function() {
   frankieCoin.isChainSynch(chainState.synchronized)
-  if(isSynching == false && chainState.isSynching == false){
+  if(isSynching == true && chainState.isSynching == false){
     //console.log("calling active sync ");
     activeSync();
+  }else if(chainState.peerNonce < chainState.synchronized){
+    activeSync();
   }else{
+    tranSynch();
+    if((slowCounter % 3) == 0){
+      activeSync();
+    }
+    slowCounter++;
     //console.log("chain is not synching so is it sync? ")
   }
   console.log("synching again in "+chainState.interval)
@@ -504,60 +523,73 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 ///////////////////////////////////////////////////////////TRANSACTION VQLIDATOR
 var transactionValidator = async function(start,end){
 
-  console.log("CALLED TXVLDY WITH "+start+" and "+end)
-  if(start <= end){
+  var cbCheckChainStateTX = async function(csTransactionHeight){
 
-    var incrementor = parseInt(start);
-    console.log("TRANSACTION VALIDATION STARTING AT "+incrementor);
-    var validateThisBlock = await function(){
-      return new Promise((resolve)=> {
-        var cbTxValidator = function(blockToValidate){
-          console.log(blockToValidate.toString())
-          resolve(blockToValidate.toString());
+
+    if(csTransactionHeight == 0 || parseInt(csTransactionHeight.toString().split(":")[0]) < end){
+
+      console.log("CALLED TXVLDY WITH "+start+" and "+end)
+      if(start <= end){
+
+        var incrementor = parseInt(start);
+        console.log("TRANSACTION VALIDATION STARTING AT "+incrementor);
+        var validateThisBlock = await function(){
+          return new Promise((resolve)=> {
+            var cbTxValidator = function(blockToValidate){
+              console.log(blockToValidate.toString())
+              resolve(blockToValidate.toString());
+            }
+            BlkDB.getBlock(incrementor,cbTxValidator)
+          })
         }
-        BlkDB.getBlock(incrementor,cbTxValidator)
-      })
-    }
-    var thisOneBlock = await validateThisBlock();
-    //console.log(thisOneBlock);
+        var thisOneBlock = await validateThisBlock();
+        //console.log(thisOneBlock);
 
-    var riserOffset = await (parseInt(incrementor) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
+        var riserOffset = await (parseInt(incrementor) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
 
-    var returnCheckPointBlock = async function(checkPointBlock){
-      var blockNumHash = await JSON.parse(checkPointBlock)["hash"];
-      console.log("blockNumHash: "+blockNumHash);
+        var returnCheckPointBlock = async function(checkPointBlock){
+          var blockNumHash = await JSON.parse(checkPointBlock)["hash"];
+          console.log("blockNumHash: "+blockNumHash);
 
-      var thisBlockCheckPointHash = await sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+          var thisBlockCheckPointHash = await sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
 
-      var updateChainStateTX = await function(isValidTXHeight,transationCheckPointHash){
-        console.log(chalk.bgGreen.black("updating chain state height to "+isValidTXHeight));
-        chainState.transactionHeight = parseInt(isValidTXHeight);
-        chainState.transactionRootHash = transationCheckPointHash;
-        BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
-        /***
-        if(isNaN(isValidTXHeight)){
-          console.log("transaction validation returned NaN");
-        }else{
+          var updateChainStateTX = await function(isValidTXHeight,transationCheckPointHash){
+            console.log(chalk.bgGreen.black("updating chain state height to "+isValidTXHeight));
+            chainState.transactionHeight = parseInt(isValidTXHeight);
+            chainState.transactionRootHash = transationCheckPointHash;
+            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
+            /***
+            if(isNaN(isValidTXHeight)){
+              console.log("transaction validation returned NaN");
+            }else{
+
+            }
+            ***/
+          }
+          await BlkDB.addTransactionsFromStream(JSON.parse(thisOneBlock)["transactions"],JSON.parse(thisOneBlock)["hash"],JSON.parse(thisOneBlock)["blockHeight"],thisOneBlock,updateChainStateTX,thisBlockCheckPointHash)
+          start++;
+          if(start == end){
+            console.log("break clause reached");
+            return;
+          }else{
+            transactionValidator(start,end)
+          }
 
         }
-        ***/
-      }
-      await BlkDB.addTransactionsFromStream(JSON.parse(thisOneBlock)["transactions"],JSON.parse(thisOneBlock)["hash"],JSON.parse(thisOneBlock)["blockHeight"],thisOneBlock,updateChainStateTX,thisBlockCheckPointHash)
-      start++;
-      if(start == end){
-        console.log("break clause reached");
-        return;
+
+        BlkDB.getBlock(incrementor,returnCheckPointBlock);
+        //console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
       }else{
-        transactionValidator(start,end)
+        console.log("start was greater than end ?")
       }
 
+    }else if(csTransactionHeight.split(":")[0] == end){
+      console.log(csTransactionHeight);
     }
 
-    BlkDB.getBlock(incrementor,returnCheckPointBlock);
-    //console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
-  }else{
-    console.log("start was greater than end ?")
   }
+
+  BlkDB.getChainStateParam("transactionHeight",cbCheckChainStateTX);
 
 }
 ///////////////////////////////////////////////////////////TRANSACTION VALIDATOR
@@ -2605,6 +2637,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   log(chalk.green("PEER CHAIN COMPARISON DATA: "));
   console.log(chalk.bgCyan.black(" longest peer: ")+chalk.bgMagenta.white(longestPeer)+chalk.bgCyan.black(" max height: ")+chalk.bgMagenta.white(peerMaxHeight)+chalk.bgCyan.black(" peer length: ")+chalk.bgMagenta.white(peerLength))
   console.log(chalk.bgCyan.black(" chainwalk ht: ")+chalk.bgMagenta.white(chainState.chainWalkHeight)+chalk.bgCyan.black(" synchro ht: ")+chalk.bgMagenta.white(chainState.synchronized)+chalk.bgCyan.black(" chain lngth: ")+chalk.bgMagenta.white(frankieCoin.getLength()))
+  console.log(chalk.bgCyan.black(" peerNonce ht: ")+chalk.bgMagenta.white(chainState.peerNonce)+chalk.bgCyan.black(" synching ht: ")+chalk.bgMagenta.white(chainState.isSynching)+chalk.bgCyan.black(" isSynch: ")+chalk.bgMagenta.white(isSynching))
   //log("------------------------------------------------------")
   //log(longestPeer+" <<lp   mh>>"+peerMaxHeight+"<<mh    pl>> "+peerLength)
   frankieCoin.incrementPeerNonce(nodesInChain[node]["id"],peerLength);
@@ -2626,17 +2659,18 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
     log("------------------------------------------------------")
     frankieCoin.inSynch = frankieCoin.isChainSynch(peerMaxHeight);
     frankieCoin.inSynchBlockHeight = peerMaxHeight;
+    chainState.peerNonce = peerMaxHeight;
     chainState.isSynching = false;
     chainState.interval = 25000;
   }else if(parseInt(peerMaxHeight - frankieCoin.getLength()) > 2500){
-    chainState.isSynching = false;
+    //chainState.isSynching = false;
     chainState.interval = 10000;
   }else if(parseInt(peerMaxHeight - frankieCoin.getLength()) > 1000){
-    chainState.isSynching = false;
+    //chainState.isSynching = false;
     chainState.interval = 8000;
   }else{
     log("------------------------------------------------------")
-    chainState.isSynching = false;//if I set to true here it stops
+    //chainState.isSynching = false;//if I set to true here it stops
   }
 
   //this.chain.inSynch = frankieCoin.isChainSynch()
