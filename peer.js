@@ -409,6 +409,10 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
 }
 /////////////////////////////////////////////////////////////END CHAIN VALIDATOR
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
 //////////////////////////////////////////////////////////////////CHAIN VAIDATOR
 var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
@@ -499,21 +503,24 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     console.log("NOT VALID NEED TO CLIP OR PING AT "+replyData+typeof(replyData));
 
     //set ping here
-    var random = 0;//will randomize later
+    //var random = 0;//will randomize later
+    var randomizer = peers.length;
+    var random = getRandomInt(randomizer);
     var called = false;
+    var i = 0;
     for (let id in peers) {
       if(peers[id].conn2 != undefined){
         log("------------------------------------------------------");
         log(chalk.green("Sending ping for chain sync."));
         log("------------------------------------------------------");
-        if(random == 0 && peers[id]){
+        if(random == i && peers[id]){
           peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           called = true;
         }else if(called == false && peers[id]){
           peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           called = true;
         }
-        random++;
+        i++;
       }
     }
   }
