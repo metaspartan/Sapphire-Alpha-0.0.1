@@ -127,7 +127,7 @@ var adjustedTimeout = function() {
     tranSynch();
     if((slowCounter % 3) == 0){
       activeSync();
-      activePing();
+      //activePing();
     }
     slowCounter++;
     //console.log("chain is not synching so is it sync? ")
