@@ -95,9 +95,9 @@ chainState.interval = 10000;
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(){
-  //console.log("chain state chain walk height is "+chainState.chainWalkHeight);
-  //console.log("chain state synchronized equals "+chainState.synchronized);
-  //console.log("blockchain height is "+frankieCoin.blockHeight);
+  console.log(chalk.bgRed("------------------------------------------------------------------"));
+  console.log(chalk.bgCyan.black(" chainwalkht: ")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight+1))+chalk.bgCyan.black(" chainStateSynchronized: ")+chalk.bgMagenta(chainState.synchronized)+chalk.bgCyan.black(" blockchainht: ")+chalk.bgMagenta(frankieCoin.blockHeight))
+
   setTimeout(function(){
     BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
   },30)
@@ -146,7 +146,7 @@ var activePing = function(){
       log(chalk.green("Sending ping for peer id "+id));
       log("------------------------------------------------------");
 
-        peers[id].conn.write(JSON.stringify({"nodeStatePing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+        peers[id].conn.write(JSON.stringify({"nodeStatePing":{Height:parseInt(chainState.synchronized+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
 
     }
   }
@@ -1163,126 +1163,6 @@ let connSeq2 = 0
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
             BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
             peers[peerId].conn.write(JSON.stringify({"nodeStatePong":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
-          }
-
-        }else if(JSON.parse(data)["ChainSyncPing"]){
-
-          //log(JSON.parse(data)["ChainSyncPing"]);
-          if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
-            log(chalk.green("Global hashes matched!"));
-            frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
-            BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
-            var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
-            var pongBack = false;
-
-              //increment it by one to return the next block
-              peerBlockHeight++;
-              //returning the block
-              console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" <<<<the difference");
-              if((frankieCoin.getLength() > parseInt(peerBlockHeight)) && (chainState.synchronized > parseInt(peerBlockHeight)) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
-                console.log("this is properly flagged for streaming");
-                /***
-                var pongBackBlockStream = function(blockData){
-                  peers[peerId].conn.write(JSON.stringify({pongBlockStream:blockData}));
-                }
-                BlkDB.getBlockStream(parseInt(peerBlockHeight),pongBackBlockStream);
-                ***/
-                var setDatSynch = function(datSynch,reqPeer){
-                  reqPeer.conn.write(JSON.stringify({pongBlockStream:datSynch,blockHeight:chainState.synchronized}));
-                }
-                //var cbGetSynch = function(datpeer){
-                //  console.log("calling dat synch")
-                //  DatSyncLink.synchDatabaseJSON(setDatSynch,datpeer);
-                //}
-
-                var cbGetStream = function(jsonStream,streamToPeerID){
-                  console.log("the streams cb condition is met");
-                  streamToPeerID.conn2.write(jsonStream);
-                  //streamToPeerID.conn2.end();
-                  //setting up some streams to try this out
-                }
-                //BlkDB.dumpDatCopy(cbGetSynch,peers[peerId]);
-                //BlkDB.dumpToJsonFIle(cbGetSynch,peers[peerId]);
-                if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 2500){
-                  var numRecordsToStream = 2500;
-                }else if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 1000){
-                  var numRecordsToStream = 1000;
-                }else if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 500){
-                  var numRecordsToStream = 500;
-                }else if(parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]) > 100){
-                  var numRecordsToStream = 100;
-                }else{
-                  var numRecordsToStream = parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]);
-                }
-                //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream)
-                //var numRecordsToStream = parseInt(frankieCoin.synchronized);
-                BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
-                  peers[peerId].conn2.write(jsonStream);
-                  //console.log("wrote this "+jsonStream);
-                  //peers[peerId].conn2.end();
-                  console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
-                })
-
-                setTimeout(function(){
-                  BlkDB.dumpToStreamTXOXRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
-                    peers[peerId].conn2.write(jsonStream);
-                    //console.log("wrote this "+jsonStream);
-                    peers[peerId].conn2.end();
-                    console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
-                  })
-                },4000)
-                //BlkDB.dumpToJsonFIleRange(cbGetSynch,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],frankieCoin.chainRiser);
-
-
-                //pongBack = true;//not sure about this since this is a stream
-              }else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
-                //okay this is a legitimate pong
-                if(chainState.synchronized > peerBlockHeight){
-                  var pongBackBlock = function(blockData){
-                    peers[peerId].conn.write(blockData.toString());
-                  }
-                  BlkDB.getBlock(parseInt(peerBlockHeight),pongBackBlock);
-                  pongBack = true;
-                }else{
-                  console.log("you are not synchronized to the peers and we should call a block synch");
-                  //call chainWalker
-                  chainWalker(peerBlockHeight,cbBlockChainValidatorStartUp);
-                }
-
-              }else if(frankieCoin.blockHeight == parseInt(peerBlockHeight)){
-                //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-                peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-                pongBack = true;
-              }else if((peerBlockHeight > frankieCoin.blockHeight) && (peerBlockHeight == (frankieCoin.blockHeight+1))){
-                //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
-                peerBlockHeight--;
-                pongBack = true;
-              }else if(peerBlockHeight > (frankieCoin.blockHeight+2)){
-
-                pongBack = false;
-                //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
-                log("8888777766665555       THIS PEER IS NOT SYNCHED     5555666677778888");
-                log("8888777766665555       THIS PEER IS NOT SYNCHED     5555666677778888");
-                log("8888777766665555       51           51              5555666677778888");
-                log("8888777766665555                 51                 5555666677778888");
-                log("8888777766665555              ??                    5555666677778888");
-                log("8888777766665555            ??                      5555666677778888");
-                log("8888777766665555                                    5555666677778888");
-                log("8888777766665555           PEER                     5555666677778888");
-                log("8888777766665555           PEER                     5555666677778888");
-              }
-
-            //setting a delay and pong back
-            //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
-            if(peers[peerId] && pongBack == true){
-              setTimeout(function(){if(peers[peerId]){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));}},300);
-            }
-            //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-          }else{
-            log("Did not match this hash and this peer is an imposter");
-            //peers[peerId].conn.write("Don't hack me bro");
-            peers[peerId].conn.write(JSON.stringify({"BadPeer":{Height:1337}}));
-            ///tesst out setTimeout(function(){disconnet peers[peerId].conn.dissconnet();},1500);
           }
 
         }else if(JSON.parse(data)["BadPeer"]){
@@ -2687,8 +2567,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   console.log(chalk.bgCyan.black(" peerNonce ht: ")+chalk.bgMagenta.white(chainState.peerNonce)+chalk.bgCyan.black(" synching ht: ")+chalk.bgMagenta.white(chainState.isSynching)+chalk.bgCyan.black(" isSynch: ")+chalk.bgMagenta.white(isSynching))
   //log("------------------------------------------------------")
   //log(longestPeer+" <<lp   mh>>"+peerMaxHeight+"<<mh    pl>> "+peerLength)
-  frankieCoin.incrementPeerNonce(nodesInChain[node]["id"],peerLength);
-  BlkDB.addNode("node:"+nodesInChain[node]["id"]+":peerBlockHeight",peerLength);
+
   //log(JSON.stringify(nodesInChain));
   //the pong us set to be one higher from the ping and is above the chain length
   /*****
