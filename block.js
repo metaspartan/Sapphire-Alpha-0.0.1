@@ -256,7 +256,9 @@ var Block = class Block {
         this.allConfigHash = '';
         //total Hash for sequencing
         this.hashOfThisBlock = '';//Hash(this.hash+BlkDB.getStateTrieRootHash())+":"+this.hash+":"+BlkDB.getStateTrieRootHash();
-        if(chainStateHash){
+        if(chainStateHash && blockheight == 2){
+          this.chainStateHash = chainStateHash;
+        }else if(chainStateHash){
           this.chainStateHash = chainStateHash;
         }else{
           this.chainStateHash = getChainState().currentBlockCheckPointHash;
@@ -463,12 +465,22 @@ var Blockchain = class Blockchain {
       }
 
       getBlock(num){
-          console.log(chalk.yellow.bgBlue("CHAIN BLOCK HEIGHT: ")+chalk.white.bgMagenta.bold(this.blockHeight));
-          //console.log("chain riser "+this.chainRiser);
-          //console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
-          var offset = (parseInt(this.blockHeight)-parseInt(this.chainRiser));
-          var newNum = (parseInt(num)-parseInt(offset));
-          return this.chain[parseInt(newNum) - 1];
+          if(num < this.chainRiser){
+            console.log(chalk.yellow.bgBlue("CHAIN BLOCK HEIGHT: ")+chalk.white.bgMagenta.bold(this.blockHeight));
+            console.log("chain riser "+this.chainRiser);
+            console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
+            var offset = (parseInt(this.blockHeight)-parseInt(this.chainRiser));
+            var newNum = (parseInt(num)-parseInt(offset));
+            return this.chain[parseInt(newNum) - 1];
+          }else{
+            console.log(chalk.yellow.bgBlue("CHAIN BLOCK HEIGHT: ")+chalk.white.bgMagenta.bold(this.blockHeight));
+            console.log("chain riser "+this.chainRiser);
+            console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
+            var offset = (parseInt(this.blockHeight)-parseInt(this.chainRiser));
+            var newNum = (parseInt(num)-parseInt(offset));
+            return this.chain[num - 1];
+          }
+
       }
 
       getLatestBlock(){
@@ -572,8 +584,20 @@ var Blockchain = class Blockchain {
 
           log("BBBBBBBBBBBBBBBBB block time stamp"+minedBlock["timestamp"]+" LAST BLOCK TIME STAMPING "+this.getLatestBlock().timestamp+"MINED  BLOCK PREV HASH "+minedBlock["previousHash"]+" LAST BLOCK HASH "+this.getLatestBlock().hash);
           var blockTimeDiff = ((blockTimeStamp-this.getLatestBlock().timestamp)/1000)
-          //constructor(blockheight, timestamp, transactions, orders, ommers, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 4) {
-          let block = new Block((parseInt(this.getLength())+1),minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, this.pendingOmmers, minedBlock["previousHash"],minedBlock["sponsor"],minedBlock["miner"],"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"]);
+
+          /***
+          constructor(
+            blockheight,
+            timestamp, transactions, orders, ommers, previousHash = '',
+            sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '',
+            nonce = 0, difficulty = 4, chainStateHash
+          )
+          ***/
+
+          if((parseInt(this.getLength())+1) == 2){
+            var thisBlocksCheckPointHash = Hash(minedBlock["hash"]+"0000000000000000000000000000000000000000000000000000000000000000")
+          }
+          let block = new Block((parseInt(this.getLength())+1),minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, this.pendingOmmers, minedBlock["previousHash"],minedBlock["sponsor"],minedBlock["miner"],"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"],thisBlocksCheckPointHash);
           /////////////////////////////////////////////////DIFFICULTY ADJUSTMENT
           //block.mineBlock(this.difficulty);
           //block.difficulty = minedBlock["difficulty"];
@@ -595,6 +619,7 @@ var Blockchain = class Blockchain {
           }
           log(chalk.bgGreen('Differential is '+blockTimeDiff));
           log('Block successfully added by outside miner '+blockTimeStamp);
+          console.log(JSON.stringify(block))
           log("BLOCK DIFFICULTY "+block.difficulty);
           /////////////////////////////////////////////END DIFFICULTY ADJUSTMENT
 

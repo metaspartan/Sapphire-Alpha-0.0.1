@@ -1742,7 +1742,7 @@ let connSeq2 = 0
                 //var numRecordsToStream = parseInt(frankieCoin.synchronized);
                 BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
                   peers[peerId].conn2.write(jsonStream);
-                  console.log("wrote this "+jsonStream);
+                  //console.log("wrote this "+jsonStream);
                   peers[peerId].conn2.end();
                   console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
                 })
@@ -2529,10 +2529,11 @@ var chainWalker = function(syncpoint,cbBlockChainValidatorStartUp){
 ////////////////////////////////////////////////end chain walker synchronisation
 
 //have to load the first block into local database
-BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"2462",setChainStateTX,frankieCoin.chainRiser,'');
+console.log(chalk.bgRed("GEN BLK TRANSACTION HASH: "+sapphirechain.Hash(frankieCoin.getLatestBlock()["hash"]+"0000000000000000000000000000000000000000000000000000000000000000")))
+BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"2462",setChainStateTX,frankieCoin.chainRiser,sapphirechain.Hash(frankieCoin.getLatestBlock()["hash"]+"0000000000000000000000000000000000000000000000000000000000000000"),"0000000000000000000000000000000000000000000000000000000000000000");
 BlkDB.addChainParams(globalGenesisHash+":blockHeight",1);
 //BlkDB.addChainState("cs:blockHeight",1);//NEVER LOAD THIS HERE IT DEFEATS THE WHOLE PURPOSE
-BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]),"");//is there a chain state hash?
+BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]),sapphirechain.Hash(frankieCoin.getLatestBlock()["hash"]+"0000000000000000000000000000000000000000000000000000000000000000"));//is there a chain state hash?
 //log("peer chain is"+ frankieCoin.getEntireChain());
 
 var franks = miner(frankieCoin);
@@ -3104,15 +3105,29 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
 
 
       //////////////going to have to make this sequential in a callback or chain
-      franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
+      //franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
+
+      console.log("incoming"+JSON.stringify(JSON.parse(childData)["createBlock"]["block"]));
+      console.log("in chain"+JSON.stringify(frankieCoin.getLatestBlock()));
+
+      frankieCoin.addPendingTransactionsToMinedBLock(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
 
       //calculating this 2 times but needed at addBlock for transations to verify properly
       var blockNum = parseInt(frankieCoin.getLatestBlock()["blockHeight"])
       var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
-      var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
-      checkPointBlock = JSON.stringify(checkPointBlock);
-      var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
-      var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+      console.log("riser offset is "+riserOffset+"blockNum"+blockNum)
+
+      if(riserOffset == blockNum){//first riser period
+        console.log(frankieCoin.getBlock(blockNum))
+        var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getLatestBlock()))["hash"];
+        var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+"0000000000000000000000000000000000000000000000000000000000000000");
+      }else{
+        var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
+        checkPointBlock = JSON.stringify(checkPointBlock);
+        var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
+        var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+      }
+
       //end pre calculation
 
       BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]),thisBlockCheckPointHash);

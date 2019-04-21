@@ -439,6 +439,8 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
       txIndex++;
     })
 
+    cbSetChainStateTX(1,txConfirmation);
+
   }else{//perblock rewards from block 2 until
     ///////////////////////////////////////////////////////////////////CORE DEVS
     var osoTx = await new Transaction("sapphire", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
