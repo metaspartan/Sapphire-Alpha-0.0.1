@@ -2588,7 +2588,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
     frankieCoin.inSynchBlockHeight = peerMaxHeight;
     chainState.peerNonce = peerMaxHeight;
     chainState.isSynching = false;
-    chainState.interval = 5000;
+    chainState.interval = 7000;
   }else if(parseInt(peerMaxHeight - frankieCoin.getLength()) > 2500){
     //chainState.isSynching = false;
     chainState.interval = 10000;
