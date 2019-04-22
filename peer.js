@@ -1618,6 +1618,8 @@ let connSeq2 = 0
 
     conn2.on('end',async function(){
 
+      console.log(chalk.bgRed("data stream conn 2 ended"));
+
       //setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
       //setting this here and heed more intake checks
 
