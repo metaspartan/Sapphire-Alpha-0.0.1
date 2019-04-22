@@ -872,7 +872,7 @@ let connSeq2 = 0
 
       let chunk;
       while (null !== (chunk = this.read())) {
-        console.log(`Received ${chunk.length} bytes of data.`);
+        console.log(`conn 1 received ${chunk.length} bytes of data.`);
         //console.log(chunk.toString());
         console.log("<== ");
         incomingStream+=chunk.toString()
@@ -1692,7 +1692,7 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
-          log(JSON.parse(data)["ChainSyncPing"]);
+          log("chain sync ping request "+JSON.parse(data)["ChainSyncPing"]);
           if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
             log(chalk.green("Global hashes matched!"));
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
