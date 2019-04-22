@@ -135,7 +135,7 @@ var adjustedTimeout = function() {
   console.log("synching again in "+chainState.interval)
   setTimeout(adjustedTimeout, chainState.interval);
 }
-//setTimeout(adjustedTimeout, chainState.interval);
+setTimeout(adjustedTimeout, chainState.interval);
 
 var activePing = function(){
   //we should get longestPeer first
