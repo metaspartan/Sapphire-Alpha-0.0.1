@@ -1623,7 +1623,7 @@ let connSeq2 = 0
       //setTimeout(function(){BlkDB.importFromJSONStream(ChainGrabRefresh,parseInt(chainState.chainWalkHeight+1),cbChainGrab,frankieCoin.chainRiser,incomingStream);},2000);
       //setting this here and heed more intake checks
 
-      if(incomingStream2.startsWith('{"blockHeight"}') || incomingStream2.startsWith('[{"ox:') || incomingStream2.startsWith('[{"tx:')){
+      if(incomingStream2.startsWith('{"blockHeight"}') || incomingStream2.startsWith('[{"ox:') || incomingStream2.startsWith('[{"tx:') || incomingStream2.startsWith('[{"sfblk:')){
 
         console.log(chalk.bgRed("data stream ended"));
         console.log(chalk.bgRed("data stream ended"));
