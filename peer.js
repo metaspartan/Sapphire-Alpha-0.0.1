@@ -2597,7 +2597,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
     chainState.interval = 8000;
   }else{
     log("------------------------------------------------------")
-    //chainState.isSynching = false;//if I set to true here it stops
+    chainState.isSynching = true;//if I set to true here it stops
   }
 
   //this.chain.inSynch = frankieCoin.isChainSynch()
