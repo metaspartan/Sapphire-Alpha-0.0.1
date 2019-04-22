@@ -2559,8 +2559,9 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   log("------------------------------------------------------")
   log(chalk.green("CHAIN SYNCING"))
   log("------------------------------------------------------")
+
   var nodesInChain = frankieCoin.retrieveNodes();
-  var longestPeer = 0;
+  var longestPeer = peerMaxHeight;
   for(node in nodesInChain){
     if(parseInt(nodesInChain[node]["info"]["chainlength"]) > longestPeer){
       longestPeer = parseInt(nodesInChain[node]["info"]["chainlength"]);
