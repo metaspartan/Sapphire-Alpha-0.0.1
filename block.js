@@ -298,7 +298,7 @@ var Blockchain = class Blockchain {
 
           this.chain = [this.createGenesisBlock()];
           this.id = 663;
-          this.chainRiser = 25;//1 - 100,101-200,etc. blocks in memory
+          this.chainRiser = 5;//1 - 100,101-200,etc. blocks in memory
           //adding in the peers connectivity
           this.nodes = [];
           //difficulty adjusts
@@ -465,22 +465,11 @@ var Blockchain = class Blockchain {
       }
 
       getBlock(num){
-          if(num < this.chainRiser){
-            console.log(chalk.yellow.bgBlue("CHAIN BLOCK HEIGHT: ")+chalk.white.bgMagenta.bold(this.blockHeight));
-            console.log("chain riser "+this.chainRiser);
-            console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
+            //console.log("chain riser "+this.chainRiser);
+            //console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
             var offset = (parseInt(this.blockHeight)-parseInt(this.chainRiser));
             var newNum = (parseInt(num)-parseInt(offset));
             return this.chain[parseInt(newNum) - 1];
-          }else{
-            console.log(chalk.yellow.bgBlue("CHAIN BLOCK HEIGHT: ")+chalk.white.bgMagenta.bold(this.blockHeight));
-            console.log("chain riser "+this.chainRiser);
-            console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
-            var offset = (parseInt(this.blockHeight)-parseInt(this.chainRiser));
-            var newNum = (parseInt(num)-parseInt(offset));
-            return this.chain[num - 1];
-          }
-
       }
 
       getLatestBlock(){
@@ -604,15 +593,15 @@ var Blockchain = class Blockchain {
           if(this.getLatestBlock().difficulty){
             this.difficulty = this.getLatestBlock().difficulty;
           }
-          ///DIFFICULTY IS PRETTY MUCH AT 5 UNTIL I FINISH TESTINF
+          ///DIFFICULTY IS PRETTY MUCH AT 5 UNTIL I FINISH TESTING
           if(blockTimeDiff < 5){
             //temporary difficulty setting stopped at 6
-            if(minedBlock["difficulty"] < 5){
+            if(minedBlock["difficulty"] < 4){
               block.difficulty = parseFloat(block.difficulty+1);
               console.log("BLOCK DIFF "+block.difficulty);
             }
           }else{
-            if(minedBlock["difficulty"] > 5){
+            if(minedBlock["difficulty"] > 4){
               block.difficulty = parseFloat(block.difficulty-1);
               console.log("BLOCK DIFF "+block.difficulty);
             }

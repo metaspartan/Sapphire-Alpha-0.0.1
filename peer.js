@@ -135,7 +135,7 @@ var adjustedTimeout = function() {
   console.log("synching again in "+chainState.interval)
   setTimeout(adjustedTimeout, chainState.interval);
 }
-setTimeout(adjustedTimeout, chainState.interval);
+//setTimeout(adjustedTimeout, chainState.interval);
 
 var activePing = function(){
   //we should get longestPeer first
@@ -187,11 +187,13 @@ var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
       var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
       var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
       checkPointBlock = JSON.stringify(checkPointBlock);
-      //console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
-
-      var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
-      //console.log("blockNumHash: "+blockNumHash);
-
+      console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
+      console.log(chalk.bgRed("right before it "+chainState.currentBlockCheckPointHash))
+      console.log("testing")
+      console.log(frankieCoin.getBlock(blockNum))
+      var blockNumHash = await JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
+      console.log("blockNumHash: "+blockNumHash);
+      console.log(chalk.bgRed("right after it "+chainState.currentBlockCheckPointHash))
       var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
 
       if(source == "miner"){
@@ -3124,7 +3126,8 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
       }else{
         var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
         checkPointBlock = JSON.stringify(checkPointBlock);
-        var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
+        console.log("riser is "+riserOffset+" block is "+checkPointBlock)
+        var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getLatestBlock()))["hash"];
         var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
       }
 
