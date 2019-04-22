@@ -127,7 +127,7 @@ var adjustedTimeout = function() {
     tranSynch();
     if((slowCounter % 3) == 0){
       activeSync();
-      //activePing();
+      activePing();
     }
     slowCounter++;
     //console.log("chain is not synching so is it sync? ")
@@ -162,7 +162,7 @@ var activePing = function(){
       console.log("   was  a node    ")
       console.log("                  ")
       longestPeer = parseInt(nodesInChain[node]["info"]["chainlength"]);
-      //frankieCoin.longestPeerBlockHeight = longestPeer;
+      frankieCoin.longestPeerBlockHeight = longestPeer;
     }
   }
   if(chainState.synchronized >= longestPeer){
@@ -1540,7 +1540,7 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["ChainSyncPong"]){
           //returned block from sunched peer and parses it for db
-          log(JSON.parse(data)["ChainSyncPong"]);
+          log("CHAIN SYNCH PONG "+JSON.parse(data)["ChainSyncPong"]);
           if(JSON.parse(data)["ChainSyncPong"]["GlobalHash"] == globalGenesisHash){
             log(chalk.green("Hash Matched good pong"))
             var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
@@ -1551,6 +1551,7 @@ let connSeq2 = 0
               peers[peerId].conn.write("---------------------------------");
               peers[peerId].conn.write("THIS PEER IS NOW SYNCHED");
               peers[peerId].conn.write("---------------------------------");
+              frankieCoin.incrementPeerNonce(peerId,peerBlockHeight)
             }else{
               console.log("NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
               //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
@@ -1880,7 +1881,7 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["ChainSyncPong"]){
           //returned block from sunched peer and parses it for db
-          log(JSON.parse(data)["ChainSyncPong"]);
+          log("conn 2 CSpong "+JSON.parse(data)["ChainSyncPong"]);
           if(JSON.parse(data)["ChainSyncPong"]["GlobalHash"] == globalGenesisHash){
             log(chalk.green("Hash Matched good pong"))
             var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
