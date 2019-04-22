@@ -106,11 +106,10 @@ var activeSync = function(){
 var tranSynch = function(){
   var startEnd = parseInt(chainState.transactionHeight+1);
   var topEnd = parseInt(startEnd+500);
-  console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
   if(topEnd >= chainState.synchronized){
     topEnd = chainState.synchronized
   }
-
+  console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
   transactionValidator(parseInt(startEnd),parseInt(topEnd));
 }
 
