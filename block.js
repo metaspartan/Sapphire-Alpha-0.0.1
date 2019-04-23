@@ -201,7 +201,7 @@ var Block = class Block {
       blockheight,
       timestamp, transactions, orders, ommers, previousHash = '',
       sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '',
-      nonce = 0, difficulty = 4, chainStateHash
+      nonce = 0, difficulty = 5, chainStateHash
     ) {
         //log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
@@ -596,7 +596,7 @@ var Blockchain = class Blockchain {
           ///DIFFICULTY IS PRETTY MUCH AT 5 UNTIL I FINISH TESTING
           if(blockTimeDiff < 5){
             //temporary difficulty setting stopped at 6
-            if(minedBlock["difficulty"] < 4){
+            if(minedBlock["difficulty"] < 5){
               block.difficulty = parseFloat(block.difficulty+1);
               console.log("BLOCK DIFF "+block.difficulty);
             }
