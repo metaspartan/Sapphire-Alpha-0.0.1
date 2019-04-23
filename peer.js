@@ -95,12 +95,14 @@ chainState.interval = 10000;
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(){
-  //console.log("chain state chain walk height is "+chainState.chainWalkHeight);
-  //console.log("chain state synchronized equals "+chainState.synchronized);
-  //console.log("blockchain height is "+frankieCoin.blockHeight);
+
+  console.log(chalk.bgRed("------------------------------------------------------------------"));
+  console.log(chalk.bgCyan.black(" chainwalkht: ")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight+1))+chalk.bgCyan.black(" chainStateSynchronized: ")+chalk.bgMagenta(chainState.synchronized)+chalk.bgCyan.black(" blockchainht: ")+chalk.bgMagenta(frankieCoin.blockHeight));
+
   setTimeout(function(){
     BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
   },30)
+
 }
 
 var tranSynch = function(){
@@ -141,7 +143,7 @@ var activePing = function(){
   //we should get longestPeer first
   var nodesInChain = frankieCoin.retrieveNodes();
   for (let id in peers) {
-    if(peers[id].conn2 != undefined){
+    if(peers[id].conn != undefined){
       log("------------------------------------------------------");
       log(chalk.green("Sending ping for peer id "+id));
       log("------------------------------------------------------");
@@ -528,7 +530,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     for(var j=0;j<peers.length;j++){
       if(peers[j].conn2 != undefined){
         log("------------------------------------------------------");
-        log(chalk.green("Sending ping for chain sync."));
+        log(chalk.green("Sending ping for chain sync in cbBlockChainValidator top"));
         log("------------------------------------------------------");
         if(random == j && peers[j]){
           peers[j].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
@@ -539,7 +541,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     for (let id in peers) {
       if(peers[id].conn2 != undefined){
         log("------------------------------------------------------");
-        log(chalk.green("Sending ping for chain sync."));
+        log(chalk.green("Sending ping for chain sync in cbBlockChainValidator bottom"));
         log("------------------------------------------------------");
         if(random == i && peers[id] && called == false){
           peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
