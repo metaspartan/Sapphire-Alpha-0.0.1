@@ -125,8 +125,9 @@ var adjustedTimeout = function() {
     activeSync();
   }else{
     tranSynch();
-    if((slowCounter % 3) == 0){
+    if((slowCounter % 4) == 0){
       activeSync();
+      activePing();
     }
     slowCounter++;
     //console.log("chain is not synching so is it sync? ")
@@ -139,6 +140,17 @@ setTimeout(adjustedTimeout, chainState.interval);
 var activePing = function(){
   //we should get longestPeer first
   var nodesInChain = frankieCoin.retrieveNodes();
+  for (let id in peers) {
+    if(peers[id].conn2 != undefined){
+      log("------------------------------------------------------");
+      log(chalk.green("Sending ping for peer id "+id));
+      log("------------------------------------------------------");
+
+        peers[id].conn2.write(JSON.stringify({"nodeStatePing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+
+    }
+  }
+  console.log(nodesInChain);
   var longestPeer = 0;
   for(node in nodesInChain){
     if(parseInt(nodesInChain[node]["info"]["chainlength"]) > longestPeer){
@@ -1141,9 +1153,24 @@ let connSeq2 = 0
           log(chalk.bgBlue("THIS IS THE UNCLRE RETURN WE LOG THE OMMER AND DELETE"));
           log(data["uncle"]);
 
+        }else if(JSON.parse(data)["nodeStatePong"]){
+
+          if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
+            frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
+            BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
+          }
+
+        }else if(JSON.parse(data)["nodeStatePing"]){
+
+          if(JSON.parse(data)["nodeStatePing"]["GlobalHash"] == globalGenesisHash){//will add more to this
+            frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
+            BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
+            peers[peerId].conn2.write(JSON.stringify({"nodeStatePong":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          }
+
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
-          log(JSON.parse(data)["ChainSyncPing"]);
+          //log(JSON.parse(data)["ChainSyncPing"]);
           if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
             log(chalk.green("Global hashes matched!"));
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
