@@ -301,6 +301,9 @@ var addyBal = function(val){
 
 //////////////////////////////////////////////////////////////////CHAIN VAIDATOR
 var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
+
+  console.log(chalk.bgRed(replyData+" << replydata and then replyhash >> "));
+
   if(isValid == true){
     if(chainState.chainWalkHeight == replyData){
       console.log("this point was already reached which means its stuck here ...pinging");
@@ -411,6 +414,10 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
 }
 /////////////////////////////////////////////////////////////END CHAIN VALIDATOR
 
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
 //////////////////////////////////////////////////////////////////CHAIN VAIDATOR
 var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
@@ -501,21 +508,25 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     console.log("NOT VALID NEED TO CLIP OR PING AT "+replyData+typeof(replyData));
 
     //set ping here
-    var random = 0;//will randomize later
+    //var random = 0;//will randomize later
+    var randomizer = peers.length;
+    var random = getRandomInt(randomizer);
     var called = false;
+    var i = 0;
+
     for (let id in peers) {
       if(peers[id].conn2 != undefined){
         log("------------------------------------------------------");
         log(chalk.green("Sending ping for chain sync."));
         log("------------------------------------------------------");
-        if(random == 0 && peers[id]){
+        if(random == i && peers[id]){
           peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           called = true;
         }else if(called == false && peers[id]){
           peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           called = true;
         }
-        random++;
+        i++;
       }
     }
   }
@@ -2119,6 +2130,7 @@ function cliGetInput(){
       console.log("MY NODE PERSISTANT ID "+chainState.nodePersistantId+" and in hex "+Buffer.from(chainState.nodePersistantId).toString('hex'))
       console.log(chalk.bgBlackBright.black("chain riser is ")+chalk.bgMagenta(frankieCoin.chainRiser))
       console.log(chalk.bgBlackBright.black("chain state chain walk height is ")+chalk.bgMagenta(chainState.chainWalkHeight));
+      console.log(chalk.bgBlackBright.black("chain state chain walk hash is ")+chalk.bgMagenta(chainState.chainWalkHash));
       console.log(chalk.bgBlackBright.black("chain state synchronized equals ")+chalk.bgMagenta(chainState.synchronized));
       console.log(chalk.bgBlackBright.black("blockchain height is ")+chalk.bgMagenta(frankieCoin.blockHeight));
       console.log(chalk.bgBlackBright.black("previousBlockCheckPointHash is ")+chalk.bgMagenta(JSON.stringify(chainState.previousBlockCheckPointHash)));
@@ -2712,7 +2724,7 @@ var cbChainGrab = async function(data) {
   setTimeout(function(){
     //console.log(frankieCoin.blockHeight);
     if(frankieCoin.blockHeight > 1){
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(frankieCoin.blockHeight),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(frankieCoin.blockHeight),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,2718);
 
     }
   },1000);
