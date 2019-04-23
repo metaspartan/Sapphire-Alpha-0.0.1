@@ -201,7 +201,7 @@ var Block = class Block {
       blockheight,
       timestamp, transactions, orders, ommers, previousHash = '',
       sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '',
-      nonce = 0, difficulty = 5, chainStateHash
+      nonce = 0, difficulty = 4, chainStateHash
     ) {
         //log("Block Constructure and hash is "+hash+" timestamp is "+timestamp+" egemBRBlock "+egemBRBlock+" egemBRBLockHash "+egemBRHash);
 
@@ -584,7 +584,7 @@ var Blockchain = class Blockchain {
           ***/
 
           if((parseInt(this.getLength())+1) == 2){
-            var thisBlocksCheckPointHash = {"blockNumber":1,"checkPointHash":Hash(minedBlock["hash"]+"0000000000000000000000000000000000000000000000000000000000000000")}
+            var thisBlocksCheckPointHash = Hash(minedBlock["hash"]+"0000000000000000000000000000000000000000000000000000000000000000")
           }
           let block = new Block((parseInt(this.getLength())+1),minedBlock["timestamp"], this.pendingTransactions, this.pendingOrders, this.pendingOmmers, minedBlock["previousHash"],minedBlock["sponsor"],minedBlock["miner"],"","",minedBlock["hash"],"",minedBlock["nonce"],minedBlock["difficulty"],thisBlocksCheckPointHash);
           /////////////////////////////////////////////////DIFFICULTY ADJUSTMENT
@@ -596,12 +596,12 @@ var Blockchain = class Blockchain {
           ///DIFFICULTY IS PRETTY MUCH AT 5 UNTIL I FINISH TESTING
           if(blockTimeDiff < 5){
             //temporary difficulty setting stopped at 6
-            if(minedBlock["difficulty"] < 6){
+            if(minedBlock["difficulty"] < 4){
               block.difficulty = parseFloat(block.difficulty+1);
               console.log("BLOCK DIFF "+block.difficulty);
             }
           }else{
-            if(minedBlock["difficulty"] > 5){
+            if(minedBlock["difficulty"] > 4){
               block.difficulty = parseFloat(block.difficulty-1);
               console.log("BLOCK DIFF "+block.difficulty);
             }
