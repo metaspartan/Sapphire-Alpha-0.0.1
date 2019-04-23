@@ -389,6 +389,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     }
     console.log("NOT VALID NEED TO PING AT "+replyData+typeof(replyData));
     if(parseInt(replyData) > 2){
+      /***
       var clipHeight = parseInt(replyData-1)
       chainClipperReduce(frankieCoin.blockHeight,clipHeight).then(function(){
         console.log("clipped chain to "+clipHeight+" restart to reindex")
@@ -396,6 +397,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
         chainState.synchronized = 1;
         BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
       });
+      ***/
     }
 
     //set ping here
