@@ -583,12 +583,12 @@ var Blockchain = class Blockchain {
           ///DIFFICULTY IS PRETTY MUCH AT 5 UNTIL I FINISH TESTINF
           if(blockTimeDiff < 5){
             //temporary difficulty setting stopped at 6
-            if(minedBlock["difficulty"] < 5){
+            if(minedBlock["difficulty"] < 4){
               block.difficulty = parseFloat(block.difficulty+1);
               console.log("BLOCK DIFF "+block.difficulty);
             }
           }else{
-            if(minedBlock["difficulty"] > 5){
+            if(minedBlock["difficulty"] > 4){
               block.difficulty = parseFloat(block.difficulty-1);
               console.log("BLOCK DIFF "+block.difficulty);
             }
