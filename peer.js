@@ -2061,10 +2061,11 @@ function cliGetInput(){
 
       var startEnd = parseInt(chainState.transactionHeight+1);
       var topEnd = parseInt(startEnd+500);
-      console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
       if(topEnd >= chainState.synchronized){
         topEnd = chainState.synchronized
       }
+      console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
+
 
       transactionValidator(parseInt(startEnd),parseInt(topEnd));
 
@@ -3130,7 +3131,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
       }else{
         var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
         checkPointBlock = JSON.stringify(checkPointBlock);
-        console.log("riser is "+riserOffset+" block is "+checkPointBlock)
+        console.log("riser is "+riserOffset+" check point block is "+checkPointBlock)
         var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getLatestBlock()))["hash"];
         var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
       }
