@@ -669,8 +669,9 @@ var getBlockRange = function(blockHeight,riser,callback){
 
 
 ///////////////////////this function validates a range of blocks for chain symch
-var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRiser){
+var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRiser,codelinenumber){
 
+      console.log("BRV CALLED FROM "+codelinenumber)
       console.log("BLOCKHEIGHT: "+blockHeight);
       console.log("RISER: "+riser);
 
@@ -690,16 +691,16 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
           if((thisDataItem.key.toString().split(":")[0] == "sfblk") && (parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)) == parseInt(currentBlockToValidate)) && (parseInt(currentBlockToValidate) <= parseInt(riser)) ){
 
 
-            //console.log("top "+currentBlockToValidate+" current hash "+currentBlockHash);
-            //console.log("second "+parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)));
-            //console.log("why below 10 "+thisDataItem.key.toString());
+            console.log("top "+currentBlockToValidate+" current hash "+currentBlockHash);
+            console.log("second "+parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)));
+            console.log("why below 10 "+thisDataItem.key.toString());
 
             /////perform the validation
 
             var isValidBlock = thisDataItem.value.toString();
 
             //going to validate chaeckpoints
-            //console.log("passing thru this conditon "+currentBlockToValidate+" "+chainRiser+" "+(currentBlockToValidate%chainRiser == 0))
+            console.log("passing thru this conditon "+currentBlockToValidate+" "+chainRiser+" "+(currentBlockToValidate%chainRiser == 0))
             if(currentBlockToValidate%chainRiser == 0){
               //console.log("now we need this to be true "+currentBlockToValidate+" "+parseInt(currentBlockToValidate-chainRiser)+" "+parseInt(currentBlockToValidate-chainRiser)+" "+(parseInt(currentBlockToValidate-chainRiser)>0 && parseInt(currentBlockToValidate-chainRiser)>chainRiser))
               if(parseInt(currentBlockToValidate-chainRiser) > 0 && parseInt(currentBlockToValidate-chainRiser) >= chainRiser){
@@ -721,7 +722,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
 
             //console.log("is this one und "+JSON.parse(isValidBlock)["timestamp"]);
             var newBlockHash = Hash(currentBlockHash+JSON.parse(isValidBlock)["timestamp"]+JSON.parse(isValidBlock)["nonce"]);//this.previousHash + this.timestamp + this.nonce
-            //console.log("comparing "+JSON.parse(isValidBlock)["hash"]+" to "+newBlockHash);
+            console.log("comparing "+JSON.parse(isValidBlock)["hash"]+" to "+newBlockHash);
             if(JSON.parse(isValidBlock)["hash"] == newBlockHash){
 
               //I can set a flag here to load transactions from the block

@@ -465,11 +465,20 @@ var Blockchain = class Blockchain {
       }
 
       getBlock(num){
-            //console.log("chain riser "+this.chainRiser);
-            //console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
+
+          if(this.chain.length <= this.chainRiser){
+            console.log("are we still here ? "+num)
+            //console.log(JSON.stringify(this.chain))
+            return this.chain[parseInt(num) - 1];
+          }else{
+            console.log("chain riser "+this.chainRiser);
+            console.log("block height - riser "+(parseInt(this.blockHeight)-parseInt(this.chainRiser)));
             var offset = (parseInt(this.blockHeight)-parseInt(this.chainRiser));
             var newNum = (parseInt(num)-parseInt(offset));
-            return this.chain[parseInt(newNum) - 1];
+            console.log("new num is "+offset)
+            return this.chain[parseInt(offset) - 1];
+          }
+
       }
 
       getLatestBlock(){
