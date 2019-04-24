@@ -669,11 +669,16 @@ var getBlockRange = function(blockHeight,riser,callback){
 
 
 ///////////////////////this function validates a range of blocks for chain symch
+<<<<<<< HEAD
 var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRiser,codelinenumber){
+=======
+var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRiser,calledFrom){
+>>>>>>> 0.0.4
 
       console.log("BRV CALLED FROM "+codelinenumber)
       console.log("BLOCKHEIGHT: "+blockHeight);
       console.log("RISER: "+riser);
+      console.log("CALLED FROM "+calledFrom)
 
       var stream = db.createReadStream();
       var dataStream = [];
@@ -702,7 +707,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
             //going to validate chaeckpoints
             console.log("passing thru this conditon "+currentBlockToValidate+" "+chainRiser+" "+(currentBlockToValidate%chainRiser == 0))
             if(currentBlockToValidate%chainRiser == 0){
-              //console.log("now we need this to be true "+currentBlockToValidate+" "+parseInt(currentBlockToValidate-chainRiser)+" "+parseInt(currentBlockToValidate-chainRiser)+" "+(parseInt(currentBlockToValidate-chainRiser)>0 && parseInt(currentBlockToValidate-chainRiser)>chainRiser))
+              console.log("now we need this to be true "+currentBlockToValidate+" "+parseInt(currentBlockToValidate-chainRiser)+" "+parseInt(currentBlockToValidate-chainRiser)+" "+(parseInt(currentBlockToValidate-chainRiser)>0 && parseInt(currentBlockToValidate-chainRiser)>chainRiser))
               if(parseInt(currentBlockToValidate-chainRiser) > 0 && parseInt(currentBlockToValidate-chainRiser) >= chainRiser){
                 var targetCheckPoint = parseInt(currentBlockToValidate-chainRiser);
                 var riserAgo = dataStream[dataItem-chainRiser].value.toString();
