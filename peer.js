@@ -3231,7 +3231,8 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
 
 
       //////////////going to have to make this sequential in a callback or chain
-      franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
+      franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);//need to swap fpr next line but test it
+      //frankieCoin.addPendingTransactionsToMinedBLock(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
 
       //calculating this 2 times but needed at addBlock for transations to verify properly
       var blockNum = parseInt(frankieCoin.getLatestBlock()["blockHeight"])
