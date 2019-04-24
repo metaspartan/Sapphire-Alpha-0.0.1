@@ -524,11 +524,11 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
     if(parseInt(replyData) > 2){
 
-      var clipHeight = parseInt(replyData-1)
+      var clipHeight = parseInt(replyData)
       chainClipperReduce(frankieCoin.blockHeight,clipHeight).then(function(){
         console.log("clipped chain to "+clipHeight+" restart to reindex")
-        chainState.chainWalkHeight = 1;
-        chainState.synchronized = 1;
+        chainState.chainWalkHeight = parseInt(clipHeight-1);
+        chainState.synchronized = parseInt(clipHeight-1);
         BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
       });
 
