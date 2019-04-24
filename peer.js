@@ -997,7 +997,7 @@ let connSeq2 = 0
             //}
           }else if(incomingBLockHeight > parseInt(frankieCoin.blockHeight+1)){/////need to move this below the block add and add the block differently to not mess with blockheight or txs
             console.log(chalk.bgCyan.red("*************   ***********   ***********   *********   **************"));
-            console.log("WE ARE IGNORING INCOMING BLOCKS WHILE is synching is "+frankieCoin.isSynching);
+            console.log("WE ARE IGNORING INCOMING BLOCKS WHILE is synching is "+chainState.isSynching+" syncronized "+chainState.synchronized);
             console.log(chalk.bgCyan.red("*************   ***********   ***********   *********   **************"));
           }else{
 
