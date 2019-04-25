@@ -98,7 +98,8 @@ var activeSync = function(){
 
   console.log(chalk.bgRed("------------------------------------------------------------------"));
   console.log(chalk.bgCyan.black(" chainwalkht: ")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight+1))+chalk.bgCyan.black(" chainStateSynchronized: ")+chalk.bgMagenta(chainState.synchronized)+chalk.bgCyan.black(" blockchainht: ")+chalk.bgMagenta(frankieCoin.blockHeight));
-  console.log(chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(parseInt(chainState.peerNonce = 0))+chalk.bgCyan.black(" transactionheight: ")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgCyan.black(" topblockheight: ")+chalk.bgMagenta(chainState.topBlock));
+  console.log(chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(parseInt(chainState.peerNonce))+chalk.bgCyan.black(" transactionheight: ")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgCyan.black(" topblockheight: ")+chalk.bgMagenta(chainState.topBlock));
+  console.log(chalk.bgCyan.black(" fcnlongpeer: ")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+chalk.bgCyan.black(" transactionheight: ")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgCyan.black(" topblockheight: ")+chalk.bgMagenta(chainState.topBlock));
 
   setTimeout(function(){
     BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,103);
@@ -165,7 +166,8 @@ var activePing = function(){
   var longestPeer = 0;
   for(node in nodesInChain){
     if(parseInt(nodesInChain[node]["info"]["chainlength"]) > longestPeer){
-      
+
+      /****
       console.log("                  ")
       console.log("   this a node    ")
       console.log("     -------      ")
@@ -173,9 +175,11 @@ var activePing = function(){
       console.log("     -------      ")
       console.log("   was  a node    ")
       console.log("                  ")
+      ****/
 
       longestPeer = parseInt(nodesInChain[node]["info"]["maxHeight"]);
-      //frankieCoin.longestPeerBlockHeight = longestPeer;
+      chainState.peerNonce = longestPeer;
+      frankieCoin.longestPeerBlockHeight = longestPeer;
     }
   }
   if(chainState.synchronized >= longestPeer){
