@@ -980,7 +980,20 @@ let connSeq2 = 0
             console.log(JSON.stringify(getDeleteableOrders[oxdel]));
           }
 ////////////////////////////////////////////////////////////incomeing peer block
-        }else if(JSON.parse(data)["previousHash"]){/////////need more refinement
+        //}else if(JSON.parse(data)["previousHash"]){/////////need more refinement
+        //{checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}
+        }else if(JSON.parse(data)["checkPointHash"] && JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
+
+          if(JSON.parse(data)["currentBlockCheckPointHash"] == chainState.currentBlockCheckPointHash && JSON.parse(data)["checkPointHash"] == chainState.checkPointHash){
+            console.log("THIS BLOCK IS PROABLY ON A VALID CHAIN")
+            //if I log this information on the chain state I can see it quickly
+          }else{
+            console.log("PROBABLY THIS BLLCK IS ERROR WILL ROBINSON")
+            //if I log this information on the chain state I can see it quickly
+          }
+
+          data = JSON.parse(data)["block"];
+
           //storing some variables of current chain
           var currentChainHash = frankieCoin.getLatestBlock()["hash"];
           var incomingBLockHeight = JSON.parse(data)["blockHeight"];
@@ -3034,7 +3047,7 @@ var broadcastPeersBlock = function(trigger,order = ''){
     log("------------------------------------------------------")
     log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
     log("------------------------------------------------------")
-    broadcastPeers(JSON.stringify(frankieCoin.getLatestBlock()));
+    broadcastPeers(JSON.stringify({checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}));
   }else if(trigger == "order"){
     //sending the block to the peers
     log("------------------------------------------------------")
