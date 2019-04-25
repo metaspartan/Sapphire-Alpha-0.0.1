@@ -411,8 +411,8 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
       var clipHeight = parseInt(replyData-1)
       chainClipperReduce(frankieCoin.blockHeight,clipHeight).then(function(){
         console.log("clipped chain to "+clipHeight+" restart to reindex")
-        chainState.chainWalkHeight = 1;
-        chainState.synchronized = 1;
+        chainState.chainWalkHeight = clipHeight;
+        chainState.synchronized = clipHeight;
         BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
       });
 
@@ -2156,8 +2156,8 @@ function cliGetInput(){
       var clipHeight = userInput.slice(userInput.indexOf("clipChainAt(")+12, userInput.indexOf(")"));
       chainClipperReduce(frankieCoin.blockHeight,clipHeight).then(function(){
         console.log("clipped chain to "+clipHeight+" restart to reindex")
-        chainState.chainWalkHeight = 1;
-        chainState.synchronized = 1;
+        chainState.chainWalkHeight = clipHeight;
+        chainState.synchronized = clipHeight;
         BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
       });
       cliGetInput();
@@ -3254,6 +3254,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         }else if(timestampcheck < 4000){
           tweenBlockDelay = 1200;
         }
+
         console.log(chalk.bgRed("setting between block delay of "+tweenBlockDelay))
         setTimeout(async function(){
           franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);//need to swap fpr next line but test it
