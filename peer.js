@@ -122,6 +122,7 @@ var adjustedTimeout = function() {
   frankieCoin.isChainSynch(chainState.synchronized)
   if((slowCounter % 4) == 0){
     tranSynch();
+    slowCounter++;
   }else if(isSynching == false && chainState.isSynching == false){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
