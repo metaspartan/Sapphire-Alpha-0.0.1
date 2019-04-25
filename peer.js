@@ -100,7 +100,7 @@ var activeSync = function(){
   console.log(chalk.bgCyan.black(" chainwalkht: ")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight+1))+chalk.bgCyan.black(" chainStateSynchronized: ")+chalk.bgMagenta(chainState.synchronized)+chalk.bgCyan.black(" blockchainht: ")+chalk.bgMagenta(frankieCoin.blockHeight));
 
   setTimeout(function(){
-    BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+    BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,103);
   },30)
 
 }
@@ -120,11 +120,18 @@ var tranSynch = function(){
 var slowCounter = 0;
 var adjustedTimeout = function() {
   frankieCoin.isChainSynch(chainState.synchronized)
-  if(isSynching == true && chainState.isSynching == false){
-    //console.log("calling active sync ");
+  if((slowCounter % 4) == 0){
+    tranSynch();
+  }else if(isSynching == false && chainState.isSynching == false){
+    console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
+    console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync();
+    activePing();
   }else if(chainState.peerNonce < chainState.synchronized){
+    console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
+    console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync();
+    activePing();
   }else{
     tranSynch();
     if((slowCounter % 4) == 0){
@@ -156,6 +163,7 @@ var activePing = function(){
   var longestPeer = 0;
   for(node in nodesInChain){
     if(parseInt(nodesInChain[node]["info"]["chainlength"]) > longestPeer){
+      /***
       console.log("                  ")
       console.log("   this a node    ")
       console.log("     -------      ")
@@ -163,6 +171,7 @@ var activePing = function(){
       console.log("     -------      ")
       console.log("   was  a node    ")
       console.log("                  ")
+      ***/
       longestPeer = parseInt(nodesInChain[node]["info"]["chainlength"]);
       //frankieCoin.longestPeerBlockHeight = longestPeer;
     }
@@ -413,7 +422,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
         console.log("clipped chain to "+clipHeight+" restart to reindex")
         chainState.chainWalkHeight = clipHeight;
         chainState.synchronized = clipHeight;
-        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,416);
       });
 
     }
@@ -518,7 +527,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
   }else if(isValid == false && replyData == chainState.transactionHeight){
 
     console.log("CHAIN STATE HEIGHT IS "+replyData+typeof(replyData)+" and chainstate issynching = "+chainState.isSynching);
-    
+
   }else{
 
     if(replyData == "NaN"){
@@ -1109,7 +1118,7 @@ let connSeq2 = 0
                       //add it to the RPC for miner
                       rpcserver.postRPCforMiner({block:JSON.parse(data)});
 
-                      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+                      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
 
                       //miner call
                       calculateCheckPoints(frankieCoin.blockHeight,'miner','');
@@ -1142,7 +1151,7 @@ let connSeq2 = 0
           //var hairCut = (JSON.parse(data)["syncTrigger"] % frankieCoin.chainRiser);
           //var lastRiser = parseInt(JSON.parse(data)["syncTrigger"] - hairCut)
           chainClipper(JSON.parse(data)["syncTrigger"]).then(function(){
-            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1145);
           });
 
           //setTimeout(function(){
@@ -1684,7 +1693,7 @@ let connSeq2 = 0
               console.log("CONN1 NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
               //setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
               chainClipper(frankieCoin.blockHeight).then(function(){
-                BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+                BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1687);
               });
             }
 
@@ -1813,7 +1822,7 @@ let connSeq2 = 0
           //var hairCut = (JSON.parse(data)["syncTrigger"] % frankieCoin.chainRiser);
           //var lastRiser = parseInt(JSON.parse(data)["syncTrigger"] - hairCut)
           chainClipper(JSON.parse(data)["syncTrigger"]).then(function(){
-            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1816);
           });
 
           //setTimeout(function(){
@@ -2024,7 +2033,7 @@ let connSeq2 = 0
               console.log("CONN2 NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
               //setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
               chainClipper(frankieCoin.blockHeight).then(function(){
-                BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+                BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2027);
               });
             }
 
@@ -2162,7 +2171,7 @@ function cliGetInput(){
         console.log("clipped chain to "+clipHeight+" restart to reindex")
         chainState.chainWalkHeight = clipHeight;
         chainState.synchronized = clipHeight;
-        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2165);
       });
       cliGetInput();
     }else if(userInput == "MM"){
@@ -2170,7 +2179,7 @@ function cliGetInput(){
       console.log("chain state synchronized equals "+chainState.synchronized);
       console.log("blockchain height is "+frankieCoin.blockHeight);
       setTimeout(function(){
-        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2173);
       },30)
       cliGetInput();
     }else if(userInput == "MT"){
@@ -2213,7 +2222,7 @@ function cliGetInput(){
     }else if(userInput == "CLIP"){
       console.log("cliping chain from "+frankieCoin.blockHeight+" back one riser ");
       chainClipper(frankieCoin.blockHeight).then(function(){
-        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser);
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
       });
       cliGetInput();
     }else if(userInput == "CHECKPOINT"){
@@ -2663,7 +2672,7 @@ var chainWalker = function(syncpoint,cbBlockChainValidatorStartUp){
   setTimeout(function(){
     //console.log(frankieCoin.blockHeight);
     if(frankieCoin.blockHeight > 1){
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(syncpoint),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(syncpoint),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,2666);
 
     }
   },1000);
