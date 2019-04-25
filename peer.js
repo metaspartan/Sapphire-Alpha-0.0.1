@@ -408,7 +408,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     console.log("NOT VALID NEED TO PING AT "+replyData+typeof(replyData));
     if(parseInt(replyData) > 2){
 
-      var clipHeight = parseInt(replyData-1)
+      var clipHeight = parseInt(replyData-3)
       chainClipperReduce(frankieCoin.blockHeight,clipHeight).then(function(){
         console.log("clipped chain to "+clipHeight+" restart to reindex")
         chainState.chainWalkHeight = clipHeight;
@@ -3296,7 +3296,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           }
           BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
         }
-        
+
 
       })();
       /////////////////////////////////////////////////////ENDING PROMISE RETURN
