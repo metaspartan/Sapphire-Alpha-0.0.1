@@ -158,7 +158,7 @@ var activePing = function(){
       //log(chalk.green("Sending ping for peer id "+id));
       //log("------------------------------------------------------");
 
-        peers[id].conn.write(JSON.stringify({"nodeStatePing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+        peers[id].conn.write(JSON.stringify({"nodeStatePing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash,ChainState:chainState.currentBlockCheckPointHash}}));
 
     }
   }
@@ -1178,6 +1178,8 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["nodeStatePong"]){
 
+          console.log("NODE STATE PONG "+JSON.parse(data)["nodeStatePong"]["currentBlockCheckPointHash"])
+
           if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
             BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
@@ -1188,7 +1190,7 @@ let connSeq2 = 0
           if(JSON.parse(data)["nodeStatePing"]["GlobalHash"] == globalGenesisHash){//will add more to this
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
             BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
-            peers[peerId].conn.write(JSON.stringify({"nodeStatePong":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+            peers[peerId].conn.write(JSON.stringify({"nodeStatePong":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),,GlobalHash:globalGenesisHash,ChainState:chainState.currentBlockCheckPointHash}}));
           }
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
