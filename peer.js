@@ -3247,64 +3247,56 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
 
         await console.log(chalk.bgRed("FIRST OFF CAN I DO A TIME OUT HERE AND "+frankieCoin.getLatestBlock().timestamp+" comares to "+JSON.parse(childData)["createBlock"]["block"]["timestamp"]))
         //////////////going to have to make this sequential in a callback or chain
-        var timestampcheck = ((JSON.parse(childData)["createBlock"]["block"]["timestamp"]-frankieCoin.getLatestBlock().timestamp)/1000);
-        var tweenBlockDelay = 1000;
-        if(timestampcheck < 3000){
-          tweenBlockDelay = 2000;
-        }else if(timestampcheck < 4000){
-          tweenBlockDelay = 1200;
-        }
 
-        console.log(chalk.bgRed("setting between block delay of "+tweenBlockDelay))
-        setTimeout(async function(){
-          franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);//need to swap fpr next line but test it
-          //frankieCoin.addPendingTransactionsToMinedBLock(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
 
-          //calculating this 2 times but needed at addBlock for transations to verify properly
-          var blockNum = await parseInt(frankieCoin.getLatestBlock()["blockHeight"])
-          var riserOffset = await (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
-          var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
-          checkPointBlock = JSON.stringify(checkPointBlock);
-          var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getLatestBlock()))["hash"];
-          var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
-          //end pre calculation
+        franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);//need to swap fpr next line but test it
+        //frankieCoin.addPendingTransactionsToMinedBLock(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
 
-          BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]),thisBlockCheckPointHash);
-          frankieCoin.hashOfThisBlock = sapphirechain.Hash(frankieCoin.hash+BlkDB.getStateTrieRootHash())+":"+frankieCoin.hash+":"+BlkDB.getStateTrieRootHash();
-          ////////database update and peers broadcast
-          log("[placeholder] mining stats from outside miner");
-          //NOTE: there is time to modify the hash of the block before broadcast as opposed to using hashOfthisBlock for stateroot
-          log("Outside Miner Mined Block Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
-          /////////////////////////////////////////////////////block stored to level
-          BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"3020",fSetChainStateTX,frankieCoin.chainRiser,thisBlockCheckPointHash);
-          BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
-          BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
+        //calculating this 2 times but needed at addBlock for transations to verify properly
+        var blockNum = await parseInt(frankieCoin.getLatestBlock()["blockHeight"])
+        var riserOffset = await (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
+        var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
+        checkPointBlock = JSON.stringify(checkPointBlock);
+        var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getLatestBlock()))["hash"];
+        var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+        //end pre calculation
 
-          chainState.chainWalkHeight = frankieCoin.blockHeight;
-          chainState.chainWalkHash = frankieCoin.getLatestBlock()["hash"];//block 1 hash
-          chainState.synchronized = frankieCoin.blockHeight;//when we are synched at a block it gets updated
-          chainState.topBlock = frankieCoin.blockHeight;
+        BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]),thisBlockCheckPointHash);
+        frankieCoin.hashOfThisBlock = sapphirechain.Hash(frankieCoin.hash+BlkDB.getStateTrieRootHash())+":"+frankieCoin.hash+":"+BlkDB.getStateTrieRootHash();
+        ////////database update and peers broadcast
+        log("[placeholder] mining stats from outside miner");
+        //NOTE: there is time to modify the hash of the block before broadcast as opposed to using hashOfthisBlock for stateroot
+        log("Outside Miner Mined Block Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
+        /////////////////////////////////////////////////////block stored to level
+        BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"3020",fSetChainStateTX,frankieCoin.chainRiser,thisBlockCheckPointHash);
+        BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
+        BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
 
-          //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
-            calculateCheckPoints(frankieCoin.blockHeight,'miner','');
-          //}
-          ///////////////////////////////////////////////////////////peers broadcast
-          fbroadcastPeersBlock('block');
-          ////////////////////finally post the RPC get work block data for the miner
-          rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-          ///////////////////////////////////////////////////chain state checkpoints
-          //now that we are valid we are going to check 3 blocks back to see if it is a candidate for chain state
-          console.log("MY MODULUS"+parseInt(frankieCoin.blockHeight - 3) % parseInt(frankieCoin.chainRiser))
-          if( parseInt(frankieCoin.blockHeight) > 3 && (parseInt(frankieCoin.blockHeight - 3) % parseInt(frankieCoin.chainRiser)) == 0 ){
-            var checkPoint = parseInt(frankieCoin.blockHeight - 3);
-            var pongBackBlock = function(blockData){
-              console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
-              BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"]);
-              //BlkDB.addCheckPoint("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"],JSON.parse(blockData)["previousHash"],JSON.parse(blockData)["timestamp"],JSON.parse(blockData)["nonce"])//block.previousHash + block.timestamp + block.nonce
-            }
-            BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
+        chainState.chainWalkHeight = frankieCoin.blockHeight;
+        chainState.chainWalkHash = frankieCoin.getLatestBlock()["hash"];//block 1 hash
+        chainState.synchronized = frankieCoin.blockHeight;//when we are synched at a block it gets updated
+        chainState.topBlock = frankieCoin.blockHeight;
+
+        //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
+          calculateCheckPoints(frankieCoin.blockHeight,'miner','');
+        //}
+        ///////////////////////////////////////////////////////////peers broadcast
+        fbroadcastPeersBlock('block');
+        ////////////////////finally post the RPC get work block data for the miner
+        rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+        ///////////////////////////////////////////////////chain state checkpoints
+        //now that we are valid we are going to check 3 blocks back to see if it is a candidate for chain state
+        console.log("MY MODULUS"+parseInt(frankieCoin.blockHeight - 3) % parseInt(frankieCoin.chainRiser))
+        if( parseInt(frankieCoin.blockHeight) > 3 && (parseInt(frankieCoin.blockHeight - 3) % parseInt(frankieCoin.chainRiser)) == 0 ){
+          var checkPoint = parseInt(frankieCoin.blockHeight - 3);
+          var pongBackBlock = function(blockData){
+            console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
+            BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"]);
+            //BlkDB.addCheckPoint("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"],JSON.parse(blockData)["previousHash"],JSON.parse(blockData)["timestamp"],JSON.parse(blockData)["nonce"])//block.previousHash + block.timestamp + block.nonce
           }
-        },tweenBlockDelay)
+          BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
+        }
+        
 
       })();
       /////////////////////////////////////////////////////ENDING PROMISE RETURN
