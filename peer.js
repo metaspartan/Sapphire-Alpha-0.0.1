@@ -82,6 +82,7 @@ chainState.chainWalkHeight = 1;
 chainState.chainWalkHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f';//block 1 hash
 chainState.synchronized = 1;//when we are synched at a block it gets updated
 chainState.topBlock = 0;
+chainState.checkPointHash;
 chainState.previousBlockCheckPointHash = {};
 chainState.currentBlockCheckPointHash = {};
 chainState.datapack = "";
@@ -92,6 +93,7 @@ chainState.transactionHeight = 0;
 chainState.transactionRootHash = '';
 //activesynch
 chainState.interval = 10000;
+chainState.activeSynch =
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(){
@@ -158,7 +160,7 @@ var activePing = function(){
       //log(chalk.green("Sending ping for peer id "+id));
       //log("------------------------------------------------------");
 
-        peers[id].conn.write(JSON.stringify({"nodeStatePing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash,ChainState:chainState.currentBlockCheckPointHash}}));
+        peers[id].conn.write(JSON.stringify({"nodeStatePing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash,checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash}}));
 
     }
   }
@@ -364,6 +366,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
         //console.log("in pong back block");
         //console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
         BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"]);
+        chainState.checkPointHash = "cs:"+checkPoint+":"+JSON.parse(blockData)["hash"];
       }
       BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
     }
@@ -487,6 +490,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       var pongBackBlock = function(blockData){
         console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
         BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"]);
+        chainState.checkPointHash = "cs:"+checkPoint+":"+JSON.parse(blockData)["hash"];
       }
       BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
     }
@@ -1178,7 +1182,10 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["nodeStatePong"]){
 
-          console.log("NODE STATE PONG "+JSON.stringify(JSON.parse(data)["nodeStatePong"]["ChainState"]))
+          var nSPongPeercurrentCPH = JSON.stringify(JSON.parse(data)["nodeStatePong"]["currentBlockCheckPointHash"]);
+          console.log("NODE STATE PONG "+JSON.parse(nSPongPeercurrentCPH)["blockNumber"]+" AND YOU "+chainState.synchronized)
+          var nSPongPeerCPH = JSON.stringify(JSON.parse(data)["nodeStatePong"]["checkPointHash"]);
+          console.log("NODE STATE PONG CP "+nSPongPeerCPH.split(":")[0]+" AND HASH "+nSPongPeerCPH.split(":")[1]+" AND YOU "+chainState.checkPointHash)
 
           if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
@@ -1187,12 +1194,16 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["nodeStatePing"]){
 
-          console.log("NODE STATE PONG "+JSON.stringify(JSON.parse(data)["nodeStatePing"]["ChainState"]))
+          var nSPingPeercurrentCPH = JSON.stringify(JSON.parse(data)["nSPingPeerCPH"]["currentBlockCheckPointHash"]);
+          console.log("NODE STATE PONG "+JSON.parse(nSPingPeercurrentCPH)["blockNumber"]+" AND YOU "+chainState.synchronized)
+          var nSPingPeerCPH = JSON.stringify(JSON.parse(data)["nSPingPeerCPH"]["checkPointHash"]);
+          console.log("NODE STATE PONG CP "+nSPingPeerCPH.split(":")[0]+" AND HASH "+nSPingPeerCPH.split(":")[1]+" AND YOU "+chainState.checkPointHash)
+
 
           if(JSON.parse(data)["nodeStatePing"]["GlobalHash"] == globalGenesisHash){//will add more to this
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
             BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
-            peers[peerId].conn.write(JSON.stringify({"nodeStatePong":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash,ChainState:chainState.currentBlockCheckPointHash}}));
+            peers[peerId].conn.write(JSON.stringify({"nodeStatePong":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash,checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash}}));
           }
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
@@ -3315,6 +3326,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           var pongBackBlock = function(blockData){
             console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
             BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"]);
+            chainState.checkPointHash = "cs:"+checkPoint+":"+JSON.parse(blockData)["hash"];
             //BlkDB.addCheckPoint("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"],JSON.parse(blockData)["previousHash"],JSON.parse(blockData)["timestamp"],JSON.parse(blockData)["nonce"])//block.previousHash + block.timestamp + block.nonce
           }
           BlkDB.getBlock(parseInt(checkPoint),pongBackBlock);
