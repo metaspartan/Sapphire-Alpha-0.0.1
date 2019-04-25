@@ -1178,7 +1178,7 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["nodeStatePong"]){
 
-          console.log("NODE STATE PONG "+JSON.parse(data)["nodeStatePong"]["ChainState"])
+          console.log("NODE STATE PONG "+JSON.stringify(JSON.parse(data)["nodeStatePong"]["ChainState"]))
 
           if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
@@ -1186,6 +1186,8 @@ let connSeq2 = 0
           }
 
         }else if(JSON.parse(data)["nodeStatePing"]){
+
+          console.log("NODE STATE PONG "+JSON.stringify(JSON.parse(data)["nodeStatePing"]["ChainState"]))
 
           if(JSON.parse(data)["nodeStatePing"]["GlobalHash"] == globalGenesisHash){//will add more to this
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
