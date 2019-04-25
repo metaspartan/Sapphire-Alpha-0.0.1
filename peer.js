@@ -93,7 +93,7 @@ chainState.transactionHeight = 0;
 chainState.transactionRootHash = '';
 //activesynch
 chainState.interval = 10000;
-chainState.activeSynch =
+chainState.activeSynch;
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(){
