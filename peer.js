@@ -1194,9 +1194,9 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["nodeStatePing"]){
 
-          var nSPingPeercurrentCPH = JSON.stringify(JSON.parse(data)["nSPingPeerCPH"]["currentBlockCheckPointHash"]);
+          var nSPingPeercurrentCPH = JSON.stringify(JSON.parse(data)["nodeStatePing"]["currentBlockCheckPointHash"]);
           console.log("NODE STATE PONG "+JSON.parse(nSPingPeercurrentCPH)["blockNumber"]+" AND YOU "+chainState.synchronized)
-          var nSPingPeerCPH = JSON.stringify(JSON.parse(data)["nSPingPeerCPH"]["checkPointHash"]);
+          var nSPingPeerCPH = JSON.stringify(JSON.parse(data)["nodeStatePing"]["checkPointHash"]);
           console.log("NODE STATE PONG CP "+nSPingPeerCPH.split(":")[0]+" AND HASH "+nSPingPeerCPH.split(":")[1]+" AND YOU "+chainState.checkPointHash)
 
 
