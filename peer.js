@@ -154,9 +154,9 @@ var activePing = function(){
   var nodesInChain = frankieCoin.retrieveNodes();
   for (let id in peers) {
     if(peers[id].conn != undefined){
-      log("------------------------------------------------------");
-      log(chalk.green("Sending ping for peer id "+id));
-      log("------------------------------------------------------");
+      //log("------------------------------------------------------");
+      //log(chalk.green("Sending ping for peer id "+id));
+      //log("------------------------------------------------------");
 
         peers[id].conn.write(JSON.stringify({"nodeStatePing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
 
@@ -183,12 +183,12 @@ var activePing = function(){
     }
   }
   if(chainState.synchronized >= longestPeer){
-    console.log("chain state synchronized "+chainState.synchronized);
-    console.log("longest peer "+longestPeer);
-    console.log("peer appears to be synched or ahead of network")
+    //console.log("chain state synchronized "+chainState.synchronized);
+    //console.log("longest peer "+longestPeer);
+    //console.log("peer appears to be synched or ahead of network")
   }
   if(chainState.isSynching = false){//keep in touch
-    console.log("is synching is FALSE");
+    //console.log("is synching is FALSE");
     for(peer in frankieCoin.nodes){
 
     }
@@ -898,9 +898,9 @@ let connSeq2 = 0
 
       let chunk;
       while (null !== (chunk = this.read())) {
-        console.log(`Received ${chunk.length} bytes of data.`);
+        //console.log(`Received ${chunk.length} bytes of data.`);
         //console.log(chunk.toString());
-        console.log("<== ");
+        //console.log("<== ");
         incomingStream+=chunk.toString()
         incomingBufferArray.push(chunk.toString());
       }
@@ -996,7 +996,7 @@ let connSeq2 = 0
             console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
             console.log(chalk.bgBlue("chainState.chainWalkHash: ")+chalk.black.bgCyan(chainState.chainWalkHash));
             console.log(chalk.bgBlue("chainState.synchronized: ")+chalk.black.bgCyan(chainState.synchronized));
-            console.log(chalk.bgBlue("chainState.topBlock: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+            console.log(chalk.bgBlue("chainState.topBlock: ")+chalk.black.bgCyan(chainState.topblock));
             console.log(chalk.bgRed("                                                    "));
             //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
               calculateCheckPoints(
@@ -1030,7 +1030,7 @@ let connSeq2 = 0
             console.log(chalk.bgBlue("  chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
             console.log(chalk.bgBlue("  chainState.chainWalkHash: ")+chalk.black.bgCyan(chainState.chainWalkHash));
             console.log(chalk.bgBlue("  chainState.synchronized: ")+chalk.black.bgCyan(chainState.synchronized));
-            console.log(chalk.bgBlue("  chainState.topBlock: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+            console.log(chalk.bgBlue("  chainState.topBlock: ")+chalk.black.bgCyan(chainState.topblock));
             console.log(chalk.bgGreen("                                                    "));
 
             //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
