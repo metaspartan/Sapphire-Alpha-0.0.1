@@ -160,7 +160,7 @@ var activePing = function(){
 
     }
   }
-  console.log(nodesInChain);
+  //console.log(nodesInChain);
   var longestPeer = 0;
   for(node in nodesInChain){
     if(parseInt(nodesInChain[node]["info"]["chainlength"]) > longestPeer){
