@@ -174,7 +174,7 @@ var activePing = function(){
       console.log("   was  a node    ")
       console.log("                  ")
       ***/
-      longestPeer = parseInt(nodesInChain[node]["info"]["chainlength"]);
+      longestPeer = parseInt(nodesInChain[node]["info"]["maxHeight"]);
       //frankieCoin.longestPeerBlockHeight = longestPeer;
     }
   }
