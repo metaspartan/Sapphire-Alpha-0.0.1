@@ -165,7 +165,7 @@ var activePing = function(){
   var longestPeer = 0;
   for(node in nodesInChain){
     if(parseInt(nodesInChain[node]["info"]["chainlength"]) > longestPeer){
-      /***
+      
       console.log("                  ")
       console.log("   this a node    ")
       console.log("     -------      ")
@@ -173,7 +173,7 @@ var activePing = function(){
       console.log("     -------      ")
       console.log("   was  a node    ")
       console.log("                  ")
-      ***/
+
       longestPeer = parseInt(nodesInChain[node]["info"]["maxHeight"]);
       //frankieCoin.longestPeerBlockHeight = longestPeer;
     }
