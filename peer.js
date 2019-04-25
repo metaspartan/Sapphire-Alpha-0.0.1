@@ -1178,7 +1178,7 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["nodeStatePong"]){
 
-          console.log("NODE STATE PONG "+JSON.parse(data)["nodeStatePong"]["currentBlockCheckPointHash"])
+          console.log("NODE STATE PONG "+JSON.parse(data)["nodeStatePong"]["ChainState"])
 
           if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
