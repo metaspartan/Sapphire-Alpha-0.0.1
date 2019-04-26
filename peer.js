@@ -998,7 +998,7 @@ let connSeq2 = 0
           }
 
           data = JSON.parse(data)["block"];
-          console.log(chainState.currentBlockCheckPointHash+"   "+chainState.checkPointHash)
+          console.log(JSON.stringify(JSON.parse(data)["currentBlockCheckPointHash"])+"   "+JSON.stringify(chainState.currentBlockCheckPointHash)+"   "+JSON.parse(data)["checkPointHash"]+"   "+chainState.checkPointHash)
           console.log(JSON.stringify(data))
 
           //storing some variables of current chain
