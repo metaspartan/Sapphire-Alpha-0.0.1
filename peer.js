@@ -993,11 +993,13 @@ let connSeq2 = 0
             console.log("THIS BLOCK IS PROABLY ON A VALID CHAIN")
             //if I log this information on the chain state I can see it quickly
           }else{
-            console.log("PROBABLY THIS BLLCK IS ERROR WILL ROBINSON")
+            console.log("PROBABLY THIS BLOCK IS ERROR WILL ROBINSON")
             //if I log this information on the chain state I can see it quickly
           }
 
           data = JSON.parse(data)["block"];
+          console.log(chainState.currentBlockCheckPointHash+"   "+chainState.checkPointHash)
+          console.log(JSON.stringify(data))
 
           //storing some variables of current chain
           var currentChainHash = frankieCoin.getLatestBlock()["hash"];
