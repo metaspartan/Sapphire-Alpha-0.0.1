@@ -997,7 +997,9 @@ let connSeq2 = 0
             //if I log this information on the chain state I can see it quickly
           }
 
-          data = JSON.parse(data)["block"];
+          console.log("FIRST THE WHOLE THING "+JSON.stringify(data));
+
+          data = JSON.parse(JSON.stringify(data))["block"];
           console.log(JSON.stringify(JSON.parse(data)["currentBlockCheckPointHash"])+"   "+JSON.stringify(chainState.currentBlockCheckPointHash)+"   "+JSON.parse(data)["checkPointHash"]+"   "+chainState.checkPointHash)
           console.log(JSON.stringify(data))
 
