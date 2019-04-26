@@ -128,7 +128,7 @@ var adjustedTimeout = function() {
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync();
-    activePing();
+    //activePing();
   }else if((slowCounter % 4) == 0){
     tranSynch();
     slowCounter++;
