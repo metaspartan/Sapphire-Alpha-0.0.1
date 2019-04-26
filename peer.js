@@ -2813,11 +2813,15 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
     chainState.interval = 25000;
   }else if(parseInt(peerMaxHeight - frankieCoin.getLength()) > 2500){
     //chainState.isSynching = false;
+    if(chainState.interval == 10000 && chainState.synchronized < 10){
+      activeSync();
+    }
     chainState.interval = 10000;
   }else if(parseInt(peerMaxHeight - frankieCoin.getLength()) > 1000){
     //chainState.isSynching = false;
     chainState.interval = 8000;
   }else{
+    chainState.interval = 4000;
     log("------------------------------------------------------")
     //chainState.isSynching = false;//if I set to true here it stops
   }
