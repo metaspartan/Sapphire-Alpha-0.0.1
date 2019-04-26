@@ -2814,6 +2814,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   }else if(parseInt(peerMaxHeight - frankieCoin.getLength()) > 2500){
     //chainState.isSynching = false;
     if(chainState.interval == 10000 && chainState.synchronized < 10){
+      console.log("calling active sync now ");
       activeSync();
     }
     chainState.interval = 10000;
