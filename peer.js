@@ -992,17 +992,17 @@ let connSeq2 = 0
 
           var riserOffset = (parseInt(JSON.parse(data)["block"]["blockHeight"]) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
 
-          var checkPointBlockAtHeight = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset+1)));
+          var checkPointBlockAtHeight = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset)));
           var checkPointBlockPlusOne = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset+1)));///getCheckpoint
           var checkPointBlockThreeBack = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset-3)));
 
-          console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlockAtHeight)["blockHeight"]+" Hash "+JSON.parse(checkPointBlockAtHeight)["hash"]);
-          console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlockPlusOne)["blockHeight"]+" Hash "+JSON.parse(checkPointBlockPlusOne)["hash"]);
-          console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlockThreeBack)["blockHeight"]+" Hash "+JSON.parse(checkPointBlockThreeBack)["hash"]);
+          console.log("CALCULATED CHECK POINT AT HEIGHT "+JSON.parse(checkPointBlockAtHeight)["blockHeight"]+" Hash "+JSON.parse(checkPointBlockAtHeight)["hash"]);
+          console.log("CALCULATED CHECK POINT PLUS ONE "+JSON.parse(checkPointBlockPlusOne)["blockHeight"]+" Hash "+JSON.parse(checkPointBlockPlusOne)["hash"]);
+          console.log("CALCULATED CHECK POINT THREE BACK "+JSON.parse(checkPointBlockThreeBack)["blockHeight"]+" Hash "+JSON.parse(checkPointBlockThreeBack)["hash"]);
 
-          var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(parseInt(JSON.parse(data)["block"]["blockHeight"])))["hash"];
-          //var blockNumHash = await JSON.parse(BlkDB.getBlock(blockNum))["hash"];
-          //console.log("blockNumHash: "+blockNumHash);
+
+          var blockNumHash = JSON.parse(data)["block"]["hash"];
+          console.log("blockNumHash: "+blockNumHash);
 
           var thisBlockCheckPointHashAtHeight = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlockAtHeight)["hash"]);
           var thisBlockCheckPointHashPlusOne = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlockPlusOne)["hash"]);
