@@ -993,218 +993,210 @@ let connSeq2 = 0
           var riserOffset = (parseInt(JSON.parse(data)["block"]["blockHeight"]) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
 
           var checkPointBlockAtHeight = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset)));
-          var checkPointBlockPlusOne = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset+1)));///getCheckpoint
-          var checkPointBlockThreeBack = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset-3)));
+          //var checkPointBlockPlusOne = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset-1)));///getCheckpoint
+          //var checkPointBlockThreeBack = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset-3)));
 
           console.log("CALCULATED CHECK POINT AT HEIGHT "+JSON.parse(checkPointBlockAtHeight)["blockHeight"]+" Hash "+JSON.parse(checkPointBlockAtHeight)["hash"]);
-          console.log("CALCULATED CHECK POINT PLUS ONE "+JSON.parse(checkPointBlockPlusOne)["blockHeight"]+" Hash "+JSON.parse(checkPointBlockPlusOne)["hash"]);
-          console.log("CALCULATED CHECK POINT THREE BACK "+JSON.parse(checkPointBlockThreeBack)["blockHeight"]+" Hash "+JSON.parse(checkPointBlockThreeBack)["hash"]);
+          //console.log("CALCULATED CHECK POINT PLUS ONE "+JSON.parse(checkPointBlockPlusOne)["blockHeight"]+" Hash "+JSON.parse(checkPointBlockPlusOne)["hash"]);
+          //console.log("CALCULATED CHECK POINT THREE BACK "+JSON.parse(checkPointBlockThreeBack)["blockHeight"]+" Hash "+JSON.parse(checkPointBlockThreeBack)["hash"]);
 
 
           var blockNumHash = JSON.parse(data)["block"]["hash"];
           console.log("blockNumHash: "+blockNumHash);
 
           var thisBlockCheckPointHashAtHeight = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlockAtHeight)["hash"]);
-          var thisBlockCheckPointHashPlusOne = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlockPlusOne)["hash"]);
-          var thisBlockCheckPointHashThreeBack = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlockThreeBack)["hash"]);
+          //var thisBlockCheckPointHashPlusOne = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlockPlusOne)["hash"]);
+          //var thisBlockCheckPointHashThreeBack = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlockThreeBack)["hash"]);
 
           console.log("BLOCK CHECK POINT HASH AT HEIGHT "+thisBlockCheckPointHashAtHeight);
-          console.log("BLOCK CHECK POINT HASH PLUS ONE "+thisBlockCheckPointHashPlusOne);
-          console.log("BLOCK CHECK POINT HASH THREE BACK "+thisBlockCheckPointHashThreeBack);
+          //console.log("BLOCK CHECK POINT HASH PLUS ONE "+thisBlockCheckPointHashPlusOne);
+          //console.log("BLOCK CHECK POINT HASH THREE BACK "+thisBlockCheckPointHashThreeBack);
 
           //calculate from this JSON.parse(data)["currentBlockCheckPointHash"]  and block data also
-          if(JSON.parse(data)["block"]["chainStateHash"] == chainState.currentBlockCheckPointHash && JSON.parse(data)["checkPointHash"] == chainState.checkPointHash){
-            console.log("THIS BLOCK IS PROABLY ON A VALID CHAIN")
+          if(JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"] == chainState.currentBlockCheckPointHash.checkPointHash && JSON.parse(data)["checkPointHash"] == chainState.checkPointHash && JSON.parse(data)["currentBlockCheckPointHash"]["checkPointHash"] == thisBlockCheckPointHashAtHeight){
+
+            console.log("VALID BLOCK MATCHING CALCULATED CHECK POINT HASHES")
             //if I log this information on the chain state I can see it quickly
 
 
+            //storing some variables of current chain
+            var currentChainHash = frankieCoin.getLatestBlock()["hash"];
+            var incomingBLockHeight = JSON.parse(data)["block"]["blockHeight"];
+            console.log("VVVVVVVVVVVVVVVVVVVVV        "+incomingBLockHeight+"        VVVVVVVVVVVVVVVVVVVV    ---->   "+frankieCoin.blockHeight);
 
+            console.log("incoming blocknum "+JSON.parse(data)["block"]["chainStateHash"]["blockNumber"]+" incoming check point hash "+JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"]);
+            console.log("chain state previous "+JSON.stringify(chainState.previousBlockCheckPointHash));
+            console.log("chain state current "+JSON.stringify(chainState.currentBlockCheckPointHash));
 
-          }else{
-            console.log("PROBABLY THIS BLOCK IS ERROR WILL ROBINSON")
-            //if I log this information on the chain state I can see it quickly
-          }
+            if(incomingBLockHeight < frankieCoin.blockHeight){
 
+              console.log(chalk.bgRed("         THIS BLOCK IS LOWER THAN EXPECTED!         "));
+              console.log(chalk.bgRed("                                                    "));
+              console.log(chalk.bgBlue("frankieCoin.blockHeight: ")+chalk.black.bgCyan(frankieCoin.blockHeight));
+              console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+              console.log(chalk.bgBlue("chainState.isSynching: ")+chalk.black.bgCyan(chainState.isSynching));
+              console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+              console.log(chalk.bgBlue("chainState.chainWalkHash: ")+chalk.black.bgCyan(chainState.chainWalkHash));
+              console.log(chalk.bgBlue("chainState.synchronized: ")+chalk.black.bgCyan(chainState.synchronized));
+              console.log(chalk.bgBlue("chainState.topBlock: ")+chalk.black.bgCyan(chainState.topblock));
+              console.log(chalk.bgRed("                                                    "));
+              //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
+                calculateCheckPoints(
+                  frankieCoin.blockHeight,
+                  'peer',
+                  JSON.parse(data)["block"]["chainStateHash"]["blockNumber"]+":"+JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"]
+                ).then(function(response,err){
+                  if(err){
+                    console.log(err);
+                  }else if(response == 2){
+                    console.log("chain state response is not normal "+response);
+                    var syncTrigger = {"syncTrigger":incomingBLockHeight,"submitCurrrentChainStateHash":JSON.parse(data)["block"]["chainStateHash"],"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
+                    peers[peerId].conn.write(JSON.stringify(syncTrigger));
+                    //peerId
+                  }else{
+                    console.log("chain state response "+response);
+                  }
+                });
+              //}
+            }else if(incomingBLockHeight > parseInt(frankieCoin.blockHeight+1)){/////need to move this below the block add and add the block differently to not mess with blockheight or txs
+              console.log(chalk.bgCyan.red("*************   ***********   ***********   *********   **************"));
+              console.log("WE ARE IGNORING INCOMING BLOCKS WHILE is synching is "+chainState.isSynching+" syncronized "+chainState.synchronized);
+              console.log(chalk.bgCyan.red("*************   ***********   ***********   *********   **************"));
+            }else{
 
-          console.log("FIRST THE WHOLE THING "+JSON.stringify(data.toString()));
+              console.log(chalk.bgGreen("                THIS BLOCK CHAIN STATS:             "));
+              console.log(chalk.bgGreen("                                                    "));
+              console.log(chalk.bgBlue("  frankieCoin.blockHeight: ")+chalk.black.bgCyan(frankieCoin.blockHeight));
+              console.log(chalk.bgBlue("  chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+              console.log(chalk.bgBlue("  chainState.isSynching: ")+chalk.black.bgCyan(chainState.isSynching));
+              console.log(chalk.bgBlue("  chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
+              console.log(chalk.bgBlue("  chainState.chainWalkHash: ")+chalk.black.bgCyan(chainState.chainWalkHash));
+              console.log(chalk.bgBlue("  chainState.synchronized: ")+chalk.black.bgCyan(chainState.synchronized));
+              console.log(chalk.bgBlue("  chainState.topBlock: ")+chalk.black.bgCyan(chainState.topblock));
+              console.log(chalk.bgGreen("                                                    "));
 
-          //data = JSON.parse(JSON.stringify(data.toString()))["block"];
-          console.log("what if I just output the timestamp? "+JSON.parse(data)["block"]["timestamp"])
+              //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
+                calculateCheckPoints(
+                  frankieCoin.blockHeight,
+                  'peer',
+                  JSON.parse(data)["block"]["chainStateHash"]["blockNumber"]+":"+JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"]
+                ).then(function(response,err){
+                  if(err){
+                    console.log(err);
+                  }else{
+                    console.log("chain state response normal "+parseInt(response));
 
-          console.log("AND THEN JUST THE DATA BLOCK "+data);
+                    if(response == 1){
 
-          console.log(JSON.stringify(JSON.parse(data)["currentBlockCheckPointHash"])+"   "+JSON.stringify(chainState.currentBlockCheckPointHash)+"   "+JSON.parse(data)["checkPointHash"]+"   "+chainState.checkPointHash)
-          console.log(JSON.stringify(data));
+                      ///////////////NEED TO REMOVE ANY MATCHED PENDING TXS FROM MEME POOL
+                      console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
+                      console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
+                      var incomingTx = JSON.parse(data)["block"]["transactions"];
+                      var existingPendingTx = frankieCoin.pendingTransactions;
+                      var replacementTx = [];
+                      for(ptx in incomingTx){
+                        //will be removed
+                        console.log("before the processed order check");
+                        if(incomingTx[ptx]["oxdid"]){
+                          console.log("we are actually in the incoming tx looking at order id deletion")
+                          BlkDB.clearOrderById(incomingTx[ptx]["oxdid"],incomingTx[ptx]["oxtid"]);
+                        }
+                        for(etx in existingPendingTx){
+                          //adding logic to remove orders if ox id present
+                          if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash"]){
 
-          //storing some variables of current chain
-          var currentChainHash = frankieCoin.getLatestBlock()["hash"];
-          var incomingBLockHeight = JSON.parse(data)["block"]["blockHeight"];
-          console.log("VVVVVVVVVVVVVVVVVVVVV        "+incomingBLockHeight+"        VVVVVVVVVVVVVVVVVVVV    ---->   "+frankieCoin.blockHeight);
-
-          console.log("incoming blocknum "+JSON.parse(data)["block"]["chainStateHash"]["blockNumber"]+" incoming check point hash "+JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"]);
-          console.log("chain state previous "+JSON.stringify(chainState.previousBlockCheckPointHash));
-          console.log("chain state current "+JSON.stringify(chainState.currentBlockCheckPointHash));
-
-          if(incomingBLockHeight < frankieCoin.blockHeight){
-
-            console.log(chalk.bgRed("         THIS BLOCK IS LOWER THAN EXPECTED!         "));
-            console.log(chalk.bgRed("                                                    "));
-            console.log(chalk.bgBlue("frankieCoin.blockHeight: ")+chalk.black.bgCyan(frankieCoin.blockHeight));
-            console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
-            console.log(chalk.bgBlue("chainState.isSynching: ")+chalk.black.bgCyan(chainState.isSynching));
-            console.log(chalk.bgBlue("chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
-            console.log(chalk.bgBlue("chainState.chainWalkHash: ")+chalk.black.bgCyan(chainState.chainWalkHash));
-            console.log(chalk.bgBlue("chainState.synchronized: ")+chalk.black.bgCyan(chainState.synchronized));
-            console.log(chalk.bgBlue("chainState.topBlock: ")+chalk.black.bgCyan(chainState.topblock));
-            console.log(chalk.bgRed("                                                    "));
-            //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
-              calculateCheckPoints(
-                frankieCoin.blockHeight,
-                'peer',
-                JSON.parse(data)["block"]["chainStateHash"]["blockNumber"]+":"+JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"]
-              ).then(function(response,err){
-                if(err){
-                  console.log(err);
-                }else if(response == 2){
-                  console.log("chain state response is not normal "+response);
-                  var syncTrigger = {"syncTrigger":incomingBLockHeight,"submitCurrrentChainStateHash":JSON.parse(data)["block"]["chainStateHash"],"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
-                  peers[peerId].conn.write(JSON.stringify(syncTrigger));
-                  //peerId
-                }else{
-                  console.log("chain state response "+response);
-                }
-              });
-            //}
-          }else if(incomingBLockHeight > parseInt(frankieCoin.blockHeight+1)){/////need to move this below the block add and add the block differently to not mess with blockheight or txs
-            console.log(chalk.bgCyan.red("*************   ***********   ***********   *********   **************"));
-            console.log("WE ARE IGNORING INCOMING BLOCKS WHILE is synching is "+chainState.isSynching+" syncronized "+chainState.synchronized);
-            console.log(chalk.bgCyan.red("*************   ***********   ***********   *********   **************"));
-          }else{
-
-            console.log(chalk.bgGreen("                THIS BLOCK CHAIN STATS:             "));
-            console.log(chalk.bgGreen("                                                    "));
-            console.log(chalk.bgBlue("  frankieCoin.blockHeight: ")+chalk.black.bgCyan(frankieCoin.blockHeight));
-            console.log(chalk.bgBlue("  chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
-            console.log(chalk.bgBlue("  chainState.isSynching: ")+chalk.black.bgCyan(chainState.isSynching));
-            console.log(chalk.bgBlue("  chainState.chainWalkHeight: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
-            console.log(chalk.bgBlue("  chainState.chainWalkHash: ")+chalk.black.bgCyan(chainState.chainWalkHash));
-            console.log(chalk.bgBlue("  chainState.synchronized: ")+chalk.black.bgCyan(chainState.synchronized));
-            console.log(chalk.bgBlue("  chainState.topBlock: ")+chalk.black.bgCyan(chainState.topblock));
-            console.log(chalk.bgGreen("                                                    "));
-
-            //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
-              calculateCheckPoints(
-                frankieCoin.blockHeight,
-                'peer',
-                JSON.parse(data)["block"]["chainStateHash"]["blockNumber"]+":"+JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"]
-              ).then(function(response,err){
-                if(err){
-                  console.log(err);
-                }else{
-                  console.log("chain state response normal "+parseInt(response));
-
-                  if(response == 1){
-
-                    ///////////////NEED TO REMOVE ANY MATCHED PENDING TXS FROM MEME POOL
-                    console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
-                    console.log("RRRRRRRRRRRRRRRRRRRRR  removing txs RRRRRRRRRRRRRRR");
-                    var incomingTx = JSON.parse(data)["block"]["transactions"];
-                    var existingPendingTx = frankieCoin.pendingTransactions;
-                    var replacementTx = [];
-                    for(ptx in incomingTx){
-                      //will be removed
-                      console.log("before the processed order check");
-                      if(incomingTx[ptx]["oxdid"]){
-                        console.log("we are actually in the incoming tx looking at order id deletion")
-                        BlkDB.clearOrderById(incomingTx[ptx]["oxdid"],incomingTx[ptx]["oxtid"]);
-                      }
-                      for(etx in existingPendingTx){
-                        //adding logic to remove orders if ox id present
-                        if(incomingTx[ptx]["hash"] == existingPendingTx[etx]["hash"]){
-
-                        }else{
-                          replacementTx.push(existingPendingTx[etx]);
+                          }else{
+                            replacementTx.push(existingPendingTx[etx]);
+                          }
                         }
                       }
-                    }
-                    frankieCoin.pendingTransactions = [];
-                    frankieCoin.pendingTransactions = replacementTx;
-                    ///////////////NEED TO REMOVE ANY MATCHED PENDING OXS FROM MEME POOL
-                    console.log("RRRRRRRRRRRRRRRRRRRRR  removing oxs RRRRRRRRRRRRRRR");
-                    console.log("RRRRRRRRRRRRRRRRRRRRR  removing oxs RRRRRRRRRRRRRRR");
-                    var incomingOx = JSON.parse(data)["block"]["orders"];
-                    var existingPendingOx = frankieCoin.pendingOrders;
-                    var replacementOx = [];
-                    for(pox in incomingOx){
-                      for(eox in existingPendingOx){
-                        if(incomingOx[pox]["hash"] == existingPendingOx[eox]["hash"]){
-                          //do nothing removes this element
-                        }else{
-                          replacementOx.push(existingPendingOx[eox]);
+                      frankieCoin.pendingTransactions = [];
+                      frankieCoin.pendingTransactions = replacementTx;
+                      ///////////////NEED TO REMOVE ANY MATCHED PENDING OXS FROM MEME POOL
+                      console.log("RRRRRRRRRRRRRRRRRRRRR  removing oxs RRRRRRRRRRRRRRR");
+                      console.log("RRRRRRRRRRRRRRRRRRRRR  removing oxs RRRRRRRRRRRRRRR");
+                      var incomingOx = JSON.parse(data)["block"]["orders"];
+                      var existingPendingOx = frankieCoin.pendingOrders;
+                      var replacementOx = [];
+                      for(pox in incomingOx){
+                        for(eox in existingPendingOx){
+                          if(incomingOx[pox]["hash"] == existingPendingOx[eox]["hash"]){
+                            //do nothing removes this element
+                          }else{
+                            replacementOx.push(existingPendingOx[eox]);
+                          }
                         }
                       }
+                      frankieCoin.pendingOrders = [];
+                      frankieCoin.pendingOrders = replacementOx;
+                      ////////////////////////////////////END REMOVAL OF PENDING TX AND OX
+
+                      //first we add the block to the blockchain with call back and id of submitting peer for conflict resolution
+                      var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data)["block"],sendBackUncle,peerId);
+
+                      log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD? "+successfulBlockAdd));
+
+
+                        //increment the internal peer nonce of sending party to track longest chain
+                        frankieCoin.incrementPeerNonce(peerId,JSON.parse(data)["block"]["blockHeight"]);
+                        BlkDB.addNode("node:"+peerId+":peerBlockHeight",JSON.parse(data)["block"]["blockHeight"]);
+                        //logging the block added to chain for console
+                        log(chalk.red("--------------------------------------------------------------------"));
+                        //log(chalk.green("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock())));//verbose
+                        log(chalk.green("block added to chain: "+JSON.stringify(JSON.parse(data)["block"]["blockHeight"])));
+                        log(chalk.green("in prev hash: ")+JSON.parse(data)["block"]["previousHash"]+chalk.green(" <=> chain: ")+currentChainHash);
+                        log(chalk.yellow("                     SUCESSFUL BLOCK FROM PEER                      "));
+                        log(chalk.red("--------------------------------------------------------------------"));
+
+                        var blockNum = JSON.parse(data)["block"]["blockHeight"];
+                        //calculating this 2 times but needed at addBlock for transations to verify properly
+                        var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
+                        var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
+                        checkPointBlock = JSON.stringify(checkPointBlock);
+                        var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getLatestBlock()))["hash"];
+                        var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+                        //end pre calculation
+
+                        //////update the client database OR reject block and rollback the chain - code is incomplete atm
+                        //add it to the database
+                        BlkDB.addBlock(parseInt(JSON.parse(data)["block"]["blockHeight"]),JSON.stringify(JSON.parse(data)["block"]),JSON.parse(data)["block"]["hash"],"967",setChainStateTX,frankieCoin.chainRiser,JSON.parse(checkPointBlock)["hash"],thisBlockCheckPointHash);
+                        BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(JSON.parse(data)["block"]["blockHeight"]));
+                        BlkDB.addChainState("cs:blockHeight",parseInt(JSON.parse(data)["block"]["blockHeight"]));
+                        BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["block"]["transactions"]),JSON.parse(data)["block"]["hash"],parseInt(JSON.parse(data)["block"]["blockHeight"]),thisBlockCheckPointHash);
+                        //add it to the RPC for miner
+                        rpcserver.postRPCforMiner({block:JSON.parse(data)["block"]});
+
+                        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
+
+                        //miner call
+                        calculateCheckPoints(frankieCoin.blockHeight,'miner','');
+
+                    }else if(parseInt(response == 2)){
+
+                      console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
+                      console.log("WARNING INCOMING PEER INFORMATION DID NOT MATCH CHAIN WEIGHT BAD WARNING");
+                      console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
+                      console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
+                      console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
+                      console.log("WARNING INCOMING PEER INFORMATION DID NOT MATCH CHAIN WEIGHT BAD WARNING");
+                      console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
+                      console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
+
                     }
-                    frankieCoin.pendingOrders = [];
-                    frankieCoin.pendingOrders = replacementOx;
-                    ////////////////////////////////////END REMOVAL OF PENDING TX AND OX
-
-                    //first we add the block to the blockchain with call back and id of submitting peer for conflict resolution
-                    var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data)["block"],sendBackUncle,peerId);
-
-                    log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD? "+successfulBlockAdd));
-
-
-                      //increment the internal peer nonce of sending party to track longest chain
-                      frankieCoin.incrementPeerNonce(peerId,JSON.parse(data)["block"]["blockHeight"]);
-                      BlkDB.addNode("node:"+peerId+":peerBlockHeight",JSON.parse(data)["block"]["blockHeight"]);
-                      //logging the block added to chain for console
-                      log(chalk.red("--------------------------------------------------------------------"));
-                      //log(chalk.green("block added to chain: "+JSON.stringify(frankieCoin.getLatestBlock())));//verbose
-                      log(chalk.green("block added to chain: "+JSON.stringify(JSON.parse(data)["block"]["blockHeight"])));
-                      log(chalk.green("in prev hash: ")+JSON.parse(data)["block"]["previousHash"]+chalk.green(" <=> chain: ")+currentChainHash);
-                      log(chalk.yellow("                     SUCESSFUL BLOCK FROM PEER                      "));
-                      log(chalk.red("--------------------------------------------------------------------"));
-
-                      var blockNum = JSON.parse(data)["block"]["blockHeight"];
-                      //calculating this 2 times but needed at addBlock for transations to verify properly
-                      var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
-                      var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
-                      checkPointBlock = JSON.stringify(checkPointBlock);
-                      var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getLatestBlock()))["hash"];
-                      var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
-                      //end pre calculation
-
-                      //////update the client database OR reject block and rollback the chain - code is incomplete atm
-                      //add it to the database
-                      BlkDB.addBlock(parseInt(JSON.parse(data)["block"]["blockHeight"]),JSON.stringify(JSON.parse(data)["block"]),JSON.parse(data)["block"]["hash"],"967",setChainStateTX,frankieCoin.chainRiser,JSON.parse(checkPointBlock)["hash"],thisBlockCheckPointHash);
-                      BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(JSON.parse(data)["block"]["blockHeight"]));
-                      BlkDB.addChainState("cs:blockHeight",parseInt(JSON.parse(data)["block"]["blockHeight"]));
-                      BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["block"]["transactions"]),JSON.parse(data)["block"]["hash"],parseInt(JSON.parse(data)["block"]["blockHeight"]),thisBlockCheckPointHash);
-                      //add it to the RPC for miner
-                      rpcserver.postRPCforMiner({block:JSON.parse(data)["block"]});
-
-                      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
-
-                      //miner call
-                      calculateCheckPoints(frankieCoin.blockHeight,'miner','');
-
-                  }else if(parseInt(response == 2)){
-
-                    console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
-                    console.log("WARNING INCOMING PEER INFORMATION DID NOT MATCH CHAIN WEIGHT BAD WARNING");
-                    console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
-                    console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
-                    console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
-                    console.log("WARNING INCOMING PEER INFORMATION DID NOT MATCH CHAIN WEIGHT BAD WARNING");
-                    console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
-                    console.log("WARNING WARNING WARNING WARNING WARNING WARNING WARNING: WARNING WARNING");
 
                   }
+                });
+              //}
+            }
 
-                }
-              });
-            //}
+
+          }else{
+
+            console.log("UNCLE OR ON WRONG CHAIN")
+            //if I log this information on the chain state I can see it quickly
+
           }
+
 
 
         }else if(JSON.parse(data)["syncTrigger"]){
