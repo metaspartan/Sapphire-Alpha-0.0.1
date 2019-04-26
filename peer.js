@@ -127,12 +127,12 @@ var adjustedTimeout = function() {
   if((slowCounter % 4) == 0){
     tranSynch();
     slowCounter++;
-  }else if(isSynching == false && chainState.isSynching == false){
+  }else if(chainState.peerNonce < chainState.synchronized){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync();
-    activePing();
-  }else if(chainState.peerNonce < chainState.synchronized){
+    //activePing();
+  }else if(isSynching == false && chainState.isSynching == false){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync();
