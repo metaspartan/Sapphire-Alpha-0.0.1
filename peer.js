@@ -1000,6 +1000,9 @@ let connSeq2 = 0
           console.log("FIRST THE WHOLE THING "+JSON.stringify(data.toString()));
 
           data = JSON.parse(JSON.stringify(data.toString()))["block"];
+
+          console.log("AND THEN JUST THE DATA BLOCK "+data);
+
           console.log(JSON.stringify(JSON.parse(data)["currentBlockCheckPointHash"])+"   "+JSON.stringify(chainState.currentBlockCheckPointHash)+"   "+JSON.parse(data)["checkPointHash"]+"   "+chainState.checkPointHash)
           console.log(JSON.stringify(data))
 
