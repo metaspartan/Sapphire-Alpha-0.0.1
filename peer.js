@@ -124,14 +124,19 @@ var tranSynch = function(){
 var slowCounter = 0;
 var adjustedTimeout = function() {
   frankieCoin.isChainSynch(chainState.synchronized)
-  if((slowCounter % 4) == 0){
+  if(slowCounter == 0){
+    console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
+    console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
+    activeSync();
+    activePing();
+  }else if((slowCounter % 4) == 0){
     tranSynch();
     slowCounter++;
   }else if(chainState.peerNonce < chainState.synchronized){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync();
-    //activePing();
+    activePing();
   }else if(isSynching == false && chainState.isSynching == false){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
