@@ -1193,6 +1193,9 @@ let connSeq2 = 0
           }else{
 
             console.log("UNCLE OR ON WRONG CHAIN")
+            var uncleReply = JSON.stringify({uncle:JSON.parse(data),chainState:chainState})
+            sendbackUncle(uncleReply,peerId)
+            //peers[peerId].conn.write(JSON.stringify(syncTrigger));
             //if I log this information on the chain state I can see it quickly
 
           }
@@ -1226,6 +1229,10 @@ let connSeq2 = 0
 
           log(chalk.bgBlue("THIS IS THE UNCLRE RETURN WE LOG THE OMMER AND DELETE"));
           log(data["uncle"]);
+          chainClipper(frankieCoin.blockHeight).then(function(){
+            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
+          });
+          //clipChainAt(parseInt(chainState.syncronized - 10))
 
         }else if(JSON.parse(data)["nodeStatePong"]){
 
