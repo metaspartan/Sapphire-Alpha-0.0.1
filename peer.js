@@ -129,7 +129,8 @@ var adjustedTimeout = function() {
     console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync();
     //activePing();
-  }else if((slowCounter % 4) == 0){
+    slowCounter++;
+  }else if((slowCounter % 4) == 0){//need a different trigger for transaction sync but for now ok
     tranSynch();
     slowCounter++;
   }else if(chainState.peerNonce < chainState.synchronized){
