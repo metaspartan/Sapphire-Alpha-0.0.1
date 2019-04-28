@@ -1198,6 +1198,12 @@ let connSeq2 = 0
             //peers[peerId].conn.write(JSON.stringify(syncTrigger));
             //if I log this information on the chain state I can see it quickly
 
+            ///this is how I did it BEFORE but in block.js and if we add a chain weight to it...
+            //var tmpOmmer = new Ommer(inBlock.timestamp,inBlock.previousHash,inBlock.nonce,inBlock.hash,inBlock.miner,inBlock.sponsor)
+            //this.addOmmer(tmpOmmer);
+            //and return the last block to the sending peer...
+            //callback({"uncle":{"blockNumber":parseInt(this.chain.length-1),"block":inBlock}},peerId);
+
           }
 
 
@@ -1229,6 +1235,9 @@ let connSeq2 = 0
 
           log(chalk.bgBlue("THIS IS THE UNCLRE RETURN WE LOG THE OMMER AND DELETE"));
           log(data["uncle"]);
+
+          //I have an uncle insert somewhere we maybe ned to insert it
+
           chainClipper(frankieCoin.blockHeight).then(function(){
             BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
           });
@@ -2305,6 +2314,12 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput == "CHECKPOINT"){
       BlkDB.getTopChainStateCheckPoint(frankieCoin.blockHeight,frankieCoin.chainRiser);
+      cliGetInput();
+    }else if(userInput == "RPCCLOSE"){
+      rpcserver.closePort();
+      cliGetInput();
+    }else if(userInput == "RPCOPEN"){
+      rpcserver.openPort();
       cliGetInput();
     }else if(userInput == "MMM"){
       console.log("calling all orders level db");

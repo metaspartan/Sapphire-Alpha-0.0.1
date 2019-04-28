@@ -234,6 +234,16 @@ function requestListener(request, response) {
     })
 }
 
+var closePort = function(){
+  log(chalk.bgRed("CLOSING server on port: "+chalk.green(": "+PORT)));
+  server.close();
+}
+
+var openPort = function(){
+  log(chalk.bgRed("RE OPENING server on port: "+chalk.green(": "+PORT)));
+  server.listen(PORT);
+}
+
 //NOTE moved call to methods up into the return function from peers above
 
 log(chalk.blue("Started and Listening on "+chalk.green(": "+PORT)));
@@ -243,5 +253,7 @@ module.exports = {
   globalParentCom:globalParentCom,
   globalParentEvent:globalParentEvent,
   globalParentComMethods:globalParentComMethods,
-  postRPCforMiner:postRPCforMiner
+  postRPCforMiner:postRPCforMiner,
+  closePort:closePort,
+  openPort:openPort
 }
