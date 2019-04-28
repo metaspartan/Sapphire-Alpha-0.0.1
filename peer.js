@@ -166,7 +166,9 @@ var activePing = function(){
       //log(chalk.green("Sending ping for peer id "+id));
       //log("------------------------------------------------------");
 
+      setTimeout(function(){
         peers[id].conn.write(JSON.stringify({"nodeStatePing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash,checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash}}));
+      },500)
 
     }
   }
