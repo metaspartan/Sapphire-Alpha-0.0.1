@@ -1005,7 +1005,7 @@ let connSeq2 = 0
 
           if(riserOffset == 0){
             (async () => {
-              await BlkDB.getBlock(parseInt(JSON.parse(data)["block"]["blockHeight"])).then(async function(block){
+              await BlkDB.getBlock(parseInt(JSON.parse(data)["block"]["blockHeight"] - frankieCoin.chainRiser)).then(async function(block){
                 var checkPointBlockAtHeight = await JSON.stringify(block)
               })
             })();
