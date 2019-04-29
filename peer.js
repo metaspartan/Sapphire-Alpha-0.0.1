@@ -97,7 +97,7 @@ chainState.activeSynch;
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(timer){
-
+  console.log(chalk.bgRed("AS TIMER "+timer))
   console.log(chalk.bgRed("------------------------------------------------------------------"));
   console.log(chalk.bgCyan.black(" chainwalkht: ")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight+1))+chalk.bgCyan.black(" chainStateSynchronized: ")+chalk.bgMagenta(chainState.synchronized)+chalk.bgCyan.black(" blockchainht: ")+chalk.bgMagenta(frankieCoin.blockHeight));
   console.log(chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(parseInt(chainState.peerNonce))+chalk.bgCyan.black(" transactionheight: ")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgCyan.black(" topblockheight: ")+chalk.bgMagenta(chainState.topBlock));
@@ -139,11 +139,12 @@ var adjustedTimeout = function() {
     console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync(parseInt(timerInterval+(slowCounter*81)));
     activePing(parseInt(timerInterval+(slowCounter*43)));
-  }else if(isSynching == false && chainState.isSynching == false){
+  }else if(isSynching == false && chainState.isSynching == false && slowCounter < 10){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync(parseInt(timerInterval+(slowCounter*110)));
     activePing(parseInt(timerInterval+(slowCounter*101)));
+    slowCounter++;
   }else{
     tranSynch();
     if((slowCounter % 4) == 0){
@@ -155,11 +156,15 @@ var adjustedTimeout = function() {
   }
   console.log("synching again in "+chainState.interval)
   setTimeout(adjustedTimeout, chainState.interval);
+  if(slowCounter == 14){
+    slowCounter = 1;
+  }
 }
 setTimeout(adjustedTimeout, chainState.interval);
 
 var activePing = function(timer){
   //we should get longestPeer first
+  console.log(chalk.bgRed("AP TIMER "+timer))
   var nodesInChain = frankieCoin.retrieveNodes();
   for (let id in peers) {
     if(peers[id].conn != undefined){
