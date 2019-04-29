@@ -1001,7 +1001,11 @@ let connSeq2 = 0
 
           var riserOffset = (parseInt(JSON.parse(data)["block"]["blockHeight"]) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
 
+          console.log("Riser OFFSET IS "+riserOffset);
+
           var checkPointBlockAtHeight = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset)));
+
+          console.log("check point block at height "+checkPointBlockAtHeight);
           //var checkPointBlockPlusOne = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset-1)));///getCheckpoint
           //var checkPointBlockThreeBack = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset-3)));
 
