@@ -96,7 +96,7 @@ chainState.interval = 10000;
 chainState.activeSynch;
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
-var activeSync = function(){
+var activeSync = function(timer){
 
   console.log(chalk.bgRed("------------------------------------------------------------------"));
   console.log(chalk.bgCyan.black(" chainwalkht: ")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight+1))+chalk.bgCyan.black(" chainStateSynchronized: ")+chalk.bgMagenta(chainState.synchronized)+chalk.bgCyan.black(" blockchainht: ")+chalk.bgMagenta(frankieCoin.blockHeight));
@@ -105,7 +105,7 @@ var activeSync = function(){
 
   setTimeout(function(){
     BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,107);
-  },50)
+  },timer)
 
 }
 
@@ -123,11 +123,12 @@ var tranSynch = function(){
 //maybe turn slowCounter into chainstate var
 var slowCounter = 0;
 var adjustedTimeout = function() {
+  var timerInterval = 50;
   frankieCoin.isChainSynch(chainState.synchronized)
   if(slowCounter == 0){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
-    activeSync();
+    activeSync(parseInt(timerInterval+(slowCounter*79)));
     //activePing();
     slowCounter++;
   }else if((slowCounter % 4) == 0){//need a different trigger for transaction sync but for now ok
@@ -136,18 +137,18 @@ var adjustedTimeout = function() {
   }else if(chainState.peerNonce < chainState.synchronized){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
-    activeSync();
-    activePing();
+    activeSync(parseInt(timerInterval+(slowCounter*81)));
+    activePing(parseInt(timerInterval+(slowCounter*43)));
   }else if(isSynching == false && chainState.isSynching == false){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
-    activeSync();
-    activePing();
+    activeSync(parseInt(timerInterval+(slowCounter*110)));
+    activePing(parseInt(timerInterval+(slowCounter*101)));
   }else{
     tranSynch();
     if((slowCounter % 4) == 0){
-      activeSync();
-      activePing();
+      activeSync(parseInt(timerInterval+(slowCounter*100)));
+      activePing(parseInt(timerInterval+(slowCounter*100)));
     }
     slowCounter++;
     //console.log("chain is not synching so is it sync? ")
@@ -157,7 +158,7 @@ var adjustedTimeout = function() {
 }
 setTimeout(adjustedTimeout, chainState.interval);
 
-var activePing = function(){
+var activePing = function(timer){
   //we should get longestPeer first
   var nodesInChain = frankieCoin.retrieveNodes();
   for (let id in peers) {
@@ -168,7 +169,7 @@ var activePing = function(){
 
       setTimeout(function(){
         peers[id].conn.write(JSON.stringify({"nodeStatePing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash,checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash}}));
-      },500)
+      },timer)
 
     }
   }
