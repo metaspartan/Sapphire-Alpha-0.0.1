@@ -1207,7 +1207,8 @@ let connSeq2 = 0
 
             console.log("UNCLE OR ON WRONG CHAIN")
             var uncleReply = JSON.stringify({uncle:JSON.parse(data),chainState:chainState})
-            sendbackUncle(uncleReply,peerId)
+            peers[peerId].conn2.write(JSON.stringify(uncleReply));
+            //sendbackUncle(uncleReply,peerId)
             //peers[peerId].conn.write(JSON.stringify(syncTrigger));
             //if I log this information on the chain state I can see it quickly
 
