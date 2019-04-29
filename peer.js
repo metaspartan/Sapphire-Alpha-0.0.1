@@ -1003,7 +1003,16 @@ let connSeq2 = 0
 
           console.log("Riser OFFSET IS "+riserOffset);
 
-          var checkPointBlockAtHeight = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset)));
+          if(riserOffset == 0){
+            (async () => {
+              await BlkDB.getBlock(parseInt(JSON.parse(data)["block"]["blockHeight"])).then(async function(block){
+                var checkPointBlockAtHeight = await JSON.stringify(block)
+              })
+            })();
+          }else{
+            var checkPointBlockAtHeight = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset)));
+          }
+
 
           console.log("check point block at height "+checkPointBlockAtHeight);
           //var checkPointBlockPlusOne = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset-1)));///getCheckpoint
