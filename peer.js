@@ -123,7 +123,7 @@ var tranSynch = function(){
 //maybe turn slowCounter into chainstate var
 var slowCounter = 0;
 var adjustedTimeout = function() {
-  var timerInterval = 50;
+  var timerInterval = 150;
   frankieCoin.isChainSynch(chainState.synchronized)
   if(slowCounter == 0){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
