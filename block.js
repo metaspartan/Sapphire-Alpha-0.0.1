@@ -476,7 +476,11 @@ var Blockchain = class Blockchain {
       }
 
       getBlockFromIndex(index){
-        return this.chain[this.chain.length - index];
+        if(index == 0){
+          return this.chain[this.chain.length - this.chainRiser];
+        }else{
+          return this.chain[this.chain.length - index];
+        }
       }
 
       getIndexLength(){
