@@ -1004,7 +1004,7 @@ let connSeq2 = 0
           console.log("Riser OFFSET IS "+riserOffset);
 
           if(riserOffset == 0){
-            var checkPointBlockAtHeight = JSON.stringify(frankieCoin.getBlockFromIndex(24));
+            var checkPointBlockAtHeight = JSON.stringify(frankieCoin.getLatestBlock());
           }else{
             var checkPointBlockAtHeight = JSON.stringify(frankieCoin.getBlockFromIndex(parseInt(riserOffset)));
           }
