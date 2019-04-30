@@ -1031,7 +1031,7 @@ let connSeq2 = 0
           //console.log("BLOCK CHECK POINT HASH THREE BACK "+thisBlockCheckPointHashThreeBack);
 
           //calculate from this JSON.parse(data)["currentBlockCheckPointHash"]  and block data also
-          if(JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"] == chainState.currentBlockCheckPointHash.checkPointHash && JSON.parse(data)["checkPointHash"] == chainState.checkPointHash && JSON.parse(data)["currentBlockCheckPointHash"]["checkPointHash"] == thisBlockCheckPointHashAtHeight){
+          if(JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"] == chainState.currentBlockCheckPointHash.checkPointHash && JSON.parse(data)["checkPointHash"] == chainState.checkPointHash && (JSON.parse(data)["currentBlockCheckPointHash"]["checkPointHash"] == thisBlockCheckPointHashAtHeight || riserOffset == 0)){
 
             console.log("VALID BLOCK MATCHING CALCULATED CHECK POINT HASHES")
             //if I log this information on the chain state I can see it quickly
