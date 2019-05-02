@@ -2605,7 +2605,7 @@ function cliGetInput(){
     }else if(userInput == "N"){//N is for Node info
       Genesis.fileHash();
       console.log("first clean the nodes "+frankieCoin.cleanNodes(frankieCoin.nodes,'id'));
-      //console.log("and the nodes in storage "+BlkDB.getNodes())
+      console.log("and the nodes in storage "+BlkDB.getNodes())
       log("------------------------------------------------------");
       log(chalk.green("List of Nodes: "));//had to BCASH LOL
       log("------------------------------------------------------");
