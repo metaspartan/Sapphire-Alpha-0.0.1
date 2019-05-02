@@ -328,6 +328,10 @@ var Blockchain = class Blockchain {
 
         var nodeFromStorage = async function(thisN){
 
+          var tempNodes = await thisN.cleanNodes(thisN.nodes,"id");
+
+          thisN.nodes = tempNodes;
+
           var nodeStorage = await BlkDB.getNodeById(id);
 
           //console.log("NODE FROM STORAGE "+nodeStorage.length+nodeStorage[0]);
@@ -391,6 +395,16 @@ var Blockchain = class Blockchain {
             this.nodes.splice(i,1);
           }
         }
+      }
+
+      cleanNodes(arr,comp){
+        const unique = arr
+       .map(e => e[comp])
+         // store the keys of the unique objects
+        .map((e, i, final) => final.indexOf(e) === i && i)
+        // eliminate the dead keys & store unique objects
+        .filter(e => arr[e]).map(e => arr[e]);
+        return unique;
       }
 
       peerSafe(publicPair,nodeId,storePrivatekey,type,egemAddress,store){
