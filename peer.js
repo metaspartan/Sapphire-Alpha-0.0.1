@@ -19,6 +19,8 @@ var bitcoinMessage = require('bitcoinjs-message');
 var cs = require('coinstring');
 const ecies = require('standard-ecies');
 var DatSyncLink = require("./datsynch.js");
+//testing other things
+const onChange = require('on-change');
 
 //genesis hash variables
 var Genesis = require('./genesis');
@@ -94,6 +96,15 @@ chainState.transactionRootHash = '';
 //activesynch
 chainState.interval = 10000;
 chainState.activeSynch;
+
+let i = 0;
+chainState = onChange(chainState, function (path, value, previousValue) {
+	console.log(chalk.bgMagenta('Object changed:', ++i));
+	console.log(chalk.bgMagenta('this:', this));
+	console.log(chalk.bgMagenta('path:', path));
+	console.log(chalk.bgMagenta('value:', value));
+	console.log(chalk.bgMagenta('previousValue:', previousValue));
+});
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(timer){
@@ -2610,6 +2621,7 @@ function cliGetInput(){
       log(chalk.green("List of Nodes: "));//had to BCASH LOL
       log("------------------------------------------------------");
       log(JSON.stringify(frankieCoin.retrieveNodes()));
+      chainState.topBlock = 30;
       cliGetInput();
     }else if(userInput == "reindex"){
       log(chalk.yellow("|------------------------------|"));

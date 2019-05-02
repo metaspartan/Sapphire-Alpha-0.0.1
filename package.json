@@ -25,15 +25,16 @@
     "mongodb": "^3.1.3",
     "nano-sql": "^1.8.0",
     "node-addon-api": "^1.6.2",
-    "node-gyp": "^3.8.0",
+    "node-gyp": "^4.0.0",
     "node-ipc": "^9.1.1",
+    "on-change": "^1.3.0",
     "openssl": "^1.1.0",
     "random-access-memory": "^3.1.1",
     "request": "^2.88.0",
     "rmdir": "^1.2.0",
     "socket.io-stream": "^0.9.1",
     "standard-ecies": "^1.0.0",
-    "web3": "^1.0.0-beta.35"
+    "web3": "^1.0.0-beta.53"
   },
   "description": "EGEM Sapphire Subchain Client",
   "main": "index.js",
