@@ -1127,12 +1127,12 @@ var getBalanceAtAddress = function(address,callback){
               balance[data.toString().split(":")[3]] = 0;
           }
 
-          if(data.toString().split(":")[1] == address){
+          if(data.toString().split(":")[1].toLowerCase() == address.toLowerCase()){
               console.log("deduct "+parseFloat(JSON.parse(value)["amount"]));
               balance[data.toString().split(":")[3]] -= parseFloat(JSON.parse(value)["amount"]);
           }
 
-          if(data.toString().split(":")[2] == address){
+          if(data.toString().split(":")[2].toLowerCase() == address.toLowerCase()){
               console.log("addit "+parseFloat(JSON.parse(value)["amount"]));
               balance[data.toString().split(":")[3]] += parseFloat(JSON.parse(value)["amount"]);
           }
