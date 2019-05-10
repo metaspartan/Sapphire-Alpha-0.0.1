@@ -1109,7 +1109,7 @@ var getBalanceAtAddress = function(address,callback){
 
     stream.on('data',function(data){
 
-      if(data.toString().split(":")[0] == "tx" && (data.toString().split(":")[1] == address || data.toString().split(":")[2] == address)){
+      if(data.toString().split(":")[0] == "tx" && (data.toString().split(":")[1].toLowerCase() == address.toLowerCase() || data.toString().split(":")[2].toLowerCase() == address.toLowerCase())){
         db.get(data, function (err, value) {
 
 
