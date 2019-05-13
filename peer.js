@@ -331,7 +331,7 @@ var getConnectionConfig = async function(ntwk){
         chainState.nodePersistantId = myLastSessionId;
         console.log("node persistantce was already set ")
       }else{
-        chainState.nodePersistantId = crypto.randomBytes(32).toString();
+        chainState.nodePersistantId = crypto.randomBytes(32).toString();//need to verify nodepersistance id is okay as string
         BlkDB.addChainParams(globalGenesisHash+":nodePersistantId",chainState.nodePersistantId);
       }
       //network related connections
