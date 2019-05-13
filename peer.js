@@ -2397,8 +2397,8 @@ function cliGetInput(){
       cliGetInput();
 
     }else if(userInput == "TX"){
-      //BlkDB.getTransactions();
-      BlkDB.getAllPeerSafes();
+      BlkDB.getTransactions();
+      //BlkDB.getAllPeerSafes();
       cliGetInput();
     }else if(userInput == "TRIE"){
       BlkDB.getEverythingFromTrie();
