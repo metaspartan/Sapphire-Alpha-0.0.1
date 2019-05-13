@@ -88,7 +88,7 @@ chainState.checkPointHash;
 chainState.previousBlockCheckPointHash = {};
 chainState.currentBlockCheckPointHash = {};
 chainState.datapack = "";
-chainState.nodePersistantId = "";
+chainState.nodePersistantId;
 chainState.peerNonce = 0;
 //now adding parameters for transactions
 chainState.transactionHeight = 0;
@@ -110,7 +110,7 @@ chainState = onChange(chainState, function (path, value, previousValue) {
   	console.log(chalk.bgMagenta('value:', value));
   	console.log(chalk.bgMagenta('previousValue:', previousValue));
   }
-});
+})
 //end chain state on change reporting
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
@@ -331,7 +331,7 @@ var getConnectionConfig = async function(ntwk){
         chainState.nodePersistantId = myLastSessionId;
         console.log("node persistantce was already set ")
       }else{
-        chainState.nodePersistantId = crypto.randomBytes(32);
+        chainState.nodePersistantId = crypto.randomBytes(32).toString();
         BlkDB.addChainParams(globalGenesisHash+":nodePersistantId",chainState.nodePersistantId);
       }
       //network related connections
