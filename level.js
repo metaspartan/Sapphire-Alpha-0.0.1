@@ -846,9 +846,9 @@ var addTransactions = async function(transactions,blockhash,blocknum,blkChainSta
     txConfirmation = await addTransaction("tx:"+receipt["fromAddress"].toLowerCase()+":"+receipt["toAddress"].toLowerCase()+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blocknum,blkChainStateHash,txIndex);
     //need to accumulate the balances and add or subtract to PMT
 
-    addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]).toFixed(8),txConfirmation,blocknum,txIndex);
+    addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blocknum,txIndex);
 
-    addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]*-1).toFixed(8),txConfirmation,blocknum,txIndex);
+    addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blocknum,txIndex);
     //2) get the trie root hash and return for hasing into the block
 
     txIndex++;
@@ -998,7 +998,7 @@ var addAllBalanceRecord = async function(address,ticker,amount,confirmation,bloc
           if (err) return console.log('Ooops!', err) // likely the key was not found
 
           // Ta da!
-          console.log("abal:"+address+":"+ticker+": " + value)
+          console.log("abal:"+address.toLowerCase()+":"+ticker+": " + value)
           resolve(value)
         })
       }).catch(resolve(console.log));
