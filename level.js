@@ -931,6 +931,7 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
   ////////////////////////////////////////////////////////////END NATIVE REWARDS
 
   ////////////////////////////////////////////////////////now block TXs in order
+  console.log("WHAT IS TRANSACTIONS LENGTH ???? "+transactions.length)
   if(transactions.length > 0){
     for(tranx in JSON.parse(transactions)){
 
