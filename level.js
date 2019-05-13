@@ -865,6 +865,7 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
 
   for(var key in transactions) {
     if(transactions.hasOwnProperty(key)){
+      console.log("this is where has own key "+transactions);
       transactions = [];
     }else{
       transactions = JSON.parse(JSON.stringify(transactions));
@@ -932,6 +933,7 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
 
   ////////////////////////////////////////////////////////now block TXs in order
   console.log("WHAT IS TRANSACTIONS LENGTH ???? "+transactions.length)
+  console.log()
   if(transactions.length > 0){
     for(tranx in JSON.parse(transactions)){
 
