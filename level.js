@@ -868,6 +868,7 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
       transactions = [];
     }else{
       transactions = JSON.parse(JSON.stringify(transactions));
+      console.log("this is where it is parsed "+transactions);
     }
   }
 
@@ -932,6 +933,8 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
   ////////////////////////////////////////////////////////now block TXs in order
   if(transactions.length > 0){
     for(tranx in JSON.parse(transactions)){
+
+      console.log("in the transactions loop ")
 
       var receipt = JSON.parse(transactions)[tranx];
       //receipts have a key of toAddress:timestamp:receipthash atm
