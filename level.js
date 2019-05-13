@@ -941,9 +941,9 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
       txConfirmation = await addTransaction("tx:"+receipt["fromAddress"].toLowerCase()+":"+receipt["toAddress"].toLowerCase()+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blknum,blkChainStateHash,txIndex);
       //need to accumulate the balances and add or subtract to PMT
 
-      addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]).toFixed(8),txConfirmation,blocknum,txIndex);
+      addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blocknum,txIndex);
 
-      addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]*-1).toFixed(8),txConfirmation,blocknum,txIndex);
+      addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blocknum,txIndex);
       //2) get the trie root hash and return for hasing into the block
 
       txIndex++
