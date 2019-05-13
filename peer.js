@@ -141,6 +141,9 @@ var tranSynch = function(){
 //maybe turn slowCounter into chainstate var
 var slowCounter = 0;
 var adjustedTimeout = function() {
+  if(chainState.peerNonce == chainState.synchronized){
+    chainStateMonitor.peerCom = true;
+  }
   var timerInterval = 223;
   frankieCoin.isChainSynch(chainState.synchronized)
   if(slowCounter == 0){
