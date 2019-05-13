@@ -88,7 +88,7 @@ chainState.checkPointHash;
 chainState.previousBlockCheckPointHash = {};
 chainState.currentBlockCheckPointHash = {};
 chainState.datapack = "";
-chainState.nodePersistantId;
+chainState.nodePersistantId = "";
 chainState.peerNonce = 0;
 //now adding parameters for transactions
 chainState.transactionHeight = 0;
