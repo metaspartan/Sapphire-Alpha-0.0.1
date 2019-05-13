@@ -97,6 +97,7 @@ chainState.transactionRootHash = '';
 chainState.interval = 10000;
 chainState.activeSynch;
 
+//checks chain state changes but logs are slow - removing logs until i == blockheight
 let i = 0;
 chainState = onChange(chainState, function (path, value, previousValue) {
 	console.log(chalk.bgMagenta('Object changed:', ++i));
@@ -105,6 +106,7 @@ chainState = onChange(chainState, function (path, value, previousValue) {
 	console.log(chalk.bgMagenta('value:', value));
 	console.log(chalk.bgMagenta('previousValue:', previousValue));
 });
+//end chain state on change reporting
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(timer){
@@ -293,10 +295,13 @@ var setChainStateTX = async function(validTXHeight,transationCheckPointHash){
   ***/
 }
 
+////chain state function pushes chainState object to the blockchain object
 var getChainState = function(){
   return chainState;
 }
 sapphirechain.setChainState(getChainState);
+///end chain state set function
+
 //chainState.accountsTrie = 0;
 var isSynching = false;//will add numerics to this
 ////////////////////////////////////////////////////////////end synching section
@@ -373,6 +378,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     }
     chainState.chainWalkHeight = replyData;
     chainState.chainWalkHash = replyHash;
+    chainState.topBlock = replyData;
 
     if( (parseInt(replyData) == parseInt(chainState.chainWalkHeight)) && (parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight)) ){
       chainState.synchronized = parseInt(replyData);
@@ -456,6 +462,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
         console.log("clipped chain to "+clipHeight+" restart to reindex")
         chainState.chainWalkHeight = clipHeight;
         chainState.synchronized = clipHeight;
+        chainState.topBlock = clipHeight;
         BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,416);
       });
 
@@ -493,6 +500,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
     chainState.chainWalkHeight = replyData;
     chainState.chainWalkHash = replyHash;
+    chainState.topBlock = replyData;
 
     console.log("VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
 
