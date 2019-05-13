@@ -98,13 +98,18 @@ chainState.interval = 10000;
 chainState.activeSynch;
 
 //checks chain state changes but logs are slow - removing logs until i == blockheight
+var chainStateMonitor = {};
+chainStateMonitor.peerCom = false;
+chainStateMonitor.rpcCom = false;
 let i = 0;
 chainState = onChange(chainState, function (path, value, previousValue) {
-	console.log(chalk.bgMagenta('Object changed:', ++i));
-	console.log(chalk.bgMagenta('this:', this));
-	console.log(chalk.bgMagenta('path:', path));
-	console.log(chalk.bgMagenta('value:', value));
-	console.log(chalk.bgMagenta('previousValue:', previousValue));
+  if(chainStateMonitor.peerCom == true || chainStateMonitor.rpcCom == true){
+    console.log(chalk.bgMagenta('Object changed:', ++i));
+  	console.log(chalk.bgMagenta('this:', this));
+  	console.log(chalk.bgMagenta('path:', path));
+  	console.log(chalk.bgMagenta('value:', value));
+  	console.log(chalk.bgMagenta('previousValue:', previousValue));
+  }
 });
 //end chain state on change reporting
 
