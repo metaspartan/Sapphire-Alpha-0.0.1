@@ -488,7 +488,7 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
 
     //miner
     var minerTx = await new Transaction("sapphire", JSON.parse(block)["miner"], calcMiningReward, "SFRX", JSON.parse(block)["timestamp"]);
-    await db.get("tx:sapphire:"+JSON.parse(block)["miner"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+    await db.get("tx:sapphire:"+JSON.parse(block)["miner"].toLowerCase()+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
       //we skip the intry
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["miner"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(minerTx),blocknum,thisBlockCheckPointHash,txIndex);
@@ -498,7 +498,7 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
 
     //sponsor
     var sponsorTx = await new Transaction("sapphire", JSON.parse(block)["sponsor"], calcSponsorReward, "SFRX", JSON.parse(block)["timestamp"]);
-    db.get("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+    db.get("tx:sapphire:"+JSON.parse(block)["sponsor"].toLowerCase()+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
       //we skip the intry
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx),blocknum,thisBlockCheckPointHash,txIndex);
@@ -843,7 +843,7 @@ var addTransactions = async function(transactions,blockhash,blocknum,blkChainSta
     var receipt = JSON.parse(transactions)[tranx];
 
     //receipts have a key of toAddress:timestamp:receipthash atm
-    txConfirmation = await addTransaction("tx:"+receipt["fromAddress"]+":"+receipt["toAddress"]+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blocknum,blkChainStateHash,txIndex);
+    txConfirmation = await addTransaction("tx:"+receipt["fromAddress"].toLowerCase()+":"+receipt["toAddress"].toLowerCase()+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blocknum,blkChainStateHash,txIndex);
     //need to accumulate the balances and add or subtract to PMT
 
     addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]).toFixed(8),txConfirmation,blocknum,txIndex);
@@ -935,7 +935,7 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
 
       var receipt = JSON.parse(transactions)[tranx];
       //receipts have a key of toAddress:timestamp:receipthash atm
-      txConfirmation = await addTransaction("tx:"+receipt["fromAddress"]+":"+receipt["toAddress"]+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blknum,blkChainStateHash,txIndex);
+      txConfirmation = await addTransaction("tx:"+receipt["fromAddress"].toLowerCase()+":"+receipt["toAddress"].toLowerCase()+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blknum,blkChainStateHash,txIndex);
       //need to accumulate the balances and add or subtract to PMT
 
       addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["toAddress"]).toFixed(8),txConfirmation,blocknum,txIndex);
@@ -1041,7 +1041,7 @@ var getBalanceAtAddressAllBalance = function(address,callback){
   var allBalances = []
   var stream = db.createReadStream();
   stream.on('data',function(data){
-    if(data.key.toString().split(":")[0] == "abal" && data.key.toString().split(":")[1] == address){
+    if(data.key.toString().split(":")[0] == "abal" && data.key.toString().split(":")[1].toLowerCase() == address.toLowerCase()){
       //balances from new all balance tree
       console.log('key = '+data.key+" value = "+data.value.toString());
       allBalances.push(parseFloat(JSON.parse(data.value.toString())["balance"]));
@@ -2045,8 +2045,8 @@ var importFromJSONStream = async function(cb,blockNum,cbChainGrab,chainRiser,inc
 
           await getBlockByHash(balBlockHash).then(async function(blknum){
             console.log(chalk.bgRed("ADDY ALL BAL ----> "+" adding to "+Object.keys(content[row]).toString().split(":")[2]+" amt: "+parseFloat(JSON.parse(Object.values(content[row]).toString())["amount"]).toFixed(8)))
-            await addAllBalanceRecord(balAddressTo,balTicker,balAmount,balBlockHash,blknum);
-            await addAllBalanceRecord(balAddressFrom,balTicker,parseFloat(parseFloat(balAmount*-1).toFixed(8)),balBlockHash,blknum);
+            await addAllBalanceRecord(balAddressTo.toLowerCase(),balTicker,balAmount,balBlockHash,blknum);
+            await addAllBalanceRecord(balAddressFrom.toLowerCase(),balTicker,parseFloat(parseFloat(balAmount*-1).toFixed(8)),balBlockHash,blknum);
           }).catch(function(err){
             console.log;
           })
