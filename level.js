@@ -866,7 +866,11 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
   for(var key in transactions) {
     if(transactions.hasOwnProperty(key)){
       console.log("this is where has own key "+JSON.stringify(transactions));
-      //try{JSON.parse(transactions)}catch(err){transactions = []}
+      if(transactions.length > 0){
+        transactions = JSON.stringify(transactions);
+      }else{
+        transactions = [];
+      }
     }else{
       transactions = JSON.parse(JSON.stringify(transactions));
       console.log("this is where it is parsed "+transactions);
