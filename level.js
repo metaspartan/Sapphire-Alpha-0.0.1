@@ -939,7 +939,7 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
   console.log("WHAT IS TRANSACTIONS LENGTH ???? "+transactions.length)
   console.log()
   if(transactions.length > 0){
-    for(tranx in JSON.parse(transactions)){
+    for(tranx in transactions){
 
       console.log("in the transactions loop ")
 
