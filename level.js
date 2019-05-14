@@ -943,7 +943,7 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
 
       console.log("in the transactions loop ")
 
-      var receipt = JSON.parse(transactions)[tranx];
+      var receipt = transactions[tranx];
       //receipts have a key of toAddress:timestamp:receipthash atm
       txConfirmation = await addTransaction("tx:"+receipt["fromAddress"].toLowerCase()+":"+receipt["toAddress"].toLowerCase()+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blknum,blkChainStateHash,txIndex);
       //need to accumulate the balances and add or subtract to PMT
