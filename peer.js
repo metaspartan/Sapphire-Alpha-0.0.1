@@ -90,17 +90,19 @@ chainState.currentBlockCheckPointHash = {};
 chainState.datapack = "";
 chainState.nodePersistantId;
 chainState.peerNonce = 0;
-//now adding parameters for transactions
+//now adding parameters for transactions which is verified in part by currentBlockCheckPointHash
 chainState.transactionHeight = 0;
 chainState.transactionRootHash = '';
 //activesynch
 chainState.interval = 10000;
 chainState.activeSynch;
-
+//need a snall array holding nodes with wieght score
+//chainState.nodeWeights?
 //checks chain state changes but logs are slow - removing logs until i == blockheight
 var chainStateMonitor = {};
 chainStateMonitor.peerCom = false;
 chainStateMonitor.rpcCom = false;
+
 let i = 0;
 chainState = onChange(chainState, function (path, value, previousValue) {
   if(chainStateMonitor.peerCom == true || chainStateMonitor.rpcCom == true){
@@ -120,6 +122,7 @@ var activeSync = function(timer){
   console.log(chalk.bgCyan.black(" chainwalkht: ")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight+1))+chalk.bgCyan.black(" chainStateSynchronized: ")+chalk.bgMagenta(chainState.synchronized)+chalk.bgCyan.black(" blockchainht: ")+chalk.bgMagenta(frankieCoin.blockHeight));
   console.log(chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(parseInt(chainState.peerNonce))+chalk.bgCyan.black(" transactionheight: ")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgCyan.black(" topblockheight: ")+chalk.bgMagenta(chainState.topBlock));
   console.log(chalk.bgCyan.black(" fcnlongpeer: ")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(chainState.peerNonce)+chalk.bgCyan.black(" peerCount: ")+chalk.bgMagenta(frankieCoin.nodes.length));
+  console.log(chalk.bgCyan.black(" transactionHash: ")+chalk.bgMagenta(parseInt(chainState.transactionRootHash))+chalk.bgCyan.black(" transactionheight: ")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgCyan.black(" peerCount: ")+chalk.bgMagenta(frankieCoin.nodes.length));
 
   setTimeout(function(){
     BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,107);
@@ -2637,7 +2640,10 @@ function cliGetInput(){
       log(chalk.green("List of Nodes: "));//had to BCASH LOL
       log("------------------------------------------------------");
       log(JSON.stringify(frankieCoin.retrieveNodes()));
-      chainState.topBlock = 30;
+      console.log("-------------------------------------------------")
+      console.log("and finally the peers data ")
+      console.log(JSON.strigify(peers))
+      console.log("-------------------------------------------------")
       cliGetInput();
     }else if(userInput == "reindex"){
       log(chalk.yellow("|------------------------------|"));
@@ -2832,7 +2838,7 @@ var franks = miner(frankieCoin);
 
 /////////////////////////////////////////////////////////////////synch the chain
 log("------------------------------------------------------")
-log(chalk.green("CHAIN SYNC (Press T to sync.)"))
+log(chalk.green("CHAIN SHOULD SYNC AUTOMATICALLY"))
 log("------------------------------------------------------")
 //internal data blockheiht
 var blockHeightPtr = 1;
