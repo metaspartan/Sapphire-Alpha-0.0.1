@@ -2664,7 +2664,9 @@ function cliGetInput(){
       setTimeout(function(peers){reindexChain(peers);},200)
     }else if(userInput == "SS"){//open function right now
       console.log("----------------------------");
-
+      console.log("yes called it");
+      BlkDB.getAddressNonce('0x0666bf13ab1902de7dee4f8193c819118d7e21a6','BTC');
+      /***
       var chainRiserStream = function(data){
         console.log("if hex works only top 10 "+data.toString())
       }
@@ -2673,6 +2675,8 @@ function cliGetInput(){
         BlkDB.getBlockRange(val,parseInt(frankieCoin.chainRiser),chainRiserStream)
       }
       BlkDB.getChainStateParam("blockHeight",currentHeight);
+      ***/
+
 
 
 

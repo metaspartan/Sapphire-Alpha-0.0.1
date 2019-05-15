@@ -9,6 +9,9 @@ var web3 = new Web3(new Web3.providers.HttpProvider("https://lb.rpc.egem.io"));
 
 var Trie = require('merkle-patricia-tree');
 
+//quite possibly we should set this in peer.js or block.js and pass it in
+var transactionRiser = 100;
+
 function decodeUTF8(s) {
   var i, d = unescape(encodeURIComponent(s)), b = new Uint8Array(d.length);
   for (i = 0; i < d.length; i++) b[i] = d.charCodeAt(i);
@@ -992,6 +995,69 @@ var getTransactionReceiptsByAddress = function(address){
 ////////////////////////////////////////////////////////////////ALL BALANCE TREE
 var addAllBalanceRecord = async function(address,ticker,amount,confirmation,blocknum,index){
 
+  //I need some nonces on an address
+  var setTxAddressNonce = function(fundsin,thisAddy,thisTicker,thisBlocknum,value){
+    //console.log("this will probably go nuts "+thisAddy,thisTicker,thisBlocknum,value.toString())
+    var allBalanceNonceStorage = [];
+    //get the total at the last nonce
+    db.get("abnc:"+thisAddy.toLowerCase()+":"+ticker).then(async function(nonces){
+
+      console.log("current nonce values are "+nonces+" and type of "+typeof(nonces))
+
+      //console.log("current nonce values 0 are "+nonces[0]+" and type of "+typeof(nonces[0]))
+      console.log("what type is avs above "+typeof(allBalanceNonceStorage))
+
+      var testVar = JSON.parse(nonces);
+
+      allBalanceNonceStorage = [];
+
+      console.log("what type is avs below "+typeof(allBalanceNonceStorage))
+
+      var currentTopEntry;
+      for(var item in JSON.parse(nonces)){
+        console.log("nonces item "+item+" is "+JSON.stringify(JSON.parse(nonces)[item]));
+        var thisEntry = JSON.parse(nonces)[item];
+        allBalanceNonceStorage[item] = thisEntry;
+        currentTopEntry = thisEntry;
+        console.log("adding them "+parseFloat(currentTopEntry.balance)+" then "+parseFloat(fundsin)+" the add "+parseFloat(parseFloat(currentTopEntry.balance)+parseFloat(fundsin)).toFixed(8))
+      }
+
+      /***
+      for(var item in JSON.parse(testVar)){
+        console.log("the item "+JSON.parse(testVar)[item])
+      }
+      ***/
+
+
+      //nonces
+
+      console.log(" and the length is "+allBalanceNonceStorage.length)
+      //thisAddy,thisTicker,thisBlocknum,value.toString()
+      var nextNonce = {address:thisAddy,ticker:thisTicker,amount:fundsin,blockHeight:thisBlocknum,prevBalance:currentTopEntry.balance,balance:parseFloat(parseFloat(currentTopEntry.balance)+parseFloat(fundsin)).toFixed(8)};
+
+      allBalanceNonceStorage.push(nextNonce);
+
+      console.log(allBalanceNonceStorage+" and length is "+allBalanceNonceStorage.length)
+
+      if(allBalanceNonceStorage.length > 4){
+        allBalanceNonceStorage.shift();
+      }
+
+      console.log("after update nonce values are "+allBalanceNonceStorage)
+
+      db.put("abnc:"+thisAddy.toLowerCase()+":"+ticker,JSON.stringify(allBalanceNonceStorage))
+    }).catch(function(err){//did not exist and so we make it 0
+      console.log("well the error is this "+err)
+      allBalanceNonceStorage = [];
+      var nextNonce = {address:thisAddy,ticker:thisTicker,amount:fundsin,blockHeight:thisBlocknum,prevBalance:0,balance:parseFloat(fundsin)};
+      allBalanceNonceStorage.push(nextNonce);
+      console.log("nothing existed so new record nonce values are "+allBalanceNonceStorage)
+      //thisAddy,thisTicker,thisBlocknum,value.toString()
+      db.put("abnc:"+thisAddy.toLowerCase()+":"+ticker,JSON.stringify(allBalanceNonceStorage))
+    })
+
+  }
+
   return new Promise((resolve)=> {
     //var currentBalance = 0;
     db.get("abal:"+address.toLowerCase()+":"+ticker).then(async function(value){
@@ -1002,11 +1068,16 @@ var addAllBalanceRecord = async function(address,ticker,amount,confirmation,bloc
       updatedBalanceJSON = JSON.stringify({"balance":currentBalance,"hash":confirmation,"blockHeight":blocknum,"index":index});
       db.put("abal:"+address.toLowerCase()+":"+ticker,updatedBalanceJSON).then(async function(){
         await db.get("abal:"+address.toLowerCase()+":"+ticker, function (err, value) {
-          if (err) return console.log('Ooops!', err) // likely the key was not found
+          if(err){
+            return console.log('Ooops!', err) // likely the key was not found
+          }else{
+            //check blockheight and make a last checkhash total?
 
-          // Ta da!
-          console.log("abal:"+address.toLowerCase()+":"+ticker+": " + value)
-          resolve(value)
+              setTxAddressNonce(amount,address.toLowerCase(),ticker,blocknum,value)
+
+            console.log("abal:"+address.toLowerCase()+":"+ticker+": " + value)
+            resolve(value)
+          }
         })
       }).catch(resolve(console.log));
     }).catch(async function(error){
@@ -1016,11 +1087,13 @@ var addAllBalanceRecord = async function(address,ticker,amount,confirmation,bloc
       updatedBalanceJSON = JSON.stringify({"balance":currentBalance,"hash":confirmation,"blockHeight":blocknum,"index":index});
       db.put("abal:"+address.toLowerCase()+":"+ticker,updatedBalanceJSON).then(async function(){
         await db.get("abal:"+address.toLowerCase()+":"+ticker, function (err, value) {
-          if (err) return console.log('Ooops!', err) // likely the key was not found
-
-          // Ta da!
-          console.log("abal:"+address+":"+ticker+": " + value)
-          resolve(value)
+          if(err){
+            return console.log('Ooops!', err) // likely the key was not found
+          }else{
+            //check blockheight and make a last checkhash total?
+            console.log("abal:"+address.toLowerCase()+":"+ticker+": " + value)
+            resolve(value)
+          }
         })
       }).catch(resolve(console.log));
     });
@@ -1068,6 +1141,21 @@ var getBalanceAtAddressABTrie = async function(address,ticker,abBlockHeight,call
     var localBalance = await parseFloat(JSON.parse(localBalanceJSON)["balance"]);
     callback(localBalance)
   })
+}
+
+var getAddressNonce = function(address,ticker){
+  console.log("get Address Nonce: ")
+  var stream = db.createReadStream();
+
+  stream.on('data',function(data){
+
+    if(data.key.toString().split(":")[0] == "abnc" && data.key.toString().split(":")[1].toLowerCase() == address.toLowerCase()){
+      console.log("this is the nonce records for "+address+" tocker "+ticker);
+      console.log("key "+data.key.toString());
+      console.log("value "+data.value.toString());
+    }
+
+  });
 }
 ////////////////////////////////////////////////////////////END ALL BALANCE TREE
 
@@ -2121,6 +2209,7 @@ module.exports = {
     getBalanceAtAddress:getBalanceAtAddress,
     getBalanceAtAddressFromTrie:getBalanceAtAddressFromTrie,
     getBalanceAtAddressABTrie:getBalanceAtAddressABTrie,
+    getAddressNonce:getAddressNonce,
     addOrder:addOrder,
     getOrdersBuy:getOrdersBuy,
     getOrdersBuySorted:getOrdersBuySorted,
