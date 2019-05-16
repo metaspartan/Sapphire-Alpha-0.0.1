@@ -828,30 +828,37 @@ var addTransaction = async function(transactionKey,transaction,blockNum,blkChain
   })
 }
 
-var addTransactions = async function(transactions,blockhash,blocknum,blkChainStateHash){
+var addTransactions = async function(transactions,blockhash,blocknum,blkChainStateHash,cbTransactionState = console.log){
 
-  //console.log("T R A N S A C T I O N S  B E I N G  A D D E D  H E R E");
-  transactions = JSON.parse(JSON.stringify(transactions));
+    //console.log("T R A N S A C T I O N S  B E I N G  A D D E D  H E R E");
+    transactions = JSON.parse(JSON.stringify(transactions));
 
-  var txIndex = 0;
-  var txConfirmation;
+    var txIndex = 0;
+    var txConfirmation;
 
-  for(tranx in JSON.parse(transactions)){
-    var receipt = JSON.parse(transactions)[tranx];
+    for(tranx in JSON.parse(transactions)){
+      var receipt = JSON.parse(transactions)[tranx];
 
-    //receipts have a key of toAddress:timestamp:receipthash atm
-    txConfirmation = await addTransaction("tx:"+receipt["fromAddress"].toLowerCase()+":"+receipt["toAddress"].toLowerCase()+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blocknum,blkChainStateHash,txIndex);
-    //need to accumulate the balances and add or subtract to PMT
+      //receipts have a key of toAddress:timestamp:receipthash atm
+      txConfirmation = await addTransaction("tx:"+receipt["fromAddress"].toLowerCase()+":"+receipt["toAddress"].toLowerCase()+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blocknum,blkChainStateHash,txIndex);
+      //need to accumulate the balances and add or subtract to PMT
 
-    addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blocknum,txIndex);
+      addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blocknum,txIndex);
 
-    addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blocknum,txIndex);
-    //2) get the trie root hash and return for hasing into the block
+      addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blocknum,txIndex);
+      //2) get the trie root hash and return for hasing into the block
 
-    txIndex++;
+      txIndex++;
 
-  }
+    }
+
+    console.log("TRANSACTION PROMISE RESOLVE SHOULD BE HERE ");
+    cbTransactionState(blocknum+":"+txIndex+":"+txConfirmation);
+    console.log("PROMISE RESOLVE HAPPENED NEXT IS RETURN ");
+
+
 }
+
 
 /////IF THE TRANSACTIONS ARE NOT PRSENT IN THE STREAD WE ARE GOING TO ADD THEM AND VALIDATE
 var addTransactionsFromStream = async function(transactions,blockhash,blknum,block,cbUpdateChainStateTX,blkChainStateHash){

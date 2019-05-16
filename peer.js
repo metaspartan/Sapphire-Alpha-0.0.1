@@ -1210,7 +1210,12 @@ let connSeq2 = 0
                         BlkDB.addBlock(parseInt(JSON.parse(data)["block"]["blockHeight"]),JSON.stringify(JSON.parse(data)["block"]),JSON.parse(data)["block"]["hash"],"967",setChainStateTX,frankieCoin.chainRiser,JSON.parse(checkPointBlock)["hash"],thisBlockCheckPointHash);
                         BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(JSON.parse(data)["block"]["blockHeight"]));
                         BlkDB.addChainState("cs:blockHeight",parseInt(JSON.parse(data)["block"]["blockHeight"]));
-                        BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["block"]["transactions"]),JSON.parse(data)["block"]["hash"],parseInt(JSON.parse(data)["block"]["blockHeight"]),thisBlockCheckPointHash);
+
+                        var thisTempFunctionWillBeSameAsTransactionValidateCallBack = function(myreturn){
+                          console.log("I'm back from ADD TRANSACTIONS with "+myreturn)
+                        }
+                        BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["block"]["transactions"]),JSON.parse(data)["block"]["hash"],parseInt(JSON.parse(data)["block"]["blockHeight"]),thisBlockCheckPointHash,thisTempFunctionWillBeSameAsTransactionValidateCallBack);
+
                         //add it to the RPC for miner
                         rpcserver.postRPCforMiner({block:JSON.parse(data)["block"]});
 
@@ -3431,7 +3436,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
         //end pre calculation
 
-        BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]),thisBlockCheckPointHash);
+
         frankieCoin.hashOfThisBlock = sapphirechain.Hash(frankieCoin.hash+BlkDB.getStateTrieRootHash())+":"+frankieCoin.hash+":"+BlkDB.getStateTrieRootHash();
         ////////database update and peers broadcast
         log("[placeholder] mining stats from outside miner");
@@ -3441,6 +3446,10 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"3020",fSetChainStateTX,frankieCoin.chainRiser,thisBlockCheckPointHash);
         BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
         BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
+        var thisTempFunctionWillBeSameAsTransactionValidateCallBack = function(myreturn){
+          console.log("I'm back from ADD TRANSACTIONS with "+myreturn)
+        }
+        BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]),thisBlockCheckPointHash,thisTempFunctionWillBeSameAsTransactionValidateCallBack);
 
         chainState.chainWalkHeight = frankieCoin.blockHeight;
         chainState.chainWalkHash = frankieCoin.getLatestBlock()["hash"];//block 1 hash
