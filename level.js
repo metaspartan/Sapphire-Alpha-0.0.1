@@ -825,12 +825,6 @@ var addTransaction = async function(transactionKey,transaction,blockNum,blkChain
         resolve(txConfirmationHash);
       }).catch(console.log)
     }).catch(console.log);
-    /***
-    db.put(transactionKey, transaction, function (err) {
-      if (err) return console.log('Ooops!', err) // some kind of I/O error
-    });
-    ***/
-
   })
 }
 
@@ -997,61 +991,39 @@ var addAllBalanceRecord = async function(address,ticker,amount,confirmation,bloc
 
   //I need some nonces on an address
   var setTxAddressNonce = function(fundsin,thisAddy,thisTicker,thisBlocknum,value){
-    //console.log("this will probably go nuts "+thisAddy,thisTicker,thisBlocknum,value.toString())
+
     var allBalanceNonceStorage = [];
     //get the total at the last nonce
     db.get("abnc:"+thisAddy.toLowerCase()+":"+ticker).then(async function(nonces){
-
-      console.log("current nonce values are "+nonces+" and type of "+typeof(nonces))
-
+      //console.log("current nonce values are "+nonces+" and type of "+typeof(nonces))
       //console.log("current nonce values 0 are "+nonces[0]+" and type of "+typeof(nonces[0]))
-      console.log("what type is avs above "+typeof(allBalanceNonceStorage))
-
-      var testVar = JSON.parse(nonces);
-
+      //console.log("what type is avs above "+typeof(allBalanceNonceStorage))
       allBalanceNonceStorage = [];
-
-      console.log("what type is avs below "+typeof(allBalanceNonceStorage))
-
+      //console.log("what type is avs below "+typeof(allBalanceNonceStorage))
       var currentTopEntry;
       for(var item in JSON.parse(nonces)){
-        console.log("nonces item "+item+" is "+JSON.stringify(JSON.parse(nonces)[item]));
+        //console.log("nonces item "+item+" is "+JSON.stringify(JSON.parse(nonces)[item]));
         var thisEntry = JSON.parse(nonces)[item];
         allBalanceNonceStorage[item] = thisEntry;
         currentTopEntry = thisEntry;
-        console.log("adding them "+parseFloat(currentTopEntry.balance)+" then "+parseFloat(fundsin)+" the add "+parseFloat(parseFloat(currentTopEntry.balance)+parseFloat(fundsin)).toFixed(8))
+        //console.log("adding them "+parseFloat(currentTopEntry.balance)+" then "+parseFloat(fundsin)+" the add "+parseFloat(parseFloat(currentTopEntry.balance)+parseFloat(fundsin)).toFixed(8))
       }
-
-      /***
-      for(var item in JSON.parse(testVar)){
-        console.log("the item "+JSON.parse(testVar)[item])
-      }
-      ***/
-
-
-      //nonces
-
-      console.log(" and the length is "+allBalanceNonceStorage.length)
+      //console.log(" and the length is "+allBalanceNonceStorage.length)
       //thisAddy,thisTicker,thisBlocknum,value.toString()
       var nextNonce = {address:thisAddy,ticker:thisTicker,amount:fundsin,blockHeight:thisBlocknum,prevBalance:currentTopEntry.balance,balance:parseFloat(parseFloat(currentTopEntry.balance)+parseFloat(fundsin)).toFixed(8)};
-
       allBalanceNonceStorage.push(nextNonce);
-
-      console.log(allBalanceNonceStorage+" and length is "+allBalanceNonceStorage.length)
-
-      if(allBalanceNonceStorage.length > 4){
+      //console.log(allBalanceNonceStorage+" and length is "+allBalanceNonceStorage.length)
+      if(allBalanceNonceStorage.length > 4){//limiting my storage to 4 records
         allBalanceNonceStorage.shift();
       }
-
-      console.log("after update nonce values are "+allBalanceNonceStorage)
-
+      //console.log("after update nonce values are "+allBalanceNonceStorage)
       db.put("abnc:"+thisAddy.toLowerCase()+":"+ticker,JSON.stringify(allBalanceNonceStorage))
     }).catch(function(err){//did not exist and so we make it 0
       console.log("well the error is this "+err)
       allBalanceNonceStorage = [];
       var nextNonce = {address:thisAddy,ticker:thisTicker,amount:fundsin,blockHeight:thisBlocknum,prevBalance:0,balance:parseFloat(fundsin)};
       allBalanceNonceStorage.push(nextNonce);
-      console.log("nothing existed so new record nonce values are "+allBalanceNonceStorage)
+      //console.log("nothing existed so new record nonce values are "+allBalanceNonceStorage)
       //thisAddy,thisTicker,thisBlocknum,value.toString()
       db.put("abnc:"+thisAddy.toLowerCase()+":"+ticker,JSON.stringify(allBalanceNonceStorage))
     })

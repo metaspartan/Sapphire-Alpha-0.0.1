@@ -1211,10 +1211,11 @@ let connSeq2 = 0
                         BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(JSON.parse(data)["block"]["blockHeight"]));
                         BlkDB.addChainState("cs:blockHeight",parseInt(JSON.parse(data)["block"]["blockHeight"]));
                         BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["block"]["transactions"]),JSON.parse(data)["block"]["hash"],parseInt(JSON.parse(data)["block"]["blockHeight"]),thisBlockCheckPointHash);
+                        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
+
                         //add it to the RPC for miner
                         rpcserver.postRPCforMiner({block:JSON.parse(data)["block"]});
 
-                        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
 
                         //miner call
                         calculateCheckPoints(frankieCoin.blockHeight,'miner','');
@@ -3441,7 +3442,11 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         BlkDB.addBlock(parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"3020",fSetChainStateTX,frankieCoin.chainRiser,thisBlockCheckPointHash);
         BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
         BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
-
+        //update the transaction validation as blocks come in
+        var currentCWH = chainState.chainWalkHeight
+        var currentCWHash = chainState.chainWalkHash
+        BlkDB.blockRangeValidate(parseInt(currentCWH+1),parseInt(currentCWH+frankieCoin.chainRiser+1),cbBlockChainValidator,currentCWHash,frankieCoin.chainRiser,3448);
+        //update the chain state
         chainState.chainWalkHeight = frankieCoin.blockHeight;
         chainState.chainWalkHash = frankieCoin.getLatestBlock()["hash"];//block 1 hash
         chainState.synchronized = frankieCoin.blockHeight;//when we are synched at a block it gets updated
