@@ -171,6 +171,22 @@ var getChainStateCheckPoint = function(blockNum,hash,cb){
   })
 }
 
+getTXCheckPoints = function(){
+  db.get("cs:transactionHeight", function(err, value){
+    if(value){
+      console.log("current transaction height is "+value);
+    }else{
+      console.log("transaction height does not exist");
+    }
+  })
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    if(data.key.toString().split(":")[0] == "cs" && data.key.toString().split(":")[1] == "transactionCheckPointHash"){
+      console.log('key = '+data.key+" value = "+data.value.toString());
+    }
+  })
+}
+
 var getCheckPoints = function(){
   var stream = db.createReadStream();
   stream.on('data',function(data){
@@ -2158,6 +2174,7 @@ module.exports = {
     getChainParamsByName:getChainParamsByName,
     getChainParamsBlockHeight:getChainParamsBlockHeight,
     getCheckPoints:getCheckPoints,
+    getTXCheckPoints:getTXCheckPoints,
     addChainState:addChainState,
     getChainStateParam:getChainStateParam,
     getChainStateCheckPoint:getChainStateCheckPoint,

@@ -308,6 +308,7 @@ var setChainStateTX = async function(validTXHeight,transationCheckPointHash){
         console.log("THIS IS WHERE TX VALIDATION IS FAILING NEED TO CLIP OR GET ON RIGHT CHAIN MOST LIKELY")
         console.log("THIS IS WHERE TX VALIDATION IS FAILING NEED TO CLIP OR GET ON RIGHT CHAIN MOST LIKELY")
       }
+      console.log(validTXHeight%frankieCoin.chainRiser)
       if(validTXHeight%frankieCoin.chainRiser == 0){
         BlkDB.addChainState("cs:transactionCheckPointHash:"+validTXHeight,transationCheckPointHash);
       }
@@ -683,13 +684,11 @@ var transactionValidator = async function(start,end){
             chainState.transactionHeight = parseInt(isValidTXHeight);
             chainState.transactionRootHash = transationCheckPointHash;
             BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
-            /***
-            if(isNaN(isValidTXHeight)){
-              console.log("transaction validation returned NaN");
-            }else{
 
+            if(isValidTXHeight%frankieCoin.chainRiser == 0){
+              BlkDB.addChainState("cs:transactionCheckPointHash:"+isValidTXHeight,transationCheckPointHash);
             }
-            ***/
+
           }
           await BlkDB.addTransactionsFromStream(JSON.parse(thisOneBlock)["transactions"],JSON.parse(thisOneBlock)["hash"],JSON.parse(thisOneBlock)["blockHeight"],thisOneBlock,updateChainStateTX,thisBlockCheckPointHash)
           start++;
@@ -2362,6 +2361,10 @@ function cliGetInput(){
       console.log(chalk.bgBlackBright.black("transactionHeight is ")+chalk.bgMagenta(JSON.stringify(chainState.transactionHeight)));
       console.log(chalk.bgBlackBright.black("transactionRootHash is ")+chalk.bgMagenta(JSON.stringify(chainState.transactionRootHash)));
       BlkDB.getCheckPoints();
+      cliGetInput();
+    }else if(userInput == "TXCHK"){
+      //getTXCheckPoints
+      BlkDB.getTXCheckPoints();
       cliGetInput();
     }else if(userInput == "TXVLDY"){
 
