@@ -337,6 +337,8 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
 
   var thisBlockCheckPointHash = Hash(blkCheckPointHash+checkPointHash);
 
+  ////WE MUST TRACK THE TX INDEX
+
   if(parseInt(blknum) == 1){//premines
     ///////////////////////////////////////////////////////////////////CORE DEVS
     var osoTx = await new Transaction("sapphire", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", "750000", "SFRX", JSON.parse(block)["timestamp"]);
@@ -844,12 +846,18 @@ var addTransaction = async function(transactionKey,transaction,blockNum,blkChain
   })
 }
 
-var addTransactions = async function(transactions,blockhash,blocknum,blkChainStateHash,cbTransactionState = console.log){
+//pay attention to the index that is what defines the order of when this function is called
+var addTransactions = async function(transactions,blockhash,blocknum,blkChainStateHash,cbTransactionState = console.log,txConfirmation){
 
     //console.log("T R A N S A C T I O N S  B E I N G  A D D E D  H E R E");
     transactions = JSON.parse(JSON.stringify(transactions));
 
-    var txIndex = 0;
+    if(blocknum == 1){
+      var txIndex = 9;
+    }else{
+      var txIndex = 7;
+    }
+
     var txConfirmation;
 
     for(tranx in JSON.parse(transactions)){

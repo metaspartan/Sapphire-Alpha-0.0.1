@@ -1231,7 +1231,7 @@ let connSeq2 = 0
                         var thisTempFunctionWillBeSameAsTransactionValidateCallBack = function(myreturn){
                           console.log("I'm back from ADD TRANSACTIONS with "+myreturn)
                         }
-                        BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["block"]["transactions"]),JSON.parse(data)["block"]["hash"],parseInt(JSON.parse(data)["block"]["blockHeight"]),thisBlockCheckPointHash,thisTempFunctionWillBeSameAsTransactionValidateCallBack);
+                        BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["block"]["transactions"]),JSON.parse(data)["block"]["hash"],parseInt(JSON.parse(data)["block"]["blockHeight"]),thisBlockCheckPointHash,thisTempFunctionWillBeSameAsTransactionValidateCallBack,chainState.transactionRootHash);
 
 
                         //add it to the RPC for miner
@@ -2862,7 +2862,11 @@ var chainWalker = function(syncpoint,cbBlockChainValidatorStartUp){
 BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"2462",setChainStateTX,frankieCoin.chainRiser,'');
 BlkDB.addChainParams(globalGenesisHash+":blockHeight",1);
 //BlkDB.addChainState("cs:blockHeight",1);//NEVER LOAD THIS HERE IT DEFEATS THE WHOLE PURPOSE
-BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]),"");//is there a chain state hash?
+var thisTempFunctionWillBeSameAsTransactionValidateCallBack = function(myreturn){
+  console.log("I'm back from ADD TRANSACTIONS with "+myreturn)
+
+}
+BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]),"",thisTempFunctionWillBeSameAsTransactionValidateCallBack,"");//is there a chain state hash?
 //log("peer chain is"+ frankieCoin.getEntireChain());
 
 var franks = miner(frankieCoin);
@@ -3474,7 +3478,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           console.log("I'm back from ADD TRANSACTIONS with "+myreturn)
 
         }
-        BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]),thisBlockCheckPointHash,thisTempFunctionWillBeSameAsTransactionValidateCallBack);
+        BlkDB.addTransactions(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),frankieCoin.getLatestBlock()["hash"],parseInt(frankieCoin.getLatestBlock()["blockHeight"]),thisBlockCheckPointHash,thisTempFunctionWillBeSameAsTransactionValidateCallBack,chainState.transactionRootHash);
 
         chainState.chainWalkHeight = frankieCoin.blockHeight;
         chainState.chainWalkHash = frankieCoin.getLatestBlock()["hash"];//block 1 hash
