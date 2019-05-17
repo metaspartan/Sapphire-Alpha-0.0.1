@@ -291,11 +291,30 @@ var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
 var setChainStateTX = async function(validTXHeight,transationCheckPointHash){
   console.log(chalk.bgGreen.black("setting chain state height to "+validTXHeight+" with hash of "+transationCheckPointHash));
-  chainState.transactionHeight = await parseInt(validTXHeight);
-  chainState.transactionRootHash = await transationCheckPointHash;
-  if(validTXHeight > 1){//otherwise it resets a memory load when it loads block 1
-    BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
+
+
+  ////setting transaction level checks and heights
+  var transactionValidator = async function(start,end){
+    var cbTransactionHeightMonitor = async function(csTransactionHeight){
+      //current transation height is csTransactionHeight.split(":")[0] with hash csTransactionHeight.split(":")[1]
+      if(validTXHeight > 1 && validTXHeight == parseInt(chainState.transactionHeight+1) && csTransactionHeight.split(":")[1] == chainState.transactionRootHash){//otherwise it resets a memory load when it loads block 1
+        //I may want to host a set of previous chainState.TransactionHeight and Hash but for now defer
+        chainState.transactionHeight = await parseInt(validTXHeight);
+        chainState.transactionRootHash = await transationCheckPointHash;
+        BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
+      }else{
+        console.log("THIS IS WHERE TX VALIDATION IS FAILING NEED TO CLIP OR GET ON RIGHT CHAIN MOST LIKELY")
+        console.log("THIS IS WHERE TX VALIDATION IS FAILING NEED TO CLIP OR GET ON RIGHT CHAIN MOST LIKELY")
+        console.log("THIS IS WHERE TX VALIDATION IS FAILING NEED TO CLIP OR GET ON RIGHT CHAIN MOST LIKELY")
+        console.log("THIS IS WHERE TX VALIDATION IS FAILING NEED TO CLIP OR GET ON RIGHT CHAIN MOST LIKELY")
+      }
+      if(validTXHeight%frankieCoin.chainRiser == 0){
+        BlkDB.addChainState("cs:transactionCheckPointHash:"+validTXHeight,transationCheckPointHash);
+      }
+    }
+    BlkDB.getChainStateParam("transactionHeight",cbTransactionHeightMonitor);
   }
+
   //BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
   /***
   if(isNaN(isValidTXHeight)){
