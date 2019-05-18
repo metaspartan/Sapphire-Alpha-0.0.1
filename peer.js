@@ -289,9 +289,8 @@ var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
 }
 
-var setChainStateTX = async function(validTXHeight,transationCheckPointHash){
+var setChainStateTX = async function(validTXHeight,transactionCheckPointHash){
   console.log(chalk.bgGreen.black("setting chain state height to "+validTXHeight+" with hash of "+transationCheckPointHash));
-
 
   ////setting transaction level checks and heights
   var transactionValidator = async function(start,end){
@@ -300,8 +299,8 @@ var setChainStateTX = async function(validTXHeight,transationCheckPointHash){
       if(validTXHeight >= 1 && validTXHeight == parseInt(chainState.transactionHeight+1) && csTransactionHeight.split(":")[1] == chainState.transactionRootHash){//otherwise it resets a memory load when it loads block 1
         //I may want to host a set of previous chainState.TransactionHeight and Hash but for now defer
         chainState.transactionHeight = await parseInt(validTXHeight);
-        chainState.transactionRootHash = await transationCheckPointHash;
-        BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
+        chainState.transactionRootHash = await transactionCheckPointHash;
+        BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transactionCheckPointHash);
       }else{
         console.log("THIS IS WHERE TX VALIDATION IS FAILING NEED TO CLIP OR GET ON RIGHT CHAIN MOST LIKELY")
         console.log("THIS IS WHERE TX VALIDATION IS FAILING NEED TO CLIP OR GET ON RIGHT CHAIN MOST LIKELY")
@@ -310,7 +309,7 @@ var setChainStateTX = async function(validTXHeight,transationCheckPointHash){
       }
       console.log(validTXHeight%frankieCoin.chainRiser)
       if(validTXHeight%frankieCoin.chainRiser == 0){
-        BlkDB.addChainState("cs:transactionCheckPointHash:"+validTXHeight,transationCheckPointHash);
+        BlkDB.addChainState("cs:transactionCheckPointHash:"+validTXHeight,transactionCheckPointHash);
       }
     }
     BlkDB.getChainStateParam("transactionHeight",cbTransactionHeightMonitor);
@@ -650,7 +649,6 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 var transactionValidator = async function(start,end){
 
   var cbCheckChainStateTX = async function(csTransactionHeight){
-
 
     if(csTransactionHeight == 0 || parseInt(csTransactionHeight.toString().split(":")[0]) < end){
 
@@ -2364,6 +2362,7 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput == "TXCHK"){
       //getTXCheckPoints
+      console.log()
       BlkDB.getTXCheckPoints();
       cliGetInput();
     }else if(userInput == "TXVLDY"){
@@ -2859,7 +2858,7 @@ var chainWalker = function(syncpoint,cbBlockChainValidatorStartUp){
 ////////////////////////////////////////////////end chain walker synchronisation
 
 //have to load the first block into local database
-BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"2462",setChainStateTX,frankieCoin.chainRiser,'');
+BlkDB.addBlock(1,JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"2462",setChainStateTX,frankieCoin.chainRiser,chainState.chainWalkHash);
 BlkDB.addChainParams(globalGenesisHash+":blockHeight",1);
 //BlkDB.addChainState("cs:blockHeight",1);//NEVER LOAD THIS HERE IT DEFEATS THE WHOLE PURPOSE
 var thisTempFunctionWillBeSameAsTransactionValidateCallBack = function(myreturn){
