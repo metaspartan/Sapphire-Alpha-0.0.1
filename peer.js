@@ -290,7 +290,7 @@ var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 }
 
 var setChainStateTX = async function(validTXHeight,transactionCheckPointHash){
-  console.log(chalk.bgGreen.black("setting chain state height to "+validTXHeight+" with hash of "+transationCheckPointHash));
+  console.log(chalk.bgGreen.black("setting chain state height to "+validTXHeight+" with hash of "+transactionCheckPointHash));
 
   ////setting transaction level checks and heights
   var transactionValidator = async function(start,end){
@@ -2631,6 +2631,12 @@ function cliGetInput(){
         console.log(chalk.yellow("--------------------------------"));
       }
       BlkDB.getBalanceAtAddressABTrie(egemAddress,'SFRX',chainState.transactionHeight,addyBal4)
+      cliGetInput();
+    }else if(userInput.startsWith("getBalanceTest(")){
+      console.log(userInput.slice(userInput.indexOf("getBalanceTest(")+15, userInput.indexOf(")")));
+      var egemAddress = userInput.slice(userInput.indexOf("getBalanceTest(")+15, userInput.indexOf(")")).toLowerCase();
+      console.log("getBalanceTest")
+      log("---------------");
       cliGetInput();
     }else if(userInput.startsWith("getPendingOrders()")){
       log("---------------");
