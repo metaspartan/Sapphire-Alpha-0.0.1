@@ -541,7 +541,7 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
       }
     }
     getChainStateParam("transactionHeight");
-  });
+  })();
 
 
 
