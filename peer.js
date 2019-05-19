@@ -290,11 +290,16 @@ var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 }
 
 var setChainStateTX = async function(validTXHeight,transactionCheckPointHash){
+
   console.log(chalk.bgGreen.black("setting chain state height to "+validTXHeight+" with hash of "+transactionCheckPointHash));
 
+  //realizing this was never actually set
+  chainState.transactionHeight = await parseInt(validTXHeight);
+  chainState.transactionRootHash = await transactionCheckPointHash;
   ////setting transaction level checks and heights
   var transactionValidator = async function(start,end){
     var cbTransactionHeightMonitor = async function(csTransactionHeight){
+      console.log("****||||****||||>>> back with chainState csTransactionHeight "+csTransactionHeight)
       //current transation height is csTransactionHeight.split(":")[0] with hash csTransactionHeight.split(":")[1]
       if(validTXHeight >= 1 && validTXHeight == parseInt(chainState.transactionHeight+1) && csTransactionHeight.split(":")[1] == chainState.transactionRootHash){//otherwise it resets a memory load when it loads block 1
         //I may want to host a set of previous chainState.TransactionHeight and Hash but for now defer
@@ -567,8 +572,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     console.log(chalk.bgBlue("chainState.chainWalkHash: ")+chalk.black.bgCyan(chainState.chainWalkHash));
     console.log(chalk.bgBlue("chainState.synchronized: ")+chalk.black.bgCyan(chainState.synchronized));
     console.log(chalk.bgBlue("chainState.topBlock: ")+chalk.black.bgCyan(chainState.chainWalkHeight));
-    console.log(chalk.bgBlue("chainState.chainStateHash: ")+chalk.black.bgYellow(JSON.stringify(chainState.previousBlockCheckPointHash)));
-    console.log(chalk.bgBlue("chainState.chainStateHash: ")+chalk.black.bgYellow(JSON.stringify(chainState.currentBlockCheckPointHash)));
+    console.log(chalk.bgBlue("chainState.previousBlockCheckPointHash: ")+chalk.black.bgYellow(JSON.stringify(chainState.previousBlockCheckPointHash)));
+    console.log(chalk.bgBlue("chainState.currentBlockCheckPointHash: ")+chalk.black.bgYellow(JSON.stringify(chainState.currentBlockCheckPointHash)));
 
     if(chainState.chainWalkHeight == parseInt(frankieCoin.blockHeight-1)){
       calculateCheckPoints(
