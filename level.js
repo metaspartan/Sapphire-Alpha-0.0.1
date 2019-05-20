@@ -539,9 +539,11 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
 
   }
 
-  pushChainState('transactionHeight',blocknum)
-  pushChainState('transactionRootHash',txConfirmation)
-
+  if(blocknum > 1){
+    pushChainState('transactionHeight',blocknum)
+    pushChainState('transactionRootHash',txConfirmation)
+  }
+  
   //this is not being used
   Promise.resolve(()=>{
     var cbGetChainStateTXHeight = function(value){
