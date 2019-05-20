@@ -359,7 +359,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     }
   }
 
-  console.log(chalk.bgCyan.black("WOOOT ADDING TRANSACITONS ON ADD BLOCK WOOT "+transactions+ " blockhash " +blockhash+ " blknum " +blknum+" blkChainStateHash: "+blkChainStateHash));
+  console.log(chalk.bgCyan.black("WOOOT ADDING TRANSACITONS ON ADD BLOCK WOOT "+transactions+ " blockhash " +JSON.parse(block)["hash"]+ " blknum " +blknum+" blkCheckPointHash: "+blkCheckPointHash));
 
   ////WE MUST TRACK THE TX INDEX
 
