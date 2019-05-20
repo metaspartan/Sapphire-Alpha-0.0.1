@@ -537,18 +537,12 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
     //EGEM node T1
     //EGEM node T2
 
-  }
-
-  //this is not being used
-  Promise.resolve(()=>{
-    var cbGetChainStateTXHeight = function(value){
-      if(parseInt(value + 1) == blocknum){
-        cbSetChainStateTX(blocknum,txConfirmation);
-      }
+    if(blocknum > 1){
+      pushChainState('transactionHeight',blocknum)
+      pushChainState('transactionRootHash',txConfirmation)
     }
-    getChainStateParam("transactionHeight");
-  })();
 
+  }
 
 
 }
