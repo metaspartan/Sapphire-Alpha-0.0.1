@@ -125,7 +125,7 @@ var activeSync = function(timer){
   console.log(chalk.bgCyan.black(" transactionHash: ")+chalk.bgMagenta(chainState.transactionRootHash));
 
   setTimeout(function(){
-    BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
+    BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
   },timer)
 
 }
@@ -2940,7 +2940,7 @@ var cbChainGrab = async function(data) {
   setTimeout(function(){
     //console.log(frankieCoin.blockHeight);
     if(frankieCoin.blockHeight > 1){
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(frankieCoin.blockHeight),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,2718);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(frankieCoin.blockHeight+1),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,2718);
 
     }
   },1000);
