@@ -301,7 +301,7 @@ var setChainStateTX = async function(validTXHeight,transactionCheckPointHash){
     var cbTransactionHeightMonitor = async function(csTransactionHeight){
       console.log("****||||****||||>>> back with chainState csTransactionHeight "+csTransactionHeight)
       //current transation height is csTransactionHeight.split(":")[0] with hash csTransactionHeight.split(":")[1]
-      if(validTXHeight > 1 && validTXHeight == parseInt(chainState.transactionHeight+1) && csTransactionHeight.split(":")[1] == chainState.transactionRootHash){//otherwise it resets a memory load when it loads block 1
+      if(validTXHeight >= 1 && validTXHeight == parseInt(chainState.transactionHeight+1) && csTransactionHeight.split(":")[1] == chainState.transactionRootHash){//otherwise it resets a memory load when it loads block 1
         //I may want to host a set of previous chainState.TransactionHeight and Hash but for now defer
         chainState.transactionHeight = await parseInt(validTXHeight);
         chainState.transactionRootHash = await transactionCheckPointHash;
