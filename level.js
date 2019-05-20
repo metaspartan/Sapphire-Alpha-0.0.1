@@ -588,7 +588,10 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     pushChainState('transactionHeight',blocknum);
     pushChainState('transactionRootHash',txConfirmation);
     addChainState("cs:transactionHeight",blocknum+":"+txConfirmation);
-    addChainState("cs:transactionCheckPointHash:"+blocknum,txConfirmation);
+    if(blocknum%chainRiser == 0){
+      addChainState("cs:transactionCheckPointHash:"+blocknum,txConfirmation);
+    }
+    cbSetChainStateTX()
   }else if(blocknum == 1){
     db.get("cs:transactionHeight").then(async function(value){
       console.log(value.toString())
