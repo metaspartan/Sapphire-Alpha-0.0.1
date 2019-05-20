@@ -301,7 +301,7 @@ var setChainStateTX = async function(validTXHeight,transactionCheckPointHash){
     var cbTransactionHeightMonitor = async function(csTransactionHeight){
       console.log("****||||****||||>>> back with chainState csTransactionHeight "+csTransactionHeight)
       //current transation height is csTransactionHeight.split(":")[0] with hash csTransactionHeight.split(":")[1]
-      if(validTXHeight >= 1 && validTXHeight == parseInt(chainState.transactionHeight+1) && csTransactionHeight.split(":")[1] == chainState.transactionRootHash){//otherwise it resets a memory load when it loads block 1
+      if(validTXHeight > 1 && validTXHeight == parseInt(chainState.transactionHeight+1) && csTransactionHeight.split(":")[1] == chainState.transactionRootHash){//otherwise it resets a memory load when it loads block 1
         //I may want to host a set of previous chainState.TransactionHeight and Hash but for now defer
         chainState.transactionHeight = await parseInt(validTXHeight);
         chainState.transactionRootHash = await transactionCheckPointHash;
@@ -2987,17 +2987,18 @@ function ChainGrab(blocknum){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
   //BlkDB.getBlockchain(99,cbChainGrab,globalGenesisHash)
   var currentHeight = function(val){
-    //console.log(val);
+    console.log("this is what we called "+val);
     BlkDB.getBlockRange(val,frankieCoin.chainRiser,cbChainGrab)
   }
   BlkDB.getChainStateParam("blockHeight",currentHeight);
   var resetTransactionHeight = function(val){
-    console.log("setting transaction state based on "+val)
+    console.log(chalk.bgGreen("in chain grab setting transaction state based on "+val))
     if(val != 0){
       setChainStateTX(val.split(":")[0],val.split(":")[1]);
     }
   }
   BlkDB.getChainStateParam("transactionHeight",resetTransactionHeight);
+
   //maybe some other stuff like .then
 };
 function ChainGrabRefresh(blocknum,cbChainGrab,chainRiser){
@@ -3008,7 +3009,7 @@ function ChainGrabRefresh(blocknum,cbChainGrab,chainRiser){
   //maybe some other stuff like .then
 };
 
-/*-------THE DYNC CALLS ON STARTUP---------------*/
+/*-------THE SYNC CALLS ON STARTUP---------------*/
 //and finally the actual call to function for synch
 isSynching = true;
 

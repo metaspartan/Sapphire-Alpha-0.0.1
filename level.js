@@ -143,7 +143,7 @@ var addCheckPoint = function(key,hash,previousHash,timestamp,nonce){
 var getChainStateParam = function(state,cb){
   db.get("cs:"+state, function (err, value) {
     if(value){
-      console.log("Chain State Param: "+state+" = "+value.toString());
+      console.log(chalk.bgMagenta("Chain State Param: "+state+" = "+value.toString()));
       cb(value.toString());
     }else{
       cb(0);
@@ -587,12 +587,20 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     console.log(chalk.bgRed("greater than 1 ---> blocknum"+blocknum))
     pushChainState('transactionHeight',blocknum);
     pushChainState('transactionRootHash',txConfirmation);
+    addChainState("cs:transactionHeight",blocknum+":"+txConfirmation);
     addChainState("cs:transactionCheckPointHash:"+blocknum,txConfirmation);
   }else if(blocknum == 1){
-    console.log(chalk.bgRed("equals 1 ---> blocknum"+blocknum))
-    pushChainState('transactionHeight',blocknum);
-    pushChainState('transactionRootHash',txConfirmation);
-    addChainState("cs:transactionCheckPointHash:"+blocknum,txConfirmation);
+    db.get("cs:transactionHeight").then(async function(value){
+      console.log(value.toString())
+      pushChainState('transactionHeight',value.toString().split(":")[0]);
+      pushChainState('transactionRootHash',value.toString().split(":")[1]);
+    }).catch(async function(){
+      pushChainState('transactionHeight',blocknum);
+      pushChainState('transactionRootHash',txConfirmation);
+      addChainState("cs:transactionHeight",blocknum+":"+txConfirmation);
+      addChainState("cs:transactionCheckPointHash:"+blocknum,txConfirmation);
+    })
+    console.log(chalk.bgRed("equals 1 ---> blocknum"+blocknum+" "+txConfirmation))
   }else{
     console.log(chalk.bgRed("not 1 or greater than 1 ?? ---> blocknum"+blocknum))
   }
