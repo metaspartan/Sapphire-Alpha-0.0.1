@@ -306,7 +306,7 @@ var getAllPeerSafes = function(){
   });
 }
 
-var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,chainRiser,blkCheckPointHash,checkPointHash){
+var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetChainStateTX,chainRiser,blkCheckPointHash){
   console.log("<<<<<----------------ADDS BLOCK TO LEVEL DB HERE------------>>>>>")
   console.log("called from "+callfrom);
   //console.log("inside add block"+block.toString());//verbose
@@ -340,7 +340,26 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
   var txConfirmation;
   var txIndex = 0;
 
-  var thisBlockCheckPointHash = Hash(blkCheckPointHash+checkPointHash);
+  //var thisBlockCheckPointHash = Hash(blkCheckPointHash+checkPointHash);
+  var thisBlockCheckPointHash = blkCheckPointHash;//was hashed before submit
+
+  console.log(transactions+" <--"+typeof(transactions))
+
+  for(var key in transactions) {
+    if(transactions.hasOwnProperty(key)){
+      console.log("this is where has own key "+JSON.stringify(transactions));
+      if(transactions.length > 0){
+        //do nothing
+      }else{
+        transactions = [];
+      }
+    }else{
+      transactions = JSON.parse(JSON.stringify(transactions));
+      console.log("this is where it is parsed "+transactions);
+    }
+  }
+
+  console.log(chalk.bgCyan.black("WOOOT ADDING TRANSACITONS ON ADD BLOCK WOOT "+transactions+ " blockhash " +blockhash+ " blknum " +blknum+" blkChainStateHash: "+blkChainStateHash));
 
   ////WE MUST TRACK THE TX INDEX
 
@@ -473,7 +492,7 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(calcDevReward).toFixed(8),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//1
     })
 
     var ridzTx = await new Transaction("sapphire", "0xc393659c2918a64cdfb44d463de9c747aa4ce3f7", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
@@ -482,7 +501,7 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7","SFRX",parseFloat(calcDevReward).toFixed(8),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//2
     })
 
     var jalTx = await new Transaction("sapphire", "0xA54EE4A7ab23068529b7Fec588Ec3959E384a816", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
@@ -491,7 +510,7 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816","SFRX",parseFloat(calcDevReward).toFixed(8),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//3
     })
 
     var tbatesTx = await new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
@@ -500,7 +519,7 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170","SFRX",parseFloat(calcDevReward).toFixed(8),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//4
     })
 
     var beastTx = await new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
@@ -509,7 +528,7 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103","SFRX",parseFloat(calcDevReward).toFixed(8),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//5
     })
 
     //miner
@@ -519,7 +538,7 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["miner"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(minerTx),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord(JSON.parse(block)["miner"],"SFRX",parseFloat(calcMiningReward).toFixed(8),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//6
     })
 
     //sponsor
@@ -529,8 +548,31 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcMiningReward).toFixed(8),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//7
     })
+
+    ////////////////////////////////////////////////////////now block TXs in order
+    console.log("WHAT IS TRANSACTIONS LENGTH ???? "+transactions.length)
+
+    if(transactions.length > 0){
+      for(tranx in transactions){
+
+        console.log("in the transactions loop ")
+
+        var receipt = transactions[tranx];
+        //receipts have a key of toAddress:timestamp:receipthash atm
+        txConfirmation = await addTransaction("tx:"+receipt["fromAddress"].toLowerCase()+":"+receipt["toAddress"].toLowerCase()+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+JSON.parse(block)["hash"],JSON.stringify(receipt),blocknum,thisBlockCheckPointHash,txIndex);
+        //need to accumulate the balances and add or subtract to PMT
+
+        addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blocknum,txIndex);
+
+        addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blocknum,txIndex);
+        //2) get the trie root hash and return for hasing into the block
+
+        txIndex++
+      }
+    }
+    /////////////////////////////////////////////////////////////////end block txs
 
     //community DEVS
     //sapphire Node T2 SUPER NODE
@@ -939,33 +981,33 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
   var osoTx = new Transaction("sapphire", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
   txConfirmation = await addTransaction("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(calcDevReward).toFixed(8),txConfirmation,blknum,txIndex);
-  txIndex++
+  txIndex++//1
   var ridzTx = new Transaction("sapphire", "0xc393659c2918a64cdfb44d463de9c747aa4ce3f7", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
   txConfirmation = await addTransaction("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7","SFRX",parseFloat(calcDevReward).toFixed(8),txConfirmation,blknum,txIndex);
-  txIndex++
+  txIndex++//2
   var jalTx = new Transaction("sapphire", "0xA54EE4A7ab23068529b7Fec588Ec3959E384a816", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
   txConfirmation = await addTransaction("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816","SFRX",parseFloat(calcDevReward).toFixed(8),txConfirmation,blknum,txIndex);
-  txIndex++
+  txIndex++//3
   var tbatesTx = new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
   txConfirmation = await addTransaction("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170","SFRX",parseFloat(calcDevReward).toFixed(8),txConfirmation,blknum,txIndex);
-  txIndex++
+  txIndex++//4
   var beastTx = new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
   txConfirmation = await addTransaction("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103","SFRX",parseFloat(calcDevReward).toFixed(8),txConfirmation,blknum,txIndex);
-  txIndex++
+  txIndex++//5
   //miner
   var minerTx = new Transaction("sapphire", JSON.parse(block)["miner"], calcMiningReward, "SFRX", JSON.parse(block)["timestamp"]);
   txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["miner"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(minerTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord(JSON.parse(block)["miner"],"SFRX",parseFloat(calcMiningReward).toFixed(8),txConfirmation,blknum,txIndex);
-  txIndex++
+  txIndex++//6
   //sponsor
   var sponsorTx = new Transaction("sapphire", JSON.parse(block)["sponsor"], calcSponsorReward, "SFRX", JSON.parse(block)["timestamp"]);
   txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx),blknum,blkChainStateHash,txIndex);
   addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcMiningReward).toFixed(8),txConfirmation,blknum,txIndex);
-  txIndex++
+  txIndex++//7
   ////////////////////////////////////////////////////////////END NATIVE REWARDS
 
   ////////////////////////////////////////////////////////now block TXs in order
