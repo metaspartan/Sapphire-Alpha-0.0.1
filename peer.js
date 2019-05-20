@@ -1232,7 +1232,7 @@ let connSeq2 = 0
 
                         //////update the client database OR reject block and rollback the chain - code is incomplete atm
                         //add it to the database
-                        BlkDB.addBlock(parseInt(JSON.stringify(JSON.parse(data)["block"]["transactions"]),JSON.parse(data)["block"]["blockHeight"]),JSON.stringify(JSON.parse(data)["block"]),JSON.parse(data)["block"]["hash"],"967",setChainStateTX,frankieCoin.chainRiser,thisBlockCheckPointHash);
+                        BlkDB.addBlock(JSON.parse(data)["block"]["transactions"],parseInt(JSON.parse(data)["block"]["blockHeight"]),JSON.stringify(JSON.parse(data)["block"]),JSON.parse(data)["block"]["hash"],"967",setChainStateTX,frankieCoin.chainRiser,thisBlockCheckPointHash);
                         BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(JSON.parse(data)["block"]["blockHeight"]));
                         BlkDB.addChainState("cs:blockHeight",parseInt(JSON.parse(data)["block"]["blockHeight"]));
                         var thisTempFunctionWillBeSameAsTransactionValidateCallBack = function(myreturn){
@@ -3435,7 +3435,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         log("Outside Miner Mined Block Get latest block: "+frankieCoin.getLatestBlock().nonce.toString()+"and the hash"+frankieCoin.getLatestBlock()["hash"]);
         /////////////////////////////////////////////////////block stored to level
 
-        BlkDB.addBlock(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"3020",fSetChainStateTX,frankieCoin.chainRiser,thisBlockCheckPointHash);
+        BlkDB.addBlock(frankieCoin.getLatestBlock()["transactions"],parseInt(frankieCoin.blockHeight),JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"3020",fSetChainStateTX,frankieCoin.chainRiser,thisBlockCheckPointHash);
         BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
         BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
         var thisTempFunctionWillBeSameAsTransactionValidateCallBack = function(myreturn){
