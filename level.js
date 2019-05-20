@@ -539,11 +539,6 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
 
   }
 
-  if(blocknum > 1){
-    pushChainState('transactionHeight',blocknum)
-    pushChainState('transactionRootHash',txConfirmation)
-  }
-  
   //this is not being used
   Promise.resolve(()=>{
     var cbGetChainStateTXHeight = function(value){
@@ -885,6 +880,11 @@ var addTransactions = async function(transactions,blockhash,blocknum,blkChainSta
 
       txIndex++;
 
+    }
+
+    if(blocknum > 1){
+      pushChainState('transactionHeight',blocknum)
+      pushChainState('transactionRootHash',txConfirmation)
     }
 
     console.log("TRANSACTION PROMISE RESOLVE SHOULD BE HERE ");
