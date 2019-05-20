@@ -601,7 +601,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
       pushChainState('transactionHeight',blocknum);
       pushChainState('transactionRootHash',txConfirmation);
       addChainState("cs:transactionHeight",blocknum+":"+txConfirmation);
-      addChainState("cs:transactionCheckPointHash:"+blocknum,txConfirmation);
+      addChainState("cs:transactionCheckPointHash:"+0,"");
     })
     console.log(chalk.bgRed("equals 1 ---> blocknum"+blocknum+" "+txConfirmation))
   }else{
