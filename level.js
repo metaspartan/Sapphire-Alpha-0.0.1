@@ -372,7 +372,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
       //var addTransaction = async function(transactionKey,transaction,blockNum,blkChainStateHash,txIndex){
       txConfirmation = await addTransaction("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(750000),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//1
     })
     //whqt I had for PMT tht I removed for now - in the git updates removed 4-5-2019 for each
     /****
@@ -404,7 +404,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0xc393659c2918a64cdfb44d463de9c747aa4ce3f7","SFRX",parseFloat(750000),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//2
     })
 
 
@@ -414,7 +414,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:0xA54EE4A7ab23068529b7Fec588Ec3959E384a816:SFRX:"+JSON.parse(block)["timestamp"]+":"+jalTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(jalTx),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0xA54EE4A7ab23068529b7Fec588Ec3959E384a816","SFRX",parseFloat(750000),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//3
     })
 
     var tbatesTx = await new Transaction("sapphire", "0x5a911396491C3b4ddA38fF14c39B9aBc2B970170", "750000", "SFRX", JSON.parse(block)["timestamp"]);
@@ -423,7 +423,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:0x5a911396491C3b4ddA38fF14c39B9aBc2B970170:SFRX:"+JSON.parse(block)["timestamp"]+":"+tbatesTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(tbatesTx),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0x5a911396491C3b4ddA38fF14c39B9aBc2B970170","SFRX",parseFloat(750000),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//4
     })
 
     var beastTx = await new Transaction("sapphire", "0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103", "750000", "SFRX", JSON.parse(block)["timestamp"]);
@@ -432,7 +432,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103:SFRX:"+JSON.parse(block)["timestamp"]+":"+beastTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(beastTx),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0xe1284A0968Fdcc44BEd32AAc6c1c7e97ee366103","SFRX",parseFloat(750000),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//5
     })
     ////////////////////////////////////////////////////////////////EARLY SUPPORT
     /***
@@ -452,7 +452,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:EGEM:"+JSON.parse(block)["timestamp"]+":"+osoTxEGEM.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxEGEM),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","EGEM",parseFloat(100000),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//6
     })
 
     var osoTxBTC = await new Transaction("sapphire", "0x7357589f8e367c2C31F51242fB77B350A11830F3", "3", "BTC", JSON.parse(block)["timestamp"]);
@@ -461,7 +461,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:BTC:"+JSON.parse(block)["timestamp"]+":"+osoTxBTC.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxBTC),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","BTC",parseFloat(3),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//7
     })
 
     //new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 3, "BTC"),//BTC
@@ -471,7 +471,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:ETH:"+JSON.parse(block)["timestamp"]+":"+osoTxETH.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxETH),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","ETH",parseFloat(10),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//8
     })
 
     //new Transaction(null, "0x7357589f8e367c2C31F51242fB77B350A11830F3", 10, "ETH"),//ETH
@@ -481,8 +481,10 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:0x7357589f8e367c2C31F51242fB77B350A11830F3:XBI:"+JSON.parse(block)["timestamp"]+":"+osoTxXBI.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTxXBI),blocknum,thisBlockCheckPointHash,txIndex);
       addAllBalanceRecord("0x7357589f8e367c2C31F51242fB77B350A11830F3","XBI",parseFloat(1000),txConfirmation,blocknum,txIndex);
-      txIndex++;
+      txIndex++;//9
     })
+
+    console.log(chalk.bgRed("passing thru here on block 1 create "))
 
   }else{//perblock rewards from block 2 until
     ///////////////////////////////////////////////////////////////////CORE DEVS
@@ -552,7 +554,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     })
 
     ////////////////////////////////////////////////////////now block TXs in order
-    console.log("WHAT IS TRANSACTIONS LENGTH ???? "+transactions.length)
+    console.log("WHAT IS TRANSACTIONS LENGTH BLOCK ???? "+transactions.length)
 
     if(transactions.length > 0){
       for(tranx in transactions){
@@ -579,11 +581,20 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     //EGEM node T1
     //EGEM node T2
 
-    if(blocknum > 1){
-      pushChainState('transactionHeight',blocknum)
-      pushChainState('transactionRootHash',txConfirmation)
-    }
+  }
 
+  if(blocknum > 1){
+    console.log(chalk.bgRed("greater than 1 ---> blocknum"+blocknum))
+    pushChainState('transactionHeight',blocknum);
+    pushChainState('transactionRootHash',txConfirmation);
+    addChainState("cs:transactionCheckPointHash:"+blocknum,txConfirmation);
+  }else if(blocknum == 1){
+    console.log(chalk.bgRed("equals 1 ---> blocknum"+blocknum))
+    pushChainState('transactionHeight',blocknum);
+    pushChainState('transactionRootHash',txConfirmation);
+    addChainState("cs:transactionCheckPointHash:"+blocknum,txConfirmation);
+  }else{
+    console.log(chalk.bgRed("not 1 or greater than 1 ?? ---> blocknum"+blocknum))
   }
 
 
@@ -1011,7 +1022,7 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
   ////////////////////////////////////////////////////////////END NATIVE REWARDS
 
   ////////////////////////////////////////////////////////now block TXs in order
-  console.log("WHAT IS TRANSACTIONS LENGTH ???? "+transactions.length)
+  console.log("WHAT IS TRANSACTIONS LENGTH STREAM ???? "+transactions.length)
   console.log()
   if(transactions.length > 0){
     for(tranx in transactions){
@@ -1034,6 +1045,11 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
   /////////////////////////////////////////////////////////////////end block txs
 
   //will eventualy add a flag for if this is update or not or not
+  if(blknum == 1){
+    console.log(chalk.bgRed("THE FIRST BLOCK IS ADDED IN STREAM "+blknum+txConfirmation));
+  }
+  console.log(chalk.bgRed("THE FIRST BLOCK IS ADDED IN STREAM "+blknum+txConfirmation));
+
   cbUpdateChainStateTX(blknum,txConfirmation);
 
 }

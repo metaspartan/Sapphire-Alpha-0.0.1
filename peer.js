@@ -2823,7 +2823,7 @@ var chainWalker = function(syncpoint,cbBlockChainValidatorStartUp){
 ////////////////////////////////////////////////end chain walker synchronisation
 
 //have to load the first block into local database
-BlkDB.addBlock(JSON.stringify(frankieCoin.getLatestBlock()["transactions"]),1,JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"2462",setChainStateTX,frankieCoin.chainRiser,chainState.chainWalkHash);
+BlkDB.addBlock(frankieCoin.getLatestBlock()["transactions"],1,JSON.stringify(frankieCoin.getLatestBlock()),frankieCoin.getLatestBlock()["hash"],"2462",setChainStateTX,frankieCoin.chainRiser,chainState.chainWalkHash);
 BlkDB.addChainParams(globalGenesisHash+":blockHeight",1);
 //BlkDB.addChainState("cs:blockHeight",1);//NEVER LOAD THIS HERE IT DEFEATS THE WHOLE PURPOSE
 var thisTempFunctionWillBeSameAsTransactionValidateCallBack = function(myreturn){
