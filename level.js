@@ -11,6 +11,11 @@ var Trie = require('merkle-patricia-tree');
 
 //quite possibly we should set this in peer.js or block.js and pass it in
 var transactionRiser = 100;
+//chain state set function from peer
+var pushChainState;
+var setChainState = function(chs){
+  pushChainState = chs;
+}
 
 function decodeUTF8(s) {
   var i, d = unescape(encodeURIComponent(s)), b = new Uint8Array(d.length);
@@ -534,6 +539,10 @@ var addBlock = async function(blknum,block,blkhash,callfrom,cbSetChainStateTX,ch
 
   }
 
+  pushChainState('transactionHeight',blocknum)
+  pushChainState('transactionHeight',txConfirmation)
+
+  //this is not being used
   Promise.resolve(()=>{
     var cbGetChainStateTXHeight = function(value){
       if(parseInt(value + 1) == blocknum){
@@ -2165,6 +2174,7 @@ var getStateTrieRootHash = function(){
 }
 
 module.exports = {
+    setChainState:setChainState,
     getAll:getAll,
     refresh:refresh,
     closeDB:closeDB,

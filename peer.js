@@ -334,7 +334,11 @@ var setChainStateTX = async function(validTXHeight,transactionCheckPointHash){
 var getChainState = function(){
   return chainState;
 }
+var setChainState = function(stateParam,paramValue){
+  chainState[stateParam] = paramValue;
+}
 sapphirechain.setChainState(getChainState);
+BlkDB.setChainState(setChainState);
 ///end chain state set function
 
 //chainState.accountsTrie = 0;
