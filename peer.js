@@ -665,7 +665,7 @@ var transactionValidator = async function(start,end){
 
   var cbCheckChainStateTX = async function(csTransactionHeight){
 
-    if(csTransactionHeight == 0 || parseInt(csTransactionHeight.toString().split(":")[0]) < end){
+    if(parseInt(csTransactionHeight.toString().split(":")[0]) <= end){
 
       console.log("CALLED TXVLDY WITH "+start+" and "+end)
       if(start <= end){
@@ -685,6 +685,12 @@ var transactionValidator = async function(start,end){
         //console.log(thisOneBlock);
 
         var riserOffset = await (parseInt(incrementor) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
+        var calcCheckPointBlock = parseInt(incrementor - riserOffest)
+        console.log("calculated check point block = "+calcCheckPointBlock);
+        /////think we need this stuff
+
+        //var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+        ////////end I think this is supposed to be here
 
         var returnCheckPointBlock = async function(checkPointBlock){
           var blockNumHash = await JSON.parse(thisOneBlock)["hash"];
@@ -713,8 +719,7 @@ var transactionValidator = async function(start,end){
           }
 
         }
-
-        BlkDB.getBlock(incrementor,returnCheckPointBlock);
+        BlkDB.getBlock(calcCheckPointBlock,returnCheckPointBlock);
         //console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
       }else{
         console.log("start was greater than or equal to end so just look at chain state hash")
