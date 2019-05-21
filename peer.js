@@ -697,7 +697,7 @@ var transactionValidator = async function(start,end){
         ////////end I think this is supposed to be here
 
         var returnCheckPointBlock = async function(checkPointBlock){
-          console.log("cpb "+checkPointBLock)
+          console.log("cpb "+checkPointBlock)
           var blockNumHash = await JSON.parse(thisOneBlock)["hash"];
           console.log("blockNumHash: "+blockNumHash);
 
