@@ -687,6 +687,10 @@ var transactionValidator = async function(start,end){
         var riserOffset = await (parseInt(incrementor) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
         var calcCheckPointBlock = parseInt(incrementor - riserOffset)
         console.log("calculated check point block = "+calcCheckPointBlock);
+
+        if(calcCheckPointBlock == 0){
+          calcCheckPointBlock == 1;
+        }
         /////think we need this stuff
 
         //var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
@@ -698,7 +702,7 @@ var transactionValidator = async function(start,end){
 
           var thisBlockCheckPointHash = await sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
 
-          var updateChainStateTX = await function(isValidTXHeight,transationCheckPointHash){
+          var updateChainStateTX = function(isValidTXHeight,transationCheckPointHash){
             console.log(chalk.bgGreen.black("updating chain state height to "+isValidTXHeight));
             chainState.transactionHeight = parseInt(isValidTXHeight);
             chainState.transactionRootHash = transationCheckPointHash;
