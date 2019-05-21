@@ -689,7 +689,7 @@ var transactionValidator = async function(start,end){
         console.log("calculated check point block = "+calcCheckPointBlock);
 
         if(calcCheckPointBlock == 0){
-          calcCheckPointBlock == 1;
+          calcCheckPointBlock = 1;
         }
         /////think we need this stuff
 
