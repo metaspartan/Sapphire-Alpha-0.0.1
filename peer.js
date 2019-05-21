@@ -685,7 +685,7 @@ var transactionValidator = async function(start,end){
         //console.log(thisOneBlock);
 
         var riserOffset = await (parseInt(incrementor) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
-        var calcCheckPointBlock = parseInt(incrementor - riserOffest)
+        var calcCheckPointBlock = parseInt(incrementor - riserOffset)
         console.log("calculated check point block = "+calcCheckPointBlock);
         /////think we need this stuff
 
