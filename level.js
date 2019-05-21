@@ -612,12 +612,13 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
 }
 
 var getBlock = function(blknum,callBack){
-  console.log("BLOCK FROM LEVEL DB");
+  //console.log("BLOCK FROM LEVEL DB");
   var blocknum = parseInt(blknum);
   var hexBlockNum = ("000000000000000" + blocknum.toString(16)).substr(-16);
     db.get("sfblk:"+hexBlockNum, function (err, value) {
       return new Promise((resolve) => {
         if (err){
+          console.log("error with get block from level "+err)
           callBack(blknum+":"+err);
           return;
         } // likely the key was not found
