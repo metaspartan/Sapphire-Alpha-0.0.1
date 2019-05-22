@@ -591,7 +591,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     if(blocknum%chainRiser == 0){
       addChainState("cs:transactionCheckPointHash:"+blocknum,txConfirmation);
     }
-    cbSetChainStateTX()
+    //cbSetChainStateTX()
   }else if(blocknum == 1){
     db.get("cs:transactionHeight").then(async function(value){
       console.log(value.toString())
@@ -806,8 +806,8 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
 
             //console.log("is this one und "+JSON.parse(isValidBlock)["timestamp"]);
             var newBlockHash = Hash(currentBlockHash+JSON.parse(isValidBlock)["timestamp"]+JSON.parse(isValidBlock)["nonce"]);//this.previousHash + this.timestamp + this.nonce
-            console.log("comparing "+JSON.parse(isValidBlock)["hash"]+" to "+newBlockHash);
-            if(JSON.parse(isValidBlock)["hash"] == newBlockHash){
+            console.log("If block nimbet is GT 1 : "+JSON.parse(isValidBlock)["blockHeight"] +" then comparing "+JSON.parse(isValidBlock)["hash"]+" to "+newBlockHash);
+            if(JSON.parse(isValidBlock)["hash"] == newBlockHash || JSON.parse(isValidBlock)["blockHeight"] == 1){
 
               //I can set a flag here to load transactions from the block
 
