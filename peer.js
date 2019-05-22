@@ -97,6 +97,9 @@ chainState.transactionRootHash = '';
 chainState.interval = 10000;
 chainState.activeSynch;
 //need a snall array holding nodes with wieght score
+
+//need to post this to egem chain using what I coded up in postEgem.js and call it as a node sort
+
 //chainState.nodeWeights?
 //checks chain state changes but logs are slow - removing logs until i == blockheight
 var chainStateMonitor = {};

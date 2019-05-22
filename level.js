@@ -905,7 +905,7 @@ var addTransaction = async function(transactionKey,transaction,blockNum,blkChain
       await db.get(transactionKey).then(function(value){
         var txConfirmationHash = JSON.parse(value)["hash"];
         console.log("add transaction txConfirmationHash "+txConfirmationHash)
-        resolve(txConfirmationHash);
+        resolve(confirmationHash);
       }).catch(console.log)
     }).catch(console.log);
   })
@@ -1347,7 +1347,7 @@ var getBalanceAtAddress = function(address,callback){
           var orig = await web3.eth.getBalance(address, 1530000)
           orig = web3.utils.fromWei(orig,'ether');
           //var orig = await web3.utils.fromWei(orig,'ether');
-          //var orig = parseFloat(orig*2);
+          orig = parseFloat(orig*2);
           console.log("orig = "+orig)
           if(!orig){orig = 0};
           console.log("okay2"+parseFloat(existing+orig));
