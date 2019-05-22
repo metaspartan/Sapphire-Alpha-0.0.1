@@ -986,7 +986,8 @@ let connSeq2 = 0
     });
 
     conn.on('readable',function(){
-      //console.log("BLOCK STREAM "+this.readableHighWaterMark);
+
+      console.log("BLOCK STREAM "+this.readableHighWaterMark);
 
       let chunk;
       while (null !== (chunk = this.read())) {
