@@ -3180,13 +3180,15 @@ var myCallbackSell = function(data) {
 
 //////////////////////////////////////////inter module parent child communicator
 
-var broadcastPeersBlock = function(trigger,order = ''){
+  var lastCheckPointHash;//used to push checkPointHash to broascast peer calback
+  var lastCurrentBlockCheckPointHash;//same as above
+  var broadcastPeersBlock = function(trigger,order = ''){
   if(trigger == "block"){
     //sending the block to the peers
     log("------------------------------------------------------")
     log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
     log("------------------------------------------------------")
-    broadcastPeers(JSON.stringify({checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}));
+    broadcastPeers(JSON.stringify({checkPointHash:lastCheckPointHash,currentBlockCheckPointHash:lastCurrentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}));
   }else if(trigger == "order"){
     //sending the block to the peers
     log("------------------------------------------------------")
@@ -3434,9 +3436,12 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         await console.log(chalk.bgRed("FIRST OFF CAN I DO A TIME OUT HERE AND "+frankieCoin.getLatestBlock().timestamp+" comares to "+JSON.parse(childData)["createBlock"]["block"]["timestamp"]))
         //////////////going to have to make this sequential in a callback or chain
 
-
-        franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);//need to swap fpr next line but test it
-        //frankieCoin.addPendingTransactionsToMinedBLock(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
+        //temporarily setting these here to be pushed in broadcastPeersBlock above because they are set in the addBlock function now
+        lastCheckPointHash = chainState.checkPointHash;
+        lastCurrentBlockCheckPointHash = chainState.currentBlockCheckPointHash;
+        log(JSON.parse(childData)["address"]+" aha this is my mined block "+JSON.stringify(JSON.parse(childData)["createBlock"]["block"]))
+        frankieCoin.addPendingTransactionsToMinedBLock(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
+        //franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);//need to swap fpr next line but test it
 
         //calculating this 2 times but needed at addBlock for transations to verify properly
         var blockNum = await parseInt(frankieCoin.getLatestBlock()["blockHeight"])
