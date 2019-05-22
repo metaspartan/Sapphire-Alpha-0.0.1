@@ -639,7 +639,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         log(chalk.green("Sending ping for chain sync in cbBlockChainValidator top"));
         log("------------------------------------------------------");
         if(random == j && peers[j]){
-          peers[j].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          peers[j].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           called = true;
         }
       }
@@ -650,10 +650,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         log(chalk.green("Sending ping for chain sync in cbBlockChainValidator bottom"));
         log("------------------------------------------------------");
         if(random == i && peers[id] && called == false){
-          peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           called = true;
         }else if(called == false && peers[id]){
-          peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           called = true;
         }
         i++;
