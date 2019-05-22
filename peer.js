@@ -126,7 +126,7 @@ var activeSync = function(timer){
   console.log(chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(parseInt(chainState.peerNonce))+chalk.bgCyan.black(" transactionheight: ")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgCyan.black(" topblockheight: ")+chalk.bgMagenta(chainState.topBlock));
   console.log(chalk.bgCyan.black(" fcnlongpeer: ")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(chainState.peerNonce)+chalk.bgCyan.black(" peerCount: ")+chalk.bgMagenta(frankieCoin.nodes.length));
   console.log(chalk.bgCyan.black(" transactionHash: ")+chalk.bgMagenta(chainState.transactionRootHash));
-  if(chainState.chainWalkHeight < 1){
+  if(chainState.chainWalkHeight == 1){
     setTimeout(function(){
       BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
     },timer)

@@ -807,7 +807,8 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
             //console.log("is this one und "+JSON.parse(isValidBlock)["timestamp"]);
             var newBlockHash = Hash(currentBlockHash+JSON.parse(isValidBlock)["timestamp"]+JSON.parse(isValidBlock)["nonce"]);//this.previousHash + this.timestamp + this.nonce
             console.log("If block nimbet is GT 1 : "+JSON.parse(isValidBlock)["blockHeight"] +" then comparing "+JSON.parse(isValidBlock)["hash"]+" to "+newBlockHash);
-            if(JSON.parse(isValidBlock)["hash"] == newBlockHash || JSON.parse(isValidBlock)["blockHeight"] == 1){
+            //if(JSON.parse(isValidBlock)["hash"] == newBlockHash || JSON.parse(isValidBlock)["blockHeight"] == 1){
+            if(JSON.parse(isValidBlock)["hash"] == newBlockHash){
 
               //I can set a flag here to load transactions from the block
 
