@@ -3188,7 +3188,8 @@ var myCallbackSell = function(data) {
     log("------------------------------------------------------")
     log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
     log("------------------------------------------------------")
-    broadcastPeers(JSON.stringify({checkPointHash:lastCheckPointHash,currentBlockCheckPointHash:lastCurrentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}));
+    broadcastPeers(JSON.stringify({checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}));
+    //broadcastPeers(JSON.stringify({checkPointHash:lastCheckPointHash,currentBlockCheckPointHash:lastCurrentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}));
   }else if(trigger == "order"){
     //sending the block to the peers
     log("------------------------------------------------------")
