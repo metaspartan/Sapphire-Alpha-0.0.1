@@ -1005,7 +1005,7 @@ let connSeq2 = 0
       // Here we handle incomming messages
 
       //console.log("type of is "+typeof(data)+JSON.stringify(data));
-      log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
+      //log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
       // callback returning verified uncles post processing probably needs a rename
       var sendBackUncle = function(msg,peerId){
         peers[peerId].conn.write(JSON.stringify(msg));
@@ -2595,16 +2595,18 @@ function cliGetInput(){
       log(userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")")));
       var egemAddress = userInput.slice(userInput.indexOf("getBalance(")+11, userInput.indexOf(")")).toLowerCase();
       BlkDB.getBalanceAtAddress(egemAddress,addyBal)
+      log("   ");
       log("---------------");
       var addyBal2 = function(data){
         console.log("from the trie "+JSON.stringify(data));//do noting now
       }
-      BlkDB.getBalanceAtAddressFromTrie(egemAddress,addyBal2)
+      //BlkDB.getBalanceAtAddressFromTrie(egemAddress,addyBal2)
       var addyBal3 = function(data){
         console.log("from the all balances "+JSON.stringify(data));//do noting now
       }
       BlkDB.getBalanceAtAddressAllBalance(egemAddress,addyBal3)
       var addyBal4 = function(data){
+        console.log(" ");
         console.log(chalk.yellow("--------------------------------"));
         console.log("FROM THE TRIE "+JSON.stringify(data));
         console.log(chalk.yellow("--------------------------------"));

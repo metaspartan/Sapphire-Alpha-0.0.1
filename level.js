@@ -1205,7 +1205,7 @@ var getBalanceAtAddressAllBalance = function(address,callback){
   stream.on('data',function(data){
     if(data.key.toString().split(":")[0] == "abal" && data.key.toString().split(":")[1].toLowerCase() == address.toLowerCase()){
       //balances from new all balance tree
-      console.log('key = '+data.key+" value = "+data.value.toString());
+      //console.log('key = '+data.key+" value = "+data.value.toString());
       allBalances.push(parseFloat(JSON.parse(data.value.toString())["balance"]));
     }
   })
@@ -1219,6 +1219,9 @@ var getBalanceAtAddressABTrie = async function(address,ticker,abBlockHeight,call
     var localBalanceJSON = await value.toString();
     var localBalance = await parseFloat(JSON.parse(localBalanceJSON)["balance"]);
     callback(localBalance)
+  }).catch(function(err){
+    //console.log(err);//in case I want to check for certain error
+    callback(0);
   })
 }
 
@@ -1290,7 +1293,7 @@ var getBalanceAtAddress = function(address,callback){
         db.get(data, function (err, value) {
 
 
-          console.log("adding or subtracting "+parseFloat(JSON.parse(value)["amount"])+" of "+data.toString().split(":")[3]+" to ");
+          //console.log("adding or subtracting "+parseFloat(JSON.parse(value)["amount"])+" of "+data.toString().split(":")[3]+" to ");
 
           /***
           for(x in balance){
@@ -1305,12 +1308,12 @@ var getBalanceAtAddress = function(address,callback){
           }
 
           if(data.toString().split(":")[1].toLowerCase() == address.toLowerCase()){
-              console.log("deduct "+parseFloat(JSON.parse(value)["amount"]));
+              //console.log("deduct "+parseFloat(JSON.parse(value)["amount"]));
               balance[data.toString().split(":")[3]] -= parseFloat(JSON.parse(value)["amount"]);
           }
 
           if(data.toString().split(":")[2].toLowerCase() == address.toLowerCase()){
-              console.log("addit "+parseFloat(JSON.parse(value)["amount"]));
+              //console.log("addit "+parseFloat(JSON.parse(value)["amount"]));
               balance[data.toString().split(":")[3]] += parseFloat(JSON.parse(value)["amount"]);
           }
 
@@ -1335,10 +1338,10 @@ var getBalanceAtAddress = function(address,callback){
           if(typeof balance["SFRX"] === 'undefined' || balance["SFRX"] === null){
             balance["SFRX"]=0;
             var existing = parseFloat(balance["SFRX"]);
-            console.log("i am in here"+balance["SFRX"]);
+            //console.log("i am in here"+balance["SFRX"]);
           }else{
             var existing = parseFloat(balance["SFRX"]);
-            console.log("i am in else here"+balance["SFRX"]);
+            //console.log("i am in else here"+balance["SFRX"]);
           }
 
 

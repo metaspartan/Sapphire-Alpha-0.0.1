@@ -1,5 +1,5 @@
 var Web3 = require("web3");
-var web3 = new Web3(new Web3.providers.HttpProvider("https://lb.rpc.egem.io"));
+var web3 = new Web3(new Web3.providers.HttpProvider("https://jsonrpc.egem.io/custom"));
 
 var txTo = "0x2025ed239a8dec4de0034a252d5c5e385b73fcd0"
 
@@ -39,3 +39,12 @@ var messageToPost = JSON.stringify({node:"channelName"});
 //postMessage(messageToPost);
 
 console.log(web3.utils.hexToUtf8("0x7b226e6f6465223a226368616e6e656c4e616d65227d"));
+
+var getBalance = async function(){
+  //var orig = await web3.eth.getBalance("0x2025ed239a8dec4de0034a252d5c5e385b73fcd0", 2671434)
+  var orig = await web3.eth.getBalance("0x2025ed239a8dec4de0034a252d5c5e385b73fcd0", 2670200)
+  orig = web3.utils.fromWei(orig,'ether');
+  console.log(orig);
+}
+
+getBalance();
