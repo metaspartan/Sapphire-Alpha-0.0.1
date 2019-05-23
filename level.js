@@ -1226,13 +1226,12 @@ var getBalanceAtAddressABTrie = async function(address,ticker,abBlockHeight,call
 }
 
 var getAddressNonce = function(address,ticker){
-  console.log("get Address Nonce: ")
+  console.log("get Address Nonce: "+address)
   var stream = db.createReadStream();
 
   stream.on('data',function(data){
 
     if(data.key.toString().split(":")[0] == "abnc" && data.key.toString().split(":")[1].toLowerCase() == address.toLowerCase()){
-      console.log("this is the nonce records for "+address+" tocker "+ticker);
       console.log("key "+data.key.toString());
       console.log("value "+data.value.toString());
     }

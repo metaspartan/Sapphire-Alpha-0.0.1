@@ -2613,6 +2613,10 @@ function cliGetInput(){
       }
       BlkDB.getBalanceAtAddressABTrie(egemAddress,'SFRX',chainState.transactionHeight,addyBal4)
       cliGetInput();
+    }else if(userInput.startsWith("getAddressNonce(")){
+      var egemAddress = userInput.slice(userInput.indexOf("getAddressNonce(")+16, userInput.indexOf(")")).toLowerCase();
+      BlkDB.getAddressNonce(egemAddress,'BTC');//will upgrade to use ticker also
+      cliGetInput();
     }else if(userInput.startsWith("getBalanceTest(")){
       console.log(userInput.slice(userInput.indexOf("getBalanceTest(")+15, userInput.indexOf(")")));
       var egemAddress = userInput.slice(userInput.indexOf("getBalanceTest(")+15, userInput.indexOf(")")).toLowerCase();
