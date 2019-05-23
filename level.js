@@ -549,7 +549,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
       //we skip the intry
     }).catch(async function(){
       txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx),blocknum,thisBlockCheckPointHash,txIndex);
-      addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcMiningReward).toFixed(8),txConfirmation,blocknum,txIndex);
+      addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcSponsorReward).toFixed(8),txConfirmation,blocknum,txIndex);
       txIndex++;//7
     })
 
