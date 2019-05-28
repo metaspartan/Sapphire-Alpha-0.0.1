@@ -561,10 +561,11 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
 
         console.log("in the transactions loop ")
 
+        var receipt = transactions[tranx];
+
         var localTxFrom = receipt["fromAddress"].toLowerCase().substring(0,41);
         var localTxTo = receipt["toAddress"].toLowerCase().substring(0,41);
 
-        var receipt = transactions[tranx];
         //receipts have a key of toAddress:timestamp:receipthash atm
         txConfirmation = await addTransaction("tx:"+localTxFrom+":"+localTxTo+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+JSON.parse(block)["hash"],JSON.stringify(receipt),blocknum,thisBlockCheckPointHash,txIndex);
         //need to accumulate the balances and add or subtract to PMT
@@ -1045,10 +1046,11 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
 
       console.log("in the transactions loop ")
 
+      var receipt = transactions[tranx];
+
       var localTxFrom = receipt["fromAddress"].toLowerCase().substring(0,41);
       var localTxTo = receipt["toAddress"].toLowerCase().substring(0,41);
 
-      var receipt = transactions[tranx];
       //receipts have a key of toAddress:timestamp:receipthash atm
       txConfirmation = await addTransaction("tx:"+localTxFrom+":"+localTxTo+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blknum,blkChainStateHash,txIndex);
       //need to accumulate the balances and add or subtract to PMT
