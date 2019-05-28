@@ -563,8 +563,8 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
 
         var receipt = transactions[tranx];
 
-        var localTxFrom = receipt["fromAddress"].toLowerCase().substring(0,41);
-        var localTxTo = receipt["toAddress"].toLowerCase().substring(0,41);
+        var localTxFrom = receipt["fromAddress"].toLowerCase().substring(1,42);
+        var localTxTo = receipt["toAddress"].toLowerCase().substring(1,42);
 
         //receipts have a key of toAddress:timestamp:receipthash atm
         txConfirmation = await addTransaction("tx:"+localTxFrom+":"+localTxTo+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+JSON.parse(block)["hash"],JSON.stringify(receipt),blocknum,thisBlockCheckPointHash,txIndex);
@@ -1048,8 +1048,8 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
 
       var receipt = transactions[tranx];
 
-      var localTxFrom = receipt["fromAddress"].toLowerCase().substring(0,41);
-      var localTxTo = receipt["toAddress"].toLowerCase().substring(0,41);
+      var localTxFrom = receipt["fromAddress"].toLowerCase().substring(1,42);
+      var localTxTo = receipt["toAddress"].toLowerCase().substring(1,42);
 
       //receipts have a key of toAddress:timestamp:receipthash atm
       txConfirmation = await addTransaction("tx:"+localTxFrom+":"+localTxTo+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blknum,blkChainStateHash,txIndex);
