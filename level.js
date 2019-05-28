@@ -561,14 +561,17 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
 
         console.log("in the transactions loop ")
 
+        var localTxFrom = receipt["fromAddress"].toLowerCase().substring(0,41);
+        var localTxTo = receipt["toAddress"].toLowerCase().substring(0,41);
+
         var receipt = transactions[tranx];
         //receipts have a key of toAddress:timestamp:receipthash atm
-        txConfirmation = await addTransaction("tx:"+receipt["fromAddress"].toLowerCase()+":"+receipt["toAddress"].toLowerCase()+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+JSON.parse(block)["hash"],JSON.stringify(receipt),blocknum,thisBlockCheckPointHash,txIndex);
+        txConfirmation = await addTransaction("tx:"+localTxFrom+":"+localTxTo+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+JSON.parse(block)["hash"],JSON.stringify(receipt),blocknum,thisBlockCheckPointHash,txIndex);
         //need to accumulate the balances and add or subtract to PMT
 
-        addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blocknum,txIndex);
+        addAllBalanceRecord(localTxTo,receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blocknum,txIndex);
 
-        addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blocknum,txIndex);
+        addAllBalanceRecord(localTxFrom,receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blocknum,txIndex);
         //2) get the trie root hash and return for hasing into the block
 
         txIndex++
@@ -1042,14 +1045,17 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
 
       console.log("in the transactions loop ")
 
+      var localTxFrom = receipt["fromAddress"].toLowerCase().substring(0,41);
+      var localTxTo = receipt["toAddress"].toLowerCase().substring(0,41);
+
       var receipt = transactions[tranx];
       //receipts have a key of toAddress:timestamp:receipthash atm
-      txConfirmation = await addTransaction("tx:"+receipt["fromAddress"].toLowerCase()+":"+receipt["toAddress"].toLowerCase()+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blknum,blkChainStateHash,txIndex);
+      txConfirmation = await addTransaction("tx:"+localTxFrom+":"+localTxTo+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blknum,blkChainStateHash,txIndex);
       //need to accumulate the balances and add or subtract to PMT
 
-      addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blknum,txIndex);
+      addAllBalanceRecord(localTxTo,receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blknum,txIndex);
 
-      addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blknum,txIndex);
+      addAllBalanceRecord(localTxFrom,receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blknum,txIndex);
       //2) get the trie root hash and return for hasing into the block
 
       txIndex++
