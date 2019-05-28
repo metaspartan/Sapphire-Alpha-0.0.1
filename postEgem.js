@@ -40,9 +40,24 @@ var messageToPost = JSON.stringify({node:"channelName"});
 
 console.log(web3.utils.hexToUtf8("0x7b226e6f6465223a226368616e6e656c4e616d65227d"));
 
+console.log(Buffer.from(web3.utils.toAscii("0xcb49b44ba602d8")).toString())
+//a54ee4a7ab23068529b7fec588ec3959e384a816
+
+
+web3.eth.getTransaction("0x76da21f99cd8ebcc955961b8559429e3421028f89e4d2fed69ec793d9e4948f2").then(function(tx){
+  console.log("transaction data is "+tx.input)
+  //console.log("in string format is "+web3.utils.hexToUtf8(tx.input));
+  console.log("in ascii format is "+web3.utils.toAscii(tx.input));
+})
+
+web3.eth.getTransaction("0xc3c4e43f3a97140b5d3e8536c50ac2ce21a23e0580123cd5204c7a343196875f").then(function(tx){
+  console.log("transaction data 2 is "+tx.input)
+  console.log("in string format is "+web3.utils.hexToUtf8(tx.input));
+})
+
 var getBalance = async function(){
   //var orig = await web3.eth.getBalance("0x2025ed239a8dec4de0034a252d5c5e385b73fcd0", 2671434)
-  var orig = await web3.eth.getBalance("0x2025ed239a8dec4de0034a252d5c5e385b73fcd0", 2670200)
+  var orig = await web3.eth.getBalance("0x2025ed239a8dec4de0034a252d5c5e385b73fcd0", 2674925)
   orig = web3.utils.fromWei(orig,'ether');
   console.log(orig);
 }
