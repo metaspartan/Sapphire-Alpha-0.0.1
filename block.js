@@ -338,7 +338,7 @@ var Blockchain = class Blockchain {
 
           if(nodeStorage.length < 1){
             //will return for thsi case
-            console.log("THE NODE DID NOT EXIST YET BUT I THINK WE WAIT UNTIL ITS SYNC..... .....")
+            //console.log("THE NODE DID NOT EXIST YET BUT I THINK WE WAIT UNTIL ITS SYNC..... .....")
           }
           //log("FIRST JUST RETRIEVING LIST "+JSON.stringify(thisN.retrieveNodes()));
 
@@ -348,13 +348,13 @@ var Blockchain = class Blockchain {
               console.log("id found "+id)
               isNodeFound = 1;
             }else{
-              console.log("id NOT found "+thisN.nodes[eachNode].id+" "+id)
+              //console.log("id NOT found "+thisN.nodes[eachNode].id+" "+id)
             }
           }
 
           if(isNodeFound == 0) {
 
-            console.log("JUST RAN THE NODE CHECK on "+id)
+            //console.log("JUST RAN THE NODE CHECK on "+id)
 
               //var privateKeyA = crypto.randomBytes(32);
               //var publicKeyA = ecies.getPublic(privateKeyA);
