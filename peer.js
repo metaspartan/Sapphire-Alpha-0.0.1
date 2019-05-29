@@ -648,16 +648,17 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     }
     //can track the pinks to other nodes in one variable for stats
     var tempNodeCallBucket = [];
-    var tempNodeCall = {};
     for (let id in peers) {
+      var localTempNode = {};
+      localTempNode.nodeId = id;
+      localTempNode.blockHeightCalled = parseInt(replyData+1);
+      localTempNode.callSynchronized = chainState.synchronized;
+      tempNodeCallBucket.push(localTempNode)
       if(peers[id].conn2 != undefined){
         //log("------------------------------------------------------");
         //log(chalk.green("Sending ping for chain sync in cbBlockChainValidator bottom"));
         //log("------------------------------------------------------");
-        tempNodeCall.nodeId = id;
-        tempNodeCall.blockHeightCalled = parseInt(replyData+1);
-        tempNodeCall.callSynchronized = chainState.synchronized;
-        tempNodeCallBucket.push(tempNodeCall)
+
         //can add more to teh call and switch params below to use these vars
 
         if(random == i && peers[id] && called == false){
