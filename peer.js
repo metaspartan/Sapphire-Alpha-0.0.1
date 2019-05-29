@@ -95,7 +95,7 @@ chainState.transactionHeight = 0;
 chainState.transactionRootHash = '';
 //activesynch
 chainState.interval = 10000;
-chainState.activeSynch;
+chainState.activeSynch = [];
 //need a snall array holding nodes with wieght score
 
 //need to post this to egem chain using what I coded up in postEgem.js and call it as a node sort
@@ -109,11 +109,13 @@ chainStateMonitor.rpcCom = false;
 let i = 0;
 chainState = onChange(chainState, function (path, value, previousValue) {
   if(chainStateMonitor.peerCom == true || chainStateMonitor.rpcCom == true){
-    console.log(chalk.bgMagenta('Object changed:', ++i));
-  	console.log(chalk.bgMagenta('this:', this));
-  	console.log(chalk.bgMagenta('path:', path));
-  	console.log(chalk.bgMagenta('value:', value));
-  	console.log(chalk.bgMagenta('previousValue:', previousValue));
+    if(path != "activeSynch"){
+      console.log(chalk.bgMagenta('Object changed:', ++i));
+    	console.log(chalk.bgMagenta('this:', this));
+    	console.log(chalk.bgMagenta('path:', path));
+    	console.log(chalk.bgMagenta('value:', value));
+    	console.log(chalk.bgMagenta('previousValue:', previousValue));
+    }
   }
 })
 //end chain state on change reporting
@@ -644,11 +646,20 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         }
       }
     }
+    //can track the pinks to other nodes in one variable for stats
+    var tempNodeCallBucket = [];
+    var tempNodeCall = {};
     for (let id in peers) {
       if(peers[id].conn2 != undefined){
-        log("------------------------------------------------------");
-        log(chalk.green("Sending ping for chain sync in cbBlockChainValidator bottom"));
-        log("------------------------------------------------------");
+        //log("------------------------------------------------------");
+        //log(chalk.green("Sending ping for chain sync in cbBlockChainValidator bottom"));
+        //log("------------------------------------------------------");
+        tempNodeCall.nodeId = id;
+        tempNodeCall.blockHeightCalled = parseInt(replyData+1);
+        tempNodeCall.callSynchronized = chainState.synchronized;
+        tempNodeCallBucket.push(tempNodeCall)
+        //can add more to teh call and switch params below to use these vars
+
         if(random == i && peers[id] && called == false){
           peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           called = true;
@@ -659,6 +670,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         i++;
       }
     }
+    //tempNodeCallBucket.push = {"updated":"bottom 671"};
+    chainState.activeSync = tempNodeCallBucket;
   }
 }
 /////////////////////////////////////////////////////////////END CHAIN VALIDATOR
@@ -2893,6 +2906,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   console.log(chalk.bgCyan.black(" longest peer: ")+chalk.bgMagenta.white(longestPeer)+chalk.bgCyan.black(" max height: ")+chalk.bgMagenta.white(peerMaxHeight)+chalk.bgCyan.black(" peer length: ")+chalk.bgMagenta.white(peerLength))
   console.log(chalk.bgCyan.black(" chainwalk ht: ")+chalk.bgMagenta.white(chainState.chainWalkHeight)+chalk.bgCyan.black(" synchro ht: ")+chalk.bgMagenta.white(chainState.synchronized)+chalk.bgCyan.black(" chain lngth: ")+chalk.bgMagenta.white(frankieCoin.getLength()))
   console.log(chalk.bgCyan.black(" peerNonce ht: ")+chalk.bgMagenta.white(chainState.peerNonce)+chalk.bgCyan.black(" synching ht: ")+chalk.bgMagenta.white(chainState.isSynching)+chalk.bgCyan.black(" isSynch: ")+chalk.bgMagenta.white(isSynching))
+  console.log(chalk.bgCyan.black(" last ping stats: ")+chalk.bgMagenta.white(JSON.stringify(chainState.activeSync)))
   //log("------------------------------------------------------")
   //log(longestPeer+" <<lp   mh>>"+peerMaxHeight+"<<mh    pl>> "+peerLength)
   frankieCoin.incrementPeerNonce(nodesInChain[node]["id"],peerLength);
