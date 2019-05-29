@@ -631,21 +631,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
     //set ping here
     //var random = 0;//will randomize later
-    var randomizer = peers.length;
+    var randomizer = Object.keys(peers).length;
     var random = getRandomInt(randomizer);
     var called = false;
     var i = 0;
-    for(var j=0;j<peers.length;j++){
-      if(peers[j].conn2 != undefined){
-        log("------------------------------------------------------");
-        log(chalk.green("Sending ping for chain sync in cbBlockChainValidator top"));
-        log("------------------------------------------------------");
-        if(random == j && peers[j]){
-          peers[j].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
-          called = true;
-        }
-      }
-    }
     //can track the pinks to other nodes in one variable for stats
     var tempNodeCallBucket = [];
     for (let id in peers) {
@@ -653,21 +642,26 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       localTempNode.nodeId = id;
       localTempNode.blockHeightCalled = parseInt(replyData+1);
       localTempNode.callSynchronized = chainState.synchronized;
-      tempNodeCallBucket.push(localTempNode)
+
       if(peers[id].conn2 != undefined){
         //log("------------------------------------------------------");
         //log(chalk.green("Sending ping for chain sync in cbBlockChainValidator bottom"));
         //log("------------------------------------------------------");
 
         //can add more to teh call and switch params below to use these vars
-
-        if(random == i && peers[id] && called == false){
+        console.log("random is "+random+" is is "+i+" peers.length "+Object.keys(peers).length)
+        //if(random == i && peers[id] && called == false){
+        if(random == i && peers[id]){
           peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           called = true;
-        }else if(called == false && peers[id]){
+          localTempNode.random = "yes";
+        //}else if(called == false && peers[id]){
+        }else if(peers[id]){
           peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           called = true;
+          localTempNode.random = "no";
         }
+        tempNodeCallBucket.push(localTempNode)
         i++;
       }
     }
