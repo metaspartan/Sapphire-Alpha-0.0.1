@@ -414,7 +414,7 @@ var addyBal = function(val){
 //////////////////////////////////////////////////////////////////CHAIN VAIDATOR
 var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
 
-  console.log(chalk.bgRed(replyData+" << replydata and then replyhash >> "));
+  //console.log(chalk.bgRed(replyData+" << replydata and then replyhash >> "+replyHash));
 
   if(isValid == true){
     if(chainState.chainWalkHeight == replyData){
