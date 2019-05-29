@@ -650,13 +650,13 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
         //can add more to teh call and switch params below to use these vars
         console.log("random is "+random+" is is "+i+" peers.length "+Object.keys(peers).length)
-        //if(random == i && peers[id] && called == false){
-        if(random == i && peers[id]){
+        if(random == i && peers[id] && called == false){
+        //if(random == i && peers[id]){
           peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           called = true;
           localTempNode.random = "yes";
-        //}else if(called == false && peers[id]){
-        }else if(peers[id]){
+        }else if(called == false && peers[id]){
+        //}else if(peers[id]){
           peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           called = true;
           localTempNode.random = "no";
