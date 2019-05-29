@@ -671,7 +671,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       }
     }
     //tempNodeCallBucket.push = {"updated":"bottom 671"};
-    chainState.activeSync = tempNodeCallBucket;
+    chainState.activeSynch = tempNodeCallBucket;
   }
 }
 /////////////////////////////////////////////////////////////END CHAIN VALIDATOR
@@ -2906,7 +2906,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   console.log(chalk.bgCyan.black(" longest peer: ")+chalk.bgMagenta.white(longestPeer)+chalk.bgCyan.black(" max height: ")+chalk.bgMagenta.white(peerMaxHeight)+chalk.bgCyan.black(" peer length: ")+chalk.bgMagenta.white(peerLength))
   console.log(chalk.bgCyan.black(" chainwalk ht: ")+chalk.bgMagenta.white(chainState.chainWalkHeight)+chalk.bgCyan.black(" synchro ht: ")+chalk.bgMagenta.white(chainState.synchronized)+chalk.bgCyan.black(" chain lngth: ")+chalk.bgMagenta.white(frankieCoin.getLength()))
   console.log(chalk.bgCyan.black(" peerNonce ht: ")+chalk.bgMagenta.white(chainState.peerNonce)+chalk.bgCyan.black(" synching ht: ")+chalk.bgMagenta.white(chainState.isSynching)+chalk.bgCyan.black(" isSynch: ")+chalk.bgMagenta.white(isSynching))
-  console.log(chalk.bgCyan.black(" last ping stats: ")+chalk.bgMagenta.white(JSON.stringify(chainState.activeSync)))
+  console.log(chalk.bgCyan.black(" last ping stats: ")+chalk.bgMagenta.white(JSON.stringify(chainState.activeSynch)))
   //log("------------------------------------------------------")
   //log(longestPeer+" <<lp   mh>>"+peerMaxHeight+"<<mh    pl>> "+peerLength)
   frankieCoin.incrementPeerNonce(nodesInChain[node]["id"],peerLength);
