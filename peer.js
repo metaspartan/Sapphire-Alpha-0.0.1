@@ -1361,7 +1361,7 @@ let connSeq2 = 0
           console.log("NODE STATE PONG "+JSON.parse(nSPongPeercurrentCPH)["blockNumber"]+" AND YOU "+chainState.synchronized)
           var nSPongPeerCPH = JSON.stringify(JSON.parse(data)["nodeStatePong"]["checkPointHash"]);
           if(nSPongPeerCPH != undefined){
-            console.log("NODE STATE PONG CP "+nSPongPeerCPH.split(":")[0]+" AND HASH "+nSPongPeerCPH.split(":")[1]+" AND YOU "+chainState.checkPointHash)
+            console.log("NODE STATE PING CP "+nSPongPeerCPH.split(":")[0]+" AND HASH "+nSPongPeerCPH.split(":")[1]+" AND YOU "+chainState.checkPointHash)
           }
 
           if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
