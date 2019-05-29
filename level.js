@@ -548,8 +548,10 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     db.get("tx:sapphire:"+JSON.parse(block)["sponsor"].toLowerCase()+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
       //we skip the intry
     }).catch(async function(){
+      var localBalanceRecord = 0;
       txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx),blocknum,thisBlockCheckPointHash,txIndex);
-      addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcSponsorReward).toFixed(8),txConfirmation,blocknum,txIndex);
+      localBalanceRecord = await addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcSponsorReward).toFixed(8),txConfirmation,blocknum,txIndex);
+      txConfirmation = await Hash(txConfirmation+localBalanceRecord);
       txIndex++;//7
     })
 
@@ -566,14 +568,19 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
         var localTxFrom = receipt["fromAddress"].toLowerCase().substring(0,42);
         var localTxTo = receipt["toAddress"].toLowerCase().substring(0,42);
 
+        var localToBalance = 0;
+        var localFromBalance = 0;
+
         //receipts have a key of toAddress:timestamp:receipthash atm
         txConfirmation = await addTransaction("tx:"+localTxFrom+":"+localTxTo+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+JSON.parse(block)["hash"],JSON.stringify(receipt),blocknum,thisBlockCheckPointHash,txIndex);
         //need to accumulate the balances and add or subtract to PMT
 
-        addAllBalanceRecord(localTxTo,receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blocknum,txIndex);
+        localToBalance = await addAllBalanceRecord(localTxTo,receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blocknum,txIndex);
 
-        addAllBalanceRecord(localTxFrom,receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blocknum,txIndex);
+        localFromBalance = await addAllBalanceRecord(localTxFrom,receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blocknum,txIndex);
         //2) get the trie root hash and return for hasing into the block
+
+        txConfirmation = await Hash(txConfirmation+localToBalance+localFromBalance)
 
         txIndex++
       }
@@ -929,6 +936,7 @@ var addTransactions = async function(transactions,blockhash,blocknum,blkChainSta
     }
 
     var txConfirmation;
+    var txConfirmationWithBalance;
 
     for(tranx in JSON.parse(transactions)){
       var receipt = JSON.parse(transactions)[tranx];
@@ -937,10 +945,15 @@ var addTransactions = async function(transactions,blockhash,blocknum,blkChainSta
       txConfirmation = await addTransaction("tx:"+receipt["fromAddress"].toLowerCase()+":"+receipt["toAddress"].toLowerCase()+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blocknum,blkChainStateHash,txIndex);
       //need to accumulate the balances and add or subtract to PMT
 
-      addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blocknum,txIndex);
+      var localToBalance = 0;
+      var localFromBalance = 0;
 
-      addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blocknum,txIndex);
+      localToBalance = await addAllBalanceRecord(receipt["toAddress"],receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blocknum,txIndex);
+
+      localFromBalance = await addAllBalanceRecord(receipt["fromAddress"],receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blocknum,txIndex);
       //2) get the trie root hash and return for hasing into the block
+
+      txConfirmation = await Hash(txConfirmation+localToBalance+localFromBalance);
 
       txIndex++;
 
@@ -1006,9 +1019,10 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
 
   ////////////////////////////////////////////////////////////////NATIVE REWARDS
   //core devs
+  var localBalanceRecord = 0;
   var osoTx = new Transaction("sapphire", "0x0666bf13ab1902de7dee4f8193c819118d7e21a6", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
   txConfirmation = await addTransaction("tx:sapphire:0x0666bf13ab1902de7dee4f8193c819118d7e21a6:SFRX:"+JSON.parse(block)["timestamp"]+":"+osoTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(osoTx),blknum,blkChainStateHash,txIndex);
-  addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(calcDevReward).toFixed(8),txConfirmation,blknum,txIndex);
+  localBalanceRecord = addAllBalanceRecord("0x0666bf13ab1902de7dee4f8193c819118d7e21a6","SFRX",parseFloat(calcDevReward).toFixed(8),txConfirmation,blknum,txIndex);
   txIndex++//1
   var ridzTx = new Transaction("sapphire", "0xc393659c2918a64cdfb44d463de9c747aa4ce3f7", calcDevReward, "SFRX", JSON.parse(block)["timestamp"]);
   txConfirmation = await addTransaction("tx:sapphire:0xc393659c2918a64cdfb44d463de9c747aa4ce3f7:SFRX:"+JSON.parse(block)["timestamp"]+":"+ridzTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(ridzTx),blknum,blkChainStateHash,txIndex);
@@ -1032,9 +1046,11 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
   addAllBalanceRecord(JSON.parse(block)["miner"],"SFRX",parseFloat(calcMiningReward).toFixed(8),txConfirmation,blknum,txIndex);
   txIndex++//6
   //sponsor
+  var localBalanceRecord = 0;
   var sponsorTx = new Transaction("sapphire", JSON.parse(block)["sponsor"], calcSponsorReward, "SFRX", JSON.parse(block)["timestamp"]);
   txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx),blknum,blkChainStateHash,txIndex);
-  addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcMiningReward).toFixed(8),txConfirmation,blknum,txIndex);
+  localBalanceRecord = await addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcMiningReward).toFixed(8),txConfirmation,blknum,txIndex);
+  txConfirmation = await Hash(txConfirmation+localBalanceRecord);
   txIndex++//7
   ////////////////////////////////////////////////////////////END NATIVE REWARDS
 
@@ -1051,14 +1067,19 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
       var localTxFrom = receipt["fromAddress"].toLowerCase().substring(0,42);
       var localTxTo = receipt["toAddress"].toLowerCase().substring(0,42);
 
+      var localToBalance = 0;
+      var localFromBalance = 0;
+
       //receipts have a key of toAddress:timestamp:receipthash atm
       txConfirmation = await addTransaction("tx:"+localTxFrom+":"+localTxTo+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blknum,blkChainStateHash,txIndex);
       //need to accumulate the balances and add or subtract to PMT
 
-      addAllBalanceRecord(localTxTo,receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blknum,txIndex);
+      localToBalance = await addAllBalanceRecord(localTxTo,receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blknum,txIndex);
 
-      addAllBalanceRecord(localTxFrom,receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blknum,txIndex);
+      localFromBalance = await addAllBalanceRecord(localTxFrom,receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blknum,txIndex);
       //2) get the trie root hash and return for hasing into the block
+
+      txConfirmation = await Hash(txConfirmation+localToBalance+localFromBalance)
 
       txIndex++
     }
