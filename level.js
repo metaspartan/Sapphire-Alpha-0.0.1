@@ -795,9 +795,9 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
             var isValidBlock = thisDataItem.value.toString();
 
             //going to validate chaeckpoints
-            console.log("passing thru this conditon "+currentBlockToValidate+" "+chainRiser+" "+(currentBlockToValidate%chainRiser == 0))
+            //console.log("passing thru this conditon "+currentBlockToValidate+" "+chainRiser+" "+(currentBlockToValidate%chainRiser == 0))
             if(currentBlockToValidate%chainRiser == 0){
-              console.log("now we need this to be true "+currentBlockToValidate+" "+parseInt(currentBlockToValidate-chainRiser)+" "+parseInt(currentBlockToValidate-chainRiser)+" "+(parseInt(currentBlockToValidate-chainRiser)>0 && parseInt(currentBlockToValidate-chainRiser)>chainRiser))
+              //console.log("now we need this to be true "+currentBlockToValidate+" "+parseInt(currentBlockToValidate-chainRiser)+" "+parseInt(currentBlockToValidate-chainRiser)+" "+(parseInt(currentBlockToValidate-chainRiser)>0 && parseInt(currentBlockToValidate-chainRiser)>chainRiser))
               if(parseInt(currentBlockToValidate-chainRiser) > 0 && parseInt(currentBlockToValidate-chainRiser) >= chainRiser){
                 var targetCheckPoint = parseInt(currentBlockToValidate-chainRiser);
                 var riserAgo = dataStream[dataItem-chainRiser].value.toString();
@@ -815,9 +815,9 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
               }
             }
 
-            console.log("is newblock hash currentblockhash "+currentBlockHash+" ts "+JSON.parse(isValidBlock)["timestamp"]+" nonce "+JSON.parse(isValidBlock)["nonce"]);
+            //console.log("is newblock hash currentblockhash "+currentBlockHash+" ts "+JSON.parse(isValidBlock)["timestamp"]+" nonce "+JSON.parse(isValidBlock)["nonce"]);
             var newBlockHash = Hash(currentBlockHash+JSON.parse(isValidBlock)["timestamp"]+JSON.parse(isValidBlock)["nonce"]);//this.previousHash + this.timestamp + this.nonce
-            console.log("If block nimbet is GT 1 : "+JSON.parse(isValidBlock)["blockHeight"] +" then comparing "+JSON.parse(isValidBlock)["hash"]+" to "+newBlockHash);
+            //console.log("If block nimbet is GT 1 : "+JSON.parse(isValidBlock)["blockHeight"] +" then comparing "+JSON.parse(isValidBlock)["hash"]+" to "+newBlockHash);
             //if(JSON.parse(isValidBlock)["hash"] == newBlockHash || JSON.parse(isValidBlock)["blockHeight"] == 1){
             if(JSON.parse(isValidBlock)["hash"] == newBlockHash){
 
