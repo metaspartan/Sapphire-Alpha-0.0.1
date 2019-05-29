@@ -548,10 +548,10 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     db.get("tx:sapphire:"+JSON.parse(block)["sponsor"].toLowerCase()+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
       //we skip the intry
     }).catch(async function(){
-      var localBalanceRecord = 0;
+      //var localBalanceRecord = 0;
       txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx),blocknum,thisBlockCheckPointHash,txIndex);
       localBalanceRecord = await addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcSponsorReward).toFixed(8),txConfirmation,blocknum,txIndex);
-      txConfirmation = await Hash(txConfirmation+localBalanceRecord);
+      //txConfirmation = await Hash(txConfirmation+localBalanceRecord);
       txIndex++;//7
     })
 
@@ -1045,11 +1045,11 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
   addAllBalanceRecord(JSON.parse(block)["miner"],"SFRX",parseFloat(calcMiningReward).toFixed(8),txConfirmation,blknum,txIndex);
   txIndex++//6
   //sponsor
-  var localBalanceRecord = 0;
+  //var localBalanceRecord = 0;
   var sponsorTx = new Transaction("sapphire", JSON.parse(block)["sponsor"], calcSponsorReward, "SFRX", JSON.parse(block)["timestamp"]);
   txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx),blknum,blkChainStateHash,txIndex);
   localBalanceRecord = await addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcMiningReward).toFixed(8),txConfirmation,blknum,txIndex);
-  txConfirmation = await Hash(txConfirmation+localBalanceRecord);
+  //txConfirmation = await Hash(txConfirmation+localBalanceRecord);
   txIndex++//7
   ////////////////////////////////////////////////////////////END NATIVE REWARDS
 
