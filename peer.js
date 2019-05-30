@@ -208,7 +208,16 @@ var activePing = function(timer){
       //log("------------------------------------------------------");
 
       setTimeout(function(){
-        peers[id].conn.write(JSON.stringify({"nodeStatePing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash,checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash}}));
+        peers[id].conn.write(JSON.stringify(
+          {"nodeStatePing":{
+            Height:parseInt(chainState.synchronized),
+            MaxHeight:parseInt(chainState.synchronized),
+            GlobalHash:globalGenesisHash,
+            checkPointHash:chainState.checkPointHash,
+            currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+            transactionHeight:chainState.transactionHeight,
+            transactionRootHash:chainState.transactionRootHash
+          }}));
       },timer)
 
     }

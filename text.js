@@ -6,7 +6,7 @@ const puretext = require('puretext');
 
   let text = {
       // To Number is the number you will be sending the text to.
-      toNumber: '+12103249208',
+      toNumber: '+14845064179',
       // From number is the number you will buy from your admin dashboard
       fromNumber: '+12027592341',
       // Text Content
