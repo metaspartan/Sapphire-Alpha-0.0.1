@@ -109,15 +109,19 @@ chainStateMonitor.rpcCom = false;
 
 let i = 0;
 chainState = onChange(chainState, function (path, value, previousValue) {
-  if(chainStateMonitor.peerCom == true || chainStateMonitor.rpcCom == true){
-    if(path != "activeSynch" && path != undefined && path != "activeSynch.receive"){
-      console.log(chalk.bgMagenta('Object changed:', ++i));
-    	console.log(chalk.bgMagenta('this:', this));
-    	console.log(chalk.bgMagenta('path:', path));
-    	console.log(chalk.bgMagenta('value:', value));
-    	console.log(chalk.bgMagenta('previousValue:', previousValue));
+
+  if(path != undefined){
+    if(chainStateMonitor.peerCom == true || chainStateMonitor.rpcCom == true){
+      if(path != "activeSynch" && path != undefined && path != "activeSynch.receive" && !path.startsWith("transactionHashWeights")){
+        console.log(chalk.bgMagenta('Object changed:', ++i));
+      	console.log(chalk.bgMagenta('this:', this));
+      	console.log(chalk.bgMagenta('path:', path));
+      	console.log(chalk.bgMagenta('value:', value));
+      	console.log(chalk.bgMagenta('previousValue:', previousValue));
+      }
     }
   }
+
 })
 //end chain state on change reporting
 
@@ -140,20 +144,19 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
   var recordChainTransactionHeightRecord = {"peerTxHeight":txHt,"peerTxHash":txHsh,"counted":1}
   if(chainState.transactionHashWeights != undefined){
     var arrayTXHeight = chainState.transactionHashWeights;
-    var shouldEnter = true;
+    var shouldEnter = false;
     for(item in arrayTXHeight){
-      console.log(arrayTXHeight[item].peer)
-      if(arrayTXHeight[item].peerTxHeight == recordChainTransactionHeightRecord.peerTxHeight){
-
-        if(arrayTXHeight[item].peerTxHash == recordChainTransactionHeightRecord.peerTxHash){
-          chainState.transactionHashWeights[item].counted+=1
-          shouldEnter == false
-        }
-
+      console.log(arrayTXHeight[item].peerTxHeight)
+      if(arrayTXHeight[item].peerTxHeight == txHt && arrayTXHeight[item].peerTxHash == txHsh){
+        chainState.transactionHashWeights[item].counted+=1;
+        console.log("setting shouldEnter = false")
+      }else{
+        shouldEnter == false;
       }
-
     }
+    console.log("chainState.transactionHashWeights.length"+chainState.transactionHashWeights.length+"shouldEnter"+shouldEnter);
     if(chainState.transactionHashWeights.length == 0 || shouldEnter == true){
+      console.log("doing a push");
       chainState.transactionHashWeights.push(recordChainTransactionHeightRecord)
     }
   }else{
