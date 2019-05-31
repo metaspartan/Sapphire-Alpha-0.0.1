@@ -143,7 +143,7 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
     var shouldEnter = true;
     for(item in arrayTXHeight){
       console.log(arrayTXHeight[item].peer)
-      if(arrayTXHeight[item].peerTxHeight == recordChainTransactionHeightRecord.peerTxHeight && ){
+      if(arrayTXHeight[item].peerTxHeight == recordChainTransactionHeightRecord.peerTxHeight){
 
         if(arrayTXHeight[item].peerTxHash == recordChainTransactionHeightRecord.peerTxHash){
           chainState.transactionHashWeights[item].counted+=1
