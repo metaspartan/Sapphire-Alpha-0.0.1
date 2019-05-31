@@ -151,7 +151,8 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
         chainState.transactionHashWeights[item].counted+=1;
         console.log("setting shouldEnter = false")
       }else{
-        shouldEnter == false;
+        shouldEnter == true;
+        console.log("setting shouldEnter = true")
       }
     }
     console.log("chainState.transactionHashWeights.length"+chainState.transactionHashWeights.length+"shouldEnter"+shouldEnter);
