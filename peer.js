@@ -140,20 +140,20 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
   var recordChainTransactionHeightRecord = {"peerTxHeight":txHt,"peerTxHash":txHsh,"counted":1}
   if(chainState.transactionHashWeights != undefined){
     var arrayTXHeight = chainState.transactionHashWeights;
+    var shouldEnter = true;
     for(item in arrayTXHeight){
       console.log(arrayTXHeight[item].peer)
-      if(arrayTXHeight[item].peerTxHeight == recordChainTransactionHeightRecord.peerTxHeight){
+      if(arrayTXHeight[item].peerTxHeight == recordChainTransactionHeightRecord.peerTxHeight && ){
 
         if(arrayTXHeight[item].peerTxHash == recordChainTransactionHeightRecord.peerTxHash){
           chainState.transactionHashWeights[item].counted+=1
+          shouldEnter == false
         }
 
-      }else{
-        chainState.transactionHashWeights.push(recordChainTransactionHeightRecord)
       }
 
     }
-    if(chainState.transactionHashWeights.length == 0){
+    if(chainState.transactionHashWeights.length == 0 || shouldEnter == true){
       chainState.transactionHashWeights.push(recordChainTransactionHeightRecord)
     }
   }else{
