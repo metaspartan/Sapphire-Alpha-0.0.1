@@ -93,6 +93,7 @@ chainState.peerNonce = 0;
 //now adding parameters for transactions which is verified in part by currentBlockCheckPointHash
 chainState.transactionHeight = 0;
 chainState.transactionRootHash = '';
+chainState.transactionHashWeights = [];
 //activesynch
 chainState.interval = 10000;
 chainState.activeSynch = [];
@@ -135,6 +136,34 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
     chainState.activeSynch.receive = [];
   }
 
+
+  var recordChainTransactionHeightRecord = {"peerTxHeight":txHt,"peerTxHash":txHsh,"counted":1}
+  if(chainState.transactionHashWeights != undefined){
+    var arrayTXHeight = chainState.transactionHashWeights;
+    for(item in arrayTXHeight){
+      console.log(arrayTXHeight[item].peer)
+      if(arrayTXHeight[item].peerTxHeight == recordChainTransactionHeightRecord.peerTxHeight){
+
+        if(arrayTXHeight[item].peerTxHash == recordChainTransactionHeightRecord.peerTxHash){
+          chainState.transactionHashWeights[item].counted+=1
+        }
+
+      }else{
+        chainState.transactionHashWeights.push(recordChainTransactionHeightRecord)
+      }
+
+    }
+    if(chainState.transactionHashWeights.length == 0){
+      chainState.transactionHashWeights.push(recordChainTransactionHeightRecord)
+    }
+  }else{
+    chainState.transactionHashWeights = [];
+  }
+
+  if(chainState.transactionHashWeights.length > 4){
+    chainState.transactionHashWeights.shift();
+  }
+
   var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh}
   chainState.activeSynch.receive.push(insertPeer)
 }
@@ -147,6 +176,7 @@ var activeSync = function(timer){
   console.log(chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(parseInt(chainState.peerNonce))+chalk.bgCyan.black(" transactionheight: ")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgCyan.black(" topblockheight: ")+chalk.bgMagenta(chainState.topBlock));
   console.log(chalk.bgCyan.black(" fcnlongpeer: ")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(chainState.peerNonce)+chalk.bgCyan.black(" peerCount: ")+chalk.bgMagenta(frankieCoin.nodes.length));
   console.log(chalk.bgCyan.black(" transactionHash: ")+chalk.bgMagenta(chainState.transactionRootHash));
+  console.log(chalk.bgCyan.black(" txHashHistory(4): ")+chalk.bgMagenta(JSON.stringify(chainState.transactionHashWeights)));
   if(chainState.chainWalkHeight == 1){
     setTimeout(function(){
       BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
@@ -1391,6 +1421,13 @@ let connSeq2 = 0
           if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
             BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
+            updatePeerState(
+              peerId,
+              JSON.parse(data)["nodeStatePong"]["MaxHeight"],
+              JSON.parse(data)["nodeStatePong"]["currentBlockCheckPointHash"],
+              JSON.parse(data)["nodeStatePong"]["transactionHeight"],
+              JSON.parse(data)["nodeStatePong"]["transactionRootHash"]
+            )
           }
 
         }else if(JSON.parse(data)["nodeStatePing"]){
