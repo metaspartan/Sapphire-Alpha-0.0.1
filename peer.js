@@ -109,7 +109,7 @@ chainStateMonitor.rpcCom = false;
 let i = 0;
 chainState = onChange(chainState, function (path, value, previousValue) {
   if(chainStateMonitor.peerCom == true || chainStateMonitor.rpcCom == true){
-    if(path != "activeSynch"){
+    if(path != "activeSynch" && path != undefined && path != "activeSynch.receive"){
       console.log(chalk.bgMagenta('Object changed:', ++i));
     	console.log(chalk.bgMagenta('this:', this));
     	console.log(chalk.bgMagenta('path:', path));
