@@ -122,6 +122,21 @@ chainState = onChange(chainState, function (path, value, previousValue) {
 
 updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
   console.log("node state updater "+peer+" "+maxHeight+" "+chainCPH+" "+txHt+" "+txHsh)
+  if(chainState.activeSynch.receive != undefined){
+    var arrayCSReceive = chainState.activeSynch.receive;
+    for(item in arrayCSReceive){
+      console.log(arrayCSReceive[item].peer)
+      if(arrayCSReceive[item].peer == peer){
+        console.log("wootas found it")
+        chainState.activeSynch.receive.splice(item, 1);
+      }
+    }
+  }else{
+    chainState.activeSynch.receive = [];
+  }
+
+  var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh}
+  chainState.activeSynch.receive.push(insertPeer)
 }
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
@@ -1393,9 +1408,9 @@ let connSeq2 = 0
             updatePeerState(
               peerId,
               JSON.parse(data)["nodeStatePing"]["MaxHeight"],
-              JSON.stringify(JSON.parse(data)["nodeStatePing"]["currentBlockCheckPointHash"]),
-              JSON.stringify(JSON.parse(data)["nodeStatePing"]["transactionHeight"]),
-              JSON.stringify(JSON.parse(data)["nodeStatePing"]["transactionRootHash"])
+              JSON.parse(data)["nodeStatePing"]["currentBlockCheckPointHash"],
+              JSON.parse(data)["nodeStatePing"]["transactionHeight"],
+              JSON.parse(data)["nodeStatePing"]["transactionRootHash"]
             )
             peers[peerId].conn.write(JSON.stringify(
               {"nodeStatePong":{
