@@ -121,13 +121,13 @@ chainState = onChange(chainState, function (path, value, previousValue) {
 //end chain state on change reporting
 
 updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
-  console.log("node state updater "+peer+" "+maxHeight+" "+chainCPH+" "+txHt+" "+txHsh)
+  //console.log("node state updater "+peer+" "+maxHeight+" "+chainCPH+" "+txHt+" "+txHsh)
   if(chainState.activeSynch.receive != undefined){
     var arrayCSReceive = chainState.activeSynch.receive;
     for(item in arrayCSReceive){
-      console.log(arrayCSReceive[item].peer)
+      //console.log(arrayCSReceive[item].peer)
       if(arrayCSReceive[item].peer == peer){
-        console.log("wootas found it")
+        //console.log("wootas found it")
         chainState.activeSynch.receive.splice(item, 1);
       }
     }
