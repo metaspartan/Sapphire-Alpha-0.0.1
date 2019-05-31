@@ -120,6 +120,10 @@ chainState = onChange(chainState, function (path, value, previousValue) {
 })
 //end chain state on change reporting
 
+updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
+  console.log("node state updater "+peer+" "+maxHeight+" "+chainCPH+" "+txHt+" "+txHsh)
+}
+
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(timer){
   console.log(chalk.bgRed("AS TIMER "+timer))
@@ -645,6 +649,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     var called = false;
     var i = 0;
     //can track the pinks to other nodes in one variable for stats
+    var oldChainStateActiveSync = chainState.activeSynch;
     var tempNodeCallBucket = [];
     for (let id in peers) {
       var localTempNode = {};
@@ -675,7 +680,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       }
     }
     //tempNodeCallBucket.push = {"updated":"bottom 671"};
-    chainState.activeSynch = tempNodeCallBucket;
+    chainState.activeSynch = {"send":tempNodeCallBucket,"receive":oldChainStateActiveSync.receive};
   }
 }
 /////////////////////////////////////////////////////////////END CHAIN VALIDATOR
@@ -1385,6 +1390,13 @@ let connSeq2 = 0
           if(JSON.parse(data)["nodeStatePing"]["GlobalHash"] == globalGenesisHash){//will add more to this
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
             BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
+            updatePeerState(
+              peerId,
+              JSON.parse(data)["nodeStatePing"]["MaxHeight"],
+              JSON.stringify(JSON.parse(data)["nodeStatePing"]["currentBlockCheckPointHash"]),
+              JSON.stringify(JSON.parse(data)["nodeStatePing"]["transactionHeight"]),
+              JSON.stringify(JSON.parse(data)["nodeStatePing"]["transactionRootHash"])
+            )
             peers[peerId].conn.write(JSON.stringify(
               {"nodeStatePong":{
                   Height:parseInt(chainState.synchronized),
