@@ -145,18 +145,20 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
   if(chainState.transactionHashWeights != undefined){
     var arrayTXHeight = chainState.transactionHashWeights;
     var shouldEnter = false;
+    var shouldEnter2 = true;
     for(item in arrayTXHeight){
       console.log(arrayTXHeight[item].peerTxHeight)
       if(arrayTXHeight[item].peerTxHeight == txHt && arrayTXHeight[item].peerTxHash == txHsh){
         chainState.transactionHashWeights[item].counted+=1;
         console.log("setting shouldEnter = false")
+        shouldEnter2 = false;
       }else{
         shouldEnter = true;
         console.log("setting shouldEnter = true")
       }
     }
     console.log("chainState.transactionHashWeights.length"+chainState.transactionHashWeights.length+"shouldEnter"+shouldEnter);
-    if(chainState.transactionHashWeights.length == 0 || shouldEnter == true){
+    if(chainState.transactionHashWeights.length == 0 || (shouldEnter == true && shouldEnter2 == true)){
       console.log("doing a push");
       chainState.transactionHashWeights.push(recordChainTransactionHeightRecord)
     }
