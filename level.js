@@ -19,6 +19,10 @@ var setChainState = function(chs,cs){
   chainState = cs;
 }
 
+var printChainState = function(){
+  console.log(chainState().previousTxHash)
+}
+
 function decodeUTF8(s) {
   var i, d = unescape(encodeURIComponent(s)), b = new Uint8Array(d.length);
   for (i = 0; i < d.length; i++) b[i] = d.charCodeAt(i);
@@ -599,7 +603,7 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
   if(blocknum > 1){
     console.log(chalk.bgRed("greater than 1 ---> blocknum"+blocknum))
     pushChainState('previousTxHeight',chainState().transactionHeight);
-    pushChainState('previousTxHash',chainState().transactionHash);
+    pushChainState('previousTxHash',chainState().transactionRootHash);
     pushChainState('transactionHeight',blocknum);
     pushChainState('transactionRootHash',txConfirmation);
     addChainState("cs:transactionHeight",blocknum+":"+txConfirmation);
@@ -611,12 +615,12 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     db.get("cs:transactionHeight").then(async function(value){
       console.log(value.toString())
       pushChainState('previousTxHeight',chainState().transactionHeight);
-      pushChainState('previousTxHash',chainState().transactionHash);
+      pushChainState('previousTxHash',chainState().transactionRootHash);
       pushChainState('transactionHeight',value.toString().split(":")[0]);
       pushChainState('transactionRootHash',value.toString().split(":")[1]);
     }).catch(async function(){
       pushChainState('previousTxHeight',chainState().transactionHeight);
-      pushChainState('previousTxHash',chainState().transactionHash);
+      pushChainState('previousTxHash',chainState().transactionRootHash);
       pushChainState('transactionHeight',blocknum);
       pushChainState('transactionRootHash',txConfirmation);
       addChainState("cs:transactionHeight",blocknum+":"+txConfirmation);
@@ -2279,6 +2283,7 @@ var getStateTrieRootHash = function(){
 }
 
 module.exports = {
+    printChainState:printChainState,
     setChainState:setChainState,
     getAll:getAll,
     refresh:refresh,

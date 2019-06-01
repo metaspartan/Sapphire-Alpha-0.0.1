@@ -2454,6 +2454,7 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput == "TXCHK"){
       //getTXCheckPoints
+      BlkDB.printChainState();
       console.log()
       BlkDB.getTXCheckPoints();
       cliGetInput();
