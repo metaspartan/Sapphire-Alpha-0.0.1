@@ -19,6 +19,7 @@ var bitcoinMessage = require('bitcoinjs-message');
 var cs = require('coinstring');
 const ecies = require('standard-ecies');
 var DatSyncLink = require("./datsynch.js");
+var ExPl = require('./explorer.js');
 //testing other things
 const onChange = require('on-change');
 
@@ -3859,6 +3860,15 @@ rpcserver.globalParentCom(impcchild,broadcastPeersBlock,setChainStateTX);
 rpcserver.globalParentEvent(impcevent);
 rpcserver.globalParentComMethods(impcMethods,impcBalance);
 //////////////////////////////////////end inter module parent child communicator
+
+////////////////////////////////////////////////////////////////////////explorer
+setTimeout(function(){
+  ExPl.startExplorer(chainState)
+},7000)
+setTimeout(function(){
+  ExPl.refreshExplorer(chainState)
+},13000)
+////////////////////////////////////////////////////////////////////end explorer
 
 ////////////////////////////////////////////////initialize the console interface
 cliGetInput();
