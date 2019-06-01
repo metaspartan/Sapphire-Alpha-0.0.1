@@ -122,25 +122,14 @@ chainState = onChange(chainState, function (path, value, previousValue) {
     }
   }
 
+  if(path == "transactionRootHash"){
+    updatePeerTxHashArray(chainState.transactionHeight,chainState.transactionRootHash);
+  }
+
 })
 //end chain state on change reporting
 
-updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
-  //console.log("node state updater "+peer+" "+maxHeight+" "+chainCPH+" "+txHt+" "+txHsh)
-  if(chainState.activeSynch.receive != undefined){
-    var arrayCSReceive = chainState.activeSynch.receive;
-    for(item in arrayCSReceive){
-      //console.log(arrayCSReceive[item].peer)
-      if(arrayCSReceive[item].peer == peer){
-        //console.log("wootas found it")
-        chainState.activeSynch.receive.splice(item, 1);
-      }
-    }
-  }else{
-    chainState.activeSynch.receive = [];
-  }
-
-
+updatePeerTxHashArray = function(txHt,txHsh){
   var recordChainTransactionHeightRecord = {"peerTxHeight":txHt,"peerTxHash":txHsh,"counted":1}
   if(chainState.transactionHashWeights != undefined){
     var arrayTXHeight = chainState.transactionHashWeights;
@@ -169,6 +158,24 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
   if(chainState.transactionHashWeights.length > 4){
     chainState.transactionHashWeights.shift();
   }
+}
+
+updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
+  //console.log("node state updater "+peer+" "+maxHeight+" "+chainCPH+" "+txHt+" "+txHsh)
+  if(chainState.activeSynch.receive != undefined){
+    var arrayCSReceive = chainState.activeSynch.receive;
+    for(item in arrayCSReceive){
+      //console.log(arrayCSReceive[item].peer)
+      if(arrayCSReceive[item].peer == peer){
+        //console.log("wootas found it")
+        chainState.activeSynch.receive.splice(item, 1);
+      }
+    }
+  }else{
+    chainState.activeSynch.receive = [];
+  }
+
+  updatePeerTxHashArray(txHt,txHsh);
 
   var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh}
   chainState.activeSynch.receive.push(insertPeer)
