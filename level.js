@@ -13,8 +13,10 @@ var Trie = require('merkle-patricia-tree');
 var transactionRiser = 100;
 //chain state set function from peer
 var pushChainState;
-var setChainState = function(chs){
+var chainState;
+var setChainState = function(chs,cs){
   pushChainState = chs;
+  chainState = cs;
 }
 
 function decodeUTF8(s) {
@@ -596,6 +598,8 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
 
   if(blocknum > 1){
     console.log(chalk.bgRed("greater than 1 ---> blocknum"+blocknum))
+    pushChainState('previousTxHeight',chainState().transactionHeight);
+    pushChainState('previousTxHash',chainState().transactionHash);
     pushChainState('transactionHeight',blocknum);
     pushChainState('transactionRootHash',txConfirmation);
     addChainState("cs:transactionHeight",blocknum+":"+txConfirmation);
@@ -606,9 +610,13 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
   }else if(blocknum == 1){
     db.get("cs:transactionHeight").then(async function(value){
       console.log(value.toString())
+      pushChainState('previousTxHeight',chainState().transactionHeight);
+      pushChainState('previousTxHash',chainState().transactionHash);
       pushChainState('transactionHeight',value.toString().split(":")[0]);
       pushChainState('transactionRootHash',value.toString().split(":")[1]);
     }).catch(async function(){
+      pushChainState('previousTxHeight',chainState().transactionHeight);
+      pushChainState('previousTxHash',chainState().transactionHash);
       pushChainState('transactionHeight',blocknum);
       pushChainState('transactionRootHash',txConfirmation);
       addChainState("cs:transactionHeight",blocknum+":"+txConfirmation);

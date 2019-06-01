@@ -428,7 +428,7 @@ var setChainState = function(stateParam,paramValue){
   chainState[stateParam] = paramValue;
 }
 sapphirechain.setChainState(getChainState);
-BlkDB.setChainState(setChainState);
+BlkDB.setChainState(setChainState,getChainState);
 ///end chain state set function
 
 //chainState.accountsTrie = 0;
