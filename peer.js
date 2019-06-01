@@ -191,6 +191,8 @@ var activeSync = function(timer){
   console.log(chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(parseInt(chainState.peerNonce))+chalk.bgCyan.black(" transactionheight: ")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgCyan.black(" topblockheight: ")+chalk.bgMagenta(chainState.topBlock));
   console.log(chalk.bgCyan.black(" fcnlongpeer: ")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(chainState.peerNonce)+chalk.bgCyan.black(" peerCount: ")+chalk.bgMagenta(frankieCoin.nodes.length));
   console.log(chalk.bgCyan.black(" transactionHash: ")+chalk.bgMagenta(chainState.transactionRootHash));
+  console.log(chalk.bgCyan.black(" previousTXHeight: ")+chalk.bgMagenta(chainState.previousTxHeight));
+  console.log(chalk.bgCyan.black(" previousTXHash: ")+chalk.bgMagenta(chainState.previousTxHash));
   console.log(chalk.bgCyan.black(" txHashHistory(4): ")+chalk.bgMagenta(JSON.stringify(chainState.transactionHashWeights)));
   if(chainState.chainWalkHeight == 1){
     setTimeout(function(){
