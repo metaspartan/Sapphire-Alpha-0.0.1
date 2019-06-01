@@ -93,6 +93,8 @@ chainState.peerNonce = 0;
 //now adding parameters for transactions which is verified in part by currentBlockCheckPointHash
 chainState.transactionHeight = 0;
 chainState.transactionRootHash = '';
+chainState.previousTxHeight = 0;
+chainState.previousTxHash = '';
 chainState.transactionHashWeights = [];
 //activesynch
 chainState.interval = 10000;
@@ -376,6 +378,8 @@ var setChainStateTX = async function(validTXHeight,transactionCheckPointHash){
   console.log(chalk.bgGreen.black("setting chain state height to "+validTXHeight+" with hash of "+transactionCheckPointHash));
 
   //realizing this was never actually set
+  chainState.previousTxHeight = chainState.transactionHeight;
+  chainState.previousTxHash = chainState.transactionRootHash;
   chainState.transactionHeight = await parseInt(validTXHeight);
   chainState.transactionRootHash = await transactionCheckPointHash;
   ////setting transaction level checks and heights
@@ -385,6 +389,8 @@ var setChainStateTX = async function(validTXHeight,transactionCheckPointHash){
       //current transation height is csTransactionHeight.split(":")[0] with hash csTransactionHeight.split(":")[1]
       if(validTXHeight >= 1 && validTXHeight == parseInt(chainState.transactionHeight+1) && csTransactionHeight.split(":")[1] == chainState.transactionRootHash){//otherwise it resets a memory load when it loads block 1
         //I may want to host a set of previous chainState.TransactionHeight and Hash but for now defer
+        chainState.previousTxHeight = chainState.transactionHeight;
+        chainState.previousTxHash = chainState.transactionRootHash;
         chainState.transactionHeight = await parseInt(validTXHeight);
         chainState.transactionRootHash = await transactionCheckPointHash;
         BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transactionCheckPointHash);
@@ -788,6 +794,8 @@ var transactionValidator = async function(start,end){
 
           var updateChainStateTX = function(isValidTXHeight,transationCheckPointHash){
             console.log(chalk.bgGreen.black("updating chain state height to "+isValidTXHeight));
+            chainState.previousTxHeight = chainState.transactionHeight;
+            chainState.previousTxHash = chainState.transactionRootHash;
             chainState.transactionHeight = parseInt(isValidTXHeight);
             chainState.transactionRootHash = transationCheckPointHash;
             BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
@@ -3302,7 +3310,13 @@ var myCallbackSell = function(data) {
     log("------------------------------------------------------")
     log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
     log("------------------------------------------------------")
-    broadcastPeers(JSON.stringify({checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}));
+    broadcastPeers(JSON.stringify({
+      checkPointHash:chainState.checkPointHash,
+      currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+      transactionHeight:chainState.transactionHeight,
+      transactionRootHash:chainState.transactionRootHash,
+      block:frankieCoin.getLatestBlock()
+    }));
     //broadcastPeers(JSON.stringify({checkPointHash:lastCheckPointHash,currentBlockCheckPointHash:lastCurrentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}));
   }else if(trigger == "order"){
     //sending the block to the peers
