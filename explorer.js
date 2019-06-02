@@ -52,13 +52,13 @@ var startExplorer = function(chainState,cb){
       })
     }else if(req.query.theValue.length < 9 && RegExp("[0-9]").test(req.query.theValue)){
       var blockReturn = function(blk,error){
-        if(error){
-          res.render('block',{myBlockReturn:""});
-        }else{
           res.render('block',{myBlockReturn:JSON.parse(blk)});
-        }
       }
-      getBlock(req.query.theValue,blockReturn)
+      if(chainState.topBlock > req.query.theValue){
+        getBlock(req.query.theValue,blockReturn)
+      }else{
+        res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue+" is an invalid address, hash, or block number"});
+      }
     }else{
       console.log("length is "+req.query.theValue.length);
       var myBalanceReturn = [];
