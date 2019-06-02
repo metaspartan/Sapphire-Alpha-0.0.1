@@ -381,10 +381,16 @@ var setChainStateTX = async function(validTXHeight,transactionCheckPointHash){
   console.log(chalk.bgGreen.black("setting chain state height to "+validTXHeight+" with hash of "+transactionCheckPointHash));
 
   //realizing this was never actually set
+  var tempPrevTXHt = chainState.previousTxHeight;
+  var tempPrevTXHash = chainState.previousTxHash;
   chainState.previousTxHeight = chainState.transactionHeight;
   chainState.previousTxHash = chainState.transactionRootHash;
   chainState.transactionHeight = await parseInt(validTXHeight);
   chainState.transactionRootHash = await transactionCheckPointHash;
+  if(chainState.previousTxHeight == chainState.transactionHeight){
+    chainState.previousTxHeight = tempPrevTXHt;
+    chainState.previousTxHash = tempPrevTXHash;
+  }
   ////setting transaction level checks and heights
   var transactionValidator = async function(start,end){
     var cbTransactionHeightMonitor = async function(csTransactionHeight){
@@ -392,10 +398,16 @@ var setChainStateTX = async function(validTXHeight,transactionCheckPointHash){
       //current transation height is csTransactionHeight.split(":")[0] with hash csTransactionHeight.split(":")[1]
       if(validTXHeight >= 1 && validTXHeight == parseInt(chainState.transactionHeight+1) && csTransactionHeight.split(":")[1] == chainState.transactionRootHash){//otherwise it resets a memory load when it loads block 1
         //I may want to host a set of previous chainState.TransactionHeight and Hash but for now defer
+        var tempPrevTXHt = chainState.previousTxHeight;
+        var tempPrevTXHash = chainState.previousTxHash;
         chainState.previousTxHeight = chainState.transactionHeight;
         chainState.previousTxHash = chainState.transactionRootHash;
         chainState.transactionHeight = await parseInt(validTXHeight);
         chainState.transactionRootHash = await transactionCheckPointHash;
+        if(chainState.previousTxHeight == chainState.transactionHeight){
+          chainState.previousTxHeight = tempPrevTXHt;
+          chainState.previousTxHash = tempPrevTXHash;
+        }
         BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transactionCheckPointHash);
       }else{
         console.log("THIS IS WHERE TX VALIDATION IS FAILING NEED TO CLIP OR GET ON RIGHT CHAIN MOST LIKELY")
@@ -795,12 +807,18 @@ var transactionValidator = async function(start,end){
 
           var thisBlockCheckPointHash = await sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
 
-          var updateChainStateTX = function(isValidTXHeight,transationCheckPointHash){
+          var updateChainStateTX = async function(isValidTXHeight,transationCheckPointHash){
             console.log(chalk.bgGreen.black("updating chain state height to "+isValidTXHeight));
+            var tempPrevTXHt = chainState.previousTxHeight;
+            var tempPrevTXHash = chainState.previousTxHash;
             chainState.previousTxHeight = chainState.transactionHeight;
             chainState.previousTxHash = chainState.transactionRootHash;
-            chainState.transactionHeight = parseInt(isValidTXHeight);
-            chainState.transactionRootHash = transationCheckPointHash;
+            chainState.transactionHeight = await parseInt(validTXHeight);
+            chainState.transactionRootHash = await transactionCheckPointHash;
+            if(chainState.previousTxHeight == chainState.transactionHeight){
+              chainState.previousTxHeight = tempPrevTXHt;
+              chainState.previousTxHash = tempPrevTXHash;
+            }
             BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
 
             if(isValidTXHeight%frankieCoin.chainRiser == 0){
