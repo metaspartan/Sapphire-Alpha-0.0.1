@@ -807,22 +807,22 @@ var transactionValidator = async function(start,end){
 
           var thisBlockCheckPointHash = await sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
 
-          var updateChainStateTX = async function(isValidTXHeight,transationCheckPointHash){
+          var updateChainStateTX = async function(isValidTXHeight,transactionCheckPointHash){
             console.log(chalk.bgGreen.black("updating chain state height to "+isValidTXHeight));
             var tempPrevTXHt = chainState.previousTxHeight;
             var tempPrevTXHash = chainState.previousTxHash;
             chainState.previousTxHeight = chainState.transactionHeight;
             chainState.previousTxHash = chainState.transactionRootHash;
-            chainState.transactionHeight = await parseInt(validTXHeight);
+            chainState.transactionHeight = await parseInt(isValidTXHeight);
             chainState.transactionRootHash = await transactionCheckPointHash;
             if(chainState.previousTxHeight == chainState.transactionHeight){
               chainState.previousTxHeight = tempPrevTXHt;
               chainState.previousTxHash = tempPrevTXHash;
             }
-            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transationCheckPointHash);
+            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transactionCheckPointHash);
 
             if(isValidTXHeight%frankieCoin.chainRiser == 0){
-              BlkDB.addChainState("cs:transactionCheckPointHash:"+isValidTXHeight,transationCheckPointHash);
+              BlkDB.addChainState("cs:transactionCheckPointHash:"+isValidTXHeight,transactionCheckPointHash);
             }
 
           }
