@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<script>
+  var callMe = function(myval){
+   window.location.href = '/address?theValue='+myval;
+  }
+</script>
+
+<link rel="stylesheet" type="text/css" href="/css/styles.css"/>
+
+<div><img width="300" src="/img/EGEM-Sapphire-h-logo-black.png" /></div>
+<div class="header">
+  <h1>Egem Sapphire Explorer</h1>
+  <span  class="header-title-span">Enter Address/Hash/Block Number</span>
+  <input class="main-input" type="text" id="address" />
+  <input type="button" value="submit" onClick="callMe(document.getElementById('address').value)" />
+</div>
+<div class="content">
+  <div><span class="title-span">This Node Validated To Block: </span><span>{{chainState.chainWalkHeight}}</span></div>
+  <div><span class="title-span">Validation Hash: </span><span>{{chainState.chainWalkHash}}</span><span>(match to validation matches below)</span></div>
+  <div><span class="title-span">synchronized: </span><span>{{chainState.synchronized}}</span></div>
+  <div><span class="title-span">topBlock: </span><span>{{chainState.topBlock}}</span></div>
+  <div><span class="title-span">checkPointHash: </span><span>{{chainState.checkPointHash}}</span></div>
+  <div><span class="title-span">Peer Block Height: </span><span>{{chainState.peerNonce}}</span></div>
+  <div><span class="title-span">Transaction Height: </span><span>{{chainState.transactionHeight}}</span></div>
+  <div><span class="title-span">transactionRootHash: </span><span>{{chainState.transactionRootHash}}</span></div>
+  <div><span class="title-span">Previous Transaction Height: </span><span>{{chainState.previousTxHeight}}</span></div>
+  <div><span class="title-span">previousTxHash: </span><span>{{chainState.previousTxHash}}</span></div>
+</div>
+<div class="validation-content">
+  <span>Validation Matches</span>
+  {{#each chainState.transactionHashWeights}}
+  <div>
+    <span>Block Height Reported: {{peerTxHeight}}</span><span>Matching Hash Reported{{peerTxHash}}</span><span>Count: {{counted}}</span>
+  </div>
+  {{/each}}
+</div>
+</html>

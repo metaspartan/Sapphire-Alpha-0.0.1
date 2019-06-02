@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+
+<script>
+  var callMe = function(myval){
+   window.location.href = '/address?theValue='+myval;
+  }
+</script>
+
+<link rel="stylesheet" type="text/css" href="/css/styles.css"/>
+
+<div><img width="300" src="/img/EGEM-Sapphire-h-logo-black.png" /></div>
+<div class="header">
+  <h1>Egem Sapphire Explorer</h1>
+  <span  class="header-title-span">Enter Address/Hash/Block Number</span>
+  <input class="main-input" type="text" id="address" />
+  <input type="button" value="submit" onClick="callMe(document.getElementById('address').value)" />
+</div>
+<div class="content">
+  <div>{{address}}</div>
+  <div>
+    {{#each myBalanceReturn}}
+    <span class="title-span">{{bal.ticker}}:</span></span>{{bal.balance}}</span>
+    {{/each}}
+  </div>
+</div>
+</html>

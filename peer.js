@@ -3862,8 +3862,13 @@ rpcserver.globalParentComMethods(impcMethods,impcBalance);
 //////////////////////////////////////end inter module parent child communicator
 
 ////////////////////////////////////////////////////////////////////////explorer
+var callMe = function(data){
+  console.log('im calling you with the button '+data);
+}
+
+ExPl.initialize(BlkDB.getBalanceAtAddress)
 setTimeout(function(){
-  ExPl.startExplorer(chainState)
+  ExPl.startExplorer(chainState,callMe);
 },7000)
 setTimeout(function(){
   ExPl.refreshExplorer(chainState)
