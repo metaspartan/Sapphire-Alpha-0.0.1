@@ -5,8 +5,12 @@ const port = 3003;
 var path = require('path');
 
 var getBalance;
-var initialize = function(getBal){
+var getBlockByHash;
+var getBLock;
+var initialize = function(getBal,getHash,getBlk){
   getBalance = getBal;
+  getBlockByHash = getHash;
+  getBlock = getBlk;
 }
 
 app.use('/css', express.static('css'));
@@ -24,11 +28,7 @@ var startExplorer = function(chainState,cb){
   })
 
   app.get('/address',(req,res)=>{
-    if(req.query.theValue.length != 42 || !RegExp("^0x[a-fA-F0-9]{40}$").test(req.query.theValue)){
-      var myBalanceReturn = [];
-      myBalanceReturn.push({"bal":{"ticker":'Does Not Exist',"balance":0}});
-      res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue+" is an invalid address"});
-    }else{
+    if(req.query.theValue.length == 42 || RegExp("^0x[a-fA-F0-9]{40}$").test(req.query.theValue)){
       console.log(req.query.theValue+"was called");
       var myBalanceReturn = [];
       var addyBal = function(val){
@@ -43,6 +43,27 @@ var startExplorer = function(chainState,cb){
         res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue});
       }
       getBalance(req.query.theValue,addyBal)
+    }else if(req.query.theValue.length == 64 && RegExp("[0-9A-Fa-f]{64}").test(req.query.theValue)){
+      var blockReturn = function(blk){
+        res.render('block',{myBlockReturn:JSON.parse(blk)});
+      }
+      getBlockByHash(req.query.theValue).then(function(val){
+        getBlock(val,blockReturn)
+      })
+    }else if(req.query.theValue.length < 9 && RegExp("[0-9]").test(req.query.theValue)){
+      var blockReturn = function(blk,error){
+        if(error){
+          res.render('block',{myBlockReturn:""});
+        }else{
+          res.render('block',{myBlockReturn:JSON.parse(blk)});
+        }
+      }
+      getBlock(req.query.theValue,blockReturn)
+    }else{
+      console.log("length is "+req.query.theValue.length);
+      var myBalanceReturn = [];
+      myBalanceReturn.push({"bal":{"ticker":'Does Not Exist',"balance":0}});
+      res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue+" is an invalid address"});
     }
 
 
