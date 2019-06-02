@@ -63,7 +63,7 @@ var startExplorer = function(chainState,cb){
       console.log("length is "+req.query.theValue.length);
       var myBalanceReturn = [];
       myBalanceReturn.push({"bal":{"ticker":'Does Not Exist',"balance":0}});
-      res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue+" is an invalid address"});
+      res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue+" is probably not an address, block number, or hash"});
     }
 
 
