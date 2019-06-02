@@ -24,20 +24,27 @@ var startExplorer = function(chainState,cb){
   })
 
   app.get('/address',(req,res)=>{
-    console.log(req.query.theValue+"was called");
-    var myBalanceReturn = [];
-    var addyBal = function(val){
-      console.log("this address balance is ");
-      console.log("------------------------");
-      for(x in val){
-        console.log(x+": "+val[x]);
-        myBalanceReturn.push({"bal":{"ticker":x,"balance":val[x]}});
+    if(req.query.theValue.length != 42 || !RegExp("^0x[a-fA-F0-9]{40}$").test(req.query.theValue)){
+      var myBalanceReturn = [];
+      myBalanceReturn.push({"bal":{"ticker":'Does Not Exist',"balance":0}});
+      res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue+" is an invalid address"});
+    }else{
+      console.log(req.query.theValue+"was called");
+      var myBalanceReturn = [];
+      var addyBal = function(val){
+        console.log("this address balance is ");
+        console.log("------------------------");
+        for(x in val){
+          console.log(x+": "+val[x]);
+          myBalanceReturn.push({"bal":{"ticker":x,"balance":val[x]}});
+        }
+        console.log("------------------------");
+        console.log(JSON.stringify(myBalanceReturn))
+        res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue});
       }
-      console.log("------------------------");
-      console.log(JSON.stringify(myBalanceReturn))
-      res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue});
+      getBalance(req.query.theValue,addyBal)
     }
-    getBalance(req.query.theValue,addyBal)
+
 
 
   })
