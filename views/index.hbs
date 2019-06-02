@@ -2,9 +2,10 @@
 <html>
 
 <script>
-  var callMe = function(myval){
-   window.location.href = '/address?theValue='+myval;
+  var callExplorer = function(addyblkhash){
+   window.location.href = '/address?theValue='+addyblkhash;
   }
+  setInterval(function(){window.location.href = '/';},30000)
 </script>
 
 <link rel="stylesheet" type="text/css" href="/css/styles.css"/>
@@ -12,9 +13,10 @@
 <div><img width="300" src="/img/EGEM-Sapphire-h-logo-black.png" /></div>
 <div class="header">
   <h1>Egem Sapphire Explorer</h1>
+  <div style="padding:5px;margin:5px;background-color:red;color:#FFFFFF;font-weight:'bold';">refreshes every 30 seconds until ajax calls implemented</div>
   <span  class="header-title-span">Enter Address/Hash/Block Number</span>
   <input class="main-input" type="text" id="address" />
-  <input type="button" value="submit" onClick="callMe(document.getElementById('address').value)" />
+  <input type="button" value="submit" onClick="callExplorer(document.getElementById('address').value)" />
 </div>
 <div class="content">
   <div><span class="title-span">This Node Validated To Block: </span><span>{{chainState.chainWalkHeight}}</span></div>
