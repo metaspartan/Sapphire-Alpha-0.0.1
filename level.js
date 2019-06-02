@@ -602,6 +602,8 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
 
   if(blocknum > 1){
     console.log(chalk.bgRed("greater than 1 ---> blocknum"+blocknum))
+    var tempPrevTXHt = chainState.previousTxHeight;
+    var tempPrevTXHash = chainState.previousTxHash;
     pushChainState('previousTxHeight',chainState().transactionHeight);
     pushChainState('previousTxHash',chainState().transactionRootHash);
     pushChainState('transactionHeight',blocknum);
@@ -609,6 +611,10 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
     addChainState("cs:transactionHeight",blocknum+":"+txConfirmation);
     if(blocknum%chainRiser == 0){
       addChainState("cs:transactionCheckPointHash:"+blocknum,txConfirmation);
+    }
+    if(chainState().transactionHeight == chainState().previousTxHeight){
+      pushChainState('previousTxHeight',tempPrevTXHt);
+      pushChainState('previousTxHash',tempPrevTXHash);
     }
     //cbSetChainStateTX()
   }else if(blocknum == 1){

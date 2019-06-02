@@ -273,7 +273,6 @@ var activePing = function(timer){
       //log("------------------------------------------------------");
       //log(chalk.green("Sending ping for peer id "+id));
       //log("------------------------------------------------------");
-
       setTimeout(function(){
         peers[id].conn.write(JSON.stringify(
           {"nodeStatePing":{
@@ -283,7 +282,9 @@ var activePing = function(timer){
             checkPointHash:chainState.checkPointHash,
             currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
             transactionHeight:chainState.transactionHeight,
-            transactionRootHash:chainState.transactionRootHash
+            transactionRootHash:chainState.transactionRootHash,
+            prevTxHeight:chainState.previousTxHeight,
+            previousTxHash:chainState.previousTxHash
           }}));
       },timer)
 
@@ -1469,12 +1470,16 @@ let connSeq2 = 0
           if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
             BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
+            if(chainState.previousTxHeight == 0){
+              chainState.previousTxHeight = JSON.parse(data)["nodeStatePong"]["prevTxHeight"];
+              chainState.previousTxHash = JSON.parse(data)["nodeStatePong"]["previousTxHash"];
+            }
             updatePeerState(
               peerId,
               JSON.parse(data)["nodeStatePong"]["MaxHeight"],
               JSON.parse(data)["nodeStatePong"]["currentBlockCheckPointHash"],
               JSON.parse(data)["nodeStatePong"]["transactionHeight"],
-              JSON.parse(data)["nodeStatePong"]["transactionRootHash"]
+              JSON.parse(data)["nodeStatePong"]["transactionRootHash"],
             )
           }
 
@@ -1497,16 +1502,24 @@ let connSeq2 = 0
               JSON.parse(data)["nodeStatePing"]["transactionHeight"],
               JSON.parse(data)["nodeStatePing"]["transactionRootHash"]
             )
-            peers[peerId].conn.write(JSON.stringify(
-              {"nodeStatePong":{
-                  Height:parseInt(chainState.synchronized),
-                  MaxHeight:parseInt(chainState.synchronized),
-                  GlobalHash:globalGenesisHash,
-                  checkPointHash:chainState.checkPointHash,
-                  currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
-                  transactionHeight:chainState.transactionHeight,
-                  transactionRootHash:chainState.transactionRootHash
-                }}));
+            if(chainState.previousTxHeight > 0){
+              peers[peerId].conn.write(JSON.stringify(
+                {"nodeStatePong":{
+                    Height:parseInt(chainState.synchronized),
+                    MaxHeight:parseInt(chainState.synchronized),
+                    GlobalHash:globalGenesisHash,
+                    checkPointHash:chainState.checkPointHash,
+                    currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+                    transactionHeight:chainState.transactionHeight,
+                    transactionRootHash:chainState.transactionRootHash,
+                    prevTxHeight:chainState.previousTxHeight,
+                    previousTxHash:chainState.previousTxHash
+                  }}));
+            }else{
+              chainState.previousTxHeight = JSON.parse(data)["nodeStatePing"]["prevTxHeight"];
+              chainState.previousTxHash = JSON.parse(data)["nodeStatePing"]["previousTxHash"];
+            }
+
           }
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
