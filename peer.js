@@ -1476,7 +1476,7 @@ let connSeq2 = 0
           if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
             BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
-            if(chainState.previousTxHeight == 0){
+            if(chainState.previousTxHeight == 0 || parseInt(chainState.previousTxHeight+1) != JSON.parse(data)["nodeStatePong"]["transactionHeight"]){
               chainState.previousTxHeight = JSON.parse(data)["nodeStatePong"]["prevTxHeight"];
               chainState.previousTxHash = JSON.parse(data)["nodeStatePong"]["previousTxHash"];
             }
@@ -1508,7 +1508,7 @@ let connSeq2 = 0
               JSON.parse(data)["nodeStatePing"]["transactionHeight"],
               JSON.parse(data)["nodeStatePing"]["transactionRootHash"]
             )
-            if(chainState.previousTxHeight > 0){
+            if(chainState.previousTxHeight > 0 && parseInt(chainState.previousTxHeight+1) == chainState.transactionHeight){
               peers[peerId].conn.write(JSON.stringify(
                 {"nodeStatePong":{
                     Height:parseInt(chainState.synchronized),
