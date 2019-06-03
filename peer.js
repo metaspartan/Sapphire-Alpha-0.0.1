@@ -1219,8 +1219,8 @@ let connSeq2 = 0
           if(
             (JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"] == chainState.currentBlockCheckPointHash.checkPointHash)
             && (JSON.parse(data)["checkPointHash"] == chainState.checkPointHash)
-            && (JSON.parse(data)["currentTransactionHeight"] == chainState.transactionHeight)
-            && (JSON.parse(data)["currentTransactionRootHash"] == chainState.transactionRootHash)
+            //&& (JSON.parse(data)["currentTransactionHeight"] == chainState.transactionHeight)
+            //&& (JSON.parse(data)["currentTransactionRootHash"] == chainState.transactionRootHash)
             && (JSON.parse(data)["currentBlockCheckPointHash"]["checkPointHash"] == thisBlockCheckPointHashAtHeight || riserOffset == 0)
           ){
 
