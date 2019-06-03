@@ -1216,6 +1216,10 @@ let connSeq2 = 0
           //console.log("BLOCK CHECK POINT HASH THREE BACK "+thisBlockCheckPointHashThreeBack);
 
           //calculate from this JSON.parse(data)["currentBlockCheckPointHash"]  and block data also
+          console.log(chalk.bgRed.white.bold("THE NEW BLOCK TX HEIGHT AND HASH"))
+          console.log(chalk.bgRed.white.bold(JSON.parse(data)["currentTransactionHeight"]))
+          console.log(chalk.bgRed.white.bold(JSON.parse(data)["currentTransactionRootHash"]))
+          console.log(chalk.bgRed.white.bold("THE NEW BLOCK TX HEIGHT AND HASH"))
           if(
             (JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"] == chainState.currentBlockCheckPointHash.checkPointHash)
             && (JSON.parse(data)["checkPointHash"] == chainState.checkPointHash)
