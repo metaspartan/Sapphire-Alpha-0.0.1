@@ -1165,18 +1165,20 @@ var getTransactionByHash = function(hash,cb){
 
 }
 
-var getTransactionReceiptsByAddress = function(address){
+var getTransactionReceiptsByAddress = function(address,cb){
 
   console.log("ALL Transaction Receipts for "+address);
-
-  var stream = db.createKeyStream();
+  var txCollection = []
+  var stream = db.createReadStream();
   stream.on('data',function(data){
-    if(data.toString().split(":")[1] == address || data.toString().split(":")[2] == address){
-      console.log(data.toString());
+    if(data.key.toString().split(":")[1] == address || data.key.toString().split(":")[2] == address){
+      console.log(data.key.toString());
+      var thisTx = txCollection.push({"fromAddress":JSON.parse(data.value)["fromAddress"],"toAddress":JSON.parse(data.value)["toAddress"],"ticker":JSON.parse(data.value)["ticker"],"amount":JSON.parse(data.value)["amount"],"hash":JSON.parse(data.value)["hash"]});
     }
-
   })
-
+  stream.on('close',function(){
+    cb(txCollection);
+  })
 }
 
 ////////////////////////////////////////////////////////////////ALL BALANCE TREE

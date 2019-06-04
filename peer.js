@@ -3970,7 +3970,7 @@ var callMe = function(data){
   console.log('im calling you with the button '+data);
 }
 
-ExPl.initialize(BlkDB.getBalanceAtAddress,BlkDB.getBlockByHash,BlkDB.getBlock,BlkDB.getTransactionByHash)
+ExPl.initialize(BlkDB.getBalanceAtAddress,BlkDB.getBlockByHash,BlkDB.getBlock,BlkDB.getTransactionByHash,BlkDB.getTransactionReceiptsByAddress)
 setTimeout(function(){
   ExPl.startExplorer(chainState,callMe);
 },7000)

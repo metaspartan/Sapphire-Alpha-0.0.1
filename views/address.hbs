@@ -23,5 +23,18 @@
     <span class="title-span">{{bal.ticker}}:</span></span>{{bal.balance}}</span>
     {{/each}}
   </div>
+
+  <div>
+    {{#each txCollection}}
+    <div>
+      <span class="title-span">From:</span><span>{{fromAddress}}</span>
+      <span class="title-span">To:</span><span>{{toAddress}}</span>
+      <span class="title-span">Ticker:</span><span>{{ticker}}</span>
+      <span class="title-span">Amount:</span><span>{{amount}}</span>
+      <span class="title-span">Hash:</span><span><a href="/address?theValue={{hash}}">{{hash}}</a></span>
+    </div>
+    {{/each}}
+  </div>
+
 </div>
 </html>

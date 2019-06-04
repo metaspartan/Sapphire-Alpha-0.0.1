@@ -7,11 +7,12 @@ var path = require('path');
 var getBalance;
 var getBlockByHash;
 var getBLock;
-var initialize = function(getBal,getHash,getBlk,getTxByHash){
+var initialize = function(getBal,getHash,getBlk,getTxByHash,getTxReceiptsByAddress){
   getBalance = getBal;
   getBlockByHash = getHash;
   getBlock = getBlk;
   getTransactionByHash = getTxByHash;
+  getTransactionReceiptsByAddress = getTxReceiptsByAddress;
 }
 
 app.use('/css', express.static('css'));
@@ -40,8 +41,11 @@ var startExplorer = function(chainState,cb){
           myBalanceReturn.push({"bal":{"ticker":x,"balance":val[x]}});
         }
         console.log("------------------------");
-        console.log(JSON.stringify(myBalanceReturn))
-        res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue});
+        console.log(JSON.stringify(myBalanceReturn));
+        getTransactionReceiptsByAddress(req.query.theValue,function(txCollection){
+          res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue,txCollection:txCollection});
+        })
+        //res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue});
       }
       getBalance(req.query.theValue,addyBal)
     }else if(req.query.theValue.length == 64 && RegExp("[0-9A-Fa-f]{64}").test(req.query.theValue)){
