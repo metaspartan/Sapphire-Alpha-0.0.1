@@ -600,6 +600,8 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     console.log("NOT VALID NEED TO PING AT "+replyData+typeof(replyData));
     if(parseInt(replyData) > 2){
 
+      console.log(" I am not sure the stuff below works as intended going to let nodestate ping fix this now ")
+      /***
       var clipHeight = parseInt(replyData-3)
       chainClipperReduce(frankieCoin.blockHeight,clipHeight).then(function(){
         console.log("clipped chain to "+clipHeight+" restart to reindex")
@@ -608,6 +610,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
         chainState.topBlock = clipHeight;
         BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,416);
       });
+      ***/
 
     }
 
@@ -1220,6 +1223,7 @@ let connSeq2 = 0
           console.log(chalk.bgRed.white.bold(JSON.parse(data)["currentTransactionHeight"]))
           console.log(chalk.bgRed.white.bold(JSON.parse(data)["currentTransactionRootHash"]))
           console.log(chalk.bgRed.white.bold("THE NEW BLOCK TX HEIGHT AND HASH"))
+
           if(
             (JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"] == chainState.currentBlockCheckPointHash.checkPointHash)
             && (JSON.parse(data)["checkPointHash"] == chainState.checkPointHash)
@@ -1410,6 +1414,19 @@ let connSeq2 = 0
             }
 
 
+          }else if(JSON.parse(data)["currentTransactionHeight"] != chainState.previousTxHeight){
+            console.log("this node sent in a treansaction height of "+JSON.parse(data)["currentTransactionHeight"]);
+            console.log("one of you nees to sync your transactions I will trigger yours");
+
+            var startEnd = parseInt(chainState.transactionHeight+1);
+            var topEnd = parseInt(startEnd+500);
+            console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
+            if(topEnd >= chainState.synchronized){
+              topEnd = chainState.synchronized
+            }
+
+            transactionValidator(parseInt(startEnd),parseInt(topEnd));
+
           }else{
 
             console.log("UNCLE OR ON WRONG CHAIN")
@@ -1454,13 +1471,36 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["uncle"]){
 
-          log(chalk.bgBlue("THIS IS THE UNCLRE RETURN WE LOG THE OMMER AND DELETE"));
+          //ver first thing is stop communicating until this reqind happens
+          rpcserver.closePort();
+          sw.closePort();
+          sw2.closePort();
+
+          log(chalk.bgBlue("THIS IS THE UNCLE RETURN WE LOG THE OMMER AND DELETE"));
+
           log(data["uncle"]);
 
-          //I have an uncle insert somewhere we maybe ned to insert it
+          console.log("starting uncle rewind here "+data.uncle.blockHeight);
 
-          chainClipper(frankieCoin.blockHeight).then(function(){
-            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
+          ////////////////////////first step is get bock number check point hash for previpus block
+          var blockNum = parseInt(data.uncle.blockHeight-1);
+          //calculating this 2 times but needed at addBlock for transations to verify properly
+          var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
+          var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
+          checkPointBlock = JSON.stringify(checkPointBlock);
+          var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getLatestBlock()))["hash"];
+          var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+          //////////////////////////////////////////////////////////////////////
+
+          var removalTransactions = franieCoin.getBlock(data.uncle.blockHeight).transactions;//need to find out who incremented their
+
+          //walk through all transactions in uncle block remove the last nonce
+
+          //I have an uncle insert somewhere we maybe need to insert it
+          BlkDB.deleteTransactions();
+
+          chainClipper(frankieCoin.blockHeight - 1).then(function(){
+            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
           });
           //clipChainAt(parseInt(chainState.syncronized - 10))
 
@@ -2459,13 +2499,32 @@ function cliGetInput(){
 
       cliGetInput();
     }else if(userInput.startsWith("clipChainAt(")){
-      var clipHeight = userInput.slice(userInput.indexOf("clipChainAt(")+12, userInput.indexOf(")"));
-      chainClipperReduce(frankieCoin.blockHeight,clipHeight).then(function(){
+      var clipHeight = parseInt(userInput.slice(userInput.indexOf("clipChainAt(")+12, userInput.indexOf(")")));
+      BlkDB.deleteTransactions();
+      chainState.transactionHeight = 0;
+      chainState.transactionRootHash = '';
+
+      var returnedBlockFn = function(retBlk){}
+
+      BlkDB.getBlock(clipHeight,function(returnBlock){
+        console.log(chalk.bgRed("return block hash"+JSON.parse(returnBlock)["hash"]))
+
+        BlkDB.addChainState("cs:transactionHeight","0:");
         console.log("clipped chain to "+clipHeight+" restart to reindex")
         chainState.chainWalkHeight = clipHeight;
         chainState.synchronized = clipHeight;
-        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2165);
-      });
+        chainState.chainWalkHash = JSON.parse(returnBlock)["hash"];
+        BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(chainState.chainWalkHeight));
+        BlkDB.addChainState("cs:blockHeight",parseInt(chainState.chainWalkHeight));
+        chainClipperReduce(frankieCoin.blockHeight,clipHeight).then(function(){
+
+          ChainGrab()
+
+
+        });
+      })
+
+
       cliGetInput();
     }else if(userInput == "MM"){
       console.log("chain state chain walk height is "+chainState.chainWalkHeight);
@@ -3129,7 +3188,7 @@ var cbChainGrab = async function(data) {
   setTimeout(function(){
     //console.log(frankieCoin.blockHeight);
     if(frankieCoin.blockHeight > 1){
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(frankieCoin.blockHeight+1),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,2718);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(frankieCoin.blockHeight+frankieCoin.chainRiser+1),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,2718);
 
     }
   },1000);

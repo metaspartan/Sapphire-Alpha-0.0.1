@@ -697,14 +697,16 @@ var getBlockStream = function(blknum,callBack){
 
 }
 
-var removeBlock = function(blknum){
+var removeBlock = async function(blknum){
   console.log("REMOVING BLOCK NUMBER "+blknum+" FROM LEVELDB");
   var blocknum = parseInt(blknum);
   var hexBlockNum = ("000000000000000" + blocknum.toString(16)).substr(-16);
+
   db.del("sfblk:"+hexBlockNum, function(err){
     if(err) return console.log('Ooops!', err) // likely the key was not found
   });
 }
+////////////////////////////////////////////////////////////////////////////////
 
 var getAllBLocks = function(){
   var stream = db.createReadStream();
@@ -924,6 +926,22 @@ var clearDatabase = function(){
   console.log("| Deleting database... level not set up for delete yet just delete the SFRX folder for now        |");
   //levelup(leveldown.destroy('./SFRX',function(){console.log("donada")}));
   //db = levelup(leveldown('./SFRX'));
+}
+
+var deleteTransactions = function(){
+  var stream = db.createKeyStream();
+
+  stream.on('data',function(data){
+
+    if(data.toString().split(":")[0] == "tx" || data.toString().split(":")[0] == "abal" || data.toString().split(":")[0] == "abnc"){
+      db.del(data);
+    }
+
+  });
+
+  stream.on('close',function(){
+    console.log("all transaction records were removed")
+  });
 }
 
 //////////////////////////////////the conglamorate transation with storage nonce
@@ -1166,7 +1184,7 @@ var addAllBalanceRecord = async function(address,ticker,amount,confirmation,bloc
       var nextNonce = {address:thisAddy,ticker:thisTicker,amount:fundsin,blockHeight:thisBlocknum,prevBalance:currentTopEntry.balance,balance:parseFloat(parseFloat(currentTopEntry.balance)+parseFloat(fundsin)).toFixed(8)};
       allBalanceNonceStorage.push(nextNonce);
       //console.log(allBalanceNonceStorage+" and length is "+allBalanceNonceStorage.length)
-      if(allBalanceNonceStorage.length > 4){//limiting my storage to 4 records
+      if(allBalanceNonceStorage.length > 5){//limiting my storage to 4 records
         allBalanceNonceStorage.shift();
       }
       //console.log("after update nonce values are "+allBalanceNonceStorage)
@@ -2294,6 +2312,7 @@ module.exports = {
     getAll:getAll,
     refresh:refresh,
     closeDB:closeDB,
+    deleteTransactions:deleteTransactions,
     dumpDatCopy:dumpDatCopy,
     dumpToJsonFIle:dumpToJsonFIle,
     dumpToJsonFIleRange:dumpToJsonFIleRange,
