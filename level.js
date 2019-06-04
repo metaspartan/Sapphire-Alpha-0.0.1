@@ -1171,7 +1171,7 @@ var getTransactionReceiptsByAddress = function(address,cb){
   var txCollection = []
   var stream = db.createReadStream();
   stream.on('data',function(data){
-    if(data.key.toString().split(":")[1] == address.toLowerCase() || data.key.toString().split(":")[2] == address.toLowerCase()){
+    if(((data.key.toString().split(":")[1]) && (data.key.toString().split(":")[1]).toLowerCase() == address.toLowerCase()) || ((data.key.toString().split(":")[2]) && (data.key.toString().split(":")[2]).toLowerCase() == address.toLowerCase())){
       console.log(data.key.toString());
       var thisTx = txCollection.push({"fromAddress":JSON.parse(data.value)["fromAddress"],"toAddress":JSON.parse(data.value)["toAddress"],"ticker":JSON.parse(data.value)["ticker"],"amount":JSON.parse(data.value)["amount"],"hash":JSON.parse(data.value)["hash"]});
     }
