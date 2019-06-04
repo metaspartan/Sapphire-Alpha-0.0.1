@@ -7,10 +7,11 @@ var path = require('path');
 var getBalance;
 var getBlockByHash;
 var getBLock;
-var initialize = function(getBal,getHash,getBlk){
+var initialize = function(getBal,getHash,getBlk,getTxByHash){
   getBalance = getBal;
   getBlockByHash = getHash;
   getBlock = getBlk;
+  getTransactionByHash = getTxByHash;
 }
 
 app.use('/css', express.static('css'));
@@ -44,12 +45,22 @@ var startExplorer = function(chainState,cb){
       }
       getBalance(req.query.theValue,addyBal)
     }else if(req.query.theValue.length == 64 && RegExp("[0-9A-Fa-f]{64}").test(req.query.theValue)){
-      var blockReturn = function(blk){
-        res.render('block',{myBlockReturn:JSON.parse(blk)});
-      }
-      getBlockByHash(req.query.theValue).then(function(val){
-        getBlock(val,blockReturn)
+
+      getTransactionByHash(req.query.theValue,function(tx,bh){
+
+        if(tx != "notatx" && tx != undefined){
+          console.log("transaction found");
+          res.render('transaction',{transaction:JSON.parse(tx),blockhash:bh});
+        }else{
+          var blockReturn = function(blk){
+            res.render('block',{myBlockReturn:JSON.parse(blk)});
+          }
+          getBlockByHash(req.query.theValue).then(function(val){
+            getBlock(val,blockReturn)
+          })
+        }
       })
+
     }else if(req.query.theValue.length < 9 && RegExp("[0-9]").test(req.query.theValue)){
       var blockReturn = function(blk,error){
           res.render('block',{myBlockReturn:JSON.parse(blk)});

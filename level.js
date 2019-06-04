@@ -1143,6 +1143,28 @@ var getTransactions = function(){
 
 }
 
+var getTransactionByHash = function(hash,cb){
+
+    var stream = db.createReadStream();
+    var thistx = "";
+    stream.on('data',function(data){
+      if(data.key.toString().split(":")[0] == "tx" && data.key.toString().split(":")[5] == hash){
+        console.log('key = '+data.key+" value = "+data.value.toString());
+        thisblockhash = data.key.toString().split(":")[6];
+        thistx = data.value.toString();
+      }
+    })
+    stream.on('close',function(){
+      if(thistx != ""){
+        cb(thistx,thisblockhash)
+      }else{
+        cb("notatx","")
+      }
+
+    })
+
+}
+
 var getTransactionReceiptsByAddress = function(address){
 
   console.log("ALL Transaction Receipts for "+address);
@@ -2354,6 +2376,7 @@ module.exports = {
     addTransactions:addTransactions,
     addTransactionsFromStream:addTransactionsFromStream,
     getTransactions:getTransactions,
+    getTransactionByHash:getTransactionByHash,
     getTransactionReceiptsByAddress:getTransactionReceiptsByAddress,
     getBalanceAtAddress:getBalanceAtAddress,
     getBalanceAtAddressFromTrie:getBalanceAtAddressFromTrie,

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<script>
+  var callMe = function(myval){
+   window.location.href = '/address?theValue='+myval;
+  }
+</script>
+
+<link rel="stylesheet" type="text/css" href="/css/styles.css"/>
+
+<div><img style="cursor: pointer;" onClick="window.location.href='/';" width="300" src="/img/EGEM-Sapphire-h-logo-black.png" /></div>
+<div class="header">
+  <h1>Egem Sapphire Explorer</h1>
+  <span  class="header-title-span">Enter Address/Hash/Block Number</span>
+  <input class="main-input" type="text" id="address" />
+  <input type="button" value="submit" onClick="callMe(document.getElementById('address').value)" />
+</div>
+<div class="content">
+
+  <div><span class="title-span">blockhash</span><span><a href="/address?theValue={{blockhash}}">{{blockhash}}</a></span></div>
+  <div><span class="title-span">tx hash</span><span>{{transaction.hash}}</span></div>
+  <div><span class="title-span">fromAddress</span><span>{{transaction.fromAddress}}</span></div>
+  <div><span class="title-span">toAddress</span><span>{{transaction.toAddress}}</span></div>
+  <div><span class="title-span">ticker</span><span>{{transaction.ticker}}</span></div>
+  <div><span class="title-span">amount</span><span>{{transaction.amount}}</span></div>
+  <div><span class="title-span">timestamp</span><span>{{transaction.timestamp}}</span></div>
+
+
+</div>
+</html>
