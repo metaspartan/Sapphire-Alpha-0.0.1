@@ -25,16 +25,19 @@
   </div>
 
   <div>
+    <table class="tx-detail-table">
     {{#each txCollection}}
-    <div>
-      <span class="title-span">From:</span><span>{{fromAddress}}</span>
-      <span class="title-span">To:</span><span>{{toAddress}}</span>
-      <span class="title-span">Ticker:</span><span>{{ticker}}</span>
-      <span class="title-span">Amount:</span><span>{{amount}}</span>
-      <span class="title-span">Hash:</span><span><a href="/address?theValue={{hash}}">{{hash}}</a></span>
-    </div>
+
+        <tr>
+          <td><span class="title-span">From:</span></td><td><a href="/address?theValue={{fromAddress}}">{{fromAddress}}</a></td>
+          <td><span class="title-span">To:</span></td><td><a href="/address?theValue={{toAddress}}">{{toAddress}}</a></td>
+          <td><span class="title-span">Ticker:</span></td><td>{{ticker}}</td>
+          <td><span class="title-span">Amount:</span></td><td>{{amount}}</td>
+          <td><span class="title-span">Hash:</span></td><td><a href="/address?theValue={{hash}}">{{hash}}</a></td>
+        </tr>
+
     {{/each}}
-  </div>
+    </table>
 
 </div>
 </html>
