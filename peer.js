@@ -2458,9 +2458,19 @@ let connSeq2 = 0
 /////////////////////////////////////ending asynchronous peers connection engine
 
 //////////////////////////////////////////////////////////////messaging to peers
-var broadcastPeers = function(message){
+var allWaiting = []
+var setWaiting = function(id,cb){
+  console.log("all waiting length "+allWaiting.length)
+  var tempWaiter = {"peerId":id,"callBack":cb}
+  allWaiting.push(tempWaiter);
+}
+
+var broadcastPeers = function(message,waiting = null){
   for (let id in peers){
     if(peers[id] && peers[id].conn != undefined){
+      if(waiting != null){
+        setWaiting(id,function(reply){console.log("reply")})
+      }
       peers[id].conn.write(message)
     }
   }
@@ -3424,7 +3434,7 @@ var myCallbackSell = function(data) {
       postBlockTransactionHeight:chainState.transactionHeight,
       postBlockTransactionHash:chainState.transactionRootHash,
       block:frankieCoin.getLatestBlock()
-    }));
+    }),"new-block");
     //broadcastPeers(JSON.stringify({checkPointHash:lastCheckPointHash,currentBlockCheckPointHash:lastCurrentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}));
   }else if(trigger == "order"){
     //sending the block to the peers

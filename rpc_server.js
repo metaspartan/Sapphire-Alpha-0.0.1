@@ -100,9 +100,26 @@ var globalParentEvent = function(callback){
 var postRPCforMiner = function(data){
   //console.log("block data is rpc relayed thorugh rpc_server to methods for miner");
   //console.log("and the rpc relayed data "+JSON.stringify(data));
-  console.log(chalk.bgGreen.bold("RPC DATA IS ENABLED FOR MINER"));
-  methods.postRPCforMiner(data);
+    setTimeout(function(){
+      console.log(chalk.bgGreen.bold("RPC DATA IS ENABLED FOR MINER"));
+      methods.postRPCforMiner(data);
+      setTimeout(function(){
+        openPort();
+      },1000)
+    },2000);
+
 }
+
+/////////////////////////////simple function to test JSON input and avoid errors
+function isJSON(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+/////////////////////////end simple function to test JSON input and avoid errors
 
 let routes = {
     // this is the rpc endpoint
@@ -200,12 +217,19 @@ function requestListener(request, response) {
         process.stdout.clearLine();
         process.stdout.cursorTo(0);
         process.stdout.write(chalk.blue("Reference Check: "+ chalk.green(buf.toString())));
-        impcparent(buf.toString(),parentBroadcastPeersFunction,orderConfirmationEvent,txConfirmationEvent,setChainStateTX);
     });
 
     // on end proceed with compute
     request.on('end', () => {
         let body = buf !== null ? buf.toString() : null;
+
+        //first off moving this to here on end instead of on data
+        if(isJSON(body) && JSON.parse(body)["createBlock"]){
+          closePort();//going to close off the port for a second
+        }else if(isJSON(body) &&  JSON.parse(body)["getWorkForMiner"]){
+          //this signifies that this is a miner and we need to turn off explorer and other RPC for orders and such
+        }
+        impcparent(body,parentBroadcastPeersFunction,orderConfirmationEvent,txConfirmationEvent,setChainStateTX);
 
         if (routes[pathname]) {
             let compute = routes[pathname].call(null, body);
@@ -241,7 +265,16 @@ var closePort = function(){
 
 var openPort = function(){
   log(chalk.bgRed("RE OPENING server on port: "+chalk.green(": "+PORT)));
-  server.listen(PORT);
+  try{
+    server.listen(PORT);
+  }catch(e){
+    if(e.toString().includes("ERR_SERVER_ALREADY_LISTEN")){
+      console.log("port was already open");
+    }else{
+      console.log(e)
+      console.log("this error is in rpc_server.js");
+    }
+  }
 }
 
 //NOTE moved call to methods up into the return function from peers above
