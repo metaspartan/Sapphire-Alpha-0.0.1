@@ -1117,6 +1117,13 @@ let connSeq2 = 0
     conn.on('data', data => {
       // Here we handle incomming messages
 
+      if(isJSON(data.toString()) && JSON.parse(data)["thanks"]){
+
+        console.log("you got a thanks from "+peerId);
+        console.log(chalk.bgRed.white.bold("you got a thanks from "+peerId));
+        removeWaiting(peerId);
+
+      }
       //console.log("type of is "+typeof(data)+JSON.stringify(data));
       //log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
       // callback returning verified uncles post processing probably needs a rename
@@ -1367,10 +1374,6 @@ let connSeq2 = 0
                         log(chalk.yellow("                     SUCESSFUL BLOCK FROM PEER                      "));
                         log(chalk.red("--------------------------------------------------------------------"));
 
-                        var thanksReply = JSON.stringify({thanks:{message:"got block "+JSON.parse(data)["block"]["blockHeight"]}});
-                        console.log(chalk.bgCyan("THANKS "+thanksReply));
-                        peers[peerId].conn2.write(JSON.stringify(thanksReply));
-
                         var blockNum = JSON.parse(data)["block"]["blockHeight"];
                         //calculating this 2 times but needed at addBlock for transations to verify properly
                         var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
@@ -1390,6 +1393,9 @@ let connSeq2 = 0
                         }
                         //BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["block"]["transactions"]),JSON.parse(data)["block"]["hash"],parseInt(JSON.parse(data)["block"]["blockHeight"]),thisBlockCheckPointHash,thisTempFunctionWillBeSameAsTransactionValidateCallBack,chainState.transactionRootHash);
 
+                        var thanksReply = JSON.stringify({thanks:{message:"got block "+JSON.parse(data)["block"]["blockHeight"]}});
+                        console.log(chalk.bgCyan.black.bold("THANKS "+thanksReply));
+                        peers[peerId].conn.write(JSON.stringify(thanksReply));
 
                         //add it to the RPC for miner
                         rpcserver.postRPCforMiner({block:JSON.parse(data)["block"]});
@@ -1507,9 +1513,6 @@ let connSeq2 = 0
             BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
           });
           //clipChainAt(parseInt(chainState.syncronized - 10))
-        }else if(JSON.parse(data)["thanks"]){
-
-          console.log("you got a thanks from "+peerId);
 
         }else if(JSON.parse(data)["nodeStatePong"]){
 
@@ -2219,11 +2222,6 @@ let connSeq2 = 0
           //  peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           //},2000)
           //var deltaToRiser = parseInt(frankieCoin.chainRiser - )
-
-        }else if(JSON.parse(data)["thanks"]){
-
-          console.log(chalk.bgRed.white.bold("you got a thanks from "+peerId));
-          removeWaiting(peerId);
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
