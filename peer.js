@@ -1367,6 +1367,9 @@ let connSeq2 = 0
                         log(chalk.yellow("                     SUCESSFUL BLOCK FROM PEER                      "));
                         log(chalk.red("--------------------------------------------------------------------"));
 
+                        var thanksReply = JSON.stringify({thanks:JSON.parse(data),chainState:chainState})
+                        peers[peerId].conn2.write(JSON.stringify(thanksReply));
+
                         var blockNum = JSON.parse(data)["block"]["blockHeight"];
                         //calculating this 2 times but needed at addBlock for transations to verify properly
                         var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
@@ -1503,6 +1506,9 @@ let connSeq2 = 0
             BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
           });
           //clipChainAt(parseInt(chainState.syncronized - 10))
+        }else if(JSON.parse(data)["thanks"]){
+
+          console.log("you got a thanks from "+peerId);
 
         }else if(JSON.parse(data)["nodeStatePong"]){
 
@@ -2465,6 +2471,15 @@ var setWaiting = function(id,cb){
   allWaiting.push(tempWaiter);
 }
 
+var removeWaiting = function(id){
+  for(eachPeer in allWaiting){
+    if(allWaiting[eachPeer] == id){
+      console.log("reply from peer "+id)
+      removeWaiting.splice(id,1);
+    }
+  }
+}
+
 var broadcastPeers = function(message,waiting = null){
   for (let id in peers){
     if(peers[id] && peers[id].conn != undefined){
@@ -3233,7 +3248,20 @@ var cbChainGrab = async function(data) {
   BlkDB.addChainParams(globalGenesisHash+":blockHeight",parseInt(frankieCoin.blockHeight));
   BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
   //console.log("about to send this to rpc "+JSON.stringify({block:frankieCoin.getLatestBlock()}))
-  rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+
+  var postMiner = function(){
+    if(allWaiting.length > 0){
+
+      setTimeout(function(){
+        postMiner();
+      },500)
+
+    }else{
+      rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+    }
+  }
+  postMiner();
+
 
   //need to open back up synching
   isSynching = false;
