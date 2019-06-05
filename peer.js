@@ -2222,7 +2222,7 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["thanks"]){
 
-          console.log("you got a thanks from "+peerId);
+          console.log(chalk.bgRed.white.bold("you got a thanks from "+peerId));
           removeWaiting(peerId);
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
@@ -2477,8 +2477,9 @@ var setWaiting = function(id,cb){
 }
 
 var removeWaiting = function(id){
+  console.log("in the remove waiting call ..."+id)
   for(eachPeer in allWaiting){
-    if(allWaiting[eachPeer] == id){
+    if(allWaiting[eachPeer].peerId == id){
       console.log("reply from peer "+id)
       removeWaiting.splice(id,1);
     }
