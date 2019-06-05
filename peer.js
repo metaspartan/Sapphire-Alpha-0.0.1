@@ -1367,8 +1367,9 @@ let connSeq2 = 0
                         log(chalk.yellow("                     SUCESSFUL BLOCK FROM PEER                      "));
                         log(chalk.red("--------------------------------------------------------------------"));
 
-                        var thanksReply = JSON.stringify({thanks:{message:"got block "+JSON.parse(data)["block"]["blockHeight"]}})
-                        peers[peerId].conn.write(JSON.stringify(thanksReply));
+                        var thanksReply = JSON.stringify({thanks:{message:"got block "+JSON.parse(data)["block"]["blockHeight"]}});
+                        console.log(chalk.bgCyan("THANKS "+thanksReply));
+                        peers[peerId].conn2.write(JSON.stringify(thanksReply));
 
                         var blockNum = JSON.parse(data)["block"]["blockHeight"];
                         //calculating this 2 times but needed at addBlock for transations to verify properly
@@ -2219,6 +2220,10 @@ let connSeq2 = 0
           //},2000)
           //var deltaToRiser = parseInt(frankieCoin.chainRiser - )
 
+        }else if(JSON.parse(data)["thanks"]){
+
+          console.log("you got a thanks from "+peerId);
+          removeWaiting(peerId);
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
