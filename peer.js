@@ -1368,7 +1368,7 @@ let connSeq2 = 0
                         log(chalk.red("--------------------------------------------------------------------"));
 
                         var thanksReply = JSON.stringify({thanks:JSON.parse(data),chainState:chainState})
-                        peers[peerId].conn2.write(JSON.stringify(thanksReply));
+                        peers[peerId].conn.write(JSON.stringify(thanksReply));
 
                         var blockNum = JSON.parse(data)["block"]["blockHeight"];
                         //calculating this 2 times but needed at addBlock for transations to verify properly
