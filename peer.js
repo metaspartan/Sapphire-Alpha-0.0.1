@@ -1564,18 +1564,22 @@ let connSeq2 = 0
               JSON.parse(data)["nodeStatePing"]["transactionRootHash"]
             )
             if(chainState.previousTxHeight > 0 && parseInt(chainState.previousTxHeight+1) == chainState.transactionHeight){
-              peers[peerId].conn.write(JSON.stringify(
-                {"nodeStatePong":{
-                    Height:parseInt(chainState.synchronized),
-                    MaxHeight:parseInt(chainState.synchronized),
-                    GlobalHash:globalGenesisHash,
-                    checkPointHash:chainState.checkPointHash,
-                    currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
-                    transactionHeight:chainState.transactionHeight,
-                    transactionRootHash:chainState.transactionRootHash,
-                    prevTxHeight:chainState.previousTxHeight,
-                    previousTxHash:chainState.previousTxHash
-                  }}));
+              
+              if(peers[peerId].conn){
+                peers[peerId].conn.write(JSON.stringify(
+                  {"nodeStatePong":{
+                      Height:parseInt(chainState.synchronized),
+                      MaxHeight:parseInt(chainState.synchronized),
+                      GlobalHash:globalGenesisHash,
+                      checkPointHash:chainState.checkPointHash,
+                      currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+                      transactionHeight:chainState.transactionHeight,
+                      transactionRootHash:chainState.transactionRootHash,
+                      prevTxHeight:chainState.previousTxHeight,
+                      previousTxHash:chainState.previousTxHash
+                    }}));
+              }
+
             }else{
               chainState.previousTxHeight = JSON.parse(data)["nodeStatePing"]["prevTxHeight"];
               chainState.previousTxHash = JSON.parse(data)["nodeStatePing"]["previousTxHash"];
