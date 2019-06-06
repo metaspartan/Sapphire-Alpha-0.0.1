@@ -1120,7 +1120,9 @@ let connSeq2 = 0
 
       //console.log("type of is "+typeof(data)+JSON.stringify(data));
       //log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
-      // callback returning verified uncles post processing probably needs a rename
+
+
+      // callback returning verified uncles ALSO USED FOR THANKS post processing probably needs a rename
       var sendBackUncle = function(msg,peerId){
         peers[peerId].conn.write(JSON.stringify(msg));
       }
@@ -2482,7 +2484,7 @@ var removeWaiting = function(id){
   for(eachPeer in allWaiting){
     if(allWaiting[eachPeer].peerId == id){
       console.log("reply from peer "+id)
-      removeWaiting.splice(id,1);
+      allWaiting.splice(id,1);
     }
   }
 }
