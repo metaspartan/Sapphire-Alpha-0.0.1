@@ -1397,7 +1397,8 @@ let connSeq2 = 0
 
                         var thanksReply = {"thanks":{"conf":"got block "+JSON.parse(data)["block"]["blockHeight"]}};
                         console.log(chalk.bgCyan.black.bold("THANKS "+thanksReply));
-                        peers[peerId].conn.write(thanksReply);
+                        //peers[peerId].conn.write(thanksReply);
+                        sendBackUncle(thanksReply,peerId);
 
                         //add it to the RPC for miner
                         rpcserver.postRPCforMiner({block:JSON.parse(data)["block"]});
