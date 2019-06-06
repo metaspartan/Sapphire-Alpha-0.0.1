@@ -2489,6 +2489,19 @@ var removeWaiting = function(id){
   }
 }
 
+var cleanUpWaitingRemoveLag = function(){
+  console.log(chalk.bgRed("CLEARING LAGGED PEER"));
+  for(eachPeer in allWaiting){
+      peers.splice(allWaiting[eachPeer].id,1);
+      peers2.splice(allWaiting[eachPeer].id,1); 
+      connSeq--
+      connSeq2--
+      console.log("going to delete this peer "+id)
+      allWaiting.splice(id,1);
+
+  }
+}
+
 var broadcastPeers = function(message,waiting = null){
   for (let id in peers){
     if(peers[id] && peers[id].conn != undefined){
@@ -3258,13 +3271,19 @@ var cbChainGrab = async function(data) {
   BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
   //console.log("about to send this to rpc "+JSON.stringify({block:frankieCoin.getLatestBlock()}))
 
-
+  var numPeerCheck = 0;
   var postMiner = function(){
     console.log(chalk.bgRed("POSTING FOR RPC DOES IT CHECK CB CHAIN GRAB "+allWaiting.length))
     if(allWaiting.length > 0){
 
       setTimeout(function(){
-        postMiner();
+        if(numPeerCheck < 2){
+          postMiner();
+        }else{
+          cleanUpWaitingRemoveLag()
+          rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+        }
+        numPeerCheck+=1;
       },500)
 
     }else{
