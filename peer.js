@@ -1395,9 +1395,9 @@ let connSeq2 = 0
                         }
                         //BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["block"]["transactions"]),JSON.parse(data)["block"]["hash"],parseInt(JSON.parse(data)["block"]["blockHeight"]),thisBlockCheckPointHash,thisTempFunctionWillBeSameAsTransactionValidateCallBack,chainState.transactionRootHash);
 
-                        var thanksReply = JSON.stringify({thanks:{message:"got block "+JSON.parse(data)["block"]["blockHeight"]}});
+                        var thanksReply = {"thanks":{"conf":"got block "+JSON.parse(data)["block"]["blockHeight"]}};
                         console.log(chalk.bgCyan.black.bold("THANKS "+thanksReply));
-                        peers[peerId].conn.write(JSON.stringify(thanksReply));
+                        peers[peerId].conn.write(thanksReply);
 
                         //add it to the RPC for miner
                         rpcserver.postRPCforMiner({block:JSON.parse(data)["block"]});
