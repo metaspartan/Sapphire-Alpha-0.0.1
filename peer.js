@@ -3258,7 +3258,9 @@ var cbChainGrab = async function(data) {
   BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
   //console.log("about to send this to rpc "+JSON.stringify({block:frankieCoin.getLatestBlock()}))
 
+
   var postMiner = function(){
+    console.log(chalk.bgRed("POSTING FOR RPC DOES IT CHECK CB CHAIN GRAB "+allWaiting.length))
     if(allWaiting.length > 0){
 
       setTimeout(function(){
@@ -3765,7 +3767,21 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         ///////////////////////////////////////////////////////////peers broadcast
         fbroadcastPeersBlock('block');
         ////////////////////finally post the RPC get work block data for the miner
-        rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+        var postMiner = function(){
+          console.log(chalk.bgRed("POSTING FOR RPC DOES IT CHECK IMP CHILD "+allWaiting.length))
+          if(allWaiting.length > 0){
+
+            setTimeout(function(){
+              postMiner();
+            },500)
+
+          }else{
+            rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+          }
+        }
+        postMiner();
+
+        //rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
         ///////////////////////////////////////////////////chain state checkpoints
         //now that we are valid we are going to check 3 blocks back to see if it is a candidate for chain state
         console.log("MY MODULUS"+parseInt(frankieCoin.blockHeight - 3) % parseInt(frankieCoin.chainRiser))
