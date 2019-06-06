@@ -2493,7 +2493,7 @@ var cleanUpWaitingRemoveLag = function(){
   console.log(chalk.bgRed("CLEARING LAGGED PEER"));
   for(eachPeer in allWaiting){
       peers.splice(allWaiting[eachPeer].id,1);
-      peers2.splice(allWaiting[eachPeer].id,1); 
+      peers2.splice(allWaiting[eachPeer].id,1);
       connSeq--
       connSeq2--
       console.log("going to delete this peer "+id)
@@ -3786,12 +3786,19 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         ///////////////////////////////////////////////////////////peers broadcast
         fbroadcastPeersBlock('block');
         ////////////////////finally post the RPC get work block data for the miner
+        var numPeerCheck = 0;
         var postMiner = function(){
           console.log(chalk.bgRed("POSTING FOR RPC DOES IT CHECK IMP CHILD "+allWaiting.length))
           if(allWaiting.length > 0){
 
             setTimeout(function(){
-              postMiner();
+              if(numPeerCheck < 2){
+                postMiner();
+              }else{
+                cleanUpWaitingRemoveLag()
+                rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+              }
+              numPeerCheck+=1;
             },500)
 
           }else{
