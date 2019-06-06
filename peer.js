@@ -2495,7 +2495,7 @@ var cleanUpWaitingRemoveLag = function(){
       delete peers[allWaiting[eachPeer].id];
       connSeq--
       connSeq2--
-      console.log("going to delete this peer "+id)
+      console.log("going to delete this peer "+allWaiting[eachPeer].id)
       allWaiting.splice(id,1);
 
   }
