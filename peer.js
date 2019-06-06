@@ -2493,7 +2493,6 @@ var cleanUpWaitingRemoveLag = function(){
   console.log(chalk.bgRed("CLEARING LAGGED PEER"));
   for(eachPeer in allWaiting){
       delete peers[allWaiting[eachPeer].id];
-      delete peers2[allWaiting[eachPeer].id];
       connSeq--
       connSeq2--
       console.log("going to delete this peer "+id)
