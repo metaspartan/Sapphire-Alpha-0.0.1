@@ -1117,13 +1117,7 @@ let connSeq2 = 0
     conn.on('data', data => {
       // Here we handle incomming messages
 
-      if(isJSON(data.toString()) && JSON.parse(data)["thanks"]){
 
-        console.log("you got a thanks from "+peerId);
-        console.log(chalk.bgRed.white.bold("you got a thanks from "+peerId));
-        removeWaiting(peerId);
-
-      }
       //console.log("type of is "+typeof(data)+JSON.stringify(data));
       //log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
       // callback returning verified uncles post processing probably needs a rename
@@ -1133,6 +1127,14 @@ let connSeq2 = 0
 
 ////////////////////////////////////////////begin the if block for incoming data
       if(isJSON(data.toString())){
+
+        if(JSON.parse(data)["thanks"]){
+
+          console.log("you got a thanks from "+peerId);
+          console.log(chalk.bgRed.white.bold("you got a thanks from "+peerId));
+          removeWaiting(peerId);
+
+        }
 ////////////////////////////////////////////////////////////incoming transaction
         if(JSON.parse(data)["signature"]){//////////////////////////////////////
           console.log("TTTTTTTTTTTTTTTTTTTT    INCOMING TX or OX    TTTTTTTTTTTTTTTTTTTTTTTTTT");
