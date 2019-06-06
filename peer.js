@@ -3276,7 +3276,7 @@ var cbChainGrab = async function(data) {
     if(allWaiting.length > 0){
 
       setTimeout(function(){
-        if(numPeerCheck < 2){
+        if(numPeerCheck < 4){
           postMiner();
         }else{
           cleanUpWaitingRemoveLag()
@@ -3791,7 +3791,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           if(allWaiting.length > 0){
 
             setTimeout(function(){
-              if(numPeerCheck < 2){
+              if(numPeerCheck < 4){
                 postMiner();
               }else{
                 cleanUpWaitingRemoveLag()
