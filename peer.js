@@ -3162,7 +3162,17 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   console.log(chalk.bgCyan.black(" longest peer: ")+chalk.bgMagenta.white(longestPeer)+chalk.bgCyan.black(" max height: ")+chalk.bgMagenta.white(peerMaxHeight)+chalk.bgCyan.black(" peer length: ")+chalk.bgMagenta.white(peerLength))
   console.log(chalk.bgCyan.black(" chainwalk ht: ")+chalk.bgMagenta.white(chainState.chainWalkHeight)+chalk.bgCyan.black(" synchro ht: ")+chalk.bgMagenta.white(chainState.synchronized)+chalk.bgCyan.black(" chain lngth: ")+chalk.bgMagenta.white(frankieCoin.getLength()))
   console.log(chalk.bgCyan.black(" peerNonce ht: ")+chalk.bgMagenta.white(chainState.peerNonce)+chalk.bgCyan.black(" synching ht: ")+chalk.bgMagenta.white(chainState.isSynching)+chalk.bgCyan.black(" isSynch: ")+chalk.bgMagenta.white(isSynching))
-  console.log(chalk.bgCyan.black(" last ping stats: ")+chalk.bgMagenta.white(JSON.stringify(chainState.activeSynch)))
+  console.log(chalk.bgGreen.black(" last ping send: "));
+  for (nodesend in chainState.activeSynch.send){
+    console.log(chalk.bgCyan.black("blockHeight Called: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.send[nodesend].blockHeightCalled+" ")+chalk.bgCyan.black(" call synchronized: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.send[nodesend].callSynchronized+" "))
+  }
+  console.log(chalk.bgGreen.black(" last ping receive: "));
+  for (nodercv in chainState.activeSynch.receive){
+    if(chainState.activeSynch.receive[nodercv] != "undefined"){
+      console.log(chalk.bgCyan.black("peer Max Height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" "))
+      console.log(chalk.bgCyan.black("CS Hash: ")+chalk.bgMagenta.white(" blockNo: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" ckPtHash: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash+" "))
+    }
+  }
   //log("------------------------------------------------------")
   //log(longestPeer+" <<lp   mh>>"+peerMaxHeight+"<<mh    pl>> "+peerLength)
   frankieCoin.incrementPeerNonce(nodesInChain[node]["id"],peerLength);
