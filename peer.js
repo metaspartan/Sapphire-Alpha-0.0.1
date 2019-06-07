@@ -750,14 +750,17 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
         //can add more to teh call and switch params below to use these vars
         //console.log("random is "+random+" is is "+i+" peers.length "+Object.keys(peers).length)
+
+        console.log("THIS IS WHERE I AM PINGING TODAY 754")
+
         if(random == i && peers[id] && called == false){
         //if(random == i && peers[id]){
-          peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           called = true;
           localTempNode.random = "yes";
         }else if(called == false && peers[id]){
         //}else if(peers[id]){
-          peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           called = true;
           localTempNode.random = "no";
         }
@@ -1593,7 +1596,7 @@ let connSeq2 = 0
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
           //log(JSON.parse(data)["ChainSyncPing"]);
-          if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
+          if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash && (parseInt(JSON.parse(data)["ChainSyncPing"]["PeerNonce"]) == chainState.peerNonce)){
             log(chalk.green("Global hashes matched!"));
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
             BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
