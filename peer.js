@@ -113,6 +113,7 @@ chainStateMonitor.rpcCom = false;
 let i = 0;
 chainState = onChange(chainState, function (path, value, previousValue) {
 
+  /***
   if(path != undefined){
     if(chainStateMonitor.peerCom == true || chainStateMonitor.rpcCom == true){
       if(path != "activeSynch" && path != undefined && path != "activeSynch.receive" && !path.startsWith("transactionHashWeights")){
@@ -124,6 +125,7 @@ chainState = onChange(chainState, function (path, value, previousValue) {
       }
     }
   }
+  ***/
 
   if(path == "transactionRootHash"){
     updatePeerTxHashArray(chainState.transactionHeight,chainState.transactionRootHash);
