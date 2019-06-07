@@ -149,7 +149,7 @@ var addCheckPoint = function(key,hash,previousHash,timestamp,nonce){
 var getChainStateParam = function(state,cb){
   db.get("cs:"+state, function (err, value) {
     if(value){
-      console.log(chalk.bgMagenta("Chain State Param: "+state+" = "+value.toString()));
+      //console.log(chalk.bgMagenta("Chain State Param: "+state+" = "+value.toString()));
       cb(value.toString());
     }else{
       cb(0);
@@ -952,7 +952,7 @@ var addTransaction = async function(transactionKey,transaction,blockNum,blkChain
     db.put(transactionKey, transaction).then(async function(){
       await db.get(transactionKey).then(function(value){
         var txConfirmationHash = JSON.parse(value)["hash"];
-        console.log("add transaction txConfirmationHash "+txConfirmationHash)
+        //console.log("add transaction txConfirmationHash "+txConfirmationHash)
         resolve(confirmationHash);
       }).catch(console.log)
     }).catch(console.log);
@@ -1013,11 +1013,11 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
 
   var hexBlockNum = ("000000000000000" + blknum.toString(16)).substr(-16);
 
-  console.log(transactions+" <--"+typeof(transactions))
+  //console.log(transactions+" <--"+typeof(transactions))
 
   for(var key in transactions) {
     if(transactions.hasOwnProperty(key)){
-      console.log("this is where has own key "+JSON.stringify(transactions));
+      //console.log("this is where has own key "+JSON.stringify(transactions));
       if(transactions.length > 0){
         //do nothing
       }else{
@@ -1025,11 +1025,11 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
       }
     }else{
       transactions = JSON.parse(JSON.stringify(transactions));
-      console.log("this is where it is parsed "+transactions);
+      //console.log("this is where it is parsed "+transactions);
     }
   }
 
-  console.log(chalk.bgCyan.black("WOOOT ADDING TRANSACITONS ON VALIDATE WOOT "+transactions+ " blockhash " +blockhash+ " blknum " +blknum+" blkChainStateHash: "+blkChainStateHash))
+  //console.log(chalk.bgCyan.black("WOOOT ADDING TRANSACITONS ON VALIDATE WOOT "+transactions+ " blockhash " +blockhash+ " blknum " +blknum+" blkChainStateHash: "+blkChainStateHash))
 
   var txIndex = 0;
   var txConfirmation;
@@ -1090,12 +1090,12 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
   ////////////////////////////////////////////////////////////END NATIVE REWARDS
 
   ////////////////////////////////////////////////////////now block TXs in order
-  console.log("WHAT IS TRANSACTIONS LENGTH STREAM ???? "+transactions.length)
-  console.log()
+  //console.log("WHAT IS TRANSACTIONS LENGTH STREAM ???? "+transactions.length)
+  //console.log()
   if(transactions.length > 0){
     for(tranx in transactions){
 
-      console.log("in the transactions loop ")
+      //console.log("in the transactions loop ")
 
       var receipt = transactions[tranx];
 
@@ -1125,7 +1125,7 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
   if(blknum == 1){
     console.log(chalk.bgRed("THE FIRST BLOCK IS ADDED IN STREAM "+blknum+txConfirmation));
   }
-  console.log(chalk.bgRed("THE FIRST BLOCK IS ADDED IN STREAM "+blknum+txConfirmation));
+  //console.log(chalk.bgRed("THE FIRST BLOCK IS ADDED IN STREAM "+blknum+txConfirmation));
 
   cbUpdateChainStateTX(blknum,txConfirmation);
 
@@ -1214,7 +1214,7 @@ var addAllBalanceRecord = async function(address,ticker,amount,confirmation,bloc
       //console.log("after update nonce values are "+allBalanceNonceStorage)
       db.put("abnc:"+thisAddy.toLowerCase()+":"+ticker,JSON.stringify(allBalanceNonceStorage))
     }).catch(function(err){//did not exist and so we make it 0
-      console.log("well the error is this "+err)
+      //console.log("well the error is this "+err)
       allBalanceNonceStorage = [];
       var nextNonce = {address:thisAddy,ticker:thisTicker,amount:fundsin,blockHeight:thisBlocknum,prevBalance:0,balance:parseFloat(fundsin)};
       allBalanceNonceStorage.push(nextNonce);
@@ -1230,7 +1230,7 @@ var addAllBalanceRecord = async function(address,ticker,amount,confirmation,bloc
     db.get("abal:"+address.toLowerCase()+":"+ticker).then(async function(value){
       var localBalanceJSON = await value.toString();
       var localBalance = await parseFloat(JSON.parse(localBalanceJSON)["balance"]);
-      console.log("cool no error "+JSON.parse(localBalance)["balance"]+" and more things "+JSON.parse(localBalanceJSON)["hash"])
+      //console.log("cool no error "+JSON.parse(localBalance)["balance"]+" and more things "+JSON.parse(localBalanceJSON)["hash"])
       var currentBalance = parseFloat(amount)+localBalance;
       updatedBalanceJSON = JSON.stringify({"balance":currentBalance,"hash":confirmation,"blockHeight":blocknum,"index":index});
       db.put("abal:"+address.toLowerCase()+":"+ticker,updatedBalanceJSON).then(async function(){
@@ -1242,13 +1242,13 @@ var addAllBalanceRecord = async function(address,ticker,amount,confirmation,bloc
 
               setTxAddressNonce(amount,address.toLowerCase(),ticker,blocknum,value)
 
-            console.log("abal:"+address.toLowerCase()+":"+ticker+": " + value)
+            //console.log("abal:"+address.toLowerCase()+":"+ticker+": " + value)
             resolve(value)
           }
         })
       }).catch(resolve(console.log));
     }).catch(async function(error){
-      console.log("why is there an error ? "+address+ticker+amount+error);
+      //console.log("why is there an error ? "+address+ticker+amount+error);
       //currentBalance = 0;
       var currentBalance = parseFloat(amount);
       updatedBalanceJSON = JSON.stringify({"balance":currentBalance,"hash":confirmation,"blockHeight":blocknum,"index":index});
@@ -1258,7 +1258,7 @@ var addAllBalanceRecord = async function(address,ticker,amount,confirmation,bloc
             return console.log('Ooops!', err) // likely the key was not found
           }else{
             //check blockheight and make a last checkhash total?
-            console.log("abal:"+address.toLowerCase()+":"+ticker+": " + value)
+            //console.log("abal:"+address.toLowerCase()+":"+ticker+": " + value)
             resolve(value)
           }
         })

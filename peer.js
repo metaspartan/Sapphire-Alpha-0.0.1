@@ -80,6 +80,7 @@ var output = fs.readFile(filename, 'utf8', function(err, data) {
 ////////////////////////////////////////////////////////////////synching section
 var chainState = {};//need to store in the db as chain state and put event lop for changes
 chainState.isSynching = false;
+chainState.isMining = false;
 //chainState.version = "alpha.0.0.1"
 chainState.chainWalkHeight = 1;
 chainState.chainWalkHash = '7e3f3dafb632457f55ae3741ab9485ba0cb213317a1e866002514b1fafa9388f';//block 1 hash
@@ -777,15 +778,15 @@ var transactionValidator = async function(start,end){
 
     if(parseInt(csTransactionHeight.toString().split(":")[0]) <= end){
 
-      console.log("CALLED TXVLDY WITH "+start+" and "+end)
+      //console.log("CALLED TXVLDY WITH "+start+" and "+end)
       if(start <= end){
 
         var incrementor = parseInt(start);
-        console.log("TRANSACTION VALIDATION STARTING AT "+incrementor);
+        //console.log("TRANSACTION VALIDATION STARTING AT "+incrementor);
         var validateThisBlock = await function(){
           return new Promise((resolve)=> {
             var cbTxValidator = function(blockToValidate){
-              console.log(blockToValidate.toString())
+              //console.log(blockToValidate.toString())
               resolve(blockToValidate.toString());
             }
             BlkDB.getBlock(incrementor,cbTxValidator)
@@ -796,7 +797,7 @@ var transactionValidator = async function(start,end){
 
         var riserOffset = await (parseInt(incrementor) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
         var calcCheckPointBlock = parseInt(incrementor - riserOffset)
-        console.log("calculated check point block = "+calcCheckPointBlock);
+        //console.log("calculated check point block = "+calcCheckPointBlock);
 
         if(calcCheckPointBlock == 0){
           calcCheckPointBlock = 1;
@@ -807,14 +808,14 @@ var transactionValidator = async function(start,end){
         ////////end I think this is supposed to be here
 
         var returnCheckPointBlock = async function(checkPointBlock){
-          console.log("cpb "+checkPointBlock)
+          //console.log("cpb "+checkPointBlock)
           var blockNumHash = await JSON.parse(thisOneBlock)["hash"];
-          console.log("blockNumHash: "+blockNumHash);
+          //console.log("blockNumHash: "+blockNumHash);
 
           var thisBlockCheckPointHash = await sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
 
           var updateChainStateTX = async function(isValidTXHeight,transactionCheckPointHash){
-            console.log(chalk.bgGreen.black("updating chain state height to "+isValidTXHeight));
+            //console.log(chalk.bgGreen.black("updating chain state height to "+isValidTXHeight));
             var tempPrevTXHt = chainState.previousTxHeight;
             var tempPrevTXHash = chainState.previousTxHash;
             chainState.previousTxHeight = chainState.transactionHeight;
