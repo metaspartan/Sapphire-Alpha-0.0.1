@@ -3298,8 +3298,14 @@ var cbChainGrab = async function(data) {
         if(numPeerCheck < 4){
           postMiner();
         }else{
-          cleanUpWaitingRemoveLag()
-          rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+          if(allWaiting.length == 1){//only one peer left
+            rpcserver.openPort;
+            cleanUpWaitingRemoveLag();
+            rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+          }else{
+            cleanUpWaitingRemoveLag();
+            rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+          }
         }
         numPeerCheck+=1;
       },500)

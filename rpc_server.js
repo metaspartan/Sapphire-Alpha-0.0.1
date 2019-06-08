@@ -276,6 +276,9 @@ var closePort = function(){
 }
 
 var openPort = function(){
+  if(isMining == true){
+    isMining == false;
+  }
   log(chalk.bgRed("RE OPENING server on port: "+chalk.green(": "+PORT)));
   try{
     server.listen(PORT);
