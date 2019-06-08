@@ -10,6 +10,8 @@ const log = console.log;
 let server = http.createServer(requestListener);
 const PORT = process.env.NODE_PORT || 9090;
 
+var isMining = false;
+
 // we'll use a very very very simple routing mechanism
 // don't do something like this in production, ok technically you can...
 // probably could even be faster than using a routing library :-D
@@ -19,12 +21,14 @@ const PORT = process.env.NODE_PORT || 9090;
 var impcparent;
 var parentBroadcastPeersFunction;
 var setChainStateTX;
+var closeExplorer;
 //callback fuction used to set a caller to the parent called by parent on load
-var globalParentCom = function(callback,callback2,callback3){
+var globalParentCom = function(callback,callback2,callback3,callback4){
   //sets the impcparent with the function from parent
   impcparent = callback;
   parentBroadcastPeersFunction = callback2;
   setChainStateTX = callback3;
+  closeExplorer = callback4;
 }
 
 var impcParentMethods;
@@ -137,7 +141,13 @@ let routes = {
             }
 
             for (let key of keys) {
-                if (methods[key] && typeof (methods[key].exec) === 'function') {
+                if (methods[key] && typeof (methods[key].exec) === 'function' && isMining == false) {
+                    let execPromise = methods[key].exec.call(null, _json[key]);
+                    if (!(execPromise instanceof Promise)) {
+                        throw new Error(`exec on ${key} did not return a promise`);
+                    }
+                    promiseArr.push(execPromise);
+                } else if (key === 'getWorkForMiner'){
                     let execPromise = methods[key].exec.call(null, _json[key]);
                     if (!(execPromise instanceof Promise)) {
                         throw new Error(`exec on ${key} did not return a promise`);
@@ -227,6 +237,8 @@ function requestListener(request, response) {
         if(isJSON(body) && JSON.parse(body)["createBlock"]){
           closePort();//going to close off the port for a second
         }else if(isJSON(body) &&  JSON.parse(body)["getWorkForMiner"]){
+          closeExplorer();//closes the explorer port on 3003
+          isMining = true;//restricts the methods to only call getWork on this page
           //this signifies that this is a miner and we need to turn off explorer and other RPC for orders and such
         }
         impcparent(body,parentBroadcastPeersFunction,orderConfirmationEvent,txConfirmationEvent,setChainStateTX);

@@ -15,6 +15,8 @@ var initialize = function(getBal,getHash,getBlk,getTxByHash,getTxReceiptsByAddre
   getTransactionReceiptsByAddress = getTxReceiptsByAddress;
 }
 
+var server;
+
 app.use('/css', express.static('css'));
 app.use('/img', express.static('img'));
 //app.use('/css', express.static('/css'))
@@ -116,7 +118,7 @@ var startExplorer = function(chainState,cb){
 
   ***/
 
-  app.listen(port, (err) => {
+  server = app.listen(port, (err) => {
     if (err) {
       return console.log('something bad happened', err)
     }
@@ -132,8 +134,13 @@ var refreshExplorer = function(chainState){
 
 }
 
+var closeExplorer = function(){
+  server.close();
+}
+
 module.exports = {
   startExplorer:startExplorer,
   refreshExplorer:refreshExplorer,
-  initialize:initialize
+  initialize:initialize,
+  closeExplorer:closeExplorer
 }

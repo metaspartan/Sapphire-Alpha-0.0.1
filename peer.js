@@ -4066,8 +4066,13 @@ var impcevent = function(callback){
     //sets the impcparent with the function from parent
     impceventcaller = callback;
 }
+//this is a function to turn off excess communications to miners
+var thisNodeIsMininig = function(){
+  ExPl.closeExplorer;
+  chainState.isMining = true;
+}
 //initialize the child with the parent communcator call back function
-rpcserver.globalParentCom(impcchild,broadcastPeersBlock,setChainStateTX);
+rpcserver.globalParentCom(impcchild,broadcastPeersBlock,setChainStateTX,thisNodeIsMininig);
 rpcserver.globalParentEvent(impcevent);
 rpcserver.globalParentComMethods(impcMethods,impcBalance);
 //////////////////////////////////////end inter module parent child communicator
