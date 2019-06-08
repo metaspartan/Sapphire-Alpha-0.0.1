@@ -3300,6 +3300,7 @@ var cbChainGrab = async function(data) {
         }else{
           if(allWaiting.length == 1){//only one peer left
             rpcserver.openPort;
+            chainState.isMining = false;
             cleanUpWaitingRemoveLag();
             rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
           }else{
