@@ -147,7 +147,7 @@ let routes = {
                         throw new Error(`exec on ${key} did not return a promise`);
                     }
                     promiseArr.push(execPromise);
-                } else if (key === 'getWorkForMiner'){
+                } else if (key === 'getWorkForMiner' || key == 'createBlock'){
                     let execPromise = methods[key].exec.call(null, _json[key]);
                     if (!(execPromise instanceof Promise)) {
                         throw new Error(`exec on ${key} did not return a promise`);
