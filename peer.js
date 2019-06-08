@@ -1596,7 +1596,7 @@ let connSeq2 = 0
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
           //log(JSON.parse(data)["ChainSyncPing"]);
-          if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash && (parseInt(JSON.parse(data)["ChainSyncPing"]["PeerNonce"]) == chainState.peerNonce)){
+          if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash && (parseInt(JSON.parse(data)["ChainSyncPing"]["PeerNonce"]) == chainState.peerNonce) && chainState.isMining == false){
             log(chalk.green("Global hashes matched!"));
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
             BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
