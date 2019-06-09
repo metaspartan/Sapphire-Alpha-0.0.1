@@ -172,9 +172,15 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
     var arrayCSReceive = chainState.activeSynch.receive;
     for(item in arrayCSReceive){
       //console.log(arrayCSReceive[item].peer)
-      if(arrayCSReceive[item].peer == peer){
+      if(arrayCSReceive[item].peer == peer || arrayCSReceive[item].peer == false){
+        //console.log("arrayCSReceive[item].peer "+arrayCSReceive[item].peer+" peer "+peer)
+        //console.log("chainState.activeSynch.receive length in upd peer state "+chainState.activeSynch.receive.length);
         //console.log("wootas found it")
         chainState.activeSynch.receive.splice(item, 1);
+        //console.log("chainState.activeSynch.receive length in upd peer state "+chainState.activeSynch.receive.length);
+      }else{
+        //console.log("arrayCSReceive[item].peer "+arrayCSReceive[item].peer+" peer "+peer)
+        //console.log("chainState.activeSynch.receive length in upd peer state "+chainState.activeSynch.receive.length);
       }
     }
   }else{
@@ -182,7 +188,7 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
   }
 
   updatePeerTxHashArray(txHt,txHsh);
-
+  //console.log("just before push "+peer)
   var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh}
   chainState.activeSynch.receive.push(insertPeer)
 }
@@ -729,6 +735,24 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     console.log("NOT VALID NEED TO PING AT "+replyData+typeof(replyData)+" and chainstate issynching = "+chainState.isSynching);
 
     //set ping here
+    var peers2 = peers;//temp copy of peers
+    for (let id in peers2) {
+
+      for(peerNode in chainState.activeSynch.receive){
+        //console.log("chainState.activeSynch.receive length "+chainState.activeSynch.receive.length)
+        //console.log("cs as rcv peer: "+JSON.stringify(chainState.activeSynch.receive[peerNode]))
+        if(chainState.activeSynch.receive[peerNode].peer = id && chainState.activeSynch.receive[peerNode].peerMaxHeight < chainState.peerNonce){
+          //console.log("splice peers2 id :"+id+" nonce "+ chainState.activeSynch.receive[peerNode].peerMaxHeight);
+          //console.log("splice checking :"+chainState.activeSynch.receive[peerNode].peer+" nonce "+ chainState.peerNonce);
+          delete peers2[id];
+        }else{
+          //console.log("not splice peers2 id :"+id+" nonce "+ chainState.activeSynch.receive[peerNode].peerMaxHeight);
+          //console.log("not splice checking :"+chainState.activeSynch.receive[peerNode].peer+" nonce "+ chainState.peerNonce);
+        }
+      }
+
+    }
+
     //var random = 0;//will randomize later
     var randomizer = Object.keys(peers).length;
     var random = getRandomInt(randomizer);
@@ -738,6 +762,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     var oldChainStateActiveSync = chainState.activeSynch;
     var tempNodeCallBucket = [];
     for (let id in peers) {
+      console.log("peers length is "+Object.keys(peers).length)
       var localTempNode = {};
       localTempNode.nodeId = id;
       localTempNode.blockHeightCalled = parseInt(replyData+1);
@@ -977,6 +1002,7 @@ var chainClipper = async function(blockHeight){//clip back to last riser from th
 
   })
 }
+
 var chainClipperReduce = async function(blockHeight,hairCut){//clip back to last riser from this height
   return new Promise(async function(resolve, reject) {
 
@@ -1140,6 +1166,9 @@ let connSeq2 = 0
 
           console.log("you got a thanks from "+peerId);
           console.log(chalk.bgRed.white.bold("you got a thanks from "+peerId));
+          chainState.peerNonce = chainState.synchronized;
+          frankieCoin.incrementPeerMaxHeight(peerId,chainState.synchronized);
+          frankieCoin.incrementPeerNonce(peerId,chainState.synchronized);
           removeWaiting(peerId);
 
         }
@@ -3174,6 +3203,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   console.log(chalk.bgGreen.black(" last ping receive: "));
   for (nodercv in chainState.activeSynch.receive){
     if(chainState.activeSynch.receive[nodercv] != "undefined"){
+      console.log(chainState.activeSynch.receive[nodercv].peer)
       console.log(chalk.bgCyan.black("peer Max Height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" "))
       console.log(chalk.bgCyan.black("CS Hash: ")+chalk.bgMagenta.white(" blockNo: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" ckPtHash: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash+" "))
     }
@@ -4076,12 +4106,15 @@ var impcevent = function(callback){
     impceventcaller = callback;
 }
 //this is a function to turn off excess communications to miners
+var thisNodeCanMine = function(){
+  return chainState.peerNonce+":"+chainState.synchronized+":"+frankieCoin.nodes.length;
+}
 var thisNodeIsMininig = function(){
   ExPl.closeExplorer;
   chainState.isMining = true;
 }
 //initialize the child with the parent communcator call back function
-rpcserver.globalParentCom(impcchild,broadcastPeersBlock,setChainStateTX,thisNodeIsMininig);
+rpcserver.globalParentCom(impcchild,broadcastPeersBlock,setChainStateTX,thisNodeIsMininig,thisNodeCanMine);
 rpcserver.globalParentEvent(impcevent);
 rpcserver.globalParentComMethods(impcMethods,impcBalance);
 //////////////////////////////////////end inter module parent child communicator

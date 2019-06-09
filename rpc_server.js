@@ -22,13 +22,15 @@ var impcparent;
 var parentBroadcastPeersFunction;
 var setChainStateTX;
 var closeExplorer;
+var thisNodeCanMine;
 //callback fuction used to set a caller to the parent called by parent on load
-var globalParentCom = function(callback,callback2,callback3,callback4){
+var globalParentCom = function(callback,callback2,callback3,callback4,callfn1){
   //sets the impcparent with the function from parent
   impcparent = callback;
   parentBroadcastPeersFunction = callback2;
   setChainStateTX = callback3;
   closeExplorer = callback4;
+  thisNodeCanMine = callfn1;
 }
 
 var impcParentMethods;
@@ -237,8 +239,17 @@ function requestListener(request, response) {
         if(isJSON(body) && JSON.parse(body)["createBlock"]){
           closePort();//going to close off the port for a second
         }else if(isJSON(body) &&  JSON.parse(body)["getWorkForMiner"]){
-          closeExplorer();//closes the explorer port on 3003
-          isMining = true;//restricts the methods to only call getWork on this page
+          var canMine = thisNodeCanMine();
+          console.log("canMine = "+canMine);
+          if(canMine.split(":")[0] == canMine.split(":")[1] && canMine.split(":")[2] > 2){
+            closeExplorer();//closes the explorer port on 3003
+            isMining = true;//restricts the methods to only call getWork on this page
+          }else{
+            console.log("not sure what action to take yet ?");
+            closePort();
+            setTimeout(function(){openPort(),30000})
+            isMining = false;
+          }
           //this signifies that this is a miner and we need to turn off explorer and other RPC for orders and such
         }
         impcparent(body,parentBroadcastPeersFunction,orderConfirmationEvent,txConfirmationEvent,setChainStateTX);
