@@ -775,6 +775,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           }else if(called == false && peers[id] && (replyData+1) < chainState.peerNonce){
           //}else if(peers[id]){
             //console.log(peers2[id])
+            console.log("THIS IS WHERE I AM PINGING TODAY 778"+(replyData+1) < chainState.peerNonce)
             let tobj = frankieCoin.nodes.find(o => o.id === id);
             console.log(tobj.info.ip)
             console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
