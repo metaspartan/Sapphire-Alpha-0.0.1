@@ -787,6 +787,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         }else{
           console.log(chalk.bgCyan.black("id "+id));
           console.log(chalk.bgCyan.black("peers2[id].conn2 "+peers2[id].conn2));
+          console.log(JSON.stringify(peers));
         }
       }
       //tempNodeCallBucket.push = {"updated":"bottom 671"};
