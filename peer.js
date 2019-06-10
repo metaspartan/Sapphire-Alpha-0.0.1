@@ -2294,7 +2294,8 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
-          log(JSON.parse(data)["ChainSyncPing"]);
+          console.log(chalk.bgCyan.black(JSON.parse(data)["ChainSyncPing"]));
+
           if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
             log(chalk.green("Global hashes matched!"));
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
