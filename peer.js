@@ -761,14 +761,14 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     //can track the pinks to other nodes in one variable for stats
     var oldChainStateActiveSync = chainState.activeSynch;
     var tempNodeCallBucket = [];
-    for (let id in peers) {
-      console.log("peers length is "+Object.keys(peers).length)
+    for (let id in peers2) {
+      console.log("peers 2 length is "+Object.keys(peers2).length)
       var localTempNode = {};
       localTempNode.nodeId = id;
       localTempNode.blockHeightCalled = parseInt(replyData+1);
       localTempNode.callSynchronized = chainState.synchronized;
 
-      if(peers[id].conn2 != undefined){
+      if(peers2[id].conn2 != undefined){
         //log("------------------------------------------------------");
         //log(chalk.green("Sending ping for chain sync in cbBlockChainValidator bottom"));
         //log("------------------------------------------------------");
@@ -778,14 +778,14 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
         console.log("THIS IS WHERE I AM PINGING TODAY 754")
 
-        if(random == i && peers[id] && called == false){
+        if(random == i && peers2[id] && called == false){
         //if(random == i && peers[id]){
-          peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+          peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           called = true;
           localTempNode.random = "yes";
         }else if(called == false && peers[id]){
         //}else if(peers[id]){
-          peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+          peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           called = true;
           localTempNode.random = "no";
         }
