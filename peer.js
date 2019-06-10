@@ -734,7 +734,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       var peers2 = peers;//temp copy of peers
       for (let id in peers2) {
         for(peerNode in chainState.activeSynch.receive){
-          if(chainState.activeSynch.receive[peerNode].peer = id && chainState.activeSynch.receive[peerNode].peerMaxHeight < chainState.peerNonce){
+          if(chainState.activeSynch.receive[peerNode].peer == id && chainState.activeSynch.receive[peerNode].peerMaxHeight < chainState.peerNonce){
+            console.log("deleting "+id+" because "+)
             delete peers2[id];
           }else{
 
@@ -806,7 +807,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       for(peerNode in chainState.activeSynch.receive){
         //console.log("chainState.activeSynch.receive length "+chainState.activeSynch.receive.length)
         //console.log("cs as rcv peer: "+JSON.stringify(chainState.activeSynch.receive[peerNode]))
-        if(chainState.activeSynch.receive[peerNode].peer = id && chainState.activeSynch.receive[peerNode].peerMaxHeight < chainState.peerNonce){
+        if(chainState.activeSynch.receive[peerNode].peer == id && chainState.activeSynch.receive[peerNode].peerMaxHeight < chainState.peerNonce){
           //console.log("splice peers2 id :"+id+" nonce "+ chainState.activeSynch.receive[peerNode].peerMaxHeight);
           //console.log("splice checking :"+chainState.activeSynch.receive[peerNode].peer+" nonce "+ chainState.peerNonce);
           delete peers2[id];
