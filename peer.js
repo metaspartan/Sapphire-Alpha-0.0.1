@@ -781,7 +781,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         //can add more to teh call and switch params below to use these vars
         //console.log("random is "+random+" is is "+i+" peers.length "+Object.keys(peers).length)
 
-        console.log("THIS IS WHERE I AM PINGING TODAY 754")
+        console.log("THIS IS WHERE I AM PINGING TODAY 754"+(replyData+1) < chainState.peerNonce)
 
         if(random == i && peers2[id] && called == false && (replyData+1) < chainState.peerNonce){
         //if(random == i && peers[id]){
