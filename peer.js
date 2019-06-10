@@ -732,7 +732,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     console.log("CHAIN STATE HEIGHT IS "+replyData+typeof(replyData)+" and chainstate issynching = "+chainState.isSynching);
     for(id in peers){
       if(peers[id].conn2 != undefined){
-        peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+        peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:parseInt(chainState.peerNonce+1),GlobalHash:globalGenesisHash}}));
       }
     }
 
