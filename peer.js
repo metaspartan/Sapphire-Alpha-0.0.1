@@ -2492,10 +2492,12 @@ let connSeq2 = 0
               peers[peerId].conn2.write("---------------------------------");
             }else{
               console.log("CONN2 NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
-              //setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
+              setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
+              /***
               chainClipper(frankieCoin.blockHeight).then(function(){
                 BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2027);
               });
+              ***/
             }
 
           }else{
