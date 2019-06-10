@@ -1680,7 +1680,7 @@ let connSeq2 = 0
             )
             if(chainState.previousTxHeight > 0 && parseInt(chainState.previousTxHeight+1) == chainState.transactionHeight){
 
-              if(peers[peerId]){
+              if(peers[peerId] && peers[peerId].conn != undefined){
                 peers[peerId].conn.write(JSON.stringify(
                   {"nodeStatePong":{
                       Height:parseInt(chainState.synchronized),
