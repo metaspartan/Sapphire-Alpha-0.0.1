@@ -210,7 +210,7 @@ var activeSync = function(timer){
     },timer)
   }else if(parseInt(chainState.peerNonce) > parseInt(chainState.chainWalkHeight)){
     setTimeout(function(){
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,128);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight-20),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+2),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,128);
     },timer)
   }else{
     setTimeout(function(){
