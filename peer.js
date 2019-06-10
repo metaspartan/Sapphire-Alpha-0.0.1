@@ -166,7 +166,7 @@ updatePeerTxHashArray = function(txHt,txHsh){
   }
 }
 
-updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
+updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce){
   //console.log("node state updater "+peer+" "+maxHeight+" "+chainCPH+" "+txHt+" "+txHsh)
   if(chainState.activeSynch.receive != undefined){
     var arrayCSReceive = chainState.activeSynch.receive;
@@ -189,7 +189,7 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh){
 
   updatePeerTxHashArray(txHt,txHsh);
   //console.log("just before push "+peer)
-  var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh}
+  var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"longPeerNonce":longPeerNonce}
   chainState.activeSynch.receive.push(insertPeer)
 }
 
@@ -210,7 +210,7 @@ var activeSync = function(timer){
     },timer)
   }else if(parseInt(chainState.peerNonce) > parseInt(chainState.chainWalkHeight)){
     setTimeout(function(){
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight-20),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+2),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,128);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight-20),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+2),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
     },timer)
   }else{
     setTimeout(function(){
@@ -291,6 +291,7 @@ var activePing = function(timer){
           {"nodeStatePing":{
             Height:parseInt(chainState.synchronized),
             MaxHeight:parseInt(chainState.synchronized),
+            PeerNonce:parseInt(chainState.peerNonce),
             GlobalHash:globalGenesisHash,
             checkPointHash:chainState.checkPointHash,
             currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
@@ -784,11 +785,20 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
         if(random == i && peers2[id] && called == false){
         //if(random == i && peers[id]){
+          //console.log(peers2[id])
+          //console.log(peers2[id])
+          let tobj = frankieCoin.nodes.find(o => o.id === id);
+          console.log(tobj.info.ip)
+          console.log("well, we are calling top chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized))
           peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           called = true;
           localTempNode.random = "yes";
         }else if(called == false && peers[id]){
         //}else if(peers[id]){
+          //console.log(peers2[id])
+          let tobj = frankieCoin.nodes.find(o => o.id === id);
+          console.log(tobj.info.ip)
+          console.log("well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized))
           peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           called = true;
           localTempNode.random = "no";
@@ -1581,6 +1591,7 @@ let connSeq2 = 0
               JSON.parse(data)["nodeStatePong"]["currentBlockCheckPointHash"],
               JSON.parse(data)["nodeStatePong"]["transactionHeight"],
               JSON.parse(data)["nodeStatePong"]["transactionRootHash"],
+              JSON.parse(data)["nodeStatePong"]["PeerNonce"],
             )
           }
 
@@ -1597,12 +1608,14 @@ let connSeq2 = 0
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
             frankieCoin.incrementPeerNonce(peerId,JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
             BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
+            BlkDB.addNode("node:"+peerId+":peerBlockHeight",JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
             updatePeerState(
               peerId,
               JSON.parse(data)["nodeStatePing"]["MaxHeight"],
               JSON.parse(data)["nodeStatePing"]["currentBlockCheckPointHash"],
               JSON.parse(data)["nodeStatePing"]["transactionHeight"],
-              JSON.parse(data)["nodeStatePing"]["transactionRootHash"]
+              JSON.parse(data)["nodeStatePing"]["transactionRootHash"],
+              JSON.parse(data)["nodeStatePing"]["PeerNonce"],
             )
             if(chainState.previousTxHeight > 0 && parseInt(chainState.previousTxHeight+1) == chainState.transactionHeight){
 
@@ -1611,6 +1624,7 @@ let connSeq2 = 0
                   {"nodeStatePong":{
                       Height:parseInt(chainState.synchronized),
                       MaxHeight:parseInt(chainState.synchronized),
+                      PeerNonce:parseInt(chainState.peerNonce),
                       GlobalHash:globalGenesisHash,
                       checkPointHash:chainState.checkPointHash,
                       currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
@@ -2970,7 +2984,7 @@ function cliGetInput(){
       log(JSON.stringify(frankieCoin.retrieveNodes()));
       console.log("-------------------------------------------------")
       console.log("and finally the peers data ")
-      console.log(JSON.strigify(peers))
+      console.log(JSON.stringify(peers))
       console.log("-------------------------------------------------")
       cliGetInput();
     }else if(userInput == "reindex"){
@@ -3208,6 +3222,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   for (nodercv in chainState.activeSynch.receive){
     if(chainState.activeSynch.receive[nodercv] != "undefined"){
       console.log(chainState.activeSynch.receive[nodercv].peer)
+      console.log(chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce))
       console.log(chalk.bgCyan.black("peer Max Height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" "))
       console.log(chalk.bgCyan.black("CS Hash: ")+chalk.bgMagenta.white(" blockNo: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" ckPtHash: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash+" "))
     }
