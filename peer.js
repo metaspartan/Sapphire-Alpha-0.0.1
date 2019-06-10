@@ -727,10 +727,13 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     }
 
     //set the chain state validated height;
-  }else if(isValid == false && replyData == chainState.transactionHeight && chainState.peerNonce == chainState.transactionHeight){
+  }else if(isValid == false && replyData == chainState.transactionHeight){
 
     console.log("CHAIN STATE HEIGHT IS "+replyData+typeof(replyData)+" and chainstate issynching = "+chainState.isSynching);
-
+    for(id in peers){
+      peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+    }
+    
   }else{
 
     if(replyData == "NaN"){
