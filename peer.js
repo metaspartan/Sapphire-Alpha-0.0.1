@@ -2492,7 +2492,7 @@ let connSeq2 = 0
               peers[peerId].conn2.write("---------------------------------");
             }else{
               console.log("CONN2 NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
-              setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
+              setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));},300);
               /***
               chainClipper(frankieCoin.blockHeight).then(function(){
                 BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2027);
@@ -2978,7 +2978,7 @@ function cliGetInput(){
         log(chalk.green("Sending ping for chain sync."));
         log("------------------------------------------------------");
         //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
-        peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+        peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
       }
       cliGetInput();
     }else if(userInput == "N"){//N is for Node info
@@ -3007,7 +3007,7 @@ function cliGetInput(){
           log("------------------------------------------------------");
           log(chalk.green("Sending ping for chain sync."));
           log("------------------------------------------------------");
-          peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+          peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
         }
       }
       setTimeout(function(peers){reindexChain(peers);},200)
