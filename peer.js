@@ -197,7 +197,7 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce){
 var activeSync = function(timer){
   console.log(chalk.bgRed("AS TIMER "+timer))
   console.log(chalk.bgRed("------------------------------------------------------------------"));
-  console.log(chalk.bgCyan.black(" chainwalkht: ")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight+1))+chalk.bgCyan.black(" chainStateSynchronized: ")+chalk.bgMagenta(chainState.synchronized)+chalk.bgCyan.black(" blockchainht: ")+chalk.bgMagenta(frankieCoin.blockHeight));
+  console.log(chalk.bgCyan.black(" chainwalkht: ")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight))+chalk.bgCyan.black(" chainStateSynchronized: ")+chalk.bgMagenta(chainState.synchronized)+chalk.bgCyan.black(" blockchainht: ")+chalk.bgMagenta(frankieCoin.blockHeight));
   console.log(chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(parseInt(chainState.peerNonce))+chalk.bgCyan.black(" transactionheight: ")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgCyan.black(" topblockheight: ")+chalk.bgMagenta(chainState.topBlock));
   console.log(chalk.bgCyan.black(" fcnlongpeer: ")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(chainState.peerNonce)+chalk.bgCyan.black(" peerCount: ")+chalk.bgMagenta(frankieCoin.nodes.length));
   console.log(chalk.bgCyan.black(" transactionHash: ")+chalk.bgMagenta(chainState.transactionRootHash));
@@ -1644,7 +1644,7 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
-          //log(JSON.parse(data)["ChainSyncPing"]);
+          console.log(chalk.bgCyan.black(JSON.stringify(JSON.parse(data)["ChainSyncPing"])));
           if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash && (parseInt(JSON.parse(data)["ChainSyncPing"]["PeerNonce"]) == chainState.peerNonce) && chainState.isMining == false){
             log(chalk.green("Global hashes matched!"));
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
