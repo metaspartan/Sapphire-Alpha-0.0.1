@@ -783,22 +783,22 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
         console.log("THIS IS WHERE I AM PINGING TODAY 754")
 
-        if(random == i && peers2[id] && called == false){
+        if(random == i && peers2[id] && called == false && (replyData+1) < chainState.peerNonce){
         //if(random == i && peers[id]){
           //console.log(peers2[id])
           //console.log(peers2[id])
           let tobj = frankieCoin.nodes.find(o => o.id === id);
           console.log(tobj.info.ip)
-          console.log("well, we are calling top chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized))
+          console.log(chalk.bgCyan.black("well, we are calling top chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
           peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           called = true;
           localTempNode.random = "yes";
-        }else if(called == false && peers[id]){
+        }else if(called == false && peers[id] && (replyData+1) < chainState.peerNonce){
         //}else if(peers[id]){
           //console.log(peers2[id])
           let tobj = frankieCoin.nodes.find(o => o.id === id);
           console.log(tobj.info.ip)
-          console.log("well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized))
+          console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
           peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           called = true;
           localTempNode.random = "no";
