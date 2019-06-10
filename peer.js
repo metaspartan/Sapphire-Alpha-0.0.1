@@ -735,7 +735,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       for (let id in peers2) {
         for(peerNode in chainState.activeSynch.receive){
           if(chainState.activeSynch.receive[peerNode].peer == id && chainState.activeSynch.receive[peerNode].peerMaxHeight < chainState.peerNonce){
-            console.log("deleting "+id+" because "+)
+            console.log("deleting "+id+" because "+chainState.activeSynch.receive[peerNode].peer)
             delete peers2[id];
           }else{
 
