@@ -2294,7 +2294,7 @@ let connSeq2 = 0
 
         }else if(JSON.parse(data)["ChainSyncPing"]){
 
-          console.log(chalk.bgCyan.black(JSON.parse(data)["ChainSyncPing"]));
+          console.log(chalk.bgCyan.black(JSON.stringify(JSON.parse(data)["ChainSyncPing"])));
 
           if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
             log(chalk.green("Global hashes matched!"));
@@ -2307,6 +2307,7 @@ let connSeq2 = 0
               peerBlockHeight++;
               //returning the block
               console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" <<<<the difference");
+              console.log("why this "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" or this "+(frankieCoin.getLength() > parseInt(peerBlockHeight))+" get length "+frankieCoin.getLength()+" peer block height "+parseInt(peerBlockHeight))
               if((frankieCoin.getLength() > parseInt(peerBlockHeight)) && (chainState.synchronized > parseInt(peerBlockHeight)) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
                 console.log("this is properly flagged for streaming");
                 /***
@@ -2367,7 +2368,7 @@ let connSeq2 = 0
 
 
                 //pongBack = true;//not sure about this since this is a stream
-              }else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
+              }else if(frankieCoin.getLength() >= parseInt(peerBlockHeight)){
                 //okay this is a legitimate pong
                 if(chainState.synchronized > peerBlockHeight){
                   var pongBackBlock = function(blockData){
