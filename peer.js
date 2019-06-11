@@ -784,7 +784,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             localTempNode.random = "no";
           }else{
             console.log("I DONT KNOW WHAT ELSE BUT PING ANYWAY");
-            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           }
           tempNodeCallBucket.push(localTempNode)
           i++;
