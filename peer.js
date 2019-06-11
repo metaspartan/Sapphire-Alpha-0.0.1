@@ -101,6 +101,7 @@ chainState.transactionHashWeights = [];
 //activesynch
 chainState.interval = 10000;
 chainState.activeSynch = [];
+
 //need a snall array holding nodes with wieght score
 
 //need to post this to egem chain using what I coded up in postEgem.js and call it as a node sort
@@ -110,6 +111,7 @@ chainState.activeSynch = [];
 var chainStateMonitor = {};
 chainStateMonitor.peerCom = false;
 chainStateMonitor.rpcCom = false;
+chainStateMonitor.deletedPeers = [];
 
 let i = 0;
 chainState = onChange(chainState, function (path, value, previousValue) {
@@ -736,7 +738,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         for(peerNode in chainState.activeSynch.receive){
           if(chainState.activeSynch.receive[peerNode].peer == id && chainState.activeSynch.receive[peerNode].peerMaxHeight < chainState.peerNonce){
             console.log("deleting "+id+" because "+chainState.activeSynch.receive[peerNode].peer)
-            delete peers2[id];
+            chainStateMonitor.deletedPeers.push(id)
+            //delete peers2[id];
           }else{
 
           }
@@ -1724,7 +1727,7 @@ let connSeq2 = 0
               //increment it by one to return the next block
               peerBlockHeight++;
               //returning the block
-              console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" <<<<the difference");
+              console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" <<<<the difference conn 1");
               if((frankieCoin.getLength() > parseInt(peerBlockHeight)) && (chainState.synchronized > parseInt(peerBlockHeight)) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
                 console.log("this is properly flagged for streaming");
                 /***
@@ -2217,10 +2220,12 @@ let connSeq2 = 0
               peers[peerId].conn.write("---------------------------------");
             }else{
               console.log("CONN1 NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
-              //setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
+              setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),PeerNonce:parseInt(chainState.peerNonce),GlobalHash:globalGenesisHash}}));},300);
+              /***
               chainClipper(frankieCoin.blockHeight).then(function(){
                 BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1687);
               });
+              ***/
             }
 
           }else{
@@ -2369,7 +2374,7 @@ let connSeq2 = 0
               //increment it by one to return the next block
               peerBlockHeight++;
               //returning the block
-              console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" <<<<the difference");
+              console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" <<<< the difference conn2 ");
               if((frankieCoin.getLength() > parseInt(peerBlockHeight)) && (chainState.synchronized > parseInt(peerBlockHeight)) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
                 console.log("this is properly flagged for streaming");
                 /***
@@ -2633,7 +2638,7 @@ var cleanUpWaitingRemoveLag = function(){
 
 var broadcastPeers = function(message,waiting = null){
   for (let id in peers){
-    if(peers[id] && peers[id].conn != undefined){
+    if(peers[id] && peers[id].conn != undefined && chainStateMonitor.deletedPeers.indexOf(id) < 0){
       if(waiting != null){
         setWaiting(id,function(reply){console.log("reply")})
       }
