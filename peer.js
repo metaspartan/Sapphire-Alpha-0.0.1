@@ -2408,12 +2408,15 @@ let connSeq2 = 0
                 }
                 //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream)
                 //var numRecordsToStream = parseInt(frankieCoin.synchronized);
-                BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
-                  peers[peerId].conn2.write(jsonStream);
-                  console.log("wrote this "+jsonStream);
-                  peers[peerId].conn2.end();
-                  console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
-                })
+                if(peers[peerId].conn2 != undefined){
+                  BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
+                    peers[peerId].conn2.write(jsonStream);
+                    console.log("wrote this "+jsonStream);
+                    peers[peerId].conn2.end();
+                    console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
+                  })
+                }
+
 
                 /****
                 setTimeout(function(){

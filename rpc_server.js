@@ -149,7 +149,8 @@ let routes = {
                         throw new Error(`exec on ${key} did not return a promise`);
                     }
                     promiseArr.push(execPromise);
-                } else if (key === 'getWorkForMiner' || key == 'createBlock'){
+                } else if (key === 'getWorkForMiner' || key === 'createBlock' && isMining == true){
+                    console.log("ONLY MINING IS ACCEPTED ON PORT")
                     let execPromise = methods[key].exec.call(null, _json[key]);
                     if (!(execPromise instanceof Promise)) {
                         throw new Error(`exec on ${key} did not return a promise`);
@@ -236,7 +237,10 @@ function requestListener(request, response) {
         let body = buf !== null ? buf.toString() : null;
 
         //first off moving this to here on end instead of on data
-        if(isJSON(body) && JSON.parse(body)["createBlock"]){
+        if(isJSON(body) && JSON.parse(body) != null){
+          response.statusCode = 404;
+          response.end("oops!! not sending properly formatted JSON")
+        }else if(isJSON(body) && JSON.parse(body)["createBlock"]){
           closePort();//going to close off the port for a second
         }else if(isJSON(body) &&  JSON.parse(body)["getWorkForMiner"]){
           var canMine = thisNodeCanMine();
