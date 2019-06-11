@@ -3427,12 +3427,16 @@ var cbChainGrab = async function(data) {
           postMiner();
         }else{
           if(allWaiting.length == 1){//only one peer left
-            rpcserver.openPort;
+            //rpcserver.openPort(1);
             chainState.isMining = false;
             cleanUpWaitingRemoveLag();
-            rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+            setTimeout(function(){
+              rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+            },30000)
           }else{
-            rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+            setTimeout(function(){
+              rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+            },30000)
           }
         }
         numPeerCheck+=1;
@@ -3951,10 +3955,12 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                 rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
               }
               numPeerCheck+=1;
-            },500)
+            },30000)
 
           }else{
-            rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+            setTimeout(function(){
+              rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+            },30000)
           }
         }
         postMiner();

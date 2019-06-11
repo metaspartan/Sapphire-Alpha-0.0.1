@@ -291,19 +291,35 @@ var closePort = function(){
   server.close();
 }
 
-var openPort = function(){
+var openPort = function(stallTime = 0){
   if(isMining == true){
     isMining == false;
   }
-  log(chalk.bgRed("RE OPENING server on port: "+chalk.green(": "+PORT)));
-  try{
-    server.listen(PORT);
-  }catch(e){
-    if(e.toString().includes("ERR_SERVER_ALREADY_LISTEN")){
-      console.log("port was already open");
-    }else{
-      console.log(e)
-      console.log("this error is in rpc_server.js");
+  if(stallTime > 0){
+    setTimeout(function(){
+      log(chalk.bgRed("RE OPENING server on port: "+chalk.green(": "+PORT)));
+      try{
+        server.listen(PORT);
+      }catch(e){
+        if(e.toString().includes("ERR_SERVER_ALREADY_LISTEN")){
+          console.log("port was already open");
+        }else{
+          console.log(e)
+          console.log("this error is in rpc_server.js");
+        }
+      }
+    },120000)
+  }else{
+    log(chalk.bgRed("RE OPENING server on port: "+chalk.green(": "+PORT)));
+    try{
+      server.listen(PORT);
+    }catch(e){
+      if(e.toString().includes("ERR_SERVER_ALREADY_LISTEN")){
+        console.log("port was already open");
+      }else{
+        console.log(e)
+        console.log("this error is in rpc_server.js");
+      }
     }
   }
 }
