@@ -216,7 +216,7 @@ var activeSync = function(timer){
     },timer)
   }else{
     setTimeout(function(){
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
     },timer)
   }
 
@@ -729,7 +729,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     }
 
     //set the chain state validated height;
-  }else if(isValid == false && replyData == chainState.transactionHeight){
+  }else if(isValid == false && replyData == chainState.transactionHeight && chainState.transactionHeight == chainState.peerNonce){
 
     if(chainState.peerNonce > chainState.synchronized){
       console.log("PINGING IN THE NEW STATE AREA");
@@ -862,7 +862,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           let tobj = frankieCoin.nodes.find(o => o.id === id);
           console.log(tobj.info.ip)
           console.log(chalk.bgCyan.black("well, we are calling top chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
-          peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+          peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           called = true;
           localTempNode.random = "yes";
         }else if(called == false && peers[id] && (replyData+1) < chainState.peerNonce){
@@ -871,7 +871,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           let tobj = frankieCoin.nodes.find(o => o.id === id);
           console.log(tobj.info.ip)
           console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
-          peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+          peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           called = true;
           localTempNode.random = "no";
         }
