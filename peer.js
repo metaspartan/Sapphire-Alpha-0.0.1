@@ -2408,7 +2408,7 @@ let connSeq2 = 0
                 }
                 //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream)
                 //var numRecordsToStream = parseInt(frankieCoin.synchronized);
-                if(peers[peerId].conn2 != undefined){
+                if(peers[peerId]){
                   BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
                     peers[peerId].conn2.write(jsonStream);
                     console.log("wrote this "+jsonStream);
@@ -3427,7 +3427,6 @@ var cbChainGrab = async function(data) {
             cleanUpWaitingRemoveLag();
             rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
           }else{
-            cleanUpWaitingRemoveLag();
             rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
           }
         }
