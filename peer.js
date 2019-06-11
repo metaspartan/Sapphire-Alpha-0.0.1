@@ -819,7 +819,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         //console.log("chainState.activeSynch.receive length "+chainState.activeSynch.receive.length)
         //console.log("cs as rcv peer: "+JSON.stringify(chainState.activeSynch.receive[peerNode]))
         if(chainState.activeSynch.receive[peerNode].peer == id && chainState.activeSynch.receive[peerNode].peerMaxHeight < chainState.peerNonce){
-          //console.log("splice peers2 id :"+id+" nonce "+ chainState.activeSynch.receive[peerNode].peerMaxHeight);
+          console.log("splice peers2 id :"+id+" nonce "+ chainState.activeSynch.receive[peerNode].peerMaxHeight);
           //console.log("splice checking :"+chainState.activeSynch.receive[peerNode].peer+" nonce "+ chainState.peerNonce);
           delete peers2[id];
         }else{
@@ -853,9 +853,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         //can add more to teh call and switch params below to use these vars
         //console.log("random is "+random+" is is "+i+" peers.length "+Object.keys(peers).length)
 
-        console.log("THIS IS WHERE I AM PINGING TODAY 754"+(replyData+1) < chainState.peerNonce)
+        console.log("THIS IS WHERE I AM PINGING TODAY 754"+(replyData) < chainState.peerNonce)
 
-        if(random == i && peers2[id] && called == false && (replyData+1) < chainState.peerNonce){
+        if(random == i && peers2[id] && called == false && (replyData) < chainState.peerNonce){
         //if(random == i && peers[id]){
           //console.log(peers2[id])
           //console.log(peers2[id])
