@@ -1258,6 +1258,8 @@ let connSeq2 = 0
           frankieCoin.incrementPeerMaxHeight(peerId,chainState.synchronized);
           frankieCoin.incrementPeerNonce(peerId,chainState.synchronized);
           removeWaiting(peerId);
+          updatePeerTxHashArray(JSON.parse(data)["thanks"]["transactionHeight"],JSON.parse(data)["thanks"]["transactionRootHash"]);
+          activePing(20);
 
         }
 ////////////////////////////////////////////////////////////incoming transaction
