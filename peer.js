@@ -1250,8 +1250,9 @@ let connSeq2 = 0
 
         if(JSON.parse(data)["thanks"]){
 
-          console.log("you got a thanks from "+peerId);
-          console.log(chalk.bgRed.white.bold("you got a thanks from "+peerId));
+          //console.log("you got a thanks from "+peerId);
+          let tobj = frankieCoin.nodes.find(o => o.id === peerId);
+          console.log(chalk.bgRed.white.bold("you got a thanks from "+tobj.info.ip));
           console.log(chalk.bgCyan.black(JSON.stringify(JSON.parse(data)["thanks"])));
           chainState.peerNonce = chainState.synchronized;
           frankieCoin.incrementPeerMaxHeight(peerId,chainState.synchronized);
@@ -1522,7 +1523,9 @@ let connSeq2 = 0
                         var thanksReply = {"thanks":{
                           "blockHeight":JSON.parse(data)["block"]["blockHeight"],
                           "transactionHeight":chainState.transactionHeight,
-                          "transactionCheckPointHash":chainState.transactionCheckPointHash,
+                          "transactionCheckPointHash":chainState.transactionRootHash,
+                          "previousTxHeight":chainState.previousTxHeight,
+                          "previousTxHash":chainState.previousTxHash,
                           "transactionHashWeights":chainState.transactionHashWeights
                           }
                         };
