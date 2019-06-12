@@ -140,7 +140,7 @@ chainState = onChange(chainState, function (path, value, previousValue) {
 updatePeerTxHashArray = function(txHt,txHsh){
   var recordChainTransactionHeightRecord = {"peerTxHeight":txHt,"peerTxHash":txHsh,"counted":1}
   if(chainState.transactionHashWeights != undefined){
-    var arrayTXHeight = chainState.transactionHashWeights.sort(function(a,b){return parseInt(b.peerTxHeight) - parseInt(a.peerTxHeight)});
+    var arrayTXHeight = chainState.transactionHashWeights.sort(function(a,b){return parseInt(a.peerTxHeight) - parseInt(b.peerTxHeight)})
     var shouldEnter = false;
     var shouldEnter2 = true;
     for(item in arrayTXHeight){
@@ -1258,8 +1258,16 @@ let connSeq2 = 0
           frankieCoin.incrementPeerMaxHeight(peerId,chainState.synchronized);
           frankieCoin.incrementPeerNonce(peerId,chainState.synchronized);
           removeWaiting(peerId);
-          updatePeerTxHashArray(JSON.parse(data)["thanks"]["previousTxHeight"],JSON.parse(data)["thanks"]["previousTxHash"]);
           updatePeerTxHashArray(JSON.parse(data)["thanks"]["transactionHeight"],JSON.parse(data)["thanks"]["transactionRootHash"]);
+          updatePeerTxHashArray(JSON.parse(data)["thanks"]["previousTxHeight"],JSON.parse(data)["thanks"]["previousTxHash"]);
+          var entireTxHashArray = JSON.parse(data)["thanks"]["transactionHashWeights"].sort(function(a,b){return parseInt(a.peerTxHeight) - parseInt(b.peerTxHeight)});
+          var ictr = 0;
+          for(itemTxHash in entireTxHashArray){
+            if(ictr > 2){
+              updatePeerTxHashArray(entireTxHashArray[itemTxHash].peerTxHeight,entireTxHashArray[itemTxHash].peerTxHash)
+            }
+            ictr++;
+          }
           activePing(20);
 
         }
