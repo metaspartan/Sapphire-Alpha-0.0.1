@@ -240,7 +240,7 @@ var adjustedTimeout = function() {
   if(chainState.peerNonce == chainState.synchronized){
     chainStateMonitor.peerCom = true;
   }
-  var timerInterval = 223;
+  var timerInterval = 113;
   frankieCoin.isChainSynch(chainState.synchronized)
   if(slowCounter == 0){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
@@ -259,14 +259,14 @@ var adjustedTimeout = function() {
   }else if(isSynching == false && chainState.isSynching == false && slowCounter < 10){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
-    activeSync(parseInt(timerInterval+(slowCounter*110)));
-    activePing(parseInt(timerInterval+(slowCounter*101)));
+    activeSync(parseInt(timerInterval+(slowCounter*35)));
+    activePing(parseInt(timerInterval+(slowCounter*37)));
     slowCounter++;
   }else{
     tranSynch();
     if((slowCounter % 4) == 0){
-      activeSync(parseInt(timerInterval+(slowCounter*100)));
-      activePing(parseInt(timerInterval+(slowCounter*100)));
+      activeSync(parseInt(timerInterval+(slowCounter*23)));
+      activePing(parseInt(timerInterval+(slowCounter*21)));
     }
     slowCounter++;
     //console.log("chain is not synching so is it sync? ")
