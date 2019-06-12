@@ -240,7 +240,7 @@ function requestListener(request, response) {
         if(isJSON(body) && JSON.parse(body) == null){
           response.statusCode = 404;
           response.end("oops!! not sending properly formatted JSON")
-          console.log(chalk.bgRed("This was the null create block"+body.toString()))
+          console.log(chalk.bgRed("This was the null create block issue from "+request.connection.remoteAddress+" ignoring it "))
         }else if(isJSON(body) && JSON.parse(body)["createBlock"]){
           closePort();//going to close off the port for a second
         }else if(isJSON(body) &&  JSON.parse(body)["getWorkForMiner"]){
