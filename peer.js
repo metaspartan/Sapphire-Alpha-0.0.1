@@ -1525,7 +1525,7 @@ let connSeq2 = 0
                         var thanksReply = {"thanks":{
                           "blockHeight":JSON.parse(data)["block"]["blockHeight"],
                           "transactionHeight":chainState.transactionHeight,
-                          "transactionCheckPointHash":chainState.transactionRootHash,
+                          "transactionRootHash":chainState.transactionRootHash,
                           "previousTxHeight":chainState.previousTxHeight,
                           "previousTxHash":chainState.previousTxHash,
                           "transactionHashWeights":chainState.transactionHashWeights
