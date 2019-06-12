@@ -163,7 +163,7 @@ updatePeerTxHashArray = function(txHt,txHsh){
     chainState.transactionHashWeights = [];
   }
 
-  if(chainState.transactionHashWeights.length > 4){
+  if(chainState.transactionHashWeights.length > 6){
     chainState.transactionHashWeights.shift();
   }
 }
