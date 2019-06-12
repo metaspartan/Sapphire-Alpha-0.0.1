@@ -140,7 +140,7 @@ chainState = onChange(chainState, function (path, value, previousValue) {
 updatePeerTxHashArray = function(txHt,txHsh){
   var recordChainTransactionHeightRecord = {"peerTxHeight":txHt,"peerTxHash":txHsh,"counted":1}
   if(chainState.transactionHashWeights != undefined){
-    var arrayTXHeight = chainState.transactionHashWeights;
+    var arrayTXHeight = chainState.transactionHashWeights.sort(function(a,b){return parseInt(b.peerTxHeight) - parseInt(a.peerTxHeight)});
     var shouldEnter = false;
     var shouldEnter2 = true;
     for(item in arrayTXHeight){
@@ -1252,6 +1252,7 @@ let connSeq2 = 0
 
           console.log("you got a thanks from "+peerId);
           console.log(chalk.bgRed.white.bold("you got a thanks from "+peerId));
+          console.log(chalk.bgCyan.black(JSON.stringify(JSON.parse(data)["thanks"])));
           chainState.peerNonce = chainState.synchronized;
           frankieCoin.incrementPeerMaxHeight(peerId,chainState.synchronized);
           frankieCoin.incrementPeerNonce(peerId,chainState.synchronized);
@@ -1518,7 +1519,13 @@ let connSeq2 = 0
                         }
                         //BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["block"]["transactions"]),JSON.parse(data)["block"]["hash"],parseInt(JSON.parse(data)["block"]["blockHeight"]),thisBlockCheckPointHash,thisTempFunctionWillBeSameAsTransactionValidateCallBack,chainState.transactionRootHash);
 
-                        var thanksReply = {"thanks":{"conf":"got block "+JSON.parse(data)["block"]["blockHeight"]}};
+                        var thanksReply = {"thanks":{
+                          "blockHeight":JSON.parse(data)["block"]["blockHeight"],
+                          "transactionHeight":chainState.transactionHeight,
+                          "transactionCheckPointHash":chainState.transactionCheckPointHash,
+                          "transactionHashWeights":chainState.transactionHashWeights
+                          }
+                        };
                         console.log(chalk.bgCyan.black.bold("THANKS "+thanksReply));
                         //peers[peerId].conn.write(thanksReply);
                         sendBackUncle(thanksReply,peerId);
