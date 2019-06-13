@@ -2630,10 +2630,12 @@ let connSeq2 = 0
 
 //////////////////////////////////////////////////////////////messaging to peers
 var allWaiting = []
+var allWaitingLength = 0;
 var setWaiting = function(id,cb){
   console.log("all waiting length "+allWaiting.length)
   var tempWaiter = {"peerId":id,"callBack":cb}
   allWaiting.push(tempWaiter);
+  allWaitingLength+=1;//need to track how many replies we asked for
 }
 
 var removeWaiting = function(id){
@@ -3444,10 +3446,15 @@ var cbChainGrab = async function(data) {
     if(allWaiting.length > 0){
 
       setTimeout(function(){
-        if(numPeerCheck < 4){
+        if(numPeerCheck < 4){//recursion number of calls in 500 ms increments (osoese is recursion woot)
           postMiner();
         }else{
-          if(allWaiting.length == 1){//only one peer left
+          if(allWaiting.length == allWaitingLength){
+            console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
+            console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
+            console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
+            process.exit();//this is going to be added to the index.js process monitor
+          }else if(allWaiting.length == 1){//only one peer left
             //rpcserver.openPort(1);
             chainState.isMining = false;
             cleanUpWaitingRemoveLag();
