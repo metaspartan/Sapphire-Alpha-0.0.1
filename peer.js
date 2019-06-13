@@ -149,6 +149,12 @@ updatePeerTxHashArray = function(txHt,txHsh){
         chainState.transactionHashWeights[item].counted+=1;
         //console.log("setting shouldEnter = false")
         shouldEnter2 = false;
+      }else if(arrayTXHeight[item].peerTxHeight == txHt && arrayTXHeight[item].peerTxHash != txHsh){
+        //blockheight existed this may be an issue with you are on wrong chain
+        console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
+        console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
+        console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
+        process.exit();//going to add to profess monitor in index
       }else{
         shouldEnter = true;
         //console.log("setting shouldEnter = true")
