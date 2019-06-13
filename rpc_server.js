@@ -234,16 +234,20 @@ function requestListener(request, response) {
 
     // on end proceed with compute
     request.on('end', () => {
+
+        var doEet = false;
         let body = buf !== null ? buf.toString() : null;
 
         //first off moving this to here on end instead of on data
         if(isJSON(body) && JSON.parse(body) == null){
           response.statusCode = 404;
           response.end("oops!! not sending properly formatted JSON")
-          console.log(chalk.bgRed("This was the null create block issue from "+request.connection.remoteAddress+" ignoring it "))
+          console.log(chalk.bgRed("This was the null create block issue from "+request.connection.remoteAddress+" ignoring it "));
         }else if(isJSON(body) && JSON.parse(body)["createBlock"]){
+          doEet = true;
           closePort();//going to close off the port for a second
         }else if(isJSON(body) &&  JSON.parse(body)["getWorkForMiner"]){
+          doEet = true;
           var canMine = thisNodeCanMine();
           console.log("canMine = "+canMine);
           if(canMine.split(":")[0] == canMine.split(":")[1] && canMine.split(":")[2] > 2){
@@ -256,8 +260,15 @@ function requestListener(request, response) {
             isMining = false;
           }
           //this signifies that this is a miner and we need to turn off explorer and other RPC for orders and such
+        }else{
+          console.log(chalk.bgRed("This was the fall through case from "+request.connection.remoteAddress+" ignoring it "));
+          console.log("probable hack attempt");
         }
-        impcparent(body,parentBroadcastPeersFunction,orderConfirmationEvent,txConfirmationEvent,setChainStateTX);
+
+        if(doEet == true){
+          impcparent(body,parentBroadcastPeersFunction,orderConfirmationEvent,txConfirmationEvent,setChainStateTX);
+        }
+
 
         if (routes[pathname]) {
             let compute = routes[pathname].call(null, body);
