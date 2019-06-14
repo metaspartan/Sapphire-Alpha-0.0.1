@@ -236,7 +236,7 @@ var activeSync = function(timer){
 var tranSynch = function(){
   var startEnd = parseInt(chainState.transactionHeight+1);
   var topEnd = parseInt(startEnd+500);
-  console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
+  console.log("want to call TXVLDY with start "+startEnd+" and top "+topEnd+" and syncronized "+chainState.synchronized)
   if(topEnd >= chainState.synchronized){
     topEnd = chainState.synchronized
   }
@@ -910,7 +910,7 @@ var transactionValidator = async function(start,end){
         var validateThisBlock = await function(){
           return new Promise((resolve)=> {
             var cbTxValidator = function(blockToValidate){
-              //console.log(blockToValidate.toString())
+              console.log(blockToValidate.toString())
               resolve(blockToValidate.toString());
             }
             BlkDB.getBlock(incrementor,cbTxValidator)
@@ -1622,7 +1622,7 @@ let connSeq2 = 0
           //var hairCut = (JSON.parse(data)["syncTrigger"] % frankieCoin.chainRiser);
           //var lastRiser = parseInt(JSON.parse(data)["syncTrigger"] - hairCut)
           chainClipper(JSON.parse(data)["syncTrigger"]).then(function(){
-            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1145);
+            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1145);
           });
 
           //setTimeout(function(){
@@ -2794,9 +2794,16 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput == "CLIP"){
       console.log("cliping chain from "+frankieCoin.blockHeight+" back one riser ");
+      BlkDB.deleteTransactions();
+      chainState.transactionHeight = 0;
+      chainState.transactionRootHash = '';
+      chainState.previousTxHeight = 0;
+      chainState.previousTxHash = '';
+      chainState.transactionHashWeights = [];
       chainClipper(frankieCoin.blockHeight).then(function(){
-        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
       });
+      BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
       cliGetInput();
     }else if(userInput == "CHECKPOINT"){
       BlkDB.getTopChainStateCheckPoint(frankieCoin.blockHeight,frankieCoin.chainRiser);

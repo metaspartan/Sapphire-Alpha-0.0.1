@@ -941,6 +941,7 @@ var deleteTransactions = function(){
 
   stream.on('close',function(){
     console.log("all transaction records were removed")
+    
   });
 }
 
