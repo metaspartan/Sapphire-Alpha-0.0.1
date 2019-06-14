@@ -154,14 +154,15 @@ updatePeerTxHashArray = function(txHt,txHsh){
         console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
         console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
         console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
+        console.log("cliping chain from "+frankieCoin.blockHeight+" back one riser ");
         BlkDB.deleteTransactions();
         chainState.transactionHeight = 0;
         chainState.transactionRootHash = '';
         chainState.previousTxHeight = 0;
         chainState.previousTxHash = '';
         chainState.transactionHashWeights = [];
-        chainClipper(frankieCoin.blockHeight - 1).then(function(){
-          BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
+        chainClipper(frankieCoin.blockHeight).then(function(){
+          BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
         });
         BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
         //process.exit();//going to add to profess monitor in index
@@ -3477,14 +3478,15 @@ var cbChainGrab = async function(data) {
             console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
             console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
             console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
+            console.log("cliping chain from "+frankieCoin.blockHeight+" back one riser ");
             BlkDB.deleteTransactions();
             chainState.transactionHeight = 0;
             chainState.transactionRootHash = '';
             chainState.previousTxHeight = 0;
             chainState.previousTxHash = '';
             chainState.transactionHashWeights = [];
-            chainClipper(frankieCoin.blockHeight - 1).then(function(){
-              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
+            chainClipper(frankieCoin.blockHeight).then(function(){
+              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
             });
             BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
             //process.exit();//this is going to be added to the index.js process monitor
