@@ -161,7 +161,7 @@ updatePeerTxHashArray = function(txHt,txHsh){
         chainState.previousTxHash = '';
         chainState.transactionHashWeights = [];
         chainClipper(frankieCoin.blockHeight - 1).then(function(){
-          BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight - 1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser - 1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
+          BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
         });
         BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
         //process.exit();//going to add to profess monitor in index
@@ -3484,7 +3484,7 @@ var cbChainGrab = async function(data) {
             chainState.previousTxHash = '';
             chainState.transactionHashWeights = [];
             chainClipper(frankieCoin.blockHeight - 1).then(function(){
-              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight - 1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser - 1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
+              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
             });
             BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
             //process.exit();//this is going to be added to the index.js process monitor
