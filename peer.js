@@ -155,9 +155,15 @@ updatePeerTxHashArray = function(txHt,txHsh){
         console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
         console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
         BlkDB.deleteTransactions();
+        chainState.transactionHeight = 0;
+        chainState.transactionRootHash = '';
+        chainState.previousTxHeight = 0;
+        chainState.previousTxHash = '';
+        chainState.transactionHashWeights = [];
         chainClipper(frankieCoin.blockHeight - 1).then(function(){
           BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight - 1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser - 1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
         });
+        BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
         //process.exit();//going to add to profess monitor in index
       }else{
         shouldEnter = true;
@@ -3472,9 +3478,15 @@ var cbChainGrab = async function(data) {
             console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
             console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
             BlkDB.deleteTransactions();
+            chainState.transactionHeight = 0;
+            chainState.transactionRootHash = '';
+            chainState.previousTxHeight = 0;
+            chainState.previousTxHash = '';
+            chainState.transactionHashWeights = [];
             chainClipper(frankieCoin.blockHeight - 1).then(function(){
               BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight - 1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser - 1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
             });
+            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
             //process.exit();//this is going to be added to the index.js process monitor
           }else if(allWaiting.length == 1){//only one peer left
             //rpcserver.openPort(1);
