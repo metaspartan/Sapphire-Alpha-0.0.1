@@ -917,7 +917,7 @@ var transactionValidator = async function(start,end){
         var validateThisBlock = await function(){
           return new Promise((resolve)=> {
             var cbTxValidator = function(blockToValidate){
-              console.log(blockToValidate.toString())
+              //console.log(blockToValidate.toString())
               resolve(blockToValidate.toString());
             }
             BlkDB.getBlock(incrementor,cbTxValidator)
