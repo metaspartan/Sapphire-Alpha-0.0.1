@@ -154,7 +154,11 @@ updatePeerTxHashArray = function(txHt,txHsh){
         console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
         console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
         console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
-        process.exit();//going to add to profess monitor in index
+        BlkDB.deleteTransactions();
+        chainClipper(frankieCoin.blockHeight - 1).then(function(){
+          BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight - 1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser - 1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
+        });
+        //process.exit();//going to add to profess monitor in index
       }else{
         shouldEnter = true;
         //console.log("setting shouldEnter = true")
@@ -1661,9 +1665,8 @@ let connSeq2 = 0
 
           //I have an uncle insert somewhere we maybe need to insert it
           BlkDB.deleteTransactions();
-
           chainClipper(frankieCoin.blockHeight - 1).then(function(){
-            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
+            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight - 1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser - 1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
           });
           //clipChainAt(parseInt(chainState.syncronized - 10))
 
@@ -2379,6 +2382,7 @@ let connSeq2 = 0
           console.log("SUBMITED "+JSON.parse(data)["syncTrigger"]["submitCurrrentChainStateHash"]+" PEER "+JSON.parse(data)["syncTrigger"]["peerCurrrentChainStateHash"])
           //var hairCut = (JSON.parse(data)["syncTrigger"] % frankieCoin.chainRiser);
           //var lastRiser = parseInt(JSON.parse(data)["syncTrigger"] - hairCut)
+          BlkDB.deleteTransactions();
           chainClipper(JSON.parse(data)["syncTrigger"]).then(function(){
             BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1816);
           });
@@ -2592,8 +2596,9 @@ let connSeq2 = 0
             }else{
               console.log("CONN2 NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
               //setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
-              chainClipper(frankieCoin.blockHeight).then(function(){
-                BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2027);
+              BlkDB.deleteTransactions();
+              chainClipper(frankieCoin.blockHeight -1).then(function(){
+                BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight - 1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser - 1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2027);
               });
             }
 
@@ -3459,7 +3464,11 @@ var cbChainGrab = async function(data) {
             console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
             console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
             console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
-            process.exit();//this is going to be added to the index.js process monitor
+            BlkDB.deleteTransactions();
+            chainClipper(frankieCoin.blockHeight - 1).then(function(){
+              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight - 1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser - 1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
+            });
+            //process.exit();//this is going to be added to the index.js process monitor
           }else if(allWaiting.length == 1){//only one peer left
             //rpcserver.openPort(1);
             chainState.isMining = false;
