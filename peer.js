@@ -113,6 +113,9 @@ chainStateMonitor.peerCom = false;
 chainStateMonitor.rpcCom = false;
 chainStateMonitor.deletedPeers = [];
 
+var nodeType = {};
+nodeType.current = 3;//start as a Listener 3 with 1 miner and 2 rpc wallets
+
 let i = 0;
 chainState = onChange(chainState, function (path, value, previousValue) {
 
@@ -186,7 +189,7 @@ updatePeerTxHashArray = function(txHt,txHsh,increment){
   }
 }
 
-updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce){
+updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,nodeType){
   //console.log("node state updater "+peer+" "+maxHeight+" "+chainCPH+" "+txHt+" "+txHsh)
   if(chainState.activeSynch.receive != undefined){
     var arrayCSReceive = chainState.activeSynch.receive;
@@ -209,7 +212,7 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce){
 
   updatePeerTxHashArray(txHt,txHsh,1);
   //console.log("just before push "+peer)
-  var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"longPeerNonce":longPeerNonce}
+  var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"longPeerNonce":longPeerNonce,"nodeType":nodeType}
   chainState.activeSynch.receive.push(insertPeer)
 }
 
@@ -318,7 +321,8 @@ var activePing = function(timer){
             transactionHeight:chainState.transactionHeight,
             transactionRootHash:chainState.transactionRootHash,
             prevTxHeight:chainState.previousTxHeight,
-            previousTxHash:chainState.previousTxHash
+            previousTxHash:chainState.previousTxHash,
+            NodeType:nodeType.current,
           }}));
       },timer)
 
@@ -1708,6 +1712,7 @@ let connSeq2 = 0
               JSON.parse(data)["nodeStatePong"]["transactionHeight"],
               JSON.parse(data)["nodeStatePong"]["transactionRootHash"],
               JSON.parse(data)["nodeStatePong"]["PeerNonce"],
+              JSON.parse(data)["nodeStatePong"]["NodeType"],
             )
           }
 
@@ -1732,6 +1737,7 @@ let connSeq2 = 0
               JSON.parse(data)["nodeStatePing"]["transactionHeight"],
               JSON.parse(data)["nodeStatePing"]["transactionRootHash"],
               JSON.parse(data)["nodeStatePing"]["PeerNonce"],
+              JSON.parse(data)["nodeStatePing"]["NodeType"],
             )
             if(chainState.previousTxHeight > 0 && parseInt(chainState.previousTxHeight+1) == chainState.transactionHeight){
 
@@ -1747,7 +1753,8 @@ let connSeq2 = 0
                       transactionHeight:chainState.transactionHeight,
                       transactionRootHash:chainState.transactionRootHash,
                       prevTxHeight:chainState.previousTxHeight,
-                      previousTxHash:chainState.previousTxHash
+                      previousTxHash:chainState.previousTxHash,
+                      NodeType:nodeType.current,
                     }}));
               }
 
@@ -4290,6 +4297,7 @@ var thisNodeCanMine = function(){
 var thisNodeIsMininig = function(){
   ExPl.closeExplorer;
   chainState.isMining = true;
+  nodeType.current = 1;
 }
 //initialize the child with the parent communcator call back function
 rpcserver.globalParentCom(impcchild,broadcastPeersBlock,setChainStateTX,thisNodeIsMininig,thisNodeCanMine);
