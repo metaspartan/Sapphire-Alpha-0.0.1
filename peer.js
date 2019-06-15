@@ -131,13 +131,13 @@ chainState = onChange(chainState, function (path, value, previousValue) {
   ***/
 
   if(path == "transactionRootHash"){
-    updatePeerTxHashArray(chainState.transactionHeight,chainState.transactionRootHash);
+    updatePeerTxHashArray(chainState.transactionHeight,chainState.transactionRootHash,1);
   }
 
 })
 //end chain state on change reporting
 
-updatePeerTxHashArray = function(txHt,txHsh){
+updatePeerTxHashArray = function(txHt,txHsh,increment){
   var recordChainTransactionHeightRecord = {"peerTxHeight":txHt,"peerTxHash":txHsh,"counted":1}
   if(chainState.transactionHashWeights != undefined){
     var arrayTXHeight = chainState.transactionHashWeights.sort(function(a,b){return parseInt(a.peerTxHeight) - parseInt(b.peerTxHeight)})
@@ -149,8 +149,9 @@ updatePeerTxHashArray = function(txHt,txHsh){
         chainState.transactionHashWeights[item].counted+=1;
         //console.log("setting shouldEnter = false")
         shouldEnter2 = false;
-      }else if(arrayTXHeight[item].peerTxHeight == txHt && arrayTXHeight[item].peerTxHash != txHsh){
+      }else if(arrayTXHeight[item].peerTxHeight == txHt && arrayTXHeight[item].peerTxHash != txHsh && arrayTXHeight[item].counted <= increment){
         //blockheight existed this may be an issue with you are on wrong chain
+        var shouldEnter2 = false;
         console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
         console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
         console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
@@ -206,7 +207,7 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce){
     chainState.activeSynch.receive = [];
   }
 
-  updatePeerTxHashArray(txHt,txHsh);
+  updatePeerTxHashArray(txHt,txHsh,1);
   //console.log("just before push "+peer)
   var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"longPeerNonce":longPeerNonce}
   chainState.activeSynch.receive.push(insertPeer)
@@ -1275,13 +1276,13 @@ let connSeq2 = 0
           frankieCoin.incrementPeerMaxHeight(peerId,chainState.synchronized);
           frankieCoin.incrementPeerNonce(peerId,chainState.synchronized);
           removeWaiting(peerId);
-          updatePeerTxHashArray(JSON.parse(data)["thanks"]["transactionHeight"],JSON.parse(data)["thanks"]["transactionRootHash"]);
-          updatePeerTxHashArray(JSON.parse(data)["thanks"]["previousTxHeight"],JSON.parse(data)["thanks"]["previousTxHash"]);
+          updatePeerTxHashArray(JSON.parse(data)["thanks"]["transactionHeight"],JSON.parse(data)["thanks"]["transactionRootHash"],1);
+          updatePeerTxHashArray(JSON.parse(data)["thanks"]["previousTxHeight"],JSON.parse(data)["thanks"]["previousTxHash"],1);
           var entireTxHashArray = JSON.parse(data)["thanks"]["transactionHashWeights"].sort(function(a,b){return parseInt(a.peerTxHeight) - parseInt(b.peerTxHeight)});
           var ictr = 0;
           for(itemTxHash in entireTxHashArray){
             if(ictr > 2){
-              updatePeerTxHashArray(entireTxHashArray[itemTxHash].peerTxHeight,entireTxHashArray[itemTxHash].peerTxHash)
+              updatePeerTxHashArray(entireTxHashArray[itemTxHash].peerTxHeight,entireTxHashArray[itemTxHash].peerTxHash,entireTxHashArray[itemTxHash].counted)
             }
             ictr++;
           }
