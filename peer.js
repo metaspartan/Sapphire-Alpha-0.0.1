@@ -827,7 +827,13 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       console.log("chain walk height is "+chainState.chainWalkHeight)
     }
 
-    console.log("NOT VALID NEED TO PING AT "+replyData+typeof(replyData)+" and chainstate issynching = "+chainState.isSynching);
+    console.log("THIS IS THE CASE I AM TRAPPING chain walk height is "+chainState.chainWalkHeight);
+    if(replyData < chainState.chainWalkHeight){
+      console.log("NOT VALID NEED TO PING AT "+replyData+typeof(replyData+1)+" and chainstate issynching = "+chainState.isSynching);
+    }else{
+      console.log("NOT VALID NEED TO PING AT "+replyData+typeof(replyData)+" and chainstate issynching = "+chainState.isSynching);
+    }
+
 
     //set ping here
     var peers2 = peers;//temp copy of peers
