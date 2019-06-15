@@ -879,7 +879,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           //console.log(peers2[id])
           let tobj = frankieCoin.nodes.find(o => o.id === id);
           console.log(tobj.info.ip)
-          console.log(chalk.bgCyan.black("well, we are calling top chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
+          console.log(chalk.bgCyan.black("well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
           peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           called = true;
           localTempNode.random = "yes";
