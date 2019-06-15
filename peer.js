@@ -2605,7 +2605,7 @@ let connSeq2 = 0
               console.log("CONN2 NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
               //setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
               BlkDB.deleteTransactions();
-              chainClipper(frankieCoin.blockHeight -1).then(function(){
+              chainClipper(frankieCoin.blockHeight).then(function(){
                 BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight - 1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser - 1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2027);
               });
             }
