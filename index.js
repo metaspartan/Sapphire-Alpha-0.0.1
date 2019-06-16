@@ -1,5 +1,6 @@
 var Peers = require('./peer.js');
 
+/****
 var resetApp = function(){
   console.log("resetting node.js app");
   //process.exit();
@@ -16,6 +17,7 @@ process.on("exit",function(){
   console.log("reset node.js app");
   console.log("reset node.js app");
 })
+****/
 
 //setTimeout(function(){resetApp()},25000)
 
