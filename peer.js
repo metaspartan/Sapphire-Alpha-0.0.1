@@ -317,40 +317,36 @@ var activePing = function(timer){
   //we should get longestPeer first
   console.log(chalk.bgRed("AP TIMER "+timer))
   var nodesInChain = frankieCoin.retrieveNodes();
-  //for (nodetoping in chainState.activeSynch.receive){
   for (let id in peers) {
-
-    for(peerNode in chainState.activeSynch.receive){
-      if(chainState.activeSynch.receive[peerNode].peer == id){
-        let thisPeer = chainState.activeSynch.receive[peerNode];
-      }
-    } 
-
     if(peers[id].conn != undefined){
 
       //this is a sync ping and we dont want to interupt miners so weeind out miners
-      if(thisPeer.nodeType > 1){
-        setTimeout(function(){
-          peers[id].conn.write(JSON.stringify(
-            {"nodeStatePing":{
-              Height:parseInt(chainState.synchronized),
-              MaxHeight:parseInt(chainState.synchronized),
-              PeerNonce:parseInt(chainState.peerNonce),
-              GlobalHash:globalGenesisHash,
-              checkPointHash:chainState.checkPointHash,
-              currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
-              transactionHeight:chainState.transactionHeight,
-              transactionRootHash:chainState.transactionRootHash,
-              prevTxHeight:chainState.previousTxHeight,
-              previousTxHash:chainState.previousTxHash,
-              NodeType:nodeType.current,
-            }}));
-        },timer)
+      for(aId in chainState.activeSynch.receive){
+        if(chainState.activeSynch.receive[aId].peer == id){
+          console.log("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType);
+        }
       }
+
+
+      setTimeout(function(){
+        peers[id].conn.write(JSON.stringify(
+          {"nodeStatePing":{
+            Height:parseInt(chainState.synchronized),
+            MaxHeight:parseInt(chainState.synchronized),
+            PeerNonce:parseInt(chainState.peerNonce),
+            GlobalHash:globalGenesisHash,
+            checkPointHash:chainState.checkPointHash,
+            currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+            transactionHeight:chainState.transactionHeight,
+            transactionRootHash:chainState.transactionRootHash,
+            prevTxHeight:chainState.previousTxHeight,
+            previousTxHash:chainState.previousTxHash,
+            NodeType:nodeType.current,
+          }}));
+      },timer)
 
     }
   }
-  //}
   //console.log(nodesInChain);
   var longestPeer = 0;
   for(node in nodesInChain){
@@ -361,8 +357,7 @@ var activePing = function(timer){
     }
   }
   if(chainState.synchronized >= longestPeer){
-    //console.log("chain state synchronized "+chainState.synchronized);
-    //console.log("longest peer "+longestPeer);
+
     console.log("peer stats indicate you are ahead of network");
     console.log("peer stats indicate you are ahead of network");
     //idk should I nodeStatePong?
@@ -386,9 +381,8 @@ var activePing = function(timer){
         );
       }
     }
+
     //this may get edited but should trigger peer to synch to me
-
-
   }
   if(chainState.isSynching = false){//keep in touch
     //console.log("is synching is FALSE");
