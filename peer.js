@@ -317,13 +317,14 @@ var activePing = function(timer){
   //we should get longestPeer first
   console.log(chalk.bgRed("AP TIMER "+timer))
   var nodesInChain = frankieCoin.retrieveNodes();
-  for (let id in peers) {
-    if(peers[id].conn != undefined){
+  for (nodetoping in chainState.activeSynch.receive){
+  //for (let id in peers) {
+    if(peers[chainState.activeSynch.receive[nodetoping].peer].conn != undefined){
 
       //this is a sync ping and we dont want to interupt miners so weeind out miners
-      if(chainState.activeSynch.receive[id].nodeType > 1){
+      if(chainState.activeSynch.receive[nodetoping].nodeType > 1){
         setTimeout(function(){
-          peers[id].conn.write(JSON.stringify(
+          peers[chainState.activeSynch.receive[nodetoping].peer].conn.write(JSON.stringify(
             {"nodeStatePing":{
               Height:parseInt(chainState.synchronized),
               MaxHeight:parseInt(chainState.synchronized),
@@ -341,6 +342,7 @@ var activePing = function(timer){
       }
 
     }
+  //}
   }
   //console.log(nodesInChain);
   var longestPeer = 0;
