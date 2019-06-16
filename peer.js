@@ -319,25 +319,26 @@ var activePing = function(timer){
   var nodesInChain = frankieCoin.retrieveNodes();
   for (let id in peers) {
     if(peers[id].conn != undefined){
-      //log("------------------------------------------------------");
-      //log(chalk.green("Sending ping for peer id "+id));
-      //log("------------------------------------------------------");
-      setTimeout(function(){
-        peers[id].conn.write(JSON.stringify(
-          {"nodeStatePing":{
-            Height:parseInt(chainState.synchronized),
-            MaxHeight:parseInt(chainState.synchronized),
-            PeerNonce:parseInt(chainState.peerNonce),
-            GlobalHash:globalGenesisHash,
-            checkPointHash:chainState.checkPointHash,
-            currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
-            transactionHeight:chainState.transactionHeight,
-            transactionRootHash:chainState.transactionRootHash,
-            prevTxHeight:chainState.previousTxHeight,
-            previousTxHash:chainState.previousTxHash,
-            NodeType:nodeType.current,
-          }}));
-      },timer)
+
+      //this is a sync ping and we dont want to interupt miners so weeind out miners
+      if(chainState.activeSynch.receive[id].nodeType > 1){
+        setTimeout(function(){
+          peers[id].conn.write(JSON.stringify(
+            {"nodeStatePing":{
+              Height:parseInt(chainState.synchronized),
+              MaxHeight:parseInt(chainState.synchronized),
+              PeerNonce:parseInt(chainState.peerNonce),
+              GlobalHash:globalGenesisHash,
+              checkPointHash:chainState.checkPointHash,
+              currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+              transactionHeight:chainState.transactionHeight,
+              transactionRootHash:chainState.transactionRootHash,
+              prevTxHeight:chainState.previousTxHeight,
+              previousTxHash:chainState.previousTxHash,
+              NodeType:nodeType.current,
+            }}));
+        },timer)
+      }
 
     }
   }
@@ -345,17 +346,6 @@ var activePing = function(timer){
   var longestPeer = 0;
   for(node in nodesInChain){
     if(parseInt(nodesInChain[node]["info"]["chainlength"]) > longestPeer){
-
-      /****
-      console.log("                  ")
-      console.log("   this a node    ")
-      console.log("     -------      ")
-      console.log(JSON.stringify(nodesInChain[node]))
-      console.log("     -------      ")
-      console.log("   was  a node    ")
-      console.log("                  ")
-      ****/
-
       longestPeer = parseInt(nodesInChain[node]["info"]["maxHeight"]);
       chainState.peerNonce = longestPeer;
       frankieCoin.longestPeerBlockHeight = longestPeer;
@@ -364,7 +354,32 @@ var activePing = function(timer){
   if(chainState.synchronized >= longestPeer){
     //console.log("chain state synchronized "+chainState.synchronized);
     //console.log("longest peer "+longestPeer);
-    //console.log("peer appears to be synched or ahead of network")
+    console.log("peer stats indicate you are ahead of network");
+    console.log("peer stats indicate you are ahead of network");
+    //idk should I nodeStatePong?
+    for (let id in peers) {
+      if(peers[id].conn != undefined){
+        peers[peerId].conn.write(JSON.stringify(
+          {"nodeStatePong":{
+              Height:parseInt(chainState.synchronized),
+              MaxHeight:parseInt(chainState.synchronized),
+              PeerNonce:parseInt(chainState.peerNonce),
+              GlobalHash:globalGenesisHash,
+              checkPointHash:chainState.checkPointHash,
+              currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+              transactionHeight:chainState.transactionHeight,
+              transactionRootHash:chainState.transactionRootHash,
+              prevTxHeight:chainState.previousTxHeight,
+              previousTxHash:chainState.previousTxHash,
+              NodeType:nodeType.current,
+            }}
+          )
+        );
+      }
+    }
+    //this may get edited but should trigger peer to synch to me
+
+
   }
   if(chainState.isSynching = false){//keep in touch
     //console.log("is synching is FALSE");
@@ -828,6 +843,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           i++;
         }else{
           console.log(chalk.bgCyan.black("id "+id));
+          console.log("this peer conn 2 is undefined and it is probably your own connection");
           console.log(chalk.bgCyan.black("peers2[id].conn "+peers2[id].conn+"peers2[id].conn2 "+peers2[id].conn2));
           console.log(JSON.stringify(peers));
         }
