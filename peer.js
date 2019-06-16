@@ -361,7 +361,7 @@ var activePing = function(timer){
     //idk should I nodeStatePong?
     for (let id in peers) {
       if(peers[id].conn != undefined){
-        peers[peerId].conn.write(JSON.stringify(
+        peers[id].conn.write(JSON.stringify(
           {"nodeStatePong":{
               Height:parseInt(chainState.synchronized),
               MaxHeight:parseInt(chainState.synchronized),
