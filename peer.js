@@ -321,29 +321,49 @@ var activePing = function(timer){
     if(peers[id].conn != undefined){
 
       //this is a sync ping and we dont want to interupt miners so weeind out miners
+      var pingCaller = true;
       for(aId in chainState.activeSynch.receive){
-        if(chainState.activeSynch.receive[aId].peer == id){
+        if(chainState.activeSynch.receive[aId].peer == id && chainState.activeSynch.receive[aId].nodeType > 1){
           console.log("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType);
+          setTimeout(function(){
+            peers[id].conn.write(JSON.stringify(
+              {"nodeStatePing":{
+                Height:parseInt(chainState.synchronized),
+                MaxHeight:parseInt(chainState.synchronized),
+                PeerNonce:parseInt(chainState.peerNonce),
+                GlobalHash:globalGenesisHash,
+                checkPointHash:chainState.checkPointHash,
+                currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+                transactionHeight:chainState.transactionHeight,
+                transactionRootHash:chainState.transactionRootHash,
+                prevTxHeight:chainState.previousTxHeight,
+                previousTxHash:chainState.previousTxHash,
+                NodeType:nodeType.current,
+              }}));
+          },timer)
+          pingCaller = false;
         }
       }
 
+      if(pingCaller){
+        setTimeout(function(){
+          peers[id].conn.write(JSON.stringify(
+            {"nodeStatePing":{
+              Height:parseInt(chainState.synchronized),
+              MaxHeight:parseInt(chainState.synchronized),
+              PeerNonce:parseInt(chainState.peerNonce),
+              GlobalHash:globalGenesisHash,
+              checkPointHash:chainState.checkPointHash,
+              currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+              transactionHeight:chainState.transactionHeight,
+              transactionRootHash:chainState.transactionRootHash,
+              prevTxHeight:chainState.previousTxHeight,
+              previousTxHash:chainState.previousTxHash,
+              NodeType:nodeType.current,
+            }}));
+        },timer)
+      }
 
-      setTimeout(function(){
-        peers[id].conn.write(JSON.stringify(
-          {"nodeStatePing":{
-            Height:parseInt(chainState.synchronized),
-            MaxHeight:parseInt(chainState.synchronized),
-            PeerNonce:parseInt(chainState.peerNonce),
-            GlobalHash:globalGenesisHash,
-            checkPointHash:chainState.checkPointHash,
-            currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
-            transactionHeight:chainState.transactionHeight,
-            transactionRootHash:chainState.transactionRootHash,
-            prevTxHeight:chainState.previousTxHeight,
-            previousTxHash:chainState.previousTxHash,
-            NodeType:nodeType.current,
-          }}));
-      },timer)
 
     }
   }
