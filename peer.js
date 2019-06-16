@@ -801,6 +801,17 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       });
     }
 
+    if(isValid == chainState.peerNonce && isValid > chainState.TransactionHeight){
+      var startEnd = parseInt(chainState.transactionHeight+1);
+      var topEnd = parseInt(startEnd+500);
+      console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
+      if(topEnd >= chainState.synchronized){
+        topEnd = chainState.synchronized
+      }
+
+      transactionValidator(parseInt(startEnd),parseInt(topEnd));
+    }
+
     //set the chain state validated height;
   }else if(isValid == false && replyData == chainState.transactionHeight && chainState.transactionHeight == chainState.peerNonce){
 
@@ -881,11 +892,25 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
     console.log("CHAIN STATE HEIGHT IS "+replyData+typeof(replyData)+" and chainstate issynching = "+chainState.isSynching);
 
+  }else if(isValid == false && replyData == chainState.peerNonce && replyData > chainState.transactionHeight){
+
+    //here we might try calling the tx validator
+    var startEnd = parseInt(chainState.transactionHeight+1);
+    var topEnd = parseInt(startEnd+500);
+    console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
+    if(topEnd >= chainState.synchronized){
+      topEnd = chainState.synchronized
+    }
+    transactionValidator(parseInt(startEnd),parseInt(topEnd));
+
+  }else if(replyData == "NaN"){
+    console.log("chain walk height is "+chainState.chainWalkHeight);
+
+    //what function should be run here?
+
   }else{
 
-    if(replyData == "NaN"){
-      console.log("chain walk height is "+chainState.chainWalkHeight)
-    }
+
 
     console.log("THIS IS THE CASE I AM TRAPPING chain walk height is "+chainState.chainWalkHeight+" REPLY DATA IS "+replyData);
     if(replyData < chainState.chainWalkHeight){
@@ -968,7 +993,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         i++;
       }
     }
-    if(called == false){
+    if(called == false){//might leave this might change to activeSync
       broadcastPeers(JSON.stringify(
         {"nodeStatePing":{
           Height:parseInt(chainState.synchronized),
