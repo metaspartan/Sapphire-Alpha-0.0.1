@@ -843,7 +843,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             //console.log(peers2[id])
             //console.log(peers2[id])
             let tobj = frankieCoin.nodes.find(o => o.id === id);
-            console.log(tobj.info.ip)
+            if(tobj.info){
+              console.log(tobj.info.ip)
+            }
             console.log(chalk.bgCyan.black("well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
             peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
             called = true;
@@ -853,7 +855,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             //console.log(peers2[id])
             console.log("THIS IS WHERE I AM PINGING TODAY 778"+(replyData+1) < chainState.peerNonce)
             let tobj = frankieCoin.nodes.find(o => o.id === id);
-            console.log(tobj.info.ip)
+            if(tobj.info){
+              console.log(tobj.info.ip)
+            }
             console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
             peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
             called = true;
@@ -940,7 +944,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           //console.log(peers2[id])
           //console.log(peers2[id])
           let tobj = frankieCoin.nodes.find(o => o.id === id);
-          console.log(tobj.info.ip)
+          if(tobj.info){
+            console.log(tobj.info.ip)
+          }
+
           console.log(chalk.bgCyan.black("well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
           peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           called = true;
@@ -949,7 +956,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         //}else if(peers[id]){
           //console.log(peers2[id])
           let tobj = frankieCoin.nodes.find(o => o.id === id);
-          console.log(tobj.info.ip)
+          if(tobj.info){
+            console.log(tobj.info.ip)
+          }
           console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
           peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
           called = true;
@@ -3419,7 +3428,9 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   for (nodercv in chainState.activeSynch.receive){
     if(chainState.activeSynch.receive[nodercv] != "undefined"){
       let tobj = frankieCoin.nodes.find(o => o.id === chainState.activeSynch.receive[nodercv].peer);
-      console.log(tobj.info.ip)
+      if(tobj.info){
+        console.log(tobj.info.ip)
+      }
       console.log(chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce))
       console.log(chalk.bgCyan.black("peer Max Height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" "))
       console.log(chalk.bgCyan.black("CS Hash: ")+chalk.bgMagenta.white(" blockNo: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" ckPtHash: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash+" "))
