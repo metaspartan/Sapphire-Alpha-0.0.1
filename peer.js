@@ -320,7 +320,11 @@ var activePing = function(timer){
   //for (nodetoping in chainState.activeSynch.receive){
   for (let id in peers) {
 
-    let thisPeer = chainState.activeSynch.receive.find(o => o.peer === id);
+    for(peerNode in chainState.activeSynch.receive){
+      if(chainState.activeSynch.receive[peerNode].peer == id){
+        let thisPeer = chainState.activeSynch.receive[peerNode];
+      }
+    } 
 
     if(peers[id].conn != undefined){
 
