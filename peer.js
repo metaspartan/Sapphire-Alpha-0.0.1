@@ -322,7 +322,7 @@ var activePing = function(timer){
 
     let thisPeer = chainState.activeSynch.receive.find(o => o.peer === id);
 
-    if(thisPeer.conn != undefined){
+    if(peers[id].conn != undefined){
 
       //this is a sync ping and we dont want to interupt miners so weeind out miners
       if(thisPeer.nodeType > 1){
