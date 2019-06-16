@@ -968,6 +968,22 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         i++;
       }
     }
+    if(called == false){
+      broadcastPeers(JSON.stringify(
+        {"nodeStatePing":{
+          Height:parseInt(chainState.synchronized),
+          MaxHeight:parseInt(chainState.synchronized),
+          PeerNonce:parseInt(chainState.peerNonce),
+          GlobalHash:globalGenesisHash,
+          checkPointHash:chainState.checkPointHash,
+          currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+          transactionHeight:chainState.transactionHeight,
+          transactionRootHash:chainState.transactionRootHash,
+          prevTxHeight:chainState.previousTxHeight,
+          previousTxHash:chainState.previousTxHash,
+          NodeType:nodeType.current,
+        }}));
+    }
     //tempNodeCallBucket.push = {"updated":"bottom 671"};
     chainState.activeSynch = {"send":tempNodeCallBucket,"receive":oldChainStateActiveSync.receive};
   }
