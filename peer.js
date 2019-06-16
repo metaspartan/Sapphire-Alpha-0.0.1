@@ -843,7 +843,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             //console.log(peers2[id])
             //console.log(peers2[id])
             let tobj = frankieCoin.nodes.find(o => o.id === id);
-            if(tobj.info){
+            if(tobj && tobj.info){
               console.log(tobj.info.ip)
             }
             console.log(chalk.bgCyan.black("well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
@@ -855,7 +855,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             //console.log(peers2[id])
             console.log("THIS IS WHERE I AM PINGING TODAY 778"+(replyData+1) < chainState.peerNonce)
             let tobj = frankieCoin.nodes.find(o => o.id === id);
-            if(tobj.info){
+            if(tobj && tobj.info){
               console.log(tobj.info.ip)
             }
             console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
@@ -944,7 +944,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           //console.log(peers2[id])
           //console.log(peers2[id])
           let tobj = frankieCoin.nodes.find(o => o.id === id);
-          if(tobj.info){
+          if(tobj && tobj.info){
             console.log(tobj.info.ip)
           }
 
@@ -956,7 +956,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         //}else if(peers[id]){
           //console.log(peers2[id])
           let tobj = frankieCoin.nodes.find(o => o.id === id);
-          if(tobj.info){
+          if(tobj && tobj.info){
             console.log(tobj.info.ip)
           }
           console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
@@ -3428,7 +3428,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   for (nodercv in chainState.activeSynch.receive){
     if(chainState.activeSynch.receive[nodercv] != "undefined"){
       let tobj = frankieCoin.nodes.find(o => o.id === chainState.activeSynch.receive[nodercv].peer);
-      if(tobj.info){
+      if(tobj && tobj.info){
         console.log(tobj.info.ip)
       }
       console.log(chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce))
