@@ -891,7 +891,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     if(replyData < chainState.chainWalkHeight){
       console.log("NOT VALID NEED TO PING AT TOP CASE ADDS ONE "+replyData+typeof(replyData+1)+" and chainstate issynching = "+chainState.isSynching);
     }else{
-      console.log("NOT VALID NEED TO PING AT BOTTOM CASE AS IS "+replyData+typeof(replyData+1)+" and chainstate issynching = "+chainState.isSynching);
+      console.log("NOT VALID NEED TO PING AT BOTTOM CASE AS IS "+replyData+typeof(replyData)+" and chainstate issynching = "+chainState.isSynching);
+      peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
     }
 
 
