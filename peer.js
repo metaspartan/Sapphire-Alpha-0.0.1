@@ -234,9 +234,11 @@ var activeSync = function(timer){
   for (nodercv in chainState.activeSynch.receive){
     if(chainState.activeSynch.receive[nodercv] != "undefined"){
       let tobj = frankieCoin.nodes.find(o => o.id === chainState.activeSynch.receive[nodercv].peer);
-      console.log(chalk.bgRed.white(tobj.info.ip));
-      console.log(chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce))
-      console.log(chalk.bgCyan.black("Node Type: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].nodeType+" ")+chalk.bgCyan.black("peer Max Height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" "))
+      console.log(
+        chalk.bgCyan.black("Node Type: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].nodeType+" ")+chalk.bgRed.white(tobj.info.ip)+chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce)+
+        chalk.bgCyan.black("peer Max Height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+
+        chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" ")
+      )
       console.log(chalk.bgCyan.black("CS Hash: ")+chalk.bgMagenta.white(" blockNo: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" ckPtHash: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash+" "))
     }
   }
@@ -324,7 +326,7 @@ var activePing = function(timer){
       var pingCaller = true;
       for(aId in chainState.activeSynch.receive){
         if(chainState.activeSynch.receive[aId].peer == id && chainState.activeSynch.receive[aId].nodeType > 1){
-          console.log("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType);
+          //console.log("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType);
           setTimeout(function(){
             peers[id].conn.write(JSON.stringify(
               {"nodeStatePing":{
@@ -378,8 +380,8 @@ var activePing = function(timer){
   }
   if(chainState.synchronized >= longestPeer){
 
-    console.log("peer stats indicate you are ahead of network");
-    console.log("peer stats indicate you are ahead of network");
+    console.log("peer stats indicate you are ahead of network or are starting up");
+    console.log("peer stats indicate you are ahead of network or are starting up");
     //idk should I nodeStatePong?
     for (let id in peers) {
       if(peers[id].conn != undefined){
@@ -993,24 +995,12 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         i++;
       }
     }
-    if(called == false){//might leave this might change to activeSync
-      broadcastPeers(JSON.stringify(
-        {"nodeStatePing":{
-          Height:parseInt(chainState.synchronized),
-          MaxHeight:parseInt(chainState.synchronized),
-          PeerNonce:parseInt(chainState.peerNonce),
-          GlobalHash:globalGenesisHash,
-          checkPointHash:chainState.checkPointHash,
-          currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
-          transactionHeight:chainState.transactionHeight,
-          transactionRootHash:chainState.transactionRootHash,
-          prevTxHeight:chainState.previousTxHeight,
-          previousTxHash:chainState.previousTxHash,
-          NodeType:nodeType.current,
-        }}));
-    }
     //tempNodeCallBucket.push = {"updated":"bottom 671"};
     chainState.activeSynch = {"send":tempNodeCallBucket,"receive":oldChainStateActiveSync.receive};
+    //finally if neither was called should I make a move here?
+    if(called == false){//might leave this might change to activeSync
+      console.log("NEITHER CASE WAS CALLED")
+    }
   }
 }
 /////////////////////////////////////////////////////////////END CHAIN VALIDATOR
@@ -3466,13 +3456,13 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
     console.log(chalk.bgCyan.black("blockHeight Called: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.send[nodesend].blockHeightCalled+" ")+chalk.bgCyan.black(" call synchronized: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.send[nodesend].callSynchronized+" "))
   }
   console.log(chalk.bgGreen.black(" last ping receive: "));
+  console.log(chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce))
   for (nodercv in chainState.activeSynch.receive){
     if(chainState.activeSynch.receive[nodercv] != "undefined"){
       let tobj = frankieCoin.nodes.find(o => o.id === chainState.activeSynch.receive[nodercv].peer);
       if(tobj && tobj.info){
         console.log(tobj.info.ip)
       }
-      console.log(chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce))
       console.log(chalk.bgCyan.black("peer Max Height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" "))
       console.log(chalk.bgCyan.black("CS Hash: ")+chalk.bgMagenta.white(" blockNo: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" ckPtHash: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash+" "))
     }
