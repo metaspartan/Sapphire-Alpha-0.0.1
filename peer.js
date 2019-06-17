@@ -1388,7 +1388,7 @@ let connSeq2 = 0
             }
             ictr++;
           }
-          activePing(20);
+          //activePing(20);
 
         }
 ////////////////////////////////////////////////////////////incoming transaction
@@ -2774,12 +2774,15 @@ var removeWaiting = function(id){
     if(allWaiting[eachPeer].peerId == id){
       console.log("reply from peer "+id)
       allWaiting.splice(id,1);
+      allWaitingLength-=1;
+      console.log("and after removal all waiting DOT length is "+allWaiting.length)
+      console.log("and after removal all waiting length is "+allWaitingLength)
     }
   }
 }
 
 var cleanUpWaitingRemoveLag = function(){
-  console.log(chalk.bgRed("CLEARING LAGGED PEER"));
+  console.log(chalk.bgRed("CLEARING LAGGED PEER allWaitingLength = "+allWaitingLength));
   for(eachPeer in allWaiting){
       delete peers[allWaiting[eachPeer].peerId];
       connSeq--
@@ -3580,13 +3583,13 @@ var cbChainGrab = async function(data) {
   BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
   //console.log("about to send this to rpc "+JSON.stringify({block:frankieCoin.getLatestBlock()}))
 
-  var numPeerCheck = 0;
+  var countPostMinerCalled = 0;
   var postMiner = function(){
     console.log(chalk.bgRed("POSTING FOR RPC DOES IT CHECK CB CHAIN GRAB "+allWaiting.length))
     if(allWaiting.length > 0){
 
       setTimeout(function(){
-        if(numPeerCheck < 4){//recursion number of calls in 500 ms increments (osoese is recursion woot)
+        if(countPostMinerCalled < 4){//recursion number of calls in 500 ms increments (osoese is recursion woot)
           postMiner();
         }else{
           if(allWaiting.length == allWaitingLength){
@@ -3605,7 +3608,7 @@ var cbChainGrab = async function(data) {
             });
             BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
             //process.exit();//this is going to be added to the index.js process monitor
-          }else if(allWaiting.length == 1){//only one peer left
+          }else if(allWaiting.length == 0){//only one peer left
             //rpcserver.openPort(1);
             chainState.isMining = false;
             cleanUpWaitingRemoveLag();
@@ -3618,10 +3621,12 @@ var cbChainGrab = async function(data) {
             },10000)
           }
         }
-        numPeerCheck+=1;
+        countPostMinerCalled+=1;
       },500)
 
     }else{
+      console.log("IN CALLBACK YOU NEVER SET IF THERE ARE NO RETURNS");
+
       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
     }
   }
@@ -4121,22 +4126,23 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         ///////////////////////////////////////////////////////////peers broadcast
         fbroadcastPeersBlock('block');
         ////////////////////finally post the RPC get work block data for the miner
-        var numPeerCheck = 0;
+        var countPostMinerCalled = 0;
         var postMiner = function(){
           console.log(chalk.bgRed("POSTING FOR RPC DOES IT CHECK IMP CHILD "+allWaiting.length))
           if(allWaiting.length > 0){
 
             setTimeout(function(){
-              if(numPeerCheck < 4){
+              if(countPostMinerCalled < 4){
                 postMiner();
               }else{
                 cleanUpWaitingRemoveLag()
                 rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
               }
-              numPeerCheck+=1;
+              countPostMinerCalled+=1;
             },10000)
 
           }else{
+            console.log(chalk.bgGreen.black.bold("THIS IS THE CASE YOU DID NOT SET"));
             setTimeout(function(){
               rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
             },10000)
