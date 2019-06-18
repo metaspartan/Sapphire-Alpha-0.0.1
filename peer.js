@@ -328,6 +328,8 @@ var activePing = function(timer){
         if(chainState.activeSynch.receive[aId].peer == id && chainState.activeSynch.receive[aId].nodeType > 1){
           //console.log("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType);
           setTimeout(function(){
+            var d1 = Date.now()
+            var d2 = new Date( d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate(), d1.getUTCHours(), d1.getUTCMinutes(), d1.getUTCSeconds() );
             peers[id].conn.write(JSON.stringify(
               {"nodeStatePing":{
                 Height:parseInt(chainState.synchronized),
@@ -341,6 +343,7 @@ var activePing = function(timer){
                 prevTxHeight:chainState.previousTxHeight,
                 previousTxHash:chainState.previousTxHash,
                 NodeType:nodeType.current,
+                utcTimeStamp:Math.floor(d2.getTime()/ 1000)
               }}));
           },timer)
           pingCaller = false;
@@ -349,6 +352,8 @@ var activePing = function(timer){
 
       if(pingCaller){
         setTimeout(function(){
+          var d1 = Date.now()
+          var d2 = new Date( d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate(), d1.getUTCHours(), d1.getUTCMinutes(), d1.getUTCSeconds() );
           peers[id].conn.write(JSON.stringify(
             {"nodeStatePing":{
               Height:parseInt(chainState.synchronized),
@@ -362,6 +367,7 @@ var activePing = function(timer){
               prevTxHeight:chainState.previousTxHeight,
               previousTxHash:chainState.previousTxHash,
               NodeType:nodeType.current,
+              utcTimeStamp:Math.floor(d2.getTime()/ 1000)
             }}));
         },timer)
       }
@@ -385,6 +391,8 @@ var activePing = function(timer){
     //idk should I nodeStatePong?
     for (let id in peers) {
       if(peers[id].conn != undefined){
+        var d1 = Date.now()
+        var d2 = new Date( d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate(), d1.getUTCHours(), d1.getUTCMinutes(), d1.getUTCSeconds() );
         peers[id].conn.write(JSON.stringify(
           {"nodeStatePong":{
               Height:parseInt(chainState.synchronized),
@@ -398,6 +406,7 @@ var activePing = function(timer){
               prevTxHeight:chainState.previousTxHeight,
               previousTxHash:chainState.previousTxHash,
               NodeType:nodeType.current,
+              utcTimeStamp:Math.floor(d2.getTime()/ 1000)
             }}
           )
         );
@@ -1789,6 +1798,8 @@ let connSeq2 = 0
             //console.log("NODE STATE PING CP "+nSPongPeerCPH.split(":")[0]+" AND HASH "+nSPongPeerCPH.split(":")[1]+" AND YOU "+chainState.checkPointHash)
           }
 
+          console.log("THIS PEER UTC TIME IS "+JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]);
+
           if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
             frankieCoin.incrementPeerNonce(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
@@ -1834,6 +1845,8 @@ let connSeq2 = 0
             if(chainState.previousTxHeight > 0 && parseInt(chainState.previousTxHeight+1) == chainState.transactionHeight){
 
               if(peers[peerId] && peers[peerId].conn != undefined){
+                var d1 = Date.now()
+                var d2 = new Date( d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate(), d1.getUTCHours(), d1.getUTCMinutes(), d1.getUTCSeconds() );
                 peers[peerId].conn.write(JSON.stringify(
                   {"nodeStatePong":{
                       Height:parseInt(chainState.synchronized),
@@ -1847,7 +1860,9 @@ let connSeq2 = 0
                       prevTxHeight:chainState.previousTxHeight,
                       previousTxHash:chainState.previousTxHash,
                       NodeType:nodeType.current,
-                    }}));
+                      utcTimeStamp:Math.floor(d2.getTime()/ 1000)
+                    }}
+                  ));
               }
 
             }else{
@@ -2707,7 +2722,10 @@ let connSeq2 = 0
               peers[peerId].conn2.write("THIS PEER IS NOW SYNCHED");
               peers[peerId].conn2.write("---------------------------------");
             }else{
-              console.log("CONN2 NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
+              console.log("CONN2 NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....");
+              //
+              rpcserver.closePort();//need to establosh if this peer is mining and jst stop it until synch
+              //
               //setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
               BlkDB.deleteTransactions();
               chainState.transactionHeight = 0;
@@ -2768,13 +2786,13 @@ var setWaiting = function(id,cb){
   allWaitingLength+=1;//need to track how many replies we asked for
 }
 
-var removeWaiting = function(id){
+var removeWaiting = async function(id){
   console.log("in the remove waiting call ..."+id)
   for(eachPeer in allWaiting){
     if(allWaiting[eachPeer].peerId == id){
       console.log("reply from peer "+id)
-      allWaiting.splice(id,1);
-      allWaitingLength-=1;
+      await allWaiting.splice(id,1);
+      allWaitingLength = await parseInt(allWaitingLength-1);
       console.log("and after removal all waiting DOT length is "+allWaiting.length)
       console.log("and after removal all waiting length is "+allWaitingLength)
     }

@@ -106,9 +106,10 @@ var Ommer = class Ommer{
 
 var Transaction = class Transaction{
     //address validation in signed raw tx
-    constructor(fromAddress, toAddress, amount, ticker, txTimestamp = Math.floor(d2.getTime()/ 1000)){
-        var d1 = Date.now()
+    constructor(fromAddress, toAddress, amount, ticker, txTimestamp = Date.now()){
+        var d1 = txTimestamp;
         var d2 = new Date( d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate(), d1.getUTCHours(), d1.getUTCMinutes(), d1.getUTCSeconds() );
+        txTimestamp = Math.floor(d2.getTime()/ 1000);
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
         this.amount = amount;
