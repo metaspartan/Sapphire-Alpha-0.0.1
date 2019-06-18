@@ -2792,15 +2792,22 @@ var removeWaiting = async function(id){
   }
 }
 
-var cleanUpWaitingRemoveLag = function(){
-  console.log(chalk.bgRed("CLEARING LAGGED PEER allWaitingLength = "+allWaitingLength));
-  for(eachPeer in allWaiting){
-      delete peers[allWaiting[eachPeer].peerId];
-      connSeq--
-      connSeq2--
-      console.log("going to delete this peer "+allWaiting[eachPeer].peerId)
-      allWaiting.splice(allWaiting[eachPeer].peerId,1);
-  }
+var cleanUpWaitingRemoveLag = async function(){
+  return new Promise((resolve)=> {
+    console.log(chalk.bgRed("CLEARING LAGGED PEER allWaitingLength = "+allWaitingLength));
+    for(eachPeer in allWaiting){
+        allWaiting.splice(allWaiting[eachPeer].peerId,1);
+        delete peers[allWaiting[eachPeer].peerId];
+        connSeq--
+        connSeq2--
+        console.log("going to delete this peer "+allWaiting[eachPeer].peerId)
+    }
+    if(allWaitingLength == 0){
+      resolve(true);
+    }else{
+      resolve(false);
+    }
+  })
 }
 
 var broadcastPeers = function(message,waiting = null){
@@ -3622,10 +3629,18 @@ var cbChainGrab = async function(data) {
           }else if(allWaiting.length == 0){//only one peer left
             //rpcserver.openPort(1);
             chainState.isMining = false;
-            cleanUpWaitingRemoveLag();
-            setTimeout(function(){
-              rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-            },10000)
+            cleanUpWaitingRemoveLag().then(function(reply){
+              if(reply == true){
+                setTimeout(function(){
+                  rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                },10000)
+              }else{
+                console.log("WE SHOULD CLOSE THE MINER HERE ALSO")
+              }
+            }).catch(function(err){
+              console.log("cleanUpWaitingRemoveLag has error "+err)
+            })
+
           }else{
             setTimeout(function(){
               rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
@@ -4138,16 +4153,26 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         fbroadcastPeersBlock('block');
         ////////////////////finally post the RPC get work block data for the miner
         var countPostMinerCalled = 0;
-        var postMiner = function(){
+        var postMiner = async function(){
           console.log(chalk.bgRed("POSTING FOR RPC DOES IT CHECK IMP CHILD "+allWaiting.length))
           if(allWaiting.length > 0){
 
             setTimeout(function(){
-              if(countPostMinerCalled < 4){
+              if(countPostMinerCalled < 4){//we call this 4 times then cleanup
                 postMiner();
               }else{
-                cleanUpWaitingRemoveLag()
-                rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+
+                chainState.isMining = false;//dows this neeed to be here?
+                cleanUpWaitingRemoveLag().then(function(repl){
+                  if(reply == true){
+                    rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                  }else{
+                    console.log(chalk.bgRed("PERHAPS SHUT DOWN MINER AND SYNC HERE"));
+                  }
+                }).catch(function(err){
+                  console.log("cleanUpWaitingRemoveLag error in fBroadcast Peers "+err);
+                })
+
               }
               countPostMinerCalled+=1;
             },10000)
