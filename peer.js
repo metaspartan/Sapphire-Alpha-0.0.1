@@ -328,8 +328,6 @@ var activePing = function(timer){
         if(chainState.activeSynch.receive[aId].peer == id && chainState.activeSynch.receive[aId].nodeType > 1){
           //console.log("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType);
           setTimeout(function(){
-            var d1 = Date.now()
-            var d2 = new Date( d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate(), d1.getUTCHours(), d1.getUTCMinutes(), d1.getUTCSeconds() );
             peers[id].conn.write(JSON.stringify(
               {"nodeStatePing":{
                 Height:parseInt(chainState.synchronized),
@@ -343,7 +341,7 @@ var activePing = function(timer){
                 prevTxHeight:chainState.previousTxHeight,
                 previousTxHash:chainState.previousTxHash,
                 NodeType:nodeType.current,
-                utcTimeStamp:Math.floor(d2.getTime()/ 1000)
+                utcTimeStamp:parseInt(new Date().getTime()/1000)
               }}));
           },timer)
           pingCaller = false;
@@ -352,8 +350,6 @@ var activePing = function(timer){
 
       if(pingCaller){
         setTimeout(function(){
-          var d1 = Date.now()
-          var d2 = new Date( d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate(), d1.getUTCHours(), d1.getUTCMinutes(), d1.getUTCSeconds() );
           peers[id].conn.write(JSON.stringify(
             {"nodeStatePing":{
               Height:parseInt(chainState.synchronized),
@@ -367,7 +363,7 @@ var activePing = function(timer){
               prevTxHeight:chainState.previousTxHeight,
               previousTxHash:chainState.previousTxHash,
               NodeType:nodeType.current,
-              utcTimeStamp:Math.floor(d2.getTime()/ 1000)
+              utcTimeStamp:parseInt(new Date().getTime()/1000)
             }}));
         },timer)
       }
@@ -391,8 +387,6 @@ var activePing = function(timer){
     //idk should I nodeStatePong?
     for (let id in peers) {
       if(peers[id].conn != undefined){
-        var d1 = Date.now()
-        var d2 = new Date( d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate(), d1.getUTCHours(), d1.getUTCMinutes(), d1.getUTCSeconds() );
         peers[id].conn.write(JSON.stringify(
           {"nodeStatePong":{
               Height:parseInt(chainState.synchronized),
@@ -406,7 +400,7 @@ var activePing = function(timer){
               prevTxHeight:chainState.previousTxHeight,
               previousTxHash:chainState.previousTxHash,
               NodeType:nodeType.current,
-              utcTimeStamp:Math.floor(d2.getTime()/ 1000)
+              utcTimeStamp:parseInt(new Date().getTime()/1000)
             }}
           )
         );
@@ -1798,7 +1792,8 @@ let connSeq2 = 0
             //console.log("NODE STATE PING CP "+nSPongPeerCPH.split(":")[0]+" AND HASH "+nSPongPeerCPH.split(":")[1]+" AND YOU "+chainState.checkPointHash)
           }
 
-          console.log("THIS PEER UTC TIME IS "+JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]);
+          var checkYourUTCTime = parseInt(new Date().getTime()/1000);
+          console.log("THIS PEER UTC TIME IS "+JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]+" and you "+checkYourUTCTime+" and diff is "+Math.abs(checkYourUTCTime - JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]));
 
           if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
             frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
@@ -1845,8 +1840,6 @@ let connSeq2 = 0
             if(chainState.previousTxHeight > 0 && parseInt(chainState.previousTxHeight+1) == chainState.transactionHeight){
 
               if(peers[peerId] && peers[peerId].conn != undefined){
-                var d1 = Date.now()
-                var d2 = new Date( d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate(), d1.getUTCHours(), d1.getUTCMinutes(), d1.getUTCSeconds() );
                 peers[peerId].conn.write(JSON.stringify(
                   {"nodeStatePong":{
                       Height:parseInt(chainState.synchronized),
@@ -1860,7 +1853,7 @@ let connSeq2 = 0
                       prevTxHeight:chainState.previousTxHeight,
                       previousTxHash:chainState.previousTxHash,
                       NodeType:nodeType.current,
-                      utcTimeStamp:Math.floor(d2.getTime()/ 1000)
+                      utcTimeStamp:parseInt(new Date().getTime()/1000)
                     }}
                   ));
               }

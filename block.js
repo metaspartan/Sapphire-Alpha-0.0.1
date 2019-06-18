@@ -106,10 +106,7 @@ var Ommer = class Ommer{
 
 var Transaction = class Transaction{
     //address validation in signed raw tx
-    constructor(fromAddress, toAddress, amount, ticker, txTimestamp = Date.now()){
-        var d1 = txTimestamp;
-        var d2 = new Date( d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate(), d1.getUTCHours(), d1.getUTCMinutes(), d1.getUTCSeconds() );
-        txTimestamp = Math.floor(d2.getTime()/ 1000);
+        constructor(fromAddress, toAddress, amount, ticker, txTimestamp = parseInt(new Date().getTime()/1000)){
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
         this.amount = amount;
@@ -543,9 +540,7 @@ var Blockchain = class Blockchain {
 
       ///for mining transactions from internal miner
       minePendingTransactions(miningRewardAddress){
-          var d1 = Date.now()
-          var d2 = new Date( d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate(), d1.getUTCHours(), d1.getUTCMinutes(), d1.getUTCSeconds() );
-          var blockTimeStamp = Math.floor(d2.getTime()/ 1000);
+          var blockTimeStamp = parseInt(new Date().getTime()/1000);
 
           //constructor(timestamp, transactions, orders, previousHash = '', sponsor, miner, egemBRBlock = '', data, hash, egemBRHash = '', nonce = 0, difficulty = 2) {
           let block = new Block((parseInt(this.getLength())+1), blockTimeStamp, this.pendingTransactions, this.pendingOrders, this.pendingOmmers, this.getLatestBlock().hash);
@@ -830,9 +825,7 @@ var Blockchain = class Blockchain {
       }
 
       createOrder(order,originationID = ''){
-          var d1 = Date.now()
-          var d2 = new Date( d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate(), d1.getUTCHours(), d1.getUTCMinutes(), d1.getUTCSeconds() );
-          order["timestamp"] = Math.floor(d2.getTime()/ 1000);
+          order["timestamp"] = parseInt(new Date().getTime()/1000);
           order["transactionID"] = Hash(order["fromAddress"]+order["pairBuy"]+order["timestamp"]);
           //need to create a transaction ID and return it
           if(originationID != ''){
