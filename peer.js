@@ -1260,17 +1260,18 @@ var port2;
 var sw;
 var sw2;
 //////////////////////////////////////////////////////core function asynchronous
-var cbReset = function(){
+var cbReset = async function(){
   try{
-    sw.close();
-    sw2.close();
+    await sw.close();
+    await sw2.close();
   }catch(err){
     console.log("initial connection being established")
     //console.log(err)
   }
-  peers = null;
-  port = null;
-  port2 = null;
+  peers = await null;
+  port = await null;
+  port2 = await null;
+  await setTimeout(function(){console.log("reloading connection")},2000);
   (async () => {
 
     peers = {}
