@@ -1265,8 +1265,10 @@ var cbReset = function(){
     sw.close();
     sw2.close();
   }catch(err){
-    console.log(err)
+    console.log("initial connection being established")
+    //console.log(err)
   }
+  peers = null;
   port = null;
   port2 = null;
   (async () => {
