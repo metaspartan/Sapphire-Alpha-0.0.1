@@ -941,7 +941,7 @@ var deleteTransactions = function(){
 
   stream.on('close',function(){
     console.log("all transaction records were removed")
-    
+
   });
 }
 
@@ -1295,7 +1295,9 @@ var getBalanceAtAddressAllBalance = function(address,callback){
     if(data.key.toString().split(":")[0] == "abal" && data.key.toString().split(":")[1].toLowerCase() == address.toLowerCase()){
       //balances from new all balance tree
       //console.log('key = '+data.key+" value = "+data.value.toString());
-      allBalances.push(parseFloat(JSON.parse(data.value.toString())["balance"]));
+      allBalances[data.key.toString().split(":")[2]]=parseFloat(JSON.parse(data.value.toString())["balance"]);
+      //var tickerBalance = {[data.key.toString().split(":")[2]]:parseFloat(JSON.parse(data.value.toString())["balance"])}
+      //allBalances.push(tickerBalance);
     }
   })
   stream.on("close",function(data){
@@ -1458,6 +1460,64 @@ var getBalanceAtAddress = function(address,callback){
       returnTime();
 
     });
+    //console.log("balance without airdrop is "+addrBalance);
+
+}
+
+var getAllBalanceAtAddress = function(address,callback){
+
+    console.log(chalk.bgRed("Total Balance of "+address));
+
+    //var balance = [];
+
+    var cbReturnAllBalance = async function(balanceArray){
+
+      console.log(JSON.stringify(balanceArray));
+
+      balance = await balanceArray;
+
+      async function returnTime(){
+
+          console.log("WHAT okay"+balance["SFRX"]);
+          if(typeof balance["SFRX"] === 'undefined' || balance["SFRX"] === null){
+            balance["SFRX"]=0;
+            var existing = await parseFloat(balance["SFRX"]);
+            console.log("i am in here"+balance["SFRX"]);
+          }else{
+            var existing = await (balance["SFRX"]);
+            console.log("i am in else here"+balance["SFRX"]);
+          }
+
+
+          //var existing = parseFloat(balance["SFRX"]);//going to have to replace this later
+          if(!existing){existing = 0};
+          //var orig = await parseFloat(airdrop);
+          var orig = await web3.eth.getBalance(address, 1530000)
+          orig = await web3.utils.fromWei(orig,'ether');
+          //var orig = await web3.utils.fromWei(orig,'ether');
+          orig = await parseFloat(orig*2);
+          console.log(chalk.bgRed("orig = "+orig))
+          if(!orig){orig = 0};
+          console.log(chalk.bgRed("okay2"+parseFloat(existing+orig)));
+          var newbal = 0;
+          newbal = await parseFloat(newbal + existing);
+          newbal = await parseFloat(newbal + orig);
+          //console.log("newbal = "+newbal)
+          //balance["SFRX"] = newbal;
+          console.log(balance["SFRX"]);
+          balance["SFRX"] = await parseFloat(existing+orig);
+          //return balance;
+          callback(balance);
+
+      }
+
+      returnTime();
+
+    }
+
+    getBalanceAtAddressAllBalance(address,cbReturnAllBalance)
+
+
     //console.log("balance without airdrop is "+addrBalance);
 
 }
@@ -2382,6 +2442,7 @@ module.exports = {
     getTransactionByHash:getTransactionByHash,
     getTransactionReceiptsByAddress:getTransactionReceiptsByAddress,
     getBalanceAtAddress:getBalanceAtAddress,
+    getAllBalanceAtAddress:getAllBalanceAtAddress,
     getBalanceAtAddressFromTrie:getBalanceAtAddressFromTrie,
     getBalanceAtAddressABTrie:getBalanceAtAddressABTrie,
     getAddressNonce:getAddressNonce,

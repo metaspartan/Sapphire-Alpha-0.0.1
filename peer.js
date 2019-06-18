@@ -1816,7 +1816,7 @@ var cbReset = async function(){
             }
 
             var checkYourUTCTime = parseInt(new Date().getTime()/1000);
-            console.log("THIS PEER UTC TIME IS "+JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]+" and you "+checkYourUTCTime+" and diff is "+Math.abs(checkYourUTCTime - JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]));
+            //console.log("THIS PEER UTC TIME IS "+JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]+" and you "+checkYourUTCTime+" and diff is "+Math.abs(checkYourUTCTime - JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]));
 
             if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
               frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
@@ -3210,9 +3210,9 @@ function cliGetInput(){
       }
       //BlkDB.getBalanceAtAddressFromTrie(egemAddress,addyBal2)
       var addyBal3 = function(data){
-        console.log("from the all balances "+JSON.stringify(data));//do noting now
+        console.log(chalk.bgRed("from the all balances "+JSON.stringify(data)));//do noting now
       }
-      BlkDB.getBalanceAtAddressAllBalance(egemAddress,addyBal3)
+      BlkDB.getAllBalanceAtAddress(egemAddress,addyBal)
       var addyBal4 = function(data){
         console.log(" ");
         console.log(chalk.yellow("--------------------------------"));
@@ -4265,7 +4265,8 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
       }
       console.log(chalk.green("------------------------"));
     }
-    BlkDB.getBalanceAtAddress(JSON.parse(childData)["getBalance"]["address"],addyBal);
+    BlkDB.getAllBalanceAtAddress(JSON.parse(childData)["getBalance"]["address"],addyBal);
+    //getBalanceAtAddress//the long way
 
   }else if(isJSON(childData) && JSON.parse(childData)["transaction"]){
     log("Incoming Transaction over RPC");
@@ -4457,7 +4458,8 @@ var impcMethods = function(datacall){
 }
 
 var impcBalance = function(addr,cbBalanceEvent){
-  BlkDB.getBalanceAtAddress(addr,cbBalanceEvent);
+  BlkDB.getAllBalanceAtAddress(addr,cbBalanceEvent);
+  //getBalanceAtAddress//the long way
 }
 
 var impceventcaller;
@@ -4485,7 +4487,7 @@ var callMe = function(data){
   console.log('im calling you with the button '+data);
 }
 
-ExPl.initialize(BlkDB.getBalanceAtAddress,BlkDB.getBlockByHash,BlkDB.getBlock,BlkDB.getTransactionByHash,BlkDB.getTransactionReceiptsByAddress)
+ExPl.initialize(BlkDB.getAllBalanceAtAddress,BlkDB.getBlockByHash,BlkDB.getBlock,BlkDB.getTransactionByHash,BlkDB.getTransactionReceiptsByAddress)
 setTimeout(function(){
   ExPl.startExplorer(chainState,callMe);
 },7000)
