@@ -2521,6 +2521,7 @@ module.exports = {
     getOrdersPairBuy:getOrdersPairBuy,
     getOrdersPairSell:getOrdersPairSell,
     getOrdersPairBuyAndSell:getOrdersPairBuyAndSell,
+    getOrdersPairSellAndBuy:getOrdersPairSellAndBuy,
     clearOrderById:clearOrderById,
     callDeletedOrders:callDeletedOrders,
     buildTrade:buildTrade,
