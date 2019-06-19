@@ -561,6 +561,10 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
       txIndex++;//7
     })
 
+    /////////////////////////////////////////////////////////////////////Listing
+
+    /////////////////////////////////////////////////////////////////////Listing
+
     ////////////////////////////////////////////////////////now block TXs in order
     console.log("WHAT IS TRANSACTIONS LENGTH BLOCK ???? "+transactions.length)
 
@@ -1089,6 +1093,10 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
   //txConfirmation = await Hash(txConfirmation+localBalanceRecord);
   txIndex++//7
   ////////////////////////////////////////////////////////////END NATIVE REWARDS
+
+  ///////////////////////////////////////////////////////////////////////Listing
+
+  ///////////////////////////////////////////////////////////////////////Listing
 
   ////////////////////////////////////////////////////////now block TXs in order
   //console.log("WHAT IS TRANSACTIONS LENGTH STREAM ???? "+transactions.length)
@@ -1696,6 +1704,66 @@ var getOrdersPairBuyAndSell = function(pairBuy,pairSell,callback){
     stream2.on('data',function(data){
 
       if(data.toString().split(":")[0] == "ox" && data.toString().split(":")[1] == "SELL" && data.toString().split(":")[2] == pairBuy && data.toString().split(":")[3] == pairSell){
+        db.get(data, function (err, value) {
+          console.log("value"+value);
+          result2.push(value.toString());
+        })
+      }
+
+    });
+    //need to test the second callback to match previous set ups from nanosql
+    stream2.on('close',function(data){
+      var resultSells = result2.sort(function(a,b){
+        var x = JSON.parse(a)["price"];
+        //console.log("x "+x+a);
+        var y = JSON.parse(b)["price"];
+        //console.log("y "+y+b)
+        if (x < y) {return -1;}
+        if (x > y) {return 1;}
+        return 0;
+      })
+      callback(resultBuys,resultSells);
+    });
+
+  });
+
+}
+
+var getOrdersPairSellAndBuy = function(pairSell,pairBuy,callback){
+
+  console.log("Open PAIR SELL Orders leveldb");
+  var result = [];
+  var result2 = []
+
+  var stream = db.createKeyStream();
+
+  stream.on('data',function(data){
+
+    if(data.toString().split(":")[0] == "ox" && data.toString().split(":")[1] == "SELL" && data.toString().split(":")[2] == pairBuy && data.toString().split(":")[3] == pairSell){
+      db.get(data, function (err, value) {
+        console.log("value"+value);
+        result.push(value.toString());
+      })
+    }
+
+  });
+  //need to test the second callback to match previous set ups from nanosql
+  stream.on('close',function(data){
+    var resultBuys = result.sort(function(a,b){
+      var x = JSON.parse(a)["price"];
+      //console.log("x "+x+a);
+      var y = JSON.parse(b)["price"];
+      //console.log("y "+y+b)
+      if (x > y) {return -1;}
+      if (x < y) {return 1;}
+      return 0;
+    })
+
+    var stream2 = db.createKeyStream();
+
+    stream2.on('data',function(data){
+
+      if(data.toString().split(":")[0] == "ox" && data.toString().split(":")[1] == "BUY" && data.toString().split(":")[2] == pairBuy && data.toString().split(":")[3] == pairSell){
         db.get(data, function (err, value) {
           console.log("value"+value);
           result2.push(value.toString());

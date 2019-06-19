@@ -3961,6 +3961,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           log(frankieCoin.pendingOrders[odr]["buyOrSell"]);
           log(frankieCoin.pendingOrders[odr]["price"]);
           log(frankieCoin.pendingOrders[odr]["amount"]);
+
           if(frankieCoin.pendingOrders[odr]["buyOrSell"] == "BUY"){
 
             var myCallbackBuySells = function(data,dataSells) {
@@ -3980,7 +3981,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                   log("--------------------------");
                   log('SELL ORDER: '+JSON.stringify(JSON.parse(dataSells[objs])));
                   log("-----V-------------V------");
-                  if(parseFloat(JSON.parse(data[obj])["price"]) >= parseFloat(JSON.parse(dataSells[objs])["price"])){//buyer i higher or equal than the seller
+                  if(parseFloat(JSON.parse(data[obj])["price"]) >= parseFloat(JSON.parse(dataSells[objs])["price"])){//buyer is higher or equal than the seller
                     log("------------<>-------------");
                     log("SELLER "+JSON.parse(dataSells[objs])["fromAddress"]+" OF "+JSON.parse(dataSells[objs])["pairBuy"]+" QTY "+JSON.parse(dataSells[objs])["amount"]+" FOR "+JSON.parse(dataSells[objs])["price"]+" PER "+JSON.parse(dataSells[objs])["pairSell"]+" timestamp "+JSON.parse(dataSells[objs])["timestamp"]+" transactionID "+JSON.parse(dataSells[objs])["transactionID"]);
                     log(JSON.parse(dataSells[objs])["amount"]+" OF "+JSON.parse(dataSells[objs])["pairBuy"]+" TO "+JSON.parse(dataSells[objs])["fromAddress"]);
@@ -4115,24 +4116,165 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
               }
             };
 
-            log("Any Sell Orders with pricing less tha or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity requested");
+            log("Any Sell Orders with pricing less than or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity requested");
             BlkDB.getOrdersPairBuyAndSell(frankieCoin.pendingOrders[odr]["pairBuy"],frankieCoin.pendingOrders[odr]["pairSell"],myCallbackBuySells)
 
           }else if (frankieCoin.pendingOrders[odr]["buyOrSell"] == "SELL"){
 
-            var myCallbackSellPS = function(data) {
+            var myCallbackSellBuys = function(dataBuys,data) {
+              //log('BUY ORDERS: '+JSON.stringify(data));//test for input
+              for (obj in data){
+                log("--------------------------");
+                log('BUY ORDER: '+JSON.stringify(JSON.parse(data[obj])));//test for input
+                log("--------------------------");
+                log("SELLER "+JSON.parse(data[obj])["fromAddress"]+" OF "+JSON.parse(data[obj])["pairBuy"]+" QTY "+JSON.parse(data[obj])["amount"]+" FOR "+JSON.parse(data[obj])["price"]+" PER "+JSON.parse(data[obj])["pairSell"]+" timestamp "+JSON.parse(data[obj])["timestamp"]+" transactionID "+JSON.parse(data[obj])["transactionID"]);
+                log(JSON.parse(data[obj])["amount"]+" OF "+JSON.parse(data[obj])["pairBuy"]+" FROM "+JSON.parse(data[obj])["fromAddress"]);
+                log(parseFloat(JSON.parse(data[obj])["amount"]*JSON.parse(data[obj])["price"])+" OF "+JSON.parse(data[obj])["pairSell"]+" TO [BUYER]");
+                //BlkDB.buildTrade(JSON.parse(data[obj]),myTradeCallback);
+
+                for (objs in dataBuys){
+                  log("--------------------------");
+                  log('SELL ORDER: '+JSON.stringify(JSON.parse(data[obj])));//test for input
+                  log("--------------------------");
+                  log('BUY ORDER: '+JSON.stringify(JSON.parse(dataBuys[objs])));
+                  log("-----V-------------V------");
+                  if(parseFloat(JSON.parse(data[obj])["price"]) <= parseFloat(JSON.parse(dataBuys[objs])["price"])){//buyer is higher or equal than the seller
+                    log("------------<>-------------");
+                    log("BUYER "+JSON.parse(dataBuys[objs])["fromAddress"]+" OF "+JSON.parse(dataBuys[objs])["pairBuy"]+" QTY "+JSON.parse(dataBuys[objs])["amount"]+" FOR "+JSON.parse(dataBuys[objs])["price"]+" PER "+JSON.parse(dataBuys[objs])["pairSell"]+" timestamp "+JSON.parse(dataBuys[objs])["timestamp"]+" transactionID "+JSON.parse(dataBuys[objs])["transactionID"]);
+                    log(JSON.parse(dataBuys[objs])["amount"]+" OF "+JSON.parse(dataBuys[objs])["pairBuy"]+" TO "+JSON.parse(dataBuys[objs])["fromAddress"]);
+                    log("SELLER "+JSON.parse(data[obj])["fromAddress"]+" OF "+JSON.parse(data[obj])["pairBuy"]+" QTY "+JSON.parse(data[obj])["amount"]+" FOR "+JSON.parse(data[obj])["price"]+" PER "+JSON.parse(data[obj])["pairSell"]+" timestamp "+JSON.parse(data[obj])["timestamp"]+" transactionID "+JSON.parse(data[obj])["transactionID"]);
+                    log(parseFloat(JSON.parse(dataBuys[objs])["amount"]*JSON.parse(dataBuys[objs])["price"])+" OF "+JSON.parse(dataBuys[objs])["pairSell"]+" TO [BUYER]");
+                    log("------------<>-------------");
+
+                    //var replacementOrder = {};
+
+                    //transaction A
+                    var addressTo = JSON.parse(dataBuys[objs])["fromAddress"];
+                    var addressFrom = JSON.parse(data[obj])["fromAddress"];
+
+                    if(parseFloat(JSON.parse(data[obj])["amount"]) >= parseFloat(JSON.parse(dataBuys[objs])["amount"])){
+                      var amount = parseFloat(JSON.parse(dataBuys[objs])["amount"]);
+                      /////////////////////////////////////replacement order buyer
+                      /****
+                      replacementOrder.buyOrSell = "BUY";
+                      replacementOrder.fromAddress = JSON.parse(data[obj])["fromAddress"];
+                      replacementOrder.amount = parseFloat(JSON.parse(data[obj])["amount"]) - parseFloat(JSON.parse(dataSells[objs])["amount"]);
+                      replacementOrder.price = JSON.parse(data[obj])["price"];
+                      replacementOrder.pairing = JSON.parse(data[obj])["pairing"];
+                      replacementOrder.pairBuy = JSON.parse(data[obj])["pairBuy"];
+                      replacementOrder.pairSell = JSON.parse(data[obj])["pairSell"];
+                      replacementOrder.transactionID = JSON.parse(data[obj])["transactionID"];
+                      replacementOrder.originationID = JSON.parse(data[obj])["originationID"];
+                      ***/
+
+                      var replacementOrder = new sapphirechain.Order(
+                        JSON.parse(data[obj])["fromAddress"],
+                        'SELL',
+                        JSON.parse(data[obj])["pairBuy"],
+                        JSON.parse(data[obj])["pairSell"],
+                        parseFloat(JSON.parse(data[obj])["amount"]) - parseFloat(JSON.parse(dataBuys[objs])["amount"]),
+                        JSON.parse(data[obj])["price"],
+                        '',
+                        ''
+                      );
+
+                      frankieCoin.createOrder(replacementOrder,JSON.parse(data[obj])["originationID"]);
+                      BlkDB.addOrder("ox:SELL"+":"+JSON.parse(data[obj])["pairBuy"]+":"+JSON.parse(data[obj])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+                      console.log(chalk.bgRed("BROADCASTING REPLACEMENT ORDER"));
+                      console.log(JSON.stringify(replacementOrder));
+                      fbroadcastPeersBlock('order',JSON.stringify(replacementOrder));
+                      console.log(chalk.bgRed("BROADCASTING REPLACEMENT ORDER"));
+                    }else{
+                      var amount = JSON.parse(data[obj])["amount"];
+                      ////////////////////////////////////replacement order seller
+                      /***
+                      replacementOrder.buyOrSell = "SELL";
+                      replacementOrder.fromAddress = JSON.parse(dataSells[objs])["fromAddress"];
+                      replacementOrder.amount = parseFloat(JSON.parse(dataSells[objs])["amount"]) - parseFloat(JSON.parse(data[obj])["amount"]);
+                      replacementOrder.price = JSON.parse(dataSells[objs])["price"];
+                      replacementOrder.pairing = JSON.parse(dataSells[objs])["pairing"];
+                      replacementOrder.pairBuy = JSON.parse(dataSells[objs])["pairBuy"];
+                      replacementOrder.pairSell = JSON.parse(dataSells[objs])["pairSell"];
+                      replacementOrder.transactionID = JSON.parse(dataSells[objs])["transactionID"];
+                      replacementOrder.originationID = JSON.parse(data[obj])["originationID"];
+                      ***/
+                      var replacementOrder = new sapphirechain.Order(
+                        JSON.parse(dataBuys[objs])["fromAddress"],
+                        'BUY',
+                        JSON.parse(dataBuys[objs])["pairBuy"],
+                        JSON.parse(dataBuys[objs])["pairSell"],
+                        parseFloat(JSON.parse(dataBuys[objs])["amount"]) - parseFloat(JSON.parse(data[obj])["amount"]),
+                        JSON.parse(dataBuys[objs])["price"],
+                        '',
+                        ''
+                      );
+
+                      frankieCoin.createOrder(replacementOrder,JSON.parse(dataBuys[objs])["originationID"]);
+                      BlkDB.addOrder("ox:BUY"+":"+JSON.parse(dataBuys[objs])["pairBuy"]+":"+JSON.parse(dataBuys[objs])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+                      console.log(chalk.bgRed("BROADCASTING REPLACEMENT ORDER"));
+                      console.log(JSON.stringify(replacementOrder));
+                      fbroadcastPeersBlock('order',JSON.stringify(replacementOrder));
+                      console.log(chalk.bgRed("BROADCASTING REPLACEMENT ORDER"));
+                    }
+
+                    var ticker = JSON.parse(data[obj])["pairBuy"];
+                    var myblocktx = new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker);
+                    //does not work this way need tro rethink
+                    myblocktx.oxdid = JSON.parse(data[obj])["transactionID"];
+                    myblocktx.oxtid = JSON.parse(data[obj])["timestamp"];
+                    console.log(JSON.stringify(myblocktx));
+                    frankieCoin.createTransaction(myblocktx);
+
+                    //transaction B
+                    var addressFrom2 = JSON.parse(data[obj])["fromAddress"];
+                    var addressTo2 = JSON.parse(dataBuys[objs])["fromAddress"];
+                    var amount2 = parseFloat(amount*JSON.parse(dataBuys[objs])["price"]);
+
+                    var ticker2 = JSON.parse(dataBuys[objs])["pairSell"];
+                    var myblocktx2 = new sapphirechain.Transaction(addressFrom2, addressTo2, amount2, ticker2);
+                    //does not work this way need tro rethink
+                    myblocktx2.oxdid = JSON.parse(dataBuys[objs])["transactionID"];
+                    myblocktx2.oxtid = JSON.parse(dataBuys[objs])["timestamp"];
+                    console.log(JSON.stringify(myblocktx2));
+                    frankieCoin.createTransaction(myblocktx2);
+                    ///////////////////////////////////REOG DELETE LOOP AND ORDERS
+                    BlkDB.clearOrderById(JSON.parse(data[obj])["transactionID"],JSON.parse(data[obj])["timestamp"]);
+                    BlkDB.clearOrderById(JSON.parse(dataBuys[objs])["transactionID"],JSON.parse(dataBuys[objs])["timestamp"]);
+                    log("********************");
+                    console.log(data.length+" "+obj+" "+dataBuys.length+" "+objs);
+                    data.splice(obj,1);
+                    log("---DELETED CALLED---");
+                    dataSells.splice(objs,1);
+                    log("---DELETED CALLED---");
+                    console.log(data.length+" "+obj+" "+dataBuys.length+" "+objs);
+                    log("********************");
+                    //update the order in DB to partial
+                    //////////////////////////////END REORG DELETE LOOP AND ORDERS
+                    }
+                    //just testing this out
+                    //delete dataSells[objs];
+                    //BlkDB.buildTrade(JSON.parse(data[obj]),myTradeCallback);
+                  }//end if price
+                }
+                //testing it
+                //delete data[obj];
+                log("--------------------------");
+              }
+
+
+            var myCallbackBuyPS = function(data) {
               log('BUY ORDERS: '+JSON.stringify(data));//test for input
               for (obj in data){
 
-                log("SELLER "+JSON.parse(data[obj])["fromAddress"]+" OF "+JSON.parse(data[obj])["pairBuy"]+" QTY "+JSON.parse(data[obj])["amount"]+" FOR "+JSON.parse(data[obj])["price"]+" PER "+JSON.parse(data[obj])["pairSell"]+" timestamp "+JSON.parse(data[obj])["timestamp"]+" transactionID "+JSON.parse(data[obj])["transactionID"]);
-                log(parseFloat(JSON.parse(data[obj])["amount"]*JSON.parse(data[obj])["price"])+" OF "+JSON.parse(data[obj])["pairSell"]+" TO "+JSON.parse(data[obj])["fromAddress"]);
-                log(JSON.parse(data[obj])["amount"]+" OF "+JSON.parse(data[obj])["pairBuy"]+" TO [BUYER]");
-                //BlkDB.buildTrade(data[obj],myTradeCallback);
+                log("BUYER "+JSON.parse(data[obj])["fromAddress"]+" OF "+JSON.parse(data[obj])["pairBuy"]+" QTY "+JSON.parse(data[obj])["amount"]+" FOR "+JSON.parse(data[obj])["price"]+" PER "+JSON.parse(data[obj])["pairSell"]+" timestamp "+JSON.parse(data[obj])["timestamp"]+" transactionID "+JSON.parse(data[obj])["transactionID"]);
+                log(JSON.parse(data[obj])["amount"]+" OF "+JSON.parse(data[obj])["pairBuy"]+" TO "+JSON.parse(data[obj])["fromAddress"]);
+                log(parseFloat(JSON.parse(data[obj])["amount"]*JSON.parse(data[obj])["price"])+" OF "+JSON.parse(data[obj])["pairSell"]+" TO [SELLER]");
+                //BlkDB.buildTrade(JSON.parse(data[obj]),myTradeCallback);
               }
             };
 
             log("Any BUY Orders with pricing greater than or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity offered");
-            BlkDB.getOrdersPairSell(frankieCoin.pendingOrders[odr]["pairBuy"],frankieCoin.pendingOrders[odr]["pairSell"],myCallbackSellPS)
+            BlkDB.getOrdersPairSellAndBuy(frankieCoin.pendingOrders[odr]["pairBuy"],frankieCoin.pendingOrders[odr]["pairSell"],myCallbackSellBuys)
 
           }
 
