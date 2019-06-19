@@ -4630,7 +4630,7 @@ var callMe = function(data){
   console.log('im calling you with the button '+data);
 }
 
-ExPl.initialize(BlkDB.getAllBalanceAtAddress,BlkDB.getBlockByHash,BlkDB.getBlock,BlkDB.getTransactionByHash,BlkDB.getTransactionReceiptsByAddress)
+ExPl.initialize(BlkDB.getAllBalanceAtAddress,BlkDB.getBlockByHash,BlkDB.getBlock,BlkDB.getTransactionByHash,BlkDB.getTransactionReceiptsByAddress,BlkDB.getOrdersBuySorted,BlkDB.getOrdersSellSorted)
 setTimeout(function(){
   ExPl.startExplorer(chainState,callMe);
 },7000)

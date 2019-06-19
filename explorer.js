@@ -7,12 +7,14 @@ var path = require('path');
 var getBalance;
 var getBlockByHash;
 var getBLock;
-var initialize = function(getBal,getHash,getBlk,getTxByHash,getTxReceiptsByAddress){
+var initialize = function(getBal,getHash,getBlk,getTxByHash,getTxReceiptsByAddress,getOrdersBS,getOrdersSS){
   getBalance = getBal;
   getBlockByHash = getHash;
   getBlock = getBlk;
   getTransactionByHash = getTxByHash;
   getTransactionReceiptsByAddress = getTxReceiptsByAddress;
+  getOrdersBuySorted = getOrdersBS;
+  getOrdersSellSorted = getOrdersSS;
 }
 
 var server;
@@ -84,6 +86,52 @@ var startExplorer = function(chainState,cb){
     }
 
 
+
+  })
+
+  app.get('/orderbook',(req,res)=>{
+
+    var cbBuySide = function(ordersBuy){
+      var orderBuyBook = [];
+      for(order in ordersBuy){
+        console.log("does it print"+JSON.parse(ordersBuy[order])["fromAddress"])
+        orderBuyBook.push({
+          fromAddress:JSON.parse(ordersBuy[order])["fromAddress"],
+          pairing:JSON.parse(ordersBuy[order])["pairing"],
+          pairBuy:JSON.parse(ordersBuy[order])["pairBuy"],
+          pairSell:JSON.parse(ordersBuy[order])["pairSell"],
+          amount:JSON.parse(ordersBuy[order])["amount"],
+          price:JSON.parse(ordersBuy[order])["price"],
+          transactionID:JSON.parse(ordersBuy[order])["transactionID"],
+          originationID:JSON.parse(ordersBuy[order])["originationID"],
+          timestamp:JSON.parse(ordersBuy[order])["timestamp"],
+        })
+      }
+
+      var cbSellSide = function(ordersSell){
+        var orderSellBook = [];
+        for(order in ordersSell){
+          console.log("does it print"+JSON.parse(ordersSell[order])["fromAddress"])
+          orderSellBook.push({
+            fromAddress:JSON.parse(ordersSell[order])["fromAddress"],
+            pairing:JSON.parse(ordersSell[order])["pairing"],
+            pairBuy:JSON.parse(ordersSell[order])["pairBuy"],
+            pairSell:JSON.parse(ordersSell[order])["pairSell"],
+            amount:JSON.parse(ordersSell[order])["amount"],
+            price:JSON.parse(ordersSell[order])["price"],
+            transactionID:JSON.parse(ordersSell[order])["transactionID"],
+            originationID:JSON.parse(ordersSell[order])["originationID"],
+            timestamp:JSON.parse(ordersSell[order])["timestamp"],
+          })
+        }
+
+        res.render('orders',{buybook:orderBuyBook,sellbook:orderSellBook});
+
+      }
+      getOrdersSellSorted(cbSellSide);
+
+    }
+    getOrdersBuySorted(cbBuySide);
 
   })
 
