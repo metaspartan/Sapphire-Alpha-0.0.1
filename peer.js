@@ -4226,8 +4226,9 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                     frankieCoin.createTransaction(myblocktx);
 
                     //transaction B
-                    var addressFrom2 = JSON.parse(data[obj])["fromAddress"];
-                    var addressTo2 = JSON.parse(dataBuys[objs])["fromAddress"];
+
+                    var addressFrom2 = JSON.parse(dataBuys[objs])["fromAddress"];
+                    var addressTo2 = JSON.parse(data[obj])["fromAddress"];
                     var amount2 = parseFloat(amount*JSON.parse(dataBuys[objs])["price"]);
 
                     var ticker2 = JSON.parse(dataBuys[objs])["pairSell"];
