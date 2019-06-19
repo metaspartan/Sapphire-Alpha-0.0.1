@@ -243,6 +243,7 @@ function requestListener(request, response) {
           response.statusCode = 404;
           response.end("oops!! not sending properly formatted JSON")
           console.log(chalk.bgRed("This was the null create block issue from "+request.connection.remoteAddress+" ignoring it "));
+
         }else if(isJSON(body) && JSON.parse(body)["createBlock"]){
           doEet = true;
           closePort();//going to close off the port for a second
@@ -260,6 +261,12 @@ function requestListener(request, response) {
             isMining = false;
           }
           //this signifies that this is a miner and we need to turn off explorer and other RPC for orders and such
+        }else if(isJSON(body) &&  JSON.parse(body)["getOrderBook"]){
+          doEet = true;
+        }else if(isJSON(body) &&  JSON.parse(body)["signedOrder"]){
+          doEet = true;
+        }else if(isJSON(body) &&  JSON.parse(body)["signedTransaction"]){
+          doEet = true;
         }else{
           console.log(chalk.bgRed("This was the fall through case from "+request.connection.remoteAddress+" ignoring it "));
           console.log("probable hack attempt");
