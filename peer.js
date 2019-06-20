@@ -3054,10 +3054,7 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput == "OX"){//O is for order
       //other commands can go Here
-      var cbTestBuys = function(){
-        console.log("does nothing yet");
-      }
-      BlkDB.getOrdersPairBuy("EGEM","SFRX",cbTestBuys);
+      BlkDB.deleteOrders();
       cliGetInput();
     }else if(userInput.startsWith("addAllBalanceRecord(")){//
       var tempAddBalance = userInput.slice(userInput.indexOf("addAllBalanceRecord(")+20, userInput.indexOf(")"));
@@ -4149,8 +4146,9 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                     //var replacementOrder = {};
 
                     //transaction A
-                    var addressTo = JSON.parse(dataBuys[objs])["fromAddress"];
                     var addressFrom = JSON.parse(data[obj])["fromAddress"];
+                    var addressTo = JSON.parse(dataBuys[objs])["fromAddress"];
+
 
                     if(parseFloat(JSON.parse(data[obj])["amount"]) >= parseFloat(JSON.parse(dataBuys[objs])["amount"])){
                       var amount = parseFloat(JSON.parse(dataBuys[objs])["amount"]);
@@ -4245,7 +4243,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                     console.log(data.length+" "+obj+" "+dataBuys.length+" "+objs);
                     data.splice(obj,1);
                     log("---DELETED CALLED---");
-                    dataSells.splice(objs,1);
+                    dataBuys.splice(objs,1);
                     log("---DELETED CALLED---");
                     console.log(data.length+" "+obj+" "+dataBuys.length+" "+objs);
                     log("********************");
@@ -4275,7 +4273,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
             };
 
             log("Any BUY Orders with pricing greater than or equal to "+frankieCoin.pendingOrders[odr]['price']+" up to the quantity offered");
-            BlkDB.getOrdersPairSellAndBuy(frankieCoin.pendingOrders[odr]["pairBuy"],frankieCoin.pendingOrders[odr]["pairSell"],myCallbackSellBuys)
+            BlkDB.getOrdersPairSellAndBuy(frankieCoin.pendingOrders[odr]["pairSell"],frankieCoin.pendingOrders[odr]["pairBuy"],myCallbackSellBuys)
 
           }
 

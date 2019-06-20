@@ -949,6 +949,23 @@ var deleteTransactions = function(){
   });
 }
 
+var deleteOrders = function(){
+  var stream = db.createKeyStream();
+
+  stream.on('data',function(data){
+
+    if(data.toString().split(":")[0] == "ox" || data.toString().split(":")[0] == "tfox" || data.toString().split(":")[0] == "fox"){
+      db.del(data);
+    }
+
+  });
+
+  stream.on('close',function(){
+    console.log("all orders and deleted are were removed")
+
+  });
+}
+
 //////////////////////////////////the conglamorate transation with storage nonce
 var addTransaction = async function(transactionKey,transaction,blockNum,blkChainStateHash,txIndex){
   return new Promise(async function(resolve) {
@@ -2466,6 +2483,7 @@ module.exports = {
     refresh:refresh,
     closeDB:closeDB,
     deleteTransactions:deleteTransactions,
+    deleteOrders:deleteOrders,
     dumpDatCopy:dumpDatCopy,
     dumpToJsonFIle:dumpToJsonFIle,
     dumpToJsonFIleRange:dumpToJsonFIleRange,
