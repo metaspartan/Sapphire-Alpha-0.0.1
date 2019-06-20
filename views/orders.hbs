@@ -17,45 +17,49 @@
   <input type="button" value="submit" onClick="callMe(document.getElementById('address').value)" />
 </div>
 
-<div>
-  <table class="tx-detail-table">
-  {{#each buybook}}
+  <table>
+    <tr>
+      <td>
+        <table class="tx-detail-table">
+        {{#each buybook}}
 
-      <tr><th style="background-color:#6FE05A;" colspan="8">{{pairing}} BUY ORDER</th></tr>
-      <tr style="background-color:yellow;">
-        <td><span class="title-span">From:</span></td><td><a href="/address?theValue={{fromAddress}}">{{fromAddress}}</a></td>
-        <td><span class="title-span">Pair:</span></td><td>BUY: {{pairBuy}} SELL: {{pairSell}}</td>
-        <td><span class="title-span">Amount:</span></td><td>{{amount}}</td>
-        <td><span class="title-span">Price:</span></td><td>{{price}}</td>
-      </tr>
-      <tr>
-        <td><span class="title-span">transaction ID:</span></td><td><a href="/address?theValue={{transactionID}}">{{transactionID}}</a></td>
-        <td><span class="title-span">origination ID:</span></td><td><a href="/address?theValue={{originationID}}">{{originationID}}</a></td>
-        <td><span class="title-span">timestamp:</span></td><td>{{timestamp}}</td>
-        <tr></tr>
-      </tr>
+            <tr>
+              <th style="background-color:#6FE05A;" colspan="8">
+              <div><span class="title-span">transaction ID:</span><a href="/address?theValue={{transactionID}}">{{transactionID}}</a></div>
+              <div><span class="title-span">origination ID:</span><a href="/address?theValue={{originationID}}">{{originationID}}</a></div>
+              <div>{{pairing}} BUY ORDER <span class="title-span">timestamp: {{timestamp}}</span></div>
+            </th></tr>
+            <tr style="background-color:yellow;">
+              <td><span class="title-span">From:</span></td><td><a href="/address?theValue={{fromAddress}}">{{fromAddress}}</a></td>
+              <td><span class="title-span">Pair:</span></td><td>BUY: {{pairBuy}} SELL: {{pairSell}}</td>
+              <td><span class="title-span">Amount:</span></td><td>{{amount}}</td>
+              <td><span class="title-span">Price:</span></td><td>{{price}}</td>
+            </tr>
 
-  {{/each}}
+        {{/each}}
+        </table>
+      </td>
+      <td>
+        <table class="tx-detail-table">
+          {{#each sellbook}}
+
+            <tr>
+              <th style="background-color:#FE6875;" colspan="8">
+              <div><span class="title-span">transaction ID:</span><a href="/address?theValue={{transactionID}}">{{transactionID}}</a></div>
+              <div><span class="title-span">origination ID:</span><a href="/address?theValue={{originationID}}">{{originationID}}</a></div>
+              <div>{{pairing}} SELL ORDER <span class="title-span">timestamp: {{timestamp}}</span></div>
+            </th></tr>
+            <tr style="background-color:yellow;">
+              <td><span class="title-span">From:</span></td><td><a href="/address?theValue={{fromAddress}}">{{fromAddress}}</a></td>
+              <td><span class="title-span">Pair:</span></td><td>BUY: {{pairBuy}} SELL: {{pairSell}}</td>
+              <td><span class="title-span">Amount:</span></td><td>{{amount}}</td>
+              <td><span class="title-span">Price:</span></td><td>{{price}}</td>
+            </tr>
+
+          {{/each}}
+        </table>
+      </td>
+    </tr>
   </table>
-  <table class="tx-detail-table">
-    {{#each sellbook}}
 
-        <tr><th style="background-color:#FE6875;" colspan="8">{{pairing}} SELL ORDER</th></tr>
-        <tr style="background-color:yellow;">
-          <td><span class="title-span">From:</span></td><td><a href="/address?theValue={{fromAddress}}">{{fromAddress}}</a></td>
-          <td><span class="title-span">Pair:</span></td><td>BUY: {{pairBuy}} SELL: {{pairSell}}</td>
-          <td><span class="title-span">Amount:</span></td><td>{{amount}}</td>
-          <td><span class="title-span">Price:</span></td><td>{{price}}</td>
-        </tr>
-        <tr>
-          <td><span class="title-span">transaction ID:</span></td><td><a href="/address?theValue={{transactionID}}">{{transactionID}}</a></td>
-          <td><span class="title-span">origination ID:</span></td><td><a href="/address?theValue={{originationID}}">{{originationID}}</a></td>
-          <td><span class="title-span">timestamp:</span></td><td>{{timestamp}}</td>
-          <tr></tr>
-        </tr>
-
-    {{/each}}
-  </table>
-
-</div>
 </html>
