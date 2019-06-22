@@ -1199,11 +1199,27 @@ var getTransactionReceiptsByAddress = function(address,cb){
   stream.on('data',function(data){
     if(((data.key.toString().split(":")[0] == "tx") && (data.key.toString().split(":")[1]).toLowerCase() == address.toLowerCase()) || ((data.key.toString().split(":")[0] == "tx") && (data.key.toString().split(":")[2]).toLowerCase() == address.toLowerCase())){
       console.log(data.key.toString());
-      var thisTx = txCollection.push({"fromAddress":JSON.parse(data.value)["fromAddress"],"toAddress":JSON.parse(data.value)["toAddress"],"ticker":JSON.parse(data.value)["ticker"],"amount":JSON.parse(data.value)["amount"],"hash":JSON.parse(data.value)["hash"]});
+
+
+      if(data.key.toString().split(":")[4].toString().length == 10){
+        var tsStart = parseInt(data.key.toString().split(":")[4] * 1000)
+      }else{
+        var tsStart = parseInt(data.key.toString().split(":")[4])
+      }
+
+
+      //var tsStart = parseInt(data.key.toString().split(":")[4])
+
+      var t = new Date(tsStart); // The 0 there is the key, which sets the date to the epoch
+
+      console.log(t.toGMTString());
+      //var t = new Date(tsStart);
+
+      var thisTx = txCollection.push({"fromAddress":JSON.parse(data.value)["fromAddress"],"toAddress":JSON.parse(data.value)["toAddress"],"ticker":JSON.parse(data.value)["ticker"],"amount":JSON.parse(data.value)["amount"],"hash":JSON.parse(data.value)["hash"],"date":t.toGMTString(),ts:t});
     }
   })
   stream.on('close',function(){
-    cb(txCollection);
+    cb(txCollection.sort(function(a, b){return b.ts - a.ts}));
   })
 }
 
