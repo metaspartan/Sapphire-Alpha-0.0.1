@@ -1525,6 +1525,13 @@ var cbReset = async function(){
               && (JSON.parse(data)["currentBlockCheckPointHash"]["checkPointHash"] == thisBlockCheckPointHashAtHeight || riserOffset == 0)
             ){
 
+              for(deleted in JSON.parse(data)["deletedOrders"]){
+                console.log("INCOMING BLOCK DELETED ORDERS NEW SCHOOL"+JSON.parse(data)["deletedOrders"][deleted]);
+
+                BlkDB.clearOrderById(JSON.parse(data)["deletedOrders"][deleted].transactionID,JSON.parse(data)["deletedOrders"][deleted].timestamp);
+
+              }
+
               console.log("VALID BLOCK MATCHING CALCULATED CHECK POINT HASHES")
               //if I log this information on the chain state I can see it quickly
 
@@ -3875,7 +3882,7 @@ var myCallbackSell = function(data) {
 
   var lastCheckPointHash;//used to push checkPointHash to broascast peer calback
   var lastCurrentBlockCheckPointHash;//same as above
-  var broadcastPeersBlock = function(trigger,order = ''){
+  var broadcastPeersBlock = function(trigger,order = '',deletedOrders){
   if(trigger == "block"){
     //sending the block to the peers
     log("------------------------------------------------------")
@@ -3888,7 +3895,8 @@ var myCallbackSell = function(data) {
       currentTransactionRootHash:chainState.previousTxHash,
       postBlockTransactionHeight:chainState.transactionHeight,
       postBlockTransactionHash:chainState.transactionRootHash,
-      block:frankieCoin.getLatestBlock()
+      block:frankieCoin.getLatestBlock(),
+      deletedOrders:deletedOrders
     }),"new-block");
     //broadcastPeers(JSON.stringify({checkPointHash:lastCheckPointHash,currentBlockCheckPointHash:lastCurrentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}));
   }else if(trigger == "order"){
@@ -3923,6 +3931,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
     if((frankieCoin.getLatestBlock().hash == JSON.parse(childData)["createBlock"]["block"]["previousHash"]) && JSON.parse(childData)["createBlock"]["block"]["timestamp"] != "1541437502148"){
       //block from miner is commmitted though internal miner - could chainge this to a direct call
 
+      var deletedOrders = [];
 
       ///////////////////////PROMIS ASYNC FUNCTION SO I CAN STRUCTURE THE TIMING
       (async () => {
@@ -4062,6 +4071,10 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                     //does not work this way need tro rethink
                     myblocktx.oxdid = JSON.parse(data[obj])["transactionID"];
                     myblocktx.oxtid = JSON.parse(data[obj])["timestamp"];
+
+                    var deleteThisOrder = {"order":{"transactionID":JSON.parse(data[obj])["transactionID"],"timestamp":JSON.parse(data[obj])["timestamp"]}};
+                    deletedOrders.push(deleteThisOrder);
+
                     console.log(JSON.stringify(myblocktx));
                     frankieCoin.createTransaction(myblocktx);
 
@@ -4075,6 +4088,10 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                     //does not work this way need tro rethink
                     myblocktx2.oxdid = JSON.parse(dataSells[objs])["transactionID"];
                     myblocktx2.oxtid = JSON.parse(dataSells[objs])["timestamp"];
+
+                    var deleteThisOrder2 = {"order":{"transactionID":JSON.parse(dataSells[objs])["transactionID"],"timestamp":JSON.parse(dataSells[objs])["timestamp"]}};
+                    deletedOrders.push(deleteThisOrder2);
+
                     console.log(JSON.stringify(myblocktx2));
                     frankieCoin.createTransaction(myblocktx2);
                     ///////////////////////////////////REOG DELETE LOOP AND ORDERS
@@ -4220,6 +4237,10 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                     //does not work this way need tro rethink
                     myblocktx.oxdid = JSON.parse(data[obj])["transactionID"];
                     myblocktx.oxtid = JSON.parse(data[obj])["timestamp"];
+
+                    var deleteThisOrder = {"order":{"transactionID":JSON.parse(data[obj])["transactionID"],"timestamp":JSON.parse(data[obj])["timestamp"]}};
+                    deletedOrders.push(deleteThisOrder);
+
                     console.log(JSON.stringify(myblocktx));
                     frankieCoin.createTransaction(myblocktx);
 
@@ -4234,6 +4255,10 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                     //does not work this way need tro rethink
                     myblocktx2.oxdid = JSON.parse(dataBuys[objs])["transactionID"];
                     myblocktx2.oxtid = JSON.parse(dataBuys[objs])["timestamp"];
+
+                    var deleteThisOrder2 = {"order":{"transactionID":JSON.parse(dataBuys[objs])["transactionID"],"timestamp":JSON.parse(dataBuys[objs])["timestamp"]}};
+                    deletedOrders.push(deleteThisOrder2)
+
                     console.log(JSON.stringify(myblocktx2));
                     frankieCoin.createTransaction(myblocktx2);
                     ///////////////////////////////////REOG DELETE LOOP AND ORDERS
@@ -4325,7 +4350,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           calculateCheckPoints(frankieCoin.blockHeight,'miner','');
         //}
         ///////////////////////////////////////////////////////////peers broadcast
-        fbroadcastPeersBlock('block');
+        fbroadcastPeersBlock('block','',deletedOrders);
         ////////////////////finally post the RPC get work block data for the miner
         var countPostMinerCalled = 0;
         var postMiner = async function(){
