@@ -1210,8 +1210,7 @@ var getTransactionReceiptsByAddress = function(address,cb){
 
       //var tsStart = parseInt(data.key.toString().split(":")[4])
 
-      var t = new Date(tsStart); // The 0 there is the key, which sets the date to the epoch
-
+      var t = new Date(tsStart);
       console.log(t.toGMTString());
       //var t = new Date(tsStart);
 
@@ -1563,10 +1562,133 @@ var getAllBalanceAtAddress = function(address,callback){
 
 }
 
-var addOrder = function(orderkey,order){
-  //current key action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp
+
+/****just a refernece for below to copy paste
+var addTransaction = async function(transactionKey,transaction,blockNum,blkChainStateHash,txIndex){
+  return new Promise(async function(resolve) {
+    var confirmationHash = await Hash(txIndex+transaction["hash"]+blockNum+blkChainStateHash);
+    transaction.confirmationHash = await confirmationHash;
+    db.put(transactionKey, transaction).then(async function(){
+      await db.get(transactionKey).then(function(value){
+        var txConfirmationHash = JSON.parse(value)["hash"];
+        //console.log("add transaction txConfirmationHash "+txConfirmationHash)
+        resolve(confirmationHash);
+      }).catch(console.log)
+    }).catch(console.log);
+  })
+}
+******/
+
+var addOrder = async function(orderkey,order,blockNum){
+  console.log("we are placing this order "+orderkey+" --> "+order+" at block "+blockNum);
+  //BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+transactionID+":"+timestamp,myblockorder);
+  var orderConfirnationHash = await Hash(order['transactionID']+order['blockNum'])//thi is also hashed in block can probably get the real checkpoint here
+  return new Promise(async function(resolve) {
+    db.put(orderkey,JSON.stringify(order)).then(async function(){
+      console.log("order added at block "+blockNum+" in database "+orderkey);
+      resolve(orderConfirnationHash);
+    }).catch(console.log)
+  })
   console.log("we are placing this order "+orderkey+" --> "+order);
-  putRecord(orderkey,JSON.stringify(order));
+  //putRecord(orderkey,JSON.stringify(order));
+}
+
+var addOrdersFromStream = async function(orders,blockhash,blknum,block,cbUpdateChainStateOX,blkChainStateHash,transactions){
+
+  var hexBlockNum = ("000000000000000" + blknum.toString(16)).substr(-16);
+
+  console.log(orders+" <--"+typeof(orders))
+
+  for(var key in orders) {
+    if(orders.hasOwnProperty(key)){
+      //console.log("this is where has own key "+JSON.stringify(transactions));
+      if(orders.length > 0){
+        //do nothing
+      }else{
+        orders = [];
+      }
+    }else{
+      orders = JSON.parse(JSON.stringify(orders));
+      //console.log("this is where it is parsed "+transactions);
+    }
+  }
+
+  for(var key in transactions) {
+    if(transactions.hasOwnProperty(key)){
+      //console.log("this is where has own key "+JSON.stringify(transactions));
+      if(transactions.length > 0){
+        //do nothing
+      }else{
+        transactions = [];
+      }
+    }else{
+      transactions = JSON.parse(JSON.stringify(transactions));
+      //console.log("this is where it is parsed "+transactions);
+    }
+  }
+
+  console.log(chalk.bgCyan.black("WOOOT ADDING ORDERS ON VALIDATE WOOT "+orders+ " blockhash " +blockhash+ " blknum " +blknum+" blkChainStateHash: "+blkChainStateHash))
+
+  var oxIndex = 0;
+  var oxConfirmation;
+
+
+  if(orders.length > 0){
+    for(ordax in orders){
+
+      //console.log("in the orders loop ")
+
+      var receipt = orders[ordax];
+
+      var localOxFrom = receipt["fromAddress"].toLowerCase().substring(0,42);
+
+      ///from hereis changes in relation to orders
+      var loclBuyOrSell = receipt["buyOrSell"];
+      var localPairing = receipt["pairing"];
+      var localPairBuy = receipt["pairBuy"];
+      var localPairSell = receipt["pairSell"];
+      var localPrice = receipt["price"];
+      var localState = receipt["state"];
+      var localTransactionID = receipt["transactionID"];
+      var localOriginationID = receipt["originationID"];
+      var localTimestamp = receipt["timestamp"];
+
+      //receipts have a key of toAddress:timestamp:receipthash atm
+      //oxConfirmation = await addTransaction("ox:"+localOxFrom+":"+localTxTo+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blknum,blkChainStateHash,oxIndex);
+      oxConfirmation = await addOrder("ox:"+loclBuyOrSell+":"+localPairBuy+":"+localPairSell+":"+localTransactionID+":"+localTimestamp,receipt);
+      //need to accumulate the balances and add or subtract to PMT
+
+      //localToBalance = await addAllBalanceRecord(localTxTo,receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blknum,txIndex);
+
+      //localFromBalance = await addAllBalanceRecord(localTxFrom,receipt["ticker"],parseFloat(receipt["amount"]*-1).toFixed(8),txConfirmation,blknum,txIndex);
+      //2) get the trie root hash and return for hasing into the block
+
+      //oxConfirmation = await Hash(txConfirmation+localToBalance+localFromBalance)
+
+      //txIndex++
+    }
+  }
+  /////////////////////////////////////////////////////////////////end block txs
+
+  ///////////////////////////////////////////////////////////if transactions have deleted orders
+  if(transactions.length > 0){
+    for(deltx in transactions){
+      if(transactions[deltx].oxdid){
+        clearOrderById(transactions[deltx].oxdid,transactions[deltx].oxtid);
+        console.log(chalk.bgRed("clearing order by id "+transactions[deltx].oxdid))
+      }
+    }
+  }
+  ///////////////////////////////////////////////////////////end if tx has de;eted orders
+
+  //will eventualy add a flag for if this is update or not or not
+  if(blknum == 1){
+    console.log(chalk.bgRed("THE FIRST BLOCK IS ADDED IN STREAM "+blknum+oxConfirmation));
+  }
+  //console.log(chalk.bgRed("THE FIRST BLOCK IS ADDED IN STREAM "+blknum+txConfirmation));
+
+  cbUpdateChainStateOX(blknum,oxConfirmation);
+
 }
 
 //remove orders by transactionID and timestamp
@@ -2549,6 +2671,7 @@ module.exports = {
     getBalanceAtAddressABTrie:getBalanceAtAddressABTrie,
     getAddressNonce:getAddressNonce,
     addOrder:addOrder,
+    addOrdersFromStream:addOrdersFromStream,
     getOrdersBuy:getOrdersBuy,
     getOrdersBuySorted:getOrdersBuySorted,
     getOrdersSellSorted:getOrdersSellSorted,

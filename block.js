@@ -824,9 +824,22 @@ var Blockchain = class Blockchain {
           this.pendingTransactions = replacementTx;
       }
 
-      createOrder(order,originationID = ''){
+      //assing block number previous block number and previous block chain state hash all readily available in proper block
+      createOrder(order,originationID = '',blk,chainStateHashBlk,chainStateHashChkPtHash){
+
+          if(parseInt(chainStateHashBlk+1) != blk){
+            console.log("this node is not able to accept orders need to trigger fail case");
+          }
+
           order["timestamp"] = parseInt(new Date().getTime()/1000);
-          order["transactionID"] = Hash(order["fromAddress"]+order["pairBuy"]+order["timestamp"]);
+          if(blk > 2214){//remove in production but for dev I am at block 2214 when making this change and want old orders to validate
+            order["transactionID"] = Hash(order["fromAddress"]+order["pairBuy"]+order["timestamp"]+chainStateHashChkPtHash);//gig to add some of those hash
+          }else{
+            order["transactionID"] = Hash(order["fromAddress"]+order["pairBuy"]+order["timestamp"]);//original format for chain walking because this change made at block 2214 in dev - remove in production maybe
+          }
+          order["blknum"] = blk;
+          order["chainStateHashBlk"] = chainStateHashBlk;
+          order["chainStateHashChkPtHash"] = chainStateHashChkPtHash;
           //need to create a transaction ID and return it
           if(originationID != ''){
             order["originationID"] = originationID;
@@ -835,6 +848,7 @@ var Blockchain = class Blockchain {
           }
           log("Order just placed is "+JSON.stringify(order));
           this.pendingOrders.push(order);
+
       }
 
       removeOrders(orders){

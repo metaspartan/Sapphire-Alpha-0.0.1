@@ -98,6 +98,12 @@ chainState.transactionRootHash = '';
 chainState.previousTxHeight = 0;
 chainState.previousTxHash = '';
 chainState.transactionHashWeights = [];
+//now adding parameters for order which is verified in part by currentBlockCheckPointHash - note may not need this depth
+chainState.orderHeight = 0;
+chainState.orderRootHash = '';
+chainState.previousOxHeight = 0;
+chainState.previousOxHash = '';
+chainState.orderHashWeights = [];
 //activesynch
 chainState.interval = 10000;
 chainState.activeSynch = [];
@@ -1097,6 +1103,95 @@ var transactionValidator = async function(start,end){
 }
 ///////////////////////////////////////////////////////////TRANSACTION VALIDATOR
 
+////////////////////////////////////////////////////////////////order validation
+var orderValidator = async function(start,end){
+
+  var cbCheckChainStateOX = async function(csOrderHeight){
+
+    if(parseInt(csOrderHeight.toString().split(":")[0]) <= end){
+
+      console.log("CALLED OXVLDY WITH "+start+" and "+end)
+      if(start <= end){
+
+        var incrementor = parseInt(start);
+        console.log("ORDER VALIDATION STARTING AT "+incrementor);
+        var validateThisBlock = await function(){
+          return new Promise((resolve)=> {
+            var cbOxValidator = function(blockToValidate){
+              //console.log(blockToValidate.toString())
+              resolve(blockToValidate.toString());
+            }
+            BlkDB.getBlock(incrementor,cbOxValidator)
+          })
+        }
+        var thisOneBlock = await validateThisBlock();
+        //console.log(thisOneBlock);
+
+        var riserOffset = await (parseInt(incrementor) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
+        var calcCheckPointBlock = parseInt(incrementor - riserOffset)
+        console.log("calculated check point block = "+calcCheckPointBlock);
+
+        if(calcCheckPointBlock == 0){
+          calcCheckPointBlock = 1;
+        }
+        /////think we need this stuff
+
+        //var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+        ////////end I think this is supposed to be here
+
+        var returnCheckPointBlock = async function(checkPointBlock){
+          //console.log("cpb "+checkPointBlock)
+          var blockNumHash = await JSON.parse(thisOneBlock)["hash"];
+          //console.log("blockNumHash: "+blockNumHash);
+
+          var thisBlockCheckPointHash = await sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+
+          var updateChainStateOX = async function(isValidOXHeight,orderCheckPointHash){
+            //console.log(chalk.bgGreen.black("updating chain state height to "+isValidTXHeight));
+            var tempPrevOXHt = chainState.previousOxHeight;
+            var tempPrevOXHash = chainState.previousOxHash;
+            chainState.previousOxHeight = chainState.orderHeight;
+            chainState.previousOxHash = chainState.orderRootHash;
+            chainState.orderHeight = await parseInt(isValidOXHeight);
+            chainState.orderRootHash = await orderCheckPointHash;
+            if(chainState.previousOxHeight == chainState.orderHeight){
+              chainState.previousOxHeight = tempPrevOXHt;
+              chainState.previousOxHash = tempPrevOXHash;
+            }
+            BlkDB.addChainState("cs:orderHeight",chainState.orderHeight+":"+orderCheckPointHash);
+
+            if(isValidOXHeight%frankieCoin.chainRiser == 0){
+              BlkDB.addChainState("cs:orderCheckPointHash:"+isValidOXHeight,orderCheckPointHash);
+            }
+
+          }
+          await BlkDB.addOrdersFromStream(JSON.parse(thisOneBlock)["orders"],JSON.parse(thisOneBlock)["hash"],JSON.parse(thisOneBlock)["blockHeight"],thisOneBlock,updateChainStateOX,thisBlockCheckPointHash,JSON.parse(thisOneBlock)["transactions"])
+          start++;
+          if(start == end){
+            console.log("break clause reached");
+            return;
+          }else{
+            orderValidator(start,end)
+          }
+
+        }
+        BlkDB.getBlock(calcCheckPointBlock,returnCheckPointBlock);
+        //console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
+      }else{
+        console.log("start was greater than or equal to end so just look at chain state hash")
+      }
+
+    }else if(csOrderHeight.split(":")[0] == end){
+      console.log(csOrderHeight);
+    }
+
+  }
+
+  BlkDB.getChainStateParam("orderHeight",cbCheckChainStateOX);
+
+}
+////////////////////////////////////////////////////////////////order validation
+
 /////////////////////////////////////////////////////ENCRYPTED DIRECT MESSAGEING
 var directMessage = function(secretMessage){
 
@@ -1458,7 +1553,7 @@ var cbReset = async function(){
                   myblockorder["originationID"]=originationID;
                   myblockorder["timestamp"]=timestamp;
                   frankieCoin.pendingOrders.push(myblockorder);
-                  BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+transactionID+":"+timestamp,myblockorder);
+                  BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+transactionID+":"+timestamp,myblockorder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
                   console.log("This legitimate signed order by "+validatedSender+" has been posted to chain with confirmation "+myblockorder.transactionID);
                 }else{
                   console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
@@ -2961,6 +3056,19 @@ function cliGetInput(){
 
       cliGetInput();
 
+    }else if(userInput == "OXVLDY"){
+
+      var startEnd = parseInt(chainState.orderHeight+1);
+      var topEnd = parseInt(startEnd+500);
+      console.log("want to call OXVLDY with "+topEnd+" and "+chainState.synchronized)
+      if(topEnd >= chainState.synchronized){
+        topEnd = chainState.synchronized
+      }
+
+      orderValidator(parseInt(startEnd),parseInt(topEnd));
+
+      cliGetInput();
+
     }else if(userInput == "HSHBLK"){
       BlkDB.getAllBLocksByHash();
       cliGetInput();
@@ -3061,6 +3169,11 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput == "OX"){//O is for order
       //other commands can go Here
+      chainState.orderHeight = 0;
+      chainState.orderRootHash = '';
+      chainState.previousOxHeight = 0;
+      chainState.previousOxHash = '';
+      BlkDB.addChainState("cs:orderHeight",chainState.orderHeight+":"+'');
       BlkDB.deleteOrders();
       cliGetInput();
     }else if(userInput.startsWith("addAllBalanceRecord(")){//
@@ -3171,7 +3284,7 @@ function cliGetInput(){
         ///need to alidate that this wallet has the funds to send
         myblockorder = new sapphirechain.Order(addressFrom,buyOrSell,pairBuy,pairSell,amount,price);
         frankieCoin.createOrder(myblockorder);
-        BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
+        BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
         console.log("This legitimate signed order by "+validatedSender+" has been posted to chain with confirmation "+myblockorder.transactionID);
       }else{
         console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
@@ -3382,7 +3495,7 @@ function cliGetInput(){
       log("1st Placing order to "+action+" "+amount+" of "+pairBuy+" for "+price+" by "+maker);
       myblockorder = new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price);
       frankieCoin.createOrder(myblockorder);
-      BlkDB.addOrder("ox:"+action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
+      BlkDB.addOrder("ox:"+action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
       cliGetInput();
     }else if(isJSON(userInput)){//ORDER JSON style strait to order DB ^^ merging with above
       if(RegExp("^0x[a-fA-F0-9]{40}$").test(JSON.parse(userInput)["fromAddress"])){//adding function capabilioties
@@ -3417,7 +3530,7 @@ function cliGetInput(){
 
         myblockorder = new sapphirechain.Order(maker,action,pairBuy,pairSell,amount,price);
         frankieCoin.createOrder(myblockorder);
-        BlkDB.addOrder("ox:"+action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
+        BlkDB.addOrder("ox:"+action+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
         //{"order":{"id":null,"fromAddress":"0x0666bf13ab1902de7dee4f8193c819118d7e21a6","buyOrSell":"SELL","pairBuy":"EGEM","pairSell":"SFRX","amount":"300","price":"26.00"}}
 
         cliGetInput();
@@ -3776,7 +3889,7 @@ var myTradeCallback = function(orig,data) {
       );
       frankieCoin.createOrder(replacementOrder,JSON.parse(data[obj])["originationID"]);
       //BlockchainDB.addOrder({order:replacementOrder});
-      BlkDB.addOrder("ox:SELL"+":"+JSON.parse(data[obj])["pairBuy"]+":"+JSON.parse(data[obj])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+      BlkDB.addOrder("ox:SELL"+":"+JSON.parse(data[obj])["pairBuy"]+":"+JSON.parse(data[obj])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
     }else if (orig["amount"] > parseInt(JSON.parse(data[obj])["amount"])){
       log("TRANSACTION: SELLER "+JSON.parse(data[obj])["fromAddress"]+" to BUYER "+orig["fromAddress"]+" QTY "+parseFloat(JSON.parse(data[obj])["amount"])+ " OF "+orig["pairBuy"]);
       frankieCoin.createTransaction(new sapphirechain.Transaction(JSON.parse(data[obj])["fromAddress"], orig["fromAddress"], parseFloat(orig["amount"]), orig["pairBuy"]));
@@ -3795,7 +3908,7 @@ var myTradeCallback = function(orig,data) {
       );
       frankieCoin.createOrder(replacementOrder,orig["originationID"]);
       //BlockchainDB.addOrder({order:replacementOrder});
-      BlkDB.addOrder("ox:BUY"+":"+orig["pairBuy"]+":"+orig["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+      BlkDB.addOrder("ox:BUY"+":"+orig["pairBuy"]+":"+orig["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
     }
 
   }
@@ -4028,7 +4141,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                       );
 
                       frankieCoin.createOrder(replacementOrder,JSON.parse(data[obj])["originationID"]);
-                      BlkDB.addOrder("ox:BUY"+":"+JSON.parse(data[obj])["pairBuy"]+":"+JSON.parse(data[obj])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+                      BlkDB.addOrder("ox:BUY"+":"+JSON.parse(data[obj])["pairBuy"]+":"+JSON.parse(data[obj])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
                       console.log(chalk.bgRed("BROADCASTING REPLACEMENT ORDER"));
                       console.log(JSON.stringify(replacementOrder));
                       fbroadcastPeersBlock('order',JSON.stringify(replacementOrder));
@@ -4059,7 +4172,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                       );
 
                       frankieCoin.createOrder(replacementOrder,JSON.parse(dataSells[objs])["originationID"]);
-                      BlkDB.addOrder("ox:SELL"+":"+JSON.parse(dataSells[objs])["pairBuy"]+":"+JSON.parse(dataSells[objs])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+                      BlkDB.addOrder("ox:SELL"+":"+JSON.parse(dataSells[objs])["pairBuy"]+":"+JSON.parse(dataSells[objs])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
                       console.log(chalk.bgRed("BROADCASTING REPLACEMENT ORDER"));
                       console.log(JSON.stringify(replacementOrder));
                       fbroadcastPeersBlock('order',JSON.stringify(replacementOrder));
@@ -4194,7 +4307,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                       );
 
                       frankieCoin.createOrder(replacementOrder,JSON.parse(data[obj])["originationID"]);
-                      BlkDB.addOrder("ox:SELL"+":"+JSON.parse(data[obj])["pairBuy"]+":"+JSON.parse(data[obj])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+                      BlkDB.addOrder("ox:SELL"+":"+JSON.parse(data[obj])["pairBuy"]+":"+JSON.parse(data[obj])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
                       console.log(chalk.bgRed("BROADCASTING REPLACEMENT ORDER"));
                       console.log(JSON.stringify(replacementOrder));
                       fbroadcastPeersBlock('order',JSON.stringify(replacementOrder));
@@ -4225,7 +4338,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                       );
 
                       frankieCoin.createOrder(replacementOrder,JSON.parse(dataBuys[objs])["originationID"]);
-                      BlkDB.addOrder("ox:BUY"+":"+JSON.parse(dataBuys[objs])["pairBuy"]+":"+JSON.parse(dataBuys[objs])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder);
+                      BlkDB.addOrder("ox:BUY"+":"+JSON.parse(dataBuys[objs])["pairBuy"]+":"+JSON.parse(dataBuys[objs])["pairSell"]+":"+replacementOrder.transactionID+":"+replacementOrder.timestamp,replacementOrder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
                       console.log(chalk.bgRed("BROADCASTING REPLACEMENT ORDER"));
                       console.log(JSON.stringify(replacementOrder));
                       fbroadcastPeersBlock('order',JSON.stringify(replacementOrder));
@@ -4468,7 +4581,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
       ///need to alidate that this wallet has the funds to send
       myblockorder = new sapphirechain.Order(addressFrom,buyOrSell,pairBuy,pairSell,amount,price);
       frankieCoin.createOrder(myblockorder);
-      BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder);
+      BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
       console.log("This legitimate signed order by "+validatedSender+" has been posted to chain with confirmation "+myblockorder.transactionID);
     }else{
       console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
