@@ -3282,9 +3282,50 @@ function cliGetInput(){
       var validatedSender = web3.eth.accounts.recover(JSON.parse(signedPackage)["message"],JSON.parse(signedPackage)["signature"]);
       if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
         ///need to alidate that this wallet has the funds to send
+        var lillocaltxid = "0";
+        var storetx = true;
+        //process cancels
+        if(buyOrSell == "CANC"){
+
+          switch(amount){
+            case "-001":{
+              lillocaltxid = JSON.stringify(JSON.parse(order)["transactionID"]).replace(/['"/]+/g, '');
+              console.log(chalk.bgRed("processing a cancellation for order id "+lillocaltxid));
+              BlkDB.clearOrderById(lillocaltxid,parseInt(new Date().getTime()/1000))
+            }
+            storetx = false;
+            break;
+            case "-002":{
+              console.log(chalk.bgRed("processing a cancellation for all orders on ticker "+pairBuy+" by "+addressFrom));
+              //todo
+            }
+            storetx = false;
+            break;
+            case "-003":{
+              console.log(chalk.bgRed("processing a cancellation for all orders on pairing "+pairBuy+" and "+pairSell+" by "+addressFrom));
+              //todo
+            }
+            storetx = false;
+            break;
+            case "-999":{
+              console.log(chalk.bgRed("processing a cancellation for all orders by "+addressFrom));
+              BlkDB.clearAllOrdersByAddress(addressFrom);
+              //todo
+            }
+            storetx = false;
+            break;
+          }
+
+        }
+
         myblockorder = new sapphirechain.Order(addressFrom,buyOrSell,pairBuy,pairSell,amount,price);
-        frankieCoin.createOrder(myblockorder);
-        BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
+        if(lillocaltxid != "0"){
+          myblockorder.transactionID = lillocaltxid;
+        }
+        frankieCoin.createOrder(myblockorder,"",frankieCoin.getLatestBlock()["blockHeight"],frankieCoin.getLatestBlock()["chainStateHash"].blockNumber,frankieCoin.getLatestBlock()["chainStateHash"].checkPointHash);
+        if(storetx == true){
+          BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
+        }
         console.log("This legitimate signed order by "+validatedSender+" has been posted to chain with confirmation "+myblockorder.transactionID);
       }else{
         console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
@@ -4075,7 +4116,9 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         ///ORDERS REWRITE
         log("PROCESS TRADES IN PEERS PROCESS TRADES IN PEERS");
         for(odr in frankieCoin.pendingOrders){
+
           console.log("these are already in the db so..... validate transact and update I guess")
+
           log(frankieCoin.pendingOrders[odr]["pairBuy"]);
           log(frankieCoin.pendingOrders[odr]["buyOrSell"]);
           log(frankieCoin.pendingOrders[odr]["price"]);
@@ -4578,10 +4621,49 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
     var price = signedPackageOrder["price"];
     var validatedSender = web3.eth.accounts.recover(JSON.parse(childData)["signedOrder"]["message"],JSON.parse(childData)["signedOrder"]["signature"]);
     if(validatedSender.toLowerCase() == addressFrom.replace(/['"]+/g, '').toLowerCase()){
-      ///need to alidate that this wallet has the funds to send
+      ///need to validate that this wallet has the funds to send
+
+      var storetx = true;
+      var lillocaltxid = "0";
+      //process cancels
+      if(buyOrSell == "CANC"){
+
+        switch(amount){
+          case "-001":{
+            lillocaltxid = signedPackageOrder["transactionID"];
+            console.log(chalk.bgRed("processing a cancellation for order id "+lillocaltxid));
+            BlkDB.clearOrderById(lillocaltxid,parseInt(new Date().getTime()/1000))
+          }
+          storetx = false;
+          break;
+          case "-002":{
+            console.log(chalk.bgRed("processing a cancellation for all orders on ticker "+pairBuy+" by "+addressFrom));
+            //todo
+          }
+          storetx = false;
+          break;
+          case "-003":{
+            console.log(chalk.bgRed("processing a cancellation for all orders on pairing "+pairBuy+" and "+pairSell+" by "+addressFrom));
+            //todo
+          }
+          storetx = false;
+          break;
+          case "-999":{
+            console.log(chalk.bgRed("processing a cancellation for all orders by "+addressFrom));
+            BlkDB.clearAllOrdersByAddress(addressFrom);
+            //todo
+          }
+          storetx = false;
+          break;
+        }
+
+      }
+
       myblockorder = new sapphirechain.Order(addressFrom,buyOrSell,pairBuy,pairSell,amount,price);
       frankieCoin.createOrder(myblockorder);
-      BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
+      if(storetx == true){
+        BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
+      }
       console.log("This legitimate signed order by "+validatedSender+" has been posted to chain with confirmation "+myblockorder.transactionID);
     }else{
       console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());

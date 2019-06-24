@@ -827,15 +827,25 @@ var Blockchain = class Blockchain {
       //assing block number previous block number and previous block chain state hash all readily available in proper block
       createOrder(order,originationID = '',blk,chainStateHashBlk,chainStateHashChkPtHash){
 
+          console.log(blk+" <> "+chainStateHashBlk+" <> "+chainStateHashChkPtHash)
           if(parseInt(chainStateHashBlk+1) != blk){
             console.log("this node is not able to accept orders need to trigger fail case");
           }
 
           order["timestamp"] = parseInt(new Date().getTime()/1000);
           if(blk > 2214){//remove in production but for dev I am at block 2214 when making this change and want old orders to validate
-            order["transactionID"] = Hash(order["fromAddress"]+order["pairBuy"]+order["timestamp"]+chainStateHashChkPtHash);//gig to add some of those hash
+            if(order["buyOrSell"] == "CANC"){
+              //order["transactionID"] = Hash(order["fromAddress"]+order["pairBuy"]+order["timestamp"]+chainStateHashChkPtHash);
+            }else{
+              order["transactionID"] = Hash(order["fromAddress"]+order["pairBuy"]+order["timestamp"]+chainStateHashChkPtHash);
+            }
+            //gig to add some of those hash
           }else{
-            order["transactionID"] = Hash(order["fromAddress"]+order["pairBuy"]+order["timestamp"]);//original format for chain walking because this change made at block 2214 in dev - remove in production maybe
+            if(order["buyOrSell"] == "CANC"){
+              //order["transactionID"] = Hash(order["fromAddress"]+order["pairBuy"]+order["timestamp"]+chainStateHashChkPtHash);
+            }else{
+              order["transactionID"] = Hash(order["fromAddress"]+order["pairBuy"]+order["timestamp"]);//original format for chain walking because this change made at block 2214 in dev - remove in production maybe
+            }
           }
           order["blknum"] = blk;
           order["chainStateHashBlk"] = chainStateHashBlk;

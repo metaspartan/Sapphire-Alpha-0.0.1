@@ -1643,7 +1643,7 @@ var addOrdersFromStream = async function(orders,blockhash,blknum,block,cbUpdateC
       var localOxFrom = receipt["fromAddress"].toLowerCase().substring(0,42);
 
       ///from hereis changes in relation to orders
-      var loclBuyOrSell = receipt["buyOrSell"];
+      var localBuyOrSell = receipt["buyOrSell"];
       var localPairing = receipt["pairing"];
       var localPairBuy = receipt["pairBuy"];
       var localPairSell = receipt["pairSell"];
@@ -1653,9 +1653,17 @@ var addOrdersFromStream = async function(orders,blockhash,blknum,block,cbUpdateC
       var localOriginationID = receipt["originationID"];
       var localTimestamp = receipt["timestamp"];
 
+      if(localBuyOrSell == "CANC"){
+        console.log(chalk.bgMagenta("NEED TO DELETE THIS ORDER "+localTransactionID));
+        clearOrderById(localTransactionID,parseInt(new Date().getTime()/1000))
+      }else{
+        console.log(chalk.bgCyan.black(localBuyOrSell));
+        oxConfirmation = await addOrder("ox:"+localBuyOrSell+":"+localPairBuy+":"+localPairSell+":"+localTransactionID+":"+localTimestamp,receipt);
+      }
+
       //receipts have a key of toAddress:timestamp:receipthash atm
       //oxConfirmation = await addTransaction("ox:"+localOxFrom+":"+localTxTo+":"+receipt["ticker"]+":"+receipt["timestamp"]+":"+receipt["hash"]+":"+blockhash,JSON.stringify(receipt),blknum,blkChainStateHash,oxIndex);
-      oxConfirmation = await addOrder("ox:"+loclBuyOrSell+":"+localPairBuy+":"+localPairSell+":"+localTransactionID+":"+localTimestamp,receipt);
+
       //need to accumulate the balances and add or subtract to PMT
 
       //localToBalance = await addAllBalanceRecord(localTxTo,receipt["ticker"],parseFloat(receipt["amount"]).toFixed(8),txConfirmation,blknum,txIndex);
@@ -1707,6 +1715,22 @@ var clearOrderById = function(transactionID,timestamp){
 
   });
 
+}
+
+var clearAllOrdersByAddress = function(address){
+
+  var stream = db.createReadStream();
+
+  stream.on('data',function(data){
+    console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+    //if(data.toString().split(":")[4] == transactionID && data.toString().split(":")[5] == timestamp){
+    if(data.key.toString().split(":")[0] == "ox" && data.value.toString()["fromAddress"] == address.toLowerCase()){
+      putRecord("fox:"+data.toString().split(":")[4],data);
+      putRecord("tfox:"+data.toString().split(":")[4],data);
+      db.del(data.key).then(function(){console.log("deleting this order "+transactionID);});
+    }
+
+  });
 
 }
 
@@ -2680,6 +2704,7 @@ module.exports = {
     getOrdersPairBuyAndSell:getOrdersPairBuyAndSell,
     getOrdersPairSellAndBuy:getOrdersPairSellAndBuy,
     clearOrderById:clearOrderById,
+    clearAllOrdersByAddress:clearAllOrdersByAddress,
     callDeletedOrders:callDeletedOrders,
     buildTrade:buildTrade,
     getStateTrieRootHash:getStateTrieRootHash,
