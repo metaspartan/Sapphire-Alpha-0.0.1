@@ -1647,15 +1647,19 @@ var addOrdersFromStream = async function(orders,blockhash,blknum,block,cbUpdateC
       var localPairing = receipt["pairing"];
       var localPairBuy = receipt["pairBuy"];
       var localPairSell = receipt["pairSell"];
+      var localAmount = receipt["amount"];
       var localPrice = receipt["price"];
       var localState = receipt["state"];
       var localTransactionID = receipt["transactionID"];
       var localOriginationID = receipt["originationID"];
       var localTimestamp = receipt["timestamp"];
 
-      if(localBuyOrSell == "CANC"){
+      if(localBuyOrSell == "CANC" && localAmount == "-001"){
         console.log(chalk.bgMagenta("NEED TO DELETE THIS ORDER "+localTransactionID));
         clearOrderById(localTransactionID,parseInt(new Date().getTime()/1000))
+      }else if(localBuyOrSell == "CANC" && localAmount == "-999"){
+        console.log(chalk.bgMagenta("NEED TO DELETE THIS ORDER "+localTransactionID));
+        clearAllOrdersByAddress(localOxFrom);
       }else{
         console.log(chalk.bgCyan.black(localBuyOrSell));
         oxConfirmation = await addOrder("ox:"+localBuyOrSell+":"+localPairBuy+":"+localPairSell+":"+localTransactionID+":"+localTimestamp,receipt);
