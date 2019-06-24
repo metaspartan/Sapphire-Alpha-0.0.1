@@ -1722,13 +1722,20 @@ var clearAllOrdersByAddress = function(address){
   var stream = db.createReadStream();
 
   stream.on('data',function(data){
-    console.log("key... "+data.key.toString()+".....value "+data.value.toString());
+    //console.log("key... "+data.key.toString()+".....value "+data.value.toString());
     //if(data.toString().split(":")[4] == transactionID && data.toString().split(":")[5] == timestamp){
-    if(data.key.toString().split(":")[0] == "ox" && data.value.toString()["fromAddress"] == address.toLowerCase()){
-      putRecord("fox:"+data.toString().split(":")[4],data);
-      putRecord("tfox:"+data.toString().split(":")[4],data);
-      db.del(data.key).then(function(){console.log("deleting this order "+transactionID);});
+    if(data.key.toString().split(":")[0] == "ox"){
+      var cleanUpOrder = JSON.parse(data.value.toString())["fromAddress"];
+      var transactionID = JSON.parse(data.value.toString())["transactionID"];
+      console.log(cleanUpOrder+" < > "+address.toLowerCase())
+      if(cleanUpOrder.toLowerCase() == address.toLowerCase()){
+        console.log("we should be making it in here")
+        putRecord("fox:"+data.toString().split(":")[4],data);
+        putRecord("tfox:"+data.toString().split(":")[4],data);
+        db.del(data.key.toString()).then(function(){console.log("deleting this order "+transactionID);});
+      }
     }
+
 
   });
 

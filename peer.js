@@ -4660,6 +4660,9 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
       }
 
       myblockorder = new sapphirechain.Order(addressFrom,buyOrSell,pairBuy,pairSell,amount,price);
+      if(lillocaltxid != "0"){
+        myblockorder.transactionID = lillocaltxid;
+      }
       frankieCoin.createOrder(myblockorder);
       if(storetx == true){
         BlkDB.addOrder("ox:"+buyOrSell+":"+pairBuy+":"+pairSell+":"+myblockorder.transactionID+":"+myblockorder.timestamp,myblockorder,parseInt(frankieCoin.getLatestBlock()["blockHeight"]));
