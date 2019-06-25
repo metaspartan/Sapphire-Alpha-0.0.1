@@ -534,6 +534,56 @@ var setChainStateTX = async function(validTXHeight,transactionCheckPointHash){
   ***/
 }
 
+var setChainStateOX = async function(validOXHeight,orderCheckPointHash){
+
+  console.log(chalk.bgGreen.black("setting chain state ORDER height to "+validOXHeight+" with hash of "+orderCheckPointHash));
+
+  //realizing this was never actually set
+  var tempPrevOXHt = chainState.previousOxHeight;
+  var tempPrevOXHash = chainState.previousOxHash;
+  chainState.previousOxHeight = chainState.orderHeight;
+  chainState.previousOxHash = chainState.orderRootHash;
+  chainState.orderHeight = await parseInt(validOXHeight);
+  chainState.orderRootHash = await orderCheckPointHash;
+  if(chainState.previousOxHeight == chainState.orderHeight){
+    chainState.previousOxHeight = tempPrevOXHt;
+    chainState.previousOxHash = tempPrevOXHash;
+  }
+  ////setting transaction level checks and heights
+  var orderValidator = async function(start,end){
+    var cbOrderHeightMonitor = async function(csOrderHeight){
+      console.log("****||||****||||>>> back with chainState csOrderHeight "+csOrderHeight)
+      //current transation height is csTransactionHeight.split(":")[0] with hash csTransactionHeight.split(":")[1]
+      if(validOXHeight >= 1 && validOXHeight == parseInt(chainState.orderHeight+1) && csOrderHeight.split(":")[1] == chainState.orderRootHash){//otherwise it resets a memory load when it loads block 1
+        //I may want to host a set of previous chainState.TransactionHeight and Hash but for now defer
+        var tempPrevOXHt = chainState.previousOxHeight;
+        var tempPrevOXHash = chainState.previousOxHash;
+        chainState.previousOxHeight = chainState.orderHeight;
+        chainState.previousOxHash = chainState.orderRootHash;
+        chainState.orderHeight = await parseInt(validOXHeight);
+        chainState.orderRootHash = await ordernCheckPointHash;
+        if(chainState.previousOxHeight == chainState.orderHeight){
+          chainState.previousOxHeight = tempPrevOXHt;
+          chainState.previousOxHash = tempPrevOXHash;
+        }
+        BlkDB.addChainState("cs:orderHeight",chainState.orderHeight+":"+orderCheckPointHash);
+      }else{
+        console.log("THIS IS WHERE OX VALIDATION IS FAILING NEED TO CLIP OR GET ON RIGHT CHAIN MOST LIKELY")
+        console.log("THIS IS WHERE OX VALIDATION IS FAILING NEED TO CLIP OR GET ON RIGHT CHAIN MOST LIKELY")
+        console.log("THIS IS WHERE OX VALIDATION IS FAILING NEED TO CLIP OR GET ON RIGHT CHAIN MOST LIKELY")
+        console.log("THIS IS WHERE OX VALIDATION IS FAILING NEED TO CLIP OR GET ON RIGHT CHAIN MOST LIKELY")
+      }
+      console.log(validOXHeight%frankieCoin.chainRiser)
+      if(validOXHeight%frankieCoin.chainRiser == 0){
+        BlkDB.addChainState("cs:orderCheckPointHash:"+validOXHeight,orderCheckPointHash);
+      }
+    }
+    BlkDB.getChainStateParam("orderHeight",cbOrderHeightMonitor);
+  }
+
+}
+
+
 ////chain state function pushes chainState object to the blockchain object
 var getChainState = function(){
   return chainState;
@@ -3872,6 +3922,13 @@ function ChainGrab(blocknum){
     }
   }
   BlkDB.getChainStateParam("transactionHeight",resetTransactionHeight);
+  var resetOrderHeight = function(val){
+    console.log(chalk.bgGreen("in chain grab setting transaction state based on "+val))
+    if(val != 0){
+      setChainStateOX(val.split(":")[0],val.split(":")[1]);
+    }
+  }
+  BlkDB.getChainStateParam("orderHeight",resetOrderHeight);
 
   //maybe some other stuff like .then
 };
@@ -4222,8 +4279,14 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                       console.log(chalk.bgRed("BROADCASTING REPLACEMENT ORDER"));
                     }
 
+                    //if buyer not using sapphire for fees
+                    var amountTaker = parseFloat(amount * 0.9975)
+                    var amountTakerFee = parseFloat(amount * 0.0025);
+                    //if buyer not using sapphire for fees
+
                     var ticker = JSON.parse(data[obj])["pairBuy"];
-                    var myblocktx = new sapphirechain.Transaction(addressFrom, addressTo, amount, ticker);
+                    var myblocktx = new sapphirechain.Transaction(addressFrom, addressTo, amountTaker, ticker);
+                    var myTakerFeeTx = new sapphirechain.Transaction(addressFrom, ("0x87045b7BAdAc9c2dA19f5B0EE2bCeA943A786644").toLowerCase(), amountTakerFee, ticker);
                     //does not work this way need tro rethink
                     myblocktx.oxdid = JSON.parse(data[obj])["transactionID"];
                     myblocktx.oxtid = JSON.parse(data[obj])["timestamp"];
@@ -4239,8 +4302,15 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                     var addressTo2 = JSON.parse(dataSells[objs])["fromAddress"];
                     var amount2 = parseFloat(amount*JSON.parse(dataSells[objs])["price"]);
 
+                    //if buyer not using sapphire for fees
+                    var amountTaker2 = parseFloat(amount * 0.9975)
+                    var amountTakerFee2 = parseFloat(amount * 0.0025);
+                    //if buyer not using sapphire for fees
+
                     var ticker2 = JSON.parse(dataSells[objs])["pairSell"];
-                    var myblocktx2 = new sapphirechain.Transaction(addressFrom2, addressTo2, amount2, ticker2);
+                    var myblocktx2 = new sapphirechain.Transaction(addressFrom2, addressTo2, amountTaker2, ticker2);
+                    var myTakerFeeTx2 = new sapphirechain.Transaction(addressFrom2, ("0x87045b7BAdAc9c2dA19f5B0EE2bCeA943A786644").toLowerCase(), amountTakerFee2, ticker);
+
                     //does not work this way need tro rethink
                     myblocktx2.oxdid = JSON.parse(dataSells[objs])["transactionID"];
                     myblocktx2.oxtid = JSON.parse(dataSells[objs])["timestamp"];
