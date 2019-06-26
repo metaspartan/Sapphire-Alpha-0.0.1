@@ -1428,11 +1428,6 @@ var cbReset = async function(){
   try{
     await sw.close();
     await sw2.close();
-    for(i=1;i<5000;i++){
-      if(i%1000 == 0){
-        console.log("connection reset timer "+i);
-      }
-    }
   }catch(err){
     console.log("initial connection being established")
     //console.log(err)
@@ -1440,7 +1435,11 @@ var cbReset = async function(){
   peers = await null;
   port = await null;
   port2 = await null;
-  await setTimeout(function(){console.log("reloading connection")},2000);
+  for(i=1;i<5000;i++){
+    if(i%1000 == 0){
+      console.log("reloading connection "+i);
+    }
+  }
   (async () => {
 
     peers = {}
