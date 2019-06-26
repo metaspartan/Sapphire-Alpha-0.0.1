@@ -347,7 +347,7 @@ var activePing = function(timer){
         if(chainState.activeSynch.receive[aId].peer == id && chainState.activeSynch.receive[aId].nodeType > 1){
           //console.log("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType);
           setTimeout(function(){
-            if(peers[id]){
+            if(peers[id] && peers[id].conn != undefined){
               peers[id].conn.write(JSON.stringify(
                 {"nodeStatePing":{
                   Height:parseInt(chainState.synchronized),
