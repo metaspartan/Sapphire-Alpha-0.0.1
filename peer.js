@@ -1427,8 +1427,8 @@ var sw2;
 //////////////////////////////////////////////////////core function asynchronous
 var cbReset = async function(){
   try{
-    await sw.close();
-    await sw2.close();
+    await sw.leave('egem-sfrx-001');
+    await sw2.leave('egem-sfrx-002');
   }catch(err){
     console.log("initial connection being established")
     //console.log(err)
