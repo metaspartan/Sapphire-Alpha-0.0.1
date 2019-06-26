@@ -1446,13 +1446,12 @@ var cbReset = async function(){
     port = await getPort()//grab available random port for peer connections
     port2 = await getPort()
 
+    sw = await getConnectionConfig(this);
     for(i=1;i<5000;i++){
       if(i%1000 == 0){
         console.log("reloading connection "+i);
       }
     }
-
-    sw = await getConnectionConfig(this);
     sw2 = await getConnectionConfig(this);
 
     sw.listen(port)//peers
