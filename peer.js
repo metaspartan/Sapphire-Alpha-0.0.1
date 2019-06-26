@@ -1428,6 +1428,11 @@ var cbReset = async function(){
   try{
     await sw.close();
     await sw2.close();
+    for(i=1;i<5000;i++){
+      if(i%1000 == 0){
+        console.log("connection reset timer "+i);
+      }
+    }
   }catch(err){
     console.log("initial connection being established")
     //console.log(err)
