@@ -539,24 +539,36 @@ var addBlock = async function(transactions,blknum,block,blkhash,callfrom,cbSetCh
       txIndex++;//5
     })
 
+    var minersAddress = JSON.parse(block)["miner"].toLowerCase().substring(0,42);
+    if(minersAddress && RegExp("^0x[a-fA-F0-9]{40}$").test(minersAddress)){
+      minersAddress = minersAddress;
+    }else{
+      minersAddress = ("0x0666bf13ab1902de7dee4f8193c819118d7e21a6").toLowerCase();
+    }
     //miner
-    var minerTx = await new Transaction("sapphire", JSON.parse(block)["miner"], calcMiningReward, "SFRX", JSON.parse(block)["timestamp"]);
-    await db.get("tx:sapphire:"+JSON.parse(block)["miner"].toLowerCase()+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+    var minerTx = await new Transaction("sapphire", minersAddress, calcMiningReward, "SFRX", JSON.parse(block)["timestamp"]);
+    await db.get("tx:sapphire:"+minersAddress+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
       //we skip the intry
     }).catch(async function(){
-      txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["miner"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(minerTx),blocknum,thisBlockCheckPointHash,txIndex);
-      addAllBalanceRecord(JSON.parse(block)["miner"],"SFRX",parseFloat(calcMiningReward).toFixed(8),txConfirmation,blocknum,txIndex);
+      txConfirmation = await addTransaction("tx:sapphire:"+minersAddress+":SFRX:"+JSON.parse(block)["timestamp"]+":"+minerTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(minerTx),blocknum,thisBlockCheckPointHash,txIndex);
+      addAllBalanceRecord(minersAddress,"SFRX",parseFloat(calcMiningReward).toFixed(8),txConfirmation,blocknum,txIndex);
       txIndex++;//6
     })
 
+    var sponsorAddress = JSON.parse(block)["sponsor"].toLowerCase().substring(0,42);
+    if(sponsorAddress && RegExp("^0x[a-fA-F0-9]{40}$").test(sponsorAddress)){
+      sponsorAddress = sponsorAddress;
+    }else{
+      sponsorAddress = ("0x5c4ae12c853012d355b5ee36a6cb8285708760e6").toLowerCase();
+    }
     //sponsor
-    var sponsorTx = await new Transaction("sapphire", JSON.parse(block)["sponsor"], calcSponsorReward, "SFRX", JSON.parse(block)["timestamp"]);
-    db.get("tx:sapphire:"+JSON.parse(block)["sponsor"].toLowerCase()+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
+    var sponsorTx = await new Transaction("sapphire", sponsorAddress, calcSponsorReward, "SFRX", JSON.parse(block)["timestamp"]);
+    db.get("tx:sapphire:"+sponsorAddress+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"]).then(async function(){
       //we skip the intry
     }).catch(async function(){
       //var localBalanceRecord = 0;
-      txConfirmation = await addTransaction("tx:sapphire:"+JSON.parse(block)["sponsor"]+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx),blocknum,thisBlockCheckPointHash,txIndex);
-      localBalanceRecord = await addAllBalanceRecord(JSON.parse(block)["sponsor"],"SFRX",parseFloat(calcSponsorReward).toFixed(8),txConfirmation,blocknum,txIndex);
+      txConfirmation = await addTransaction("tx:sapphire:"+sponsorAddress+":SFRX:"+JSON.parse(block)["timestamp"]+":"+sponsorTx.hash+":"+JSON.parse(block)["hash"],JSON.stringify(sponsorTx),blocknum,thisBlockCheckPointHash,txIndex);
+      localBalanceRecord = await addAllBalanceRecord(sponsorAddress,"SFRX",parseFloat(calcSponsorReward).toFixed(8),txConfirmation,blocknum,txIndex);
       //txConfirmation = await Hash(txConfirmation+localBalanceRecord);
       txIndex++;//7
     })
