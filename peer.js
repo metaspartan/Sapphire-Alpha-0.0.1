@@ -1435,11 +1435,7 @@ var cbReset = async function(){
   peers = await null;
   port = await null;
   port2 = await null;
-  for(i=1;i<5000;i++){
-    if(i%1000 == 0){
-      console.log("reloading connection "+i);
-    }
-  }
+
   (async () => {
 
     peers = {}
@@ -1452,6 +1448,13 @@ var cbReset = async function(){
 
     sw = await getConnectionConfig(this);
     sw2 = await getConnectionConfig(this);
+
+    for(i=1;i<5000;i++){
+      if(i%1000 == 0){
+        console.log("reloading connection "+i);
+      }
+    }
+
     sw.listen(port)//peers
     sw2.listen(port2)
     sw.join('egem-sfrx-001') // can be any id/name/hash
