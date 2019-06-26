@@ -628,7 +628,7 @@ const rl = readline.createInterface({
 /////////////////////////////////////////////asynchronous peer connection engine
 var getConnectionConfig = async function(ntwk){
   return new Promise(function(resolve, reject) {
-    var callBackNodePersistence = function(npid){
+    var callBackNodePersistence = async function(npid){
       myLastSessionId = npid;
       console.log("my last session = "+myLastSessionId);
       if(myLastSessionId != "notfound"){
