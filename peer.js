@@ -632,7 +632,7 @@ var getConnectionConfig = async function(ntwk){
       myLastSessionId = npid;
       console.log("my last session = "+myLastSessionId);
       if(myLastSessionId != "notfound"){
-        
+
         chainState.nodePersistantId = myLastSessionId;
         console.log("node persistantce was already set ")
       }else{
@@ -1451,8 +1451,12 @@ var cbReset = async function(){
 
     sw2 = await getConnectionConfig(this);
 
-    sw.listen(port)//peers
-    sw2.listen(port2)
+    sw.listen(port,function(){
+      console.log('sw running on port '+port)
+    });
+    sw2.listen(port2,function(){
+      console.log('sw2 running on port '+port2)
+    });
     sw.join('egem-sfrx-001') // can be any id/name/hash
     sw2.join('egem-sfrx-002')//second teier peers
     sw.maxConnections = 20;//testing this out for node organization
