@@ -1065,10 +1065,20 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           if(tobj && tobj.info){
             console.log(tobj.info.ip)
           }
-          console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
-          peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
-          called = true;
-          localTempNode.random = "no";
+          if(parseInt(replyData) == parseInt(chainState.synchronized)){
+            console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
+            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+            called = true;
+            localTempNode.random = "no";
+          }else if(parseInt(replyData+1) == parseInt(chainState.synchronized)){
+            console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
+            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+            called = true;
+            localTempNode.random = "no";
+          }else{
+            cbReset();
+          }
+
         }
         tempNodeCallBucket.push(localTempNode)
         i++;
@@ -1569,22 +1579,25 @@ var cbReset = async function(){
 
             //console.log("you got a thanks from "+peerId);
             let tobj = frankieCoin.nodes.find(o => o.id === peerId);
-            console.log(chalk.bgRed.white.bold("you got a thanks from "+tobj.info.ip));
-            console.log(chalk.bgCyan.black(JSON.stringify(JSON.parse(data)["thanks"])));
-            chainState.peerNonce = chainState.synchronized;
-            frankieCoin.incrementPeerMaxHeight(peerId,chainState.synchronized);
-            frankieCoin.incrementPeerNonce(peerId,chainState.synchronized);
-            removeWaiting(peerId);
-            updatePeerTxHashArray(JSON.parse(data)["thanks"]["transactionHeight"],JSON.parse(data)["thanks"]["transactionRootHash"],1);
-            updatePeerTxHashArray(JSON.parse(data)["thanks"]["previousTxHeight"],JSON.parse(data)["thanks"]["previousTxHash"],1);
-            var entireTxHashArray = JSON.parse(data)["thanks"]["transactionHashWeights"].sort(function(a,b){return parseInt(a.peerTxHeight) - parseInt(b.peerTxHeight)});
-            var ictr = 0;
-            for(itemTxHash in entireTxHashArray){
-              if(ictr > 2){
-                updatePeerTxHashArray(entireTxHashArray[itemTxHash].peerTxHeight,entireTxHashArray[itemTxHash].peerTxHash,entireTxHashArray[itemTxHash].counted)
+            if(tobj.info){
+              console.log(chalk.bgRed.white.bold("you got a thanks from "+tobj.info.ip));
+              console.log(chalk.bgCyan.black(JSON.stringify(JSON.parse(data)["thanks"])));
+              chainState.peerNonce = chainState.synchronized;
+              frankieCoin.incrementPeerMaxHeight(peerId,chainState.synchronized);
+              frankieCoin.incrementPeerNonce(peerId,chainState.synchronized);
+              removeWaiting(peerId);
+              updatePeerTxHashArray(JSON.parse(data)["thanks"]["transactionHeight"],JSON.parse(data)["thanks"]["transactionRootHash"],1);
+              updatePeerTxHashArray(JSON.parse(data)["thanks"]["previousTxHeight"],JSON.parse(data)["thanks"]["previousTxHash"],1);
+              var entireTxHashArray = JSON.parse(data)["thanks"]["transactionHashWeights"].sort(function(a,b){return parseInt(a.peerTxHeight) - parseInt(b.peerTxHeight)});
+              var ictr = 0;
+              for(itemTxHash in entireTxHashArray){
+                if(ictr > 2){
+                  updatePeerTxHashArray(entireTxHashArray[itemTxHash].peerTxHeight,entireTxHashArray[itemTxHash].peerTxHash,entireTxHashArray[itemTxHash].counted)
+                }
+                ictr++;
               }
-              ictr++;
             }
+
             //activePing(20);
 
           }
@@ -3162,10 +3175,10 @@ function cliGetInput(){
         BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
       });
       BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
-      cbReset()
+      cbReset();
       cliGetInput();
     }else if(userInput == "CLIP2"){
-      cbReset()
+      cbReset();
       cliGetInput();
     }else if(userInput == "CHECKPOINT"){
       BlkDB.getTopChainStateCheckPoint(frankieCoin.blockHeight,frankieCoin.chainRiser);
