@@ -4620,7 +4620,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                   }
                 }).catch(function(err){
                   console.log("cleanUpWaitingRemoveLag error in fBroadcast Peers "+err);
-                  setTimeout(functon(){cbReset();},1000);
+                  setTimeout(function(){cbReset();},1000);
                   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                   console.log("I make it past here miner error ");
                 })
