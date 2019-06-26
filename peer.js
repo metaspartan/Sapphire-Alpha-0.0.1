@@ -276,6 +276,17 @@ var tranSynch = function(){
   transactionValidator(parseInt(startEnd),parseInt(topEnd));
 }
 
+var oxSynch = function(){
+  var startEnd = parseInt(chainState.orderHeight+1);
+  var topEnd = parseInt(startEnd+500);
+  console.log("want to call TXVLDY with start "+startEnd+" and top "+topEnd+" and syncronized "+chainState.synchronized)
+  if(topEnd >= chainState.synchronized){
+    topEnd = chainState.synchronized
+  }
+
+  orderValidator(parseInt(startEnd),parseInt(topEnd));
+}
+
 //maybe turn slowCounter into chainstate var
 var slowCounter = 0;
 var adjustedTimeout = function() {
@@ -292,6 +303,7 @@ var adjustedTimeout = function() {
     slowCounter++;
   }else if((slowCounter % 4) == 0){//need a different trigger for transaction sync but for now ok
     tranSynch();
+    oxSynch()
     slowCounter++;
   }else if(chainState.peerNonce < chainState.synchronized){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
@@ -306,6 +318,7 @@ var adjustedTimeout = function() {
     slowCounter++;
   }else{
     tranSynch();
+    oxSynch();
     if((slowCounter % 4) == 0){
       activeSync(parseInt(timerInterval+(slowCounter*23)));
       activePing(parseInt(timerInterval+(slowCounter*21)));
@@ -344,6 +357,8 @@ var activePing = function(timer){
                 currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
                 transactionHeight:chainState.transactionHeight,
                 transactionRootHash:chainState.transactionRootHash,
+                orderHeight:chainState.orderHeight,
+                orderRootHash:chainState.orderRootHash,
                 prevTxHeight:chainState.previousTxHeight,
                 previousTxHash:chainState.previousTxHash,
                 NodeType:nodeType.current,
@@ -366,6 +381,8 @@ var activePing = function(timer){
               currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
               transactionHeight:chainState.transactionHeight,
               transactionRootHash:chainState.transactionRootHash,
+              orderHeight:chainState.orderHeight,
+              orderRootHash:chainState.orderRootHash,
               prevTxHeight:chainState.previousTxHeight,
               previousTxHash:chainState.previousTxHash,
               NodeType:nodeType.current,
@@ -403,6 +420,8 @@ var activePing = function(timer){
               currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
               transactionHeight:chainState.transactionHeight,
               transactionRootHash:chainState.transactionRootHash,
+              orderHeight:chainState.orderHeight,
+              orderRootHash:chainState.orderRootHash,
               prevTxHeight:chainState.previousTxHeight,
               previousTxHash:chainState.previousTxHash,
               NodeType:nodeType.current,
@@ -2025,6 +2044,8 @@ var cbReset = async function(){
                         currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
                         transactionHeight:chainState.transactionHeight,
                         transactionRootHash:chainState.transactionRootHash,
+                        orderHeight:chainState.orderHeight,
+                        orderRootHash:chainState.orderRootHash,
                         prevTxHeight:chainState.previousTxHeight,
                         previousTxHash:chainState.previousTxHash,
                         NodeType:nodeType.current,
