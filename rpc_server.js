@@ -248,7 +248,7 @@ function requestListener(request, response) {
           doEet = true;
           closePort();//going to close off the port for a second
         }else if(isJSON(body) &&  JSON.parse(body)["getWorkForMiner"]){
-          doEet = true;
+          //doEet = true;
           var canMine = thisNodeCanMine();
           console.log("canMine = "+canMine);
           if(canMine.split(":")[0] == canMine.split(":")[1] && canMine.split(":")[2] > 2){
@@ -257,7 +257,7 @@ function requestListener(request, response) {
           }else{
             console.log("not sure what action to take yet ?");
             closePort();
-            setTimeout(function(){openPort(),30000})
+            setTimeout(function(){openPort(),15000})
             isMining = false;
           }
           //this signifies that this is a miner and we need to turn off explorer and other RPC for orders and such
