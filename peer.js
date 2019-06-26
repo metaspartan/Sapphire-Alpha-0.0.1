@@ -628,10 +628,11 @@ const rl = readline.createInterface({
 /////////////////////////////////////////////asynchronous peer connection engine
 var getConnectionConfig = async function(ntwk){
   return new Promise(function(resolve, reject) {
-    var callBackNodePersistence = async function(npid){
+    var callBackNodePersistence = function(npid){
       myLastSessionId = npid;
       console.log("my last session = "+myLastSessionId);
       if(myLastSessionId != "notfound"){
+        
         chainState.nodePersistantId = myLastSessionId;
         console.log("node persistantce was already set ")
       }else{
@@ -643,13 +644,8 @@ var getConnectionConfig = async function(ntwk){
         // peer-id
         id: chainState.nodePersistantId,
       })
-      try{
-        const ntwk = await swarm(config);
-        console.log("swarm accomplished")
-      }catch(e){
-        console.log("it error "+e.toString());
-      }
 
+      const ntwk = swarm(config);
       resolve(ntwk);
     }
     BlkDB.getChainParamsByName(globalGenesisHash,'nodePersistantId',callBackNodePersistence);
