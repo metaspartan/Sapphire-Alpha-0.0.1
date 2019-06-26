@@ -294,7 +294,7 @@ function requestListener(request, response) {
                     response.end(JSON.stringify(res))
                 }).catch(err => {
                     console.error(err);
-
+                    closePort();
                     response.statusCode = 500;
                     response.end('oops! server error!');
                 });
