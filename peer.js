@@ -347,23 +347,25 @@ var activePing = function(timer){
         if(chainState.activeSynch.receive[aId].peer == id && chainState.activeSynch.receive[aId].nodeType > 1){
           //console.log("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType);
           setTimeout(function(){
-            peers[id].conn.write(JSON.stringify(
-              {"nodeStatePing":{
-                Height:parseInt(chainState.synchronized),
-                MaxHeight:parseInt(chainState.synchronized),
-                PeerNonce:parseInt(chainState.peerNonce),
-                GlobalHash:globalGenesisHash,
-                checkPointHash:chainState.checkPointHash,
-                currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
-                transactionHeight:chainState.transactionHeight,
-                transactionRootHash:chainState.transactionRootHash,
-                orderHeight:chainState.orderHeight,
-                orderRootHash:chainState.orderRootHash,
-                prevTxHeight:chainState.previousTxHeight,
-                previousTxHash:chainState.previousTxHash,
-                NodeType:nodeType.current,
-                utcTimeStamp:parseInt(new Date().getTime()/1000)
-              }}));
+            if(peers[id]){
+              peers[id].conn.write(JSON.stringify(
+                {"nodeStatePing":{
+                  Height:parseInt(chainState.synchronized),
+                  MaxHeight:parseInt(chainState.synchronized),
+                  PeerNonce:parseInt(chainState.peerNonce),
+                  GlobalHash:globalGenesisHash,
+                  checkPointHash:chainState.checkPointHash,
+                  currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+                  transactionHeight:chainState.transactionHeight,
+                  transactionRootHash:chainState.transactionRootHash,
+                  orderHeight:chainState.orderHeight,
+                  orderRootHash:chainState.orderRootHash,
+                  prevTxHeight:chainState.previousTxHeight,
+                  previousTxHash:chainState.previousTxHash,
+                  NodeType:nodeType.current,
+                  utcTimeStamp:parseInt(new Date().getTime()/1000)
+                }}));
+            }
           },timer)
           pingCaller = false;
         }
@@ -2822,8 +2824,11 @@ var cbReset = async function(){
 
                 }else if(frankieCoin.blockHeight == parseInt(peerBlockHeight)){
                   //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-                  peers[peerId].conn2.write(JSON.stringify(frankieCoin.getLatestBlock()));
-                  pongBack = true;
+                  if(peers[peerId]){
+                    peers[peerId].conn2.write(JSON.stringify(frankieCoin.getLatestBlock()));
+                    pongBack = true;
+                  }
+
                 }else if((peerBlockHeight > frankieCoin.blockHeight) && (peerBlockHeight == (frankieCoin.blockHeight+1))){
                   //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
                   peerBlockHeight--;
