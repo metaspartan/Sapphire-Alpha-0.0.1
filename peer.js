@@ -632,11 +632,6 @@ var getConnectionConfig = async function(ntwk){
       myLastSessionId = npid;
       console.log("my last session = "+myLastSessionId);
       if(myLastSessionId != "notfound"){
-        for(i=1;i<10000;i++){
-          if(i%1000 == 0){
-            console.log("reloading connection "+i);
-          }
-        }
         chainState.nodePersistantId = myLastSessionId;
         console.log("node persistantce was already set ")
       }else{
@@ -648,8 +643,13 @@ var getConnectionConfig = async function(ntwk){
         // peer-id
         id: chainState.nodePersistantId,
       })
+      try{
+        const ntwk = await swarm(config);
+        console.log("swarm accomplished")
+      }catch(e){
+        console.log("it error "+e.toString());
+      }
 
-      const ntwk = swarm(config);
       resolve(ntwk);
     }
     BlkDB.getChainParamsByName(globalGenesisHash,'nodePersistantId',callBackNodePersistence);
