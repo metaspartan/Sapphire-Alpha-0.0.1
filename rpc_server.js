@@ -284,14 +284,17 @@ function requestListener(request, response) {
                 // we're kinda expecting compute to be a promise
                 // so if it isn't, just avoid it
 
-                response.statusCode = 500;
-                response.end('oops! server error!');
+                response.statusCode = 469;
+
                 console.warn(`whatever I got from rpc wasn't a Promise!`);
+                response.end('oops! server error!');
+
             } else {
                 compute.then(res => {
                     response.end(JSON.stringify(res))
                 }).catch(err => {
                     console.error(err);
+
                     response.statusCode = 500;
                     response.end('oops! server error!');
                 });
