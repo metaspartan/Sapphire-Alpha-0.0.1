@@ -373,23 +373,25 @@ var activePing = function(timer){
 
       if(pingCaller){
         setTimeout(function(){
-          peers[id].conn.write(JSON.stringify(
-            {"nodeStatePing":{
-              Height:parseInt(chainState.synchronized),
-              MaxHeight:parseInt(chainState.synchronized),
-              PeerNonce:parseInt(chainState.peerNonce),
-              GlobalHash:globalGenesisHash,
-              checkPointHash:chainState.checkPointHash,
-              currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
-              transactionHeight:chainState.transactionHeight,
-              transactionRootHash:chainState.transactionRootHash,
-              orderHeight:chainState.orderHeight,
-              orderRootHash:chainState.orderRootHash,
-              prevTxHeight:chainState.previousTxHeight,
-              previousTxHash:chainState.previousTxHash,
-              NodeType:nodeType.current,
-              utcTimeStamp:parseInt(new Date().getTime()/1000)
-            }}));
+          if(peers[id] && peers[id].conn != undefined){
+            peers[id].conn.write(JSON.stringify(
+              {"nodeStatePing":{
+                Height:parseInt(chainState.synchronized),
+                MaxHeight:parseInt(chainState.synchronized),
+                PeerNonce:parseInt(chainState.peerNonce),
+                GlobalHash:globalGenesisHash,
+                checkPointHash:chainState.checkPointHash,
+                currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+                transactionHeight:chainState.transactionHeight,
+                transactionRootHash:chainState.transactionRootHash,
+                orderHeight:chainState.orderHeight,
+                orderRootHash:chainState.orderRootHash,
+                prevTxHeight:chainState.previousTxHeight,
+                previousTxHash:chainState.previousTxHash,
+                NodeType:nodeType.current,
+                utcTimeStamp:parseInt(new Date().getTime()/1000)
+              }}));
+            }
         },timer)
       }
 
