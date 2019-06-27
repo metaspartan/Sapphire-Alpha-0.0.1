@@ -226,13 +226,22 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(timer){
   console.log(chalk.bgRed("AS TIMER "+timer))
-  console.log(chalk.bgRed("------------------------------------------------------------------"));
-  console.log(chalk.bgCyan.black(" chainwalkht: ")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight))+chalk.bgCyan.black(" chainStateSynchronized: ")+chalk.bgMagenta(chainState.synchronized)+chalk.bgCyan.black(" blockchainht: ")+chalk.bgMagenta(frankieCoin.blockHeight));
-  console.log(chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(parseInt(chainState.peerNonce))+chalk.bgCyan.black(" transactionheight: ")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgCyan.black(" topblockheight: ")+chalk.bgMagenta(chainState.topBlock));
-  console.log(chalk.bgCyan.black(" fcnlongpeer: ")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+chalk.bgCyan.black(" cspeernonce: ")+chalk.bgMagenta(chainState.peerNonce)+chalk.bgCyan.black(" peerCount: ")+chalk.bgMagenta(frankieCoin.nodes.length));
-  console.log(chalk.bgCyan.black(" transactionHash: ")+chalk.bgMagenta(chainState.transactionRootHash));
-  console.log(chalk.bgCyan.black(" previousTXHeight: ")+chalk.bgMagenta(chainState.previousTxHeight));
-  console.log(chalk.bgCyan.black(" previousTXHash: ")+chalk.bgMagenta(chainState.previousTxHash));
+  console.log(chalk.green("--------------------------------------------------------------------------------"));
+  console.log(
+      chalk.bgCyan.black("chainwalkht:")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight))+
+      chalk(" ")+chalk.bgCyan.black("chainStateSynched:")+chalk.bgMagenta(chainState.synchronized)+
+      chalk(" ")+chalk.bgCyan.black("blockchainht:  ")+chalk.bgMagenta(frankieCoin.blockHeight));
+  console.log(
+      chalk.bgCyan.black("cspeernonce:")+chalk.bgMagenta(parseInt(chainState.peerNonce))+
+      chalk("    ")+chalk.bgCyan.black("transactionheight:")+chalk.bgMagenta(chainState.transactionHeight)+
+      chalk(" ")+chalk.bgCyan.black("topblockheight:")+chalk.bgMagenta(chainState.topBlock));
+  console.log(
+      chalk.bgCyan.black("fcnlongpeer:")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+
+      chalk("    ")+chalk.bgCyan.black("cspeernonce:      ")+chalk.bgMagenta(chainState.peerNonce)+
+      chalk("    ")+chalk.bgCyan.black("peerCount:     ")+chalk.bgMagenta(frankieCoin.nodes.length));
+  console.log(chalk.bgCyan.black("transactionHash: ")+chalk.bgMagenta(chainState.transactionRootHash));
+  console.log(chalk.bgCyan.black("previousTXHash:  ")+chalk.bgMagenta(chainState.previousTxHash));
+  console.log(chalk.bgCyan.black("previousTXHeight:")+chalk.bgMagenta(chainState.previousTxHeight));
   /***
   console.log(chalk.bgCyan.black(" txHashHistory(4): ")+chalk.bgMagenta(JSON.stringify(chainState.transactionHashWeights)));
   for (nodesend in chainState.activeSynch.send){
@@ -240,7 +249,7 @@ var activeSync = function(timer){
   }
   ***/
   var nodenum = "0"
-
+  console.log(chalk.green("--------------------------------------------------------------------------------"));
   console.log(chalk.bgGreen.black(" last ping receive: "));
   for (nodercv in chainState.activeSynch.receive){
     if(chainState.activeSynch.receive[nodercv] != "undefined"){
@@ -276,7 +285,7 @@ var activeSync = function(timer){
       }
     }
   }
-  console.log(chalk.bgRed("------------------------------------------------------------------"));
+  console.log(chalk.green("--------------------------------------------------------------------------------"));
   if(chainState.chainWalkHeight == 1){
     setTimeout(function(){
       BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
@@ -715,12 +724,13 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
   if(isValid == true){
     if(chainState.chainWalkHeight == replyData){
       console.log("this point was already reached which means its stuck here ...pinging");
-      for (let id in peers) {
-        log("------------------------------------------------------");
-        log(chalk.green("Sending ping for chain sync."));
-        log("------------------------------------------------------");
-        //peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(replyData),GlobalHash:globalGenesisHash}}));
-      }
+
+      log(chalk.white("---------->   ")+chalk.green("sending ping for chain sync")+chalk.white("   <----------"));
+
+      // for (let id in peers) {
+      //   log(chalk.white("---------->   ")+chalk.green("sending ping for chain sync")+chalk.white("   <----------"));
+      //   //peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(replyData),GlobalHash:globalGenesisHash}}));
+      // }
     }
     chainState.chainWalkHeight = replyData;
     chainState.chainWalkHash = replyHash;
@@ -818,12 +828,13 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     }
 
     //set ping here
-    for (let id in peers) {
-      log("------------------------------------------------------");
-      log(chalk.green("Sending ping for chain sync."));
-      log("------------------------------------------------------");
-      //peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(replyData),GlobalHash:globalGenesisHash}}));
-    }
+    log(chalk.white("---------->   ")+chalk.green("sending ping for chain sync")+chalk.white("   <----------"));
+    // for (let id in peers) {
+    //   log("------------------------------------------------------");
+    //   log(chalk.green("Sending ping for chain sync."));
+    //   log("------------------------------------------------------");
+    //   //peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(replyData),GlobalHash:globalGenesisHash}}));
+    // }
   }
 }
 /////////////////////////////////////////////////////////////END CHAIN VALIDATOR
@@ -839,12 +850,13 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
     if(chainState.chainWalkHeight == replyData){
       console.log("this point was already reached which means its stuck here ...pinging");
-      for (let id in peers) {
-        log("------------------------------------------------------");
-        log(chalk.green("Sending ping for chain sync."));
-        log("------------------------------------------------------");
-        //peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
-      }
+      log(chalk.white("---------->   ")+chalk.green("sending ping for chain sync")+chalk.white("   <----------"));
+      // for (let id in peers) {
+      //   log("------------------------------------------------------");
+      //   log(chalk.green("Sending ping for chain sync."));
+      //   log("------------------------------------------------------");
+      //   //peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+      // }
     }
 
     chainState.chainWalkHeight = replyData;
@@ -1868,7 +1880,7 @@ var cbReset = async function(){
                         //first we add the block to the blockchain with call back and id of submitting peer for conflict resolution
                         var successfulBlockAdd = frankieCoin.addBlockFromPeers(JSON.parse(data)["block"],sendBackUncle,peerId);
 
-                        log(chalk.bgGreen("SUCCEFSSFUL BLOCK ADD? "+successfulBlockAdd));
+                        log(chalk.bgGreen("SUCCESSFUL BLOCK ADD? "+successfulBlockAdd));
 
 
                           //increment the internal peer nonce of sending party to track longest chain
@@ -3542,10 +3554,11 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput == "T"){//T is for talk but using it to initiate chain sync
       //sneaking this chain synch in here...that is a "talk"
+      log(chalk.white("---------->   ")+chalk.green("sending ping for chain sync")+chalk.white("   <----------"));
       for (let id in peers) {
-        log("------------------------------------------------------");
-        log(chalk.green("Sending ping for chain sync."));
-        log("------------------------------------------------------");
+        // log("------------------------------------------------------");
+        // log(chalk.green("Sending ping for chain sync."));
+        // log("------------------------------------------------------");
         //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
         peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
       }
@@ -3572,10 +3585,11 @@ function cliGetInput(){
       log(chalk.yellow("|------------------------------|"));
       //process.exit();
       var reindexChain = function(peers){
+        log(chalk.white("---------->   ")+chalk.green("sending ping for chain sync")+chalk.white("   <----------"));
         for (let id in peers) {
-          log("------------------------------------------------------");
-          log(chalk.green("Sending ping for chain sync."));
-          log("------------------------------------------------------");
+          // log("------------------------------------------------------");
+          // log(chalk.green("Sending ping for chain sync."));
+          // log("------------------------------------------------------");
           peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
         }
       }
