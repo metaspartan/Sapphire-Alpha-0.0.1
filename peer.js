@@ -233,10 +233,12 @@ var activeSync = function(timer){
   console.log(chalk.bgCyan.black(" transactionHash: ")+chalk.bgMagenta(chainState.transactionRootHash));
   console.log(chalk.bgCyan.black(" previousTXHeight: ")+chalk.bgMagenta(chainState.previousTxHeight));
   console.log(chalk.bgCyan.black(" previousTXHash: ")+chalk.bgMagenta(chainState.previousTxHash));
+  /***
   console.log(chalk.bgCyan.black(" txHashHistory(4): ")+chalk.bgMagenta(JSON.stringify(chainState.transactionHashWeights)));
   for (nodesend in chainState.activeSynch.send){
     console.log(chalk.bgCyan.black("blockHeight Called: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.send[nodesend].blockHeightCalled+" ")+chalk.bgCyan.black(" call synchronized: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.send[nodesend].callSynchronized+" "))
   }
+  ***/
   console.log(chalk.bgGreen.black(" last ping receive: "));
   for (nodercv in chainState.activeSynch.receive){
     if(chainState.activeSynch.receive[nodercv] != "undefined"){
@@ -268,6 +270,7 @@ var activeSync = function(timer){
       }
     }
   }
+  console.log(chalk.bgRed("------------------------------------------------------------------"));
   if(chainState.chainWalkHeight == 1){
     setTimeout(function(){
       BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
@@ -3781,10 +3784,12 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   console.log(chalk.bgCyan.black(" longest peer: ")+chalk.bgMagenta.white(longestPeer)+chalk.bgCyan.black(" max height: ")+chalk.bgMagenta.white(peerMaxHeight)+chalk.bgCyan.black(" peer length: ")+chalk.bgMagenta.white(peerLength))
   console.log(chalk.bgCyan.black(" chainwalk ht: ")+chalk.bgMagenta.white(chainState.chainWalkHeight)+chalk.bgCyan.black(" synchro ht: ")+chalk.bgMagenta.white(chainState.synchronized)+chalk.bgCyan.black(" chain lngth: ")+chalk.bgMagenta.white(frankieCoin.getLength()))
   console.log(chalk.bgCyan.black(" peerNonce ht: ")+chalk.bgMagenta.white(chainState.peerNonce)+chalk.bgCyan.black(" synching ht: ")+chalk.bgMagenta.white(chainState.isSynching)+chalk.bgCyan.black(" isSynch: ")+chalk.bgMagenta.white(isSynching))
+  /***
   console.log(chalk.bgGreen.black(" last ping send: "));
   for (nodesend in chainState.activeSynch.send){
     console.log(chalk.bgCyan.black("blockHeight Called: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.send[nodesend].blockHeightCalled+" ")+chalk.bgCyan.black(" call synchronized: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.send[nodesend].callSynchronized+" "))
   }
+  ***/
   console.log(chalk.bgGreen.black(" last ping receive: "));
   console.log(chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce))
   for (nodercv in chainState.activeSynch.receive){
