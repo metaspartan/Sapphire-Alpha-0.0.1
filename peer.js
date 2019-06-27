@@ -218,7 +218,7 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
 
   updatePeerTxHashArray(txHt,txHsh,1);
   //console.log("just before push "+peer)
-  console.log("oxHeight"+oxHt+"oxHash"+oxHsh)
+  //console.log("oxHeight"+oxHt+"oxHash"+oxHsh)
   var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"peerOXHeight":oxHt,"peerOXHash":oxHsh,"longPeerNonce":longPeerNonce,"nodeType":nodeType}
   chainState.activeSynch.receive.push(insertPeer)
 }
@@ -995,7 +995,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       chainState.activeSynch = {"send":tempNodeCallBucket,"receive":oldChainStateActiveSync.receive};
     }
 
-    console.log("CHAIN STATE HEIGHT IS "+replyData+typeof(replyData)+" and chainstate issynching = "+chainState.isSynching);
+    //console.log("CHAIN STATE HEIGHT IS "+replyData+typeof(replyData)+" and chainstate issynching = "+chainState.isSynching);
 
   }else if(isValid == false && replyData == chainState.peerNonce && replyData > chainState.transactionHeight){
 
@@ -1009,7 +1009,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     transactionValidator(parseInt(startEnd),parseInt(topEnd));
 
   }else if(replyData == "NaN"){
-    console.log("chain walk height is "+chainState.chainWalkHeight);
+    console.log("chain walk height is WHAT FUNCTION TO RUN HERE "+chainState.chainWalkHeight);
 
     //what function should be run here?
 
