@@ -195,8 +195,11 @@ updatePeerTxHashArray = function(txHt,txHsh,increment){
   }
 }
 
-updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,nodeType){
+updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,nodeType,oxHt,oxHsh){
   //console.log("node state updater "+peer+" "+maxHeight+" "+chainCPH+" "+txHt+" "+txHsh)
+
+  console.log("is not nodeType getting here?? "+nodeType)
+
   if(chainState.activeSynch.receive != undefined){
     var arrayCSReceive = chainState.activeSynch.receive;
     for(item in arrayCSReceive){
@@ -218,7 +221,7 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
 
   updatePeerTxHashArray(txHt,txHsh,1);
   //console.log("just before push "+peer)
-  var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"longPeerNonce":longPeerNonce,"nodeType":nodeType}
+  var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"peerOXHeight":oxHt,"peerOXHash":oxHsh,"longPeerNonce":longPeerNonce,"nodeType":nodeType}
   chainState.activeSynch.receive.push(insertPeer)
 }
 
@@ -242,11 +245,11 @@ var activeSync = function(timer){
       let tobj = frankieCoin.nodes.find(o => o.id === chainState.activeSynch.receive[nodercv].peer);
       if(tobj){
         console.log(
-          chalk.bgCyan.black("Node Type: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].nodeType+" ")+chalk.bgRed.white(tobj.info.ip)+chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce)+
-          chalk.bgCyan.black("peer Max Height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+
-          chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" ")
+          chalk.bgCyan.black("Type: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].nodeType+" ")+chalk.bgRed.white(tobj.info.ip)+chalk.bgCyan.black("OPNC: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce)+
+          chalk.bgCyan.black("OPmaxht: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+
+          chalk.bgCyan.black("OPtxht: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" ")+
+          chalk.bgCyan.black("CSHtHx: ")+chalk.bgMagenta.yellow("Ht: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgMagenta.white(" ckPtH: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash.substring(1,10)+" "+chalk.bgCyan.black("TxHt: "))
         )
-        console.log(chalk.bgCyan.black("CS Hash: ")+chalk.bgMagenta.white(" blockNo: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" ckPtHash: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash+" "))
       }
     }
   }
@@ -2029,6 +2032,8 @@ var cbReset = async function(){
                 JSON.parse(data)["nodeStatePong"]["currentBlockCheckPointHash"],
                 JSON.parse(data)["nodeStatePong"]["transactionHeight"],
                 JSON.parse(data)["nodeStatePong"]["transactionRootHash"],
+                JSON.parse(data)["nodeStatePong"]["orderHeight"],
+                JSON.parse(data)["nodeStatePong"]["orderRootHash"],
                 JSON.parse(data)["nodeStatePong"]["PeerNonce"],
                 JSON.parse(data)["nodeStatePong"]["NodeType"],
               )
@@ -2054,6 +2059,8 @@ var cbReset = async function(){
                 JSON.parse(data)["nodeStatePing"]["currentBlockCheckPointHash"],
                 JSON.parse(data)["nodeStatePing"]["transactionHeight"],
                 JSON.parse(data)["nodeStatePing"]["transactionRootHash"],
+                JSON.parse(data)["nodeStatePing"]["orderHeight"],
+                JSON.parse(data)["nodeStatePing"]["orderRootHash"],
                 JSON.parse(data)["nodeStatePing"]["PeerNonce"],
                 JSON.parse(data)["nodeStatePing"]["NodeType"],
               )
