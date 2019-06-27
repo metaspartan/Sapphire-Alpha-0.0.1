@@ -228,20 +228,16 @@ var activeSync = function(timer){
   console.log(chalk.bgRed("AS TIMER "+timer))
   console.log(chalk.green("--------------------------------------------------------------------------------"));
   console.log(
-      chalk.bgCyan.black("chainwalkht:")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight))+
-      chalk(" ")+chalk.bgCyan.black("chainStateSynched:")+chalk.bgMagenta(chainState.synchronized)+
-      chalk(" ")+chalk.bgCyan.black("blockchainht:  ")+chalk.bgMagenta(frankieCoin.blockHeight));
-  console.log(
-      chalk.bgCyan.black("cspeernonce:")+chalk.bgMagenta(parseInt(chainState.peerNonce))+
-      chalk("    ")+chalk.bgCyan.black("transactionheight:")+chalk.bgMagenta(chainState.transactionHeight)+
-      chalk(" ")+chalk.bgCyan.black("topblockheight:")+chalk.bgMagenta(chainState.topBlock));
-  console.log(
-      chalk.bgCyan.black("fcnlongpeer:")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+
-      chalk("    ")+chalk.bgCyan.black("cspeernonce:      ")+chalk.bgMagenta(chainState.peerNonce)+
-      chalk("    ")+chalk.bgCyan.black("peerCount:     ")+chalk.bgMagenta(frankieCoin.nodes.length));
-  console.log(chalk.bgCyan.black("transactionHash: ")+chalk.bgMagenta(chainState.transactionRootHash));
-  console.log(chalk.bgCyan.black("previousTXHash:  ")+chalk.bgMagenta(chainState.previousTxHash));
-  console.log(chalk.bgCyan.black("previousTXHeight:")+chalk.bgMagenta(chainState.previousTxHeight));
+      chalk.bgCyan.black("CwHt:")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight))+
+      chalk(" ")+chalk.bgCyan.black("csSynced:")+chalk.bgMagenta(chainState.synchronized)+
+      chalk(" ")+chalk.bgCyan.black("bcHT:")+chalk.bgMagenta(frankieCoin.blockHeight)+
+      chalk(" ")+chalk.bgCyan.black("csPrNnce:")+chalk.bgMagenta(parseInt(chainState.peerNonce))+
+      chalk(" ")+chalk.bgCyan.black("TopBlkHt:")+chalk.bgMagenta(chainState.topBlock)+
+      chalk(" ")+chalk.bgCyan.black("longPrHt:")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+
+      chalk(" ")+chalk.bgCyan.black("csPrNnce:")+chalk.bgMagenta(chainState.peerNonce)+
+      chalk(" ")+chalk.bgCyan.black("peers:")+chalk.bgMagenta(frankieCoin.nodes.length)+
+      chalk(" ")+chalk.bgCyan.black("TxHt:")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgMagenta.yellow(" "+chainState.transactionRootHash.substring(0,8))+
+      chalk(" ")+chalk.bgCyan.black("prevTxHt:")+chalk.bgMagenta(chainState.previousTxHeight)+chalk.bgMagenta.yellow(" "+chainState.previousTxHash.substring(0,8)));
   /***
   console.log(chalk.bgCyan.black(" txHashHistory(4): ")+chalk.bgMagenta(JSON.stringify(chainState.transactionHashWeights)));
   for (nodesend in chainState.activeSynch.send){
@@ -250,7 +246,6 @@ var activeSync = function(timer){
   ***/
   var nodenum = "0"
   console.log(chalk.green("--------------------------------------------------------------------------------"));
-  console.log(chalk.bgGreen.black(" last ping receive: "));
   for (nodercv in chainState.activeSynch.receive){
     if(chainState.activeSynch.receive[nodercv] != "undefined"){
       nodenum++
