@@ -240,12 +240,14 @@ var activeSync = function(timer){
   for (nodercv in chainState.activeSynch.receive){
     if(chainState.activeSynch.receive[nodercv] != "undefined"){
       let tobj = frankieCoin.nodes.find(o => o.id === chainState.activeSynch.receive[nodercv].peer);
-      console.log(
-        chalk.bgCyan.black("Node Type: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].nodeType+" ")+chalk.bgRed.white(tobj.info.ip)+chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce)+
-        chalk.bgCyan.black("peer Max Height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+
-        chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" ")
-      )
-      console.log(chalk.bgCyan.black("CS Hash: ")+chalk.bgMagenta.white(" blockNo: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" ckPtHash: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash+" "))
+      if(tobj){
+        console.log(
+          chalk.bgCyan.black("Node Type: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].nodeType+" ")+chalk.bgRed.white(tobj.info.ip)+chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce)+
+          chalk.bgCyan.black("peer Max Height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+
+          chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" ")
+        )
+        console.log(chalk.bgCyan.black("CS Hash: ")+chalk.bgMagenta.white(" blockNo: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" ckPtHash: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash+" "))
+      }
     }
   }
   if(chainState.chainWalkHeight == 1){
