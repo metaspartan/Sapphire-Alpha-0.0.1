@@ -802,9 +802,9 @@ var getBlockRange = function(blockHeight,riser,callback){
 ///////////////////////this function validates a range of blocks for chain symch
 var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRiser,calledFrom){
 
-      console.log("BLOCKHEIGHT: "+blockHeight);
-      console.log("RISER: "+riser);
-      console.log("CALLED FROM "+calledFrom)
+      //console.log("BLOCKHEIGHT: "+blockHeight);
+      //console.log("RISER: "+riser);
+      //console.log("CALLED FROM "+calledFrom)
 
       var stream = db.createReadStream();
       var dataStream = [];

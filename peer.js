@@ -197,9 +197,6 @@ updatePeerTxHashArray = function(txHt,txHsh,increment){
 
 updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,nodeType,oxHt,oxHsh){
   //console.log("node state updater "+peer+" "+maxHeight+" "+chainCPH+" "+txHt+" "+txHsh)
-
-  console.log("is not nodeType getting here?? "+nodeType)
-
   if(chainState.activeSynch.receive != undefined){
     var arrayCSReceive = chainState.activeSynch.receive;
     for(item in arrayCSReceive){
@@ -284,7 +281,7 @@ var tranSynch = function(){
 var oxSynch = function(){
   var startEnd = parseInt(chainState.orderHeight+1);
   var topEnd = parseInt(startEnd+500);
-  console.log("want to call TXVLDY with start "+startEnd+" and top "+topEnd+" and syncronized "+chainState.synchronized)
+  console.log("want to call OXVLDY with start "+startEnd+" and top "+topEnd+" and syncronized "+chainState.synchronized)
   if(topEnd >= chainState.synchronized){
     topEnd = chainState.synchronized
   }
@@ -331,7 +328,7 @@ var adjustedTimeout = function() {
     slowCounter++;
     //console.log("chain is not synching so is it sync? ")
   }
-  console.log("synching again in "+chainState.interval)
+  //console.log("synching again in "+chainState.interval)
   setTimeout(adjustedTimeout, chainState.interval);
   if(slowCounter == 14){
     slowCounter = 1;
@@ -507,7 +504,7 @@ var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
 var setChainStateTX = async function(validTXHeight,transactionCheckPointHash){
 
-  console.log(chalk.bgGreen.black("setting chain state height to "+validTXHeight+" with hash of "+transactionCheckPointHash));
+  //console.log(chalk.bgGreen.black("setting chain state height to "+validTXHeight+" with hash of "+transactionCheckPointHash));
 
   //realizing this was never actually set
   var tempPrevTXHt = chainState.previousTxHeight;
