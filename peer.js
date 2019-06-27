@@ -218,6 +218,7 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
 
   updatePeerTxHashArray(txHt,txHsh,1);
   //console.log("just before push "+peer)
+  console.log(oxHt+oxHsh)
   var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"peerOXHeight":oxHt,"peerOXHash":oxHsh,"longPeerNonce":longPeerNonce,"nodeType":nodeType}
   chainState.activeSynch.receive.push(insertPeer)
 }
