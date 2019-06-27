@@ -1642,7 +1642,7 @@ var addOrdersFromStream = async function(orders,blockhash,blknum,block,cbUpdateC
   console.log(chalk.bgCyan.black("WOOOT ADDING ORDERS ON VALIDATE WOOT "+orders+ " blockhash " +blockhash+ " blknum " +blknum+" blkChainStateHash: "+blkChainStateHash))
 
   var oxIndex = 0;
-  var oxConfirmation;
+  var oxConfirmation = await Hash(blockhash+blkChainStateHash+blknum);
 
 
   if(orders.length > 0){
@@ -1709,7 +1709,7 @@ var addOrdersFromStream = async function(orders,blockhash,blknum,block,cbUpdateC
   if(blknum == 1){
     console.log(chalk.bgRed("THE FIRST BLOCK IS ADDED IN STREAM "+blknum+oxConfirmation));
   }
-  //console.log(chalk.bgRed("THE FIRST BLOCK IS ADDED IN STREAM "+blknum+txConfirmation));
+  console.log(chalk.bgRed("THE BLOCK IS ADDED IN STREAM "+blknum+oxConfirmation));
 
   cbUpdateChainStateOX(blknum,oxConfirmation);
 
