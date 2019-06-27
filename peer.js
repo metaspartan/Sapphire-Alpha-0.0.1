@@ -241,11 +241,22 @@ var activeSync = function(timer){
     if(chainState.activeSynch.receive[nodercv] != "undefined"){
       let tobj = frankieCoin.nodes.find(o => o.id === chainState.activeSynch.receive[nodercv].peer);
       if(tobj){
+        if(chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash){
+          var thisPeerCHKPTHASH = chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash;
+        }else{
+          var thisPeerCHKPTHASH = "..data..."
+        }
+        if(chainState.activeSynch.receive[nodercv].peerTxHash){
+          var thisPeerTXHASH = chainState.activeSynch.receive[nodercv].peerTxHash;
+        }else{
+          var thisPeerTXHASH = "..data..."
+        }
         console.log(
           chalk.bgCyan.black("Type: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].nodeType+" ")+chalk.bgRed.white(tobj.info.ip)+chalk.bgCyan.black("OPNC: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce)+
           chalk.bgCyan.black("OPmaxht: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+
           chalk.bgCyan.black("OPtxht: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" ")+
-          chalk.bgCyan.black("CSHtHx: ")+chalk.bgMagenta.yellow("Ht: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgMagenta.white(" ckPtH: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash.substring(1,10)+" "+chalk.bgCyan.black("TxHt: "))
+          chalk.bgCyan.black("CSHtHx: ")+chalk.bgMagenta.yellow(chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgMagenta.white(thisPeerCHKPTHASH.substring(0,8))+
+          chalk.bgCyan.black("TXHtHx: ")+chalk.bgMagenta.yellow(chainState.activeSynch.receive[nodercv].peerTxHeight+" ")+chalk.bgMagenta.white(thisPeerTXHASH.substring(0,8))
         )
       }
     }
