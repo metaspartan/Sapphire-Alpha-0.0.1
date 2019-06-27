@@ -251,12 +251,18 @@ var activeSync = function(timer){
         }else{
           var thisPeerTXHASH = "..data..."
         }
+        if(chainState.activeSynch.receive[nodercv].peerOXHash){
+          var thisPeerOXHASH = chainState.activeSynch.receive[nodercv].peerOXHash;
+        }else{
+          var thisPeerOXHASH = "..data..."
+        }
         console.log(
-          chalk.bgCyan.black("Type: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].nodeType+" ")+chalk.bgRed.white(tobj.info.ip)+chalk.bgCyan.black("OPNC: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce)+
-          chalk.bgCyan.black("OPmaxht: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+
-          chalk.bgCyan.black("OPtxht: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" ")+
-          chalk.bgCyan.black("CSHtHx: ")+chalk.bgMagenta.yellow(chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgMagenta.white(thisPeerCHKPTHASH.substring(0,8))+
-          chalk.bgCyan.black("TXHtHx: ")+chalk.bgMagenta.yellow(chainState.activeSynch.receive[nodercv].peerTxHeight+" ")+chalk.bgMagenta.white(thisPeerTXHASH.substring(0,8))
+          chalk.bgCyan.black("T:")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].nodeType+" ")+chalk.bgRed.white(tobj.info.ip)+chalk.bgCyan.black("OPNC: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce)+
+          chalk.bgCyan.black("OPmaxht:")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+
+          chalk.bgCyan.black("OPtxht:")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" ")+
+          chalk.bgCyan.black("CS:")+chalk.bgMagenta.yellow(chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgMagenta.white(thisPeerCHKPTHASH.substring(0,8))+
+          chalk.bgCyan.black("TXHt:")+chalk.bgMagenta.yellow(chainState.activeSynch.receive[nodercv].peerTxHeight+" ")+chalk.bgMagenta.white(thisPeerTXHASH.substring(0,8))+
+          chalk.bgCyan.black("OXHt:")+chalk.bgMagenta.yellow(chainState.activeSynch.receive[nodercv].peerOXHeight+" ")+chalk.bgMagenta.white(thisPeerOXHASH.substring(0,8))
         )
       }
     }
