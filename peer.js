@@ -2032,10 +2032,10 @@ var cbReset = async function(){
                 JSON.parse(data)["nodeStatePong"]["currentBlockCheckPointHash"],
                 JSON.parse(data)["nodeStatePong"]["transactionHeight"],
                 JSON.parse(data)["nodeStatePong"]["transactionRootHash"],
-                JSON.parse(data)["nodeStatePong"]["orderHeight"],
-                JSON.parse(data)["nodeStatePong"]["orderRootHash"],
                 JSON.parse(data)["nodeStatePong"]["PeerNonce"],
                 JSON.parse(data)["nodeStatePong"]["NodeType"],
+                JSON.parse(data)["nodeStatePong"]["orderHeight"],
+                JSON.parse(data)["nodeStatePong"]["orderRootHash"],
               )
             }
 
@@ -2059,10 +2059,10 @@ var cbReset = async function(){
                 JSON.parse(data)["nodeStatePing"]["currentBlockCheckPointHash"],
                 JSON.parse(data)["nodeStatePing"]["transactionHeight"],
                 JSON.parse(data)["nodeStatePing"]["transactionRootHash"],
-                JSON.parse(data)["nodeStatePing"]["orderHeight"],
-                JSON.parse(data)["nodeStatePing"]["orderRootHash"],
                 JSON.parse(data)["nodeStatePing"]["PeerNonce"],
                 JSON.parse(data)["nodeStatePing"]["NodeType"],
+                JSON.parse(data)["nodeStatePing"]["orderHeight"],
+                JSON.parse(data)["nodeStatePing"]["orderRootHash"],
               )
               if(chainState.previousTxHeight > 0 && parseInt(chainState.previousTxHeight+1) == chainState.transactionHeight){
 
