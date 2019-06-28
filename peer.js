@@ -1509,7 +1509,7 @@ var cbReset = async function(){
     });
     sw.join('egem-sfrx-001') // can be any id/name/hash
     sw2.join('egem-sfrx-002')//second teier peers
-    sw.maxConnections = 20;//testing this out for node organization
+    sw.maxConnections = 4;//testing this out for node organization
 
     //incoming connections from peers
     sw.on('connection', (conn, info) => {
@@ -3967,7 +3967,7 @@ var cbChainGrab = async function(data) {
               }else{
                 console.log("WE SHOULD CLOSE THE MINER HERE ALSO BUT LETS TRY TO REST CONNECTION FIRST");
                 cbReset();
-                rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                //rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
               }
             }).catch(function(err){
               console.log("cleanUpWaitingRemoveLag has error "+err);
@@ -3978,7 +3978,7 @@ var cbChainGrab = async function(data) {
           }else{
             setTimeout(function(){
               rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-            },10000)
+            },5000)
           }
         }
         countPostMinerCalled+=1;
@@ -4687,12 +4687,12 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                   }else{
                     console.log(chalk.bgRed("PERHAPS SHUT DOWN MINER AND SYNC HERE"));
                     cbReset();
-                    rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                    //rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                   }
                 }).catch(function(err){
                   console.log("cleanUpWaitingRemoveLag error in fBroadcast Peers "+err);
                   setTimeout(function(){cbReset();},1000);
-                  rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                  //rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                   console.log("I make it past here miner error ");
                 })
 
