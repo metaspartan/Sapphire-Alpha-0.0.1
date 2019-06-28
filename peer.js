@@ -221,7 +221,13 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
   //console.log("just before push "+peer)
   //console.log("oxHeight"+oxHt+"oxHash"+oxHsh)
   var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"peerOXHeight":oxHt,"peerOXHash":oxHsh,"longPeerNonce":longPeerNonce,"nodeType":nodeType}
-  chainState.activeSynch.receive.push(insertPeer)
+  chainState.activeSynch.receive.push(insertPeer);
+
+  //finally ping if necessary
+  if(txHt > chainState.synchronized){
+    peers2[peer].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+  }
+
 }
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
