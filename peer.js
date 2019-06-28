@@ -118,6 +118,7 @@ var chainStateMonitor = {};
 chainStateMonitor.peerCom = false;
 chainStateMonitor.rpcCom = false;
 chainStateMonitor.deletedPeers = [];
+chainStateMonitor.thanksCount = 0;
 
 var nodeType = {};
 nodeType.current = 3;//start as a Listener 3 with 1 miner and 2 rpc wallets
@@ -1621,6 +1622,7 @@ var cbReset = async function(){
             //console.log("you got a thanks from "+peerId);
             let tobj = frankieCoin.nodes.find(o => o.id === peerId);
             if(tobj.info){
+              chainStateMonitor.thanksCount+=1;
               console.log(chalk.bgRed.white.bold("you got a thanks from "+tobj.info.ip));
               console.log(chalk.bgCyan.black(JSON.stringify(JSON.parse(data)["thanks"])));
               chainState.peerNonce = chainState.synchronized;
@@ -3062,11 +3064,13 @@ var cleanUpWaitingRemoveLag = async function(){
   return new Promise((resolve)=> {
     console.log(chalk.bgRed("CLEARING LAGGED PEER allWaitingLength = "+allWaitingLength));
     for(eachPeer in allWaiting){
+      console.log("going to delete OR CLEAR this peer "+allWaiting[eachPeer].peerId)
+      if(allWaiting[eachPeer].peerId){
         allWaiting.splice(allWaiting[eachPeer].peerId,1);
         delete peers[allWaiting[eachPeer].peerId];
         connSeq--
         connSeq2--
-        console.log("going to delete this peer "+allWaiting[eachPeer].peerId)
+      }
     }
     if(allWaitingLength == 0){
       resolve(true);
@@ -4192,6 +4196,10 @@ var myCallbackSell = function(data) {
     log("------------------------------------------------------")
     log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
     log("------------------------------------------------------")
+
+    //tracking replies
+    chainStateMonitor.thanksCount = 0;
+
     broadcastPeers(JSON.stringify({
       checkPointHash:chainState.checkPointHash,
       currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
@@ -4677,12 +4685,14 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           if(allWaiting.length > 0){
 
             setTimeout(function(){
-              if(countPostMinerCalled < 4){//we call this 4 times then cleanup
+              if(countPostMinerCalled < 4 && chainStateMonitor.thanksCount < 2){//we call this 4 times then cleanup
+                console.log(chalk.bgWhite.black("calling postMiner countPostMinerCalled "+countPostMinerCalled))
+                console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                 postMiner();
               }else{
 
                 chainState.isMining = false;//dows this neeed to be here?
-                cleanUpWaitingRemoveLag().then(function(repl){
+                cleanUpWaitingRemoveLag().then(function(reply){
                   if(reply == true){
                     rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                   }else{
@@ -4692,8 +4702,11 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                   }
                 }).catch(function(err){
                   console.log("cleanUpWaitingRemoveLag error in fBroadcast Peers "+err);
+                  allWaiting = [];
+                  allWaitingLength = 0;
+                  //want to count the returns here
                   setTimeout(function(){cbReset();},1000);
-                  //rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                  rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                   console.log("I make it past here miner error ");
                 })
 
