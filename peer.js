@@ -1510,6 +1510,7 @@ var cbReset = async function(){
     sw.join('egem-sfrx-001') // can be any id/name/hash
     sw2.join('egem-sfrx-002')//second teier peers
     sw.maxConnections = 4;//testing this out for node organization
+    sw2.maxConnections = 4;//testing this out for node organization
 
     //incoming connections from peers
     sw.on('connection', (conn, info) => {
