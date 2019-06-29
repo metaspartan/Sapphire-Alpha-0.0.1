@@ -318,7 +318,7 @@ var activeSync = function(timer){
 var tranSynch = function(){
   var startEnd = parseInt(chainState.transactionHeight+1);
   var topEnd = parseInt(startEnd+500);
-  console.log("want to call TXVLDY with start "+startEnd+" and top "+topEnd+" and syncronized "+chainState.synchronized)
+  //console.log("want to call TXVLDY with start "+startEnd+" and top "+topEnd+" and syncronized "+chainState.synchronized)
   if(topEnd >= chainState.synchronized){
     topEnd = chainState.synchronized
   }
@@ -329,7 +329,7 @@ var tranSynch = function(){
 var oxSynch = function(){
   var startEnd = parseInt(chainState.orderHeight+1);
   var topEnd = parseInt(startEnd+500);
-  console.log("want to call OXVLDY with start "+startEnd+" and top "+topEnd+" and syncronized "+chainState.synchronized)
+  //console.log("want to call OXVLDY with start "+startEnd+" and top "+topEnd+" and syncronized "+chainState.synchronized)
   if(topEnd >= chainState.synchronized){
     topEnd = chainState.synchronized
   }
@@ -346,8 +346,8 @@ var adjustedTimeout = function() {
   var timerInterval = 113;
   frankieCoin.isChainSynch(chainState.synchronized)
   if(slowCounter == 0){
-    console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
-    console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
+    //console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
+    //console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync(parseInt(timerInterval+(slowCounter*79)));
     //activePing();
     slowCounter++;
@@ -356,13 +356,13 @@ var adjustedTimeout = function() {
     oxSynch()
     slowCounter++;
   }else if(chainState.peerNonce < chainState.synchronized){
-    console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
-    console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
+    //console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
+    //console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync(parseInt(timerInterval+(slowCounter*81)));
     activePing(parseInt(timerInterval+(slowCounter*43)));
   }else if(isSynching == false && chainState.isSynching == false && slowCounter < 10){
-    console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
-    console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
+    //console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
+    //console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync(parseInt(timerInterval+(slowCounter*35)));
     activePing(parseInt(timerInterval+(slowCounter*37)));
     slowCounter++;
@@ -457,10 +457,10 @@ var activePing = function(timer){
       frankieCoin.longestPeerBlockHeight = longestPeer;
     }
   }
-  if(chainState.synchronized >= longestPeer){
-
-    console.log("peer stats indicate you are ahead of network or are starting up");
-    console.log("peer stats indicate you are ahead of network or are starting up");
+  if(chainState.synchronized > longestPeer){
+    console.log(chalk.yellow("---------------------------------------------------------------"));
+    console.log(chalk.red("peer stats indicate you are ahead of network or are starting up"));
+    console.log(chalk.yellow("---------------------------------------------------------------"));
     //idk should I nodeStatePong?
     for (let id in peers) {
       if(peers[id].conn != undefined){
@@ -487,6 +487,10 @@ var activePing = function(timer){
     }
 
     //this may get edited but should trigger peer to synch to me
+  }else if(chainState.synchronized == longestPeer){
+    console.log(chalk.yellow("---------------------------------------------------------------"));
+    console.log(chalk.green("peer stats indicate you are synch to network"));
+    console.log(chalk.yellow("---------------------------------------------------------------"));
   }
   if(chainState.isSynching = false){//keep in touch
     //console.log("is synching is FALSE");
@@ -942,7 +946,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     if(isValid == chainState.peerNonce && isValid > chainState.TransactionHeight){
       var startEnd = parseInt(chainState.transactionHeight+1);
       var topEnd = parseInt(startEnd+500);
-      console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
+      //console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
       if(topEnd >= chainState.synchronized){
         topEnd = chainState.synchronized
       }
@@ -1247,11 +1251,11 @@ var orderValidator = async function(start,end){
 
     if(parseInt(csOrderHeight.toString().split(":")[0]) <= end){
 
-      console.log("CALLED OXVLDY WITH "+start+" and "+end)
+      //console.log("CALLED OXVLDY WITH "+start+" and "+end)
       if(start <= end){
 
         var incrementor = parseInt(start);
-        console.log("ORDER VALIDATION STARTING AT "+incrementor);
+        //console.log("ORDER VALIDATION STARTING AT "+incrementor);
         var validateThisBlock = await function(){
           return new Promise((resolve)=> {
             var cbOxValidator = function(blockToValidate){
@@ -1969,7 +1973,7 @@ var cbReset = async function(){
 
             }else if(JSON.parse(data)["currentTransactionHeight"] != chainState.previousTxHeight){
               console.log("this node sent in a treansaction height of "+JSON.parse(data)["currentTransactionHeight"]);
-              console.log("one of you nees to sync your transactions I will trigger yours");
+              console.log("one of you needs to sync your transactions I will trigger yours");
 
               var startEnd = parseInt(chainState.transactionHeight+1);
               var topEnd = parseInt(startEnd+500);

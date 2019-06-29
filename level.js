@@ -1639,7 +1639,7 @@ var addOrdersFromStream = async function(orders,blockhash,blknum,block,cbUpdateC
     }
   }
 
-  console.log(chalk.bgCyan.black("WOOOT ADDING ORDERS ON VALIDATE WOOT "+orders+ " blockhash " +blockhash+ " blknum " +blknum+" blkChainStateHash: "+blkChainStateHash))
+  //console.log(chalk.bgCyan.black("WOOOT ADDING ORDERS ON VALIDATE WOOT "+orders+ " blockhash " +blockhash+ " blknum " +blknum+" blkChainStateHash: "+blkChainStateHash))
 
   var oxIndex = 0;
   var oxConfirmation = await Hash(blockhash+blkChainStateHash+blknum);
