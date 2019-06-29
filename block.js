@@ -343,14 +343,31 @@ var Blockchain = class Blockchain {
           //log("FIRST JUST RETRIEVING LIST "+JSON.stringify(thisN.retrieveNodes()));
 
           var isNodeFound = 0;
+
+          let tnod = thisN.nodes.find(p => p.id === id);
+          if(tnod){
+            console.log("tnod id is "+tnod.id);
+            console.log("tnod id is "+tnod.id);
+            console.log("tnod id is "+tnod.id);
+            console.log("tnod id is "+tnod.id);
+            console.log("tnod id is "+tnod.id);
+            console.log("tnod id is "+tnod.id);
+            console.log("tnod id is "+tnod.id);
+            isNodeFound = 1;
+          }else{
+            console.log("tnod not there is "+id);
+          }
+
+
           for(var eachNode in thisN.nodes){
             if(thisN.nodes[eachNode].id == id){
-              //console.log("id found "+id)
+              console.log("id found "+id)
               isNodeFound = 1;
             }else{
-              //console.log("id NOT found "+thisN.nodes[eachNode].id+" "+id)
+              console.log("id NOT found "+thisN.nodes[eachNode].id+" "+id)
             }
           }
+
 
           if(isNodeFound == 0) {
 
