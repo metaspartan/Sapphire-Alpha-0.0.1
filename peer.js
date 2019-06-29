@@ -263,19 +263,30 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(timer){
+  var blockHeightLength = Math.log(chainState.chainWalkHeight) * Math.LOG10E + 1 | 0;
+  if(chainState.peerNonce == "0"){
+    var displayPeerNonce = ("0").padStart(blockHeightLength,"0");
+  }else{
+    var displayPeerNonce = chainState.peerNonce;
+  }
   console.log(chalk.bgRed("AS TIMER "+timer))
   console.log(chalk.green("--------------------------------------------------------------------------------"));
   console.log(
-      chalk.bgCyan.black("CwHt:")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight))+
-      chalk(" ")+chalk.bgCyan.black("csSynced:")+chalk.bgMagenta(chainState.synchronized)+
-      chalk(" ")+chalk.bgCyan.black("bcHT:")+chalk.bgMagenta(frankieCoin.blockHeight)+
-      chalk(" ")+chalk.bgCyan.black("csPrNnce:")+chalk.bgMagenta(parseInt(chainState.peerNonce))+
-      chalk(" ")+chalk.bgCyan.black("TopBlkHt:")+chalk.bgMagenta(chainState.topBlock)+
-      chalk(" ")+chalk.bgCyan.black("longPrHt:")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+
-      chalk(" ")+chalk.bgCyan.black("csPrNnce:")+chalk.bgMagenta(chainState.peerNonce)+
-      chalk(" ")+chalk.bgCyan.black("peers:")+chalk.bgMagenta(frankieCoin.nodes.length)+
-      chalk(" ")+chalk.bgCyan.black("TxHt:")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgMagenta.yellow(" "+chainState.transactionRootHash.substring(0,8))+
-      chalk(" ")+chalk.bgCyan.black("prevTxHt:")+chalk.bgMagenta(chainState.previousTxHeight)+chalk.bgMagenta.yellow(" "+chainState.previousTxHash.substring(0,8)));
+    chalk.bgCyan.black("CwHt:")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight))+
+    chalk(" ")+chalk.bgCyan.black("bcHT:")+chalk.bgMagenta(frankieCoin.blockHeight)+
+    chalk(" ")+chalk.bgCyan.black("longPrHt:")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+
+    chalk(" ")+chalk.bgCyan.black("prevTxHt:")+chalk.bgMagenta(chainState.previousTxHeight)+chalk.bgMagenta.yellow(" "+chainState.previousTxHash.substring(0,8))+
+    chalk(" ")+chalk.bgCyan.black("TopBlkHt:")+chalk.bgMagenta(chainState.topBlock)+
+    chalk(" ")+chalk.bgCyan.black("peers:")+chalk.bgMagenta(frankieCoin.nodes.length)
+  );
+  console.log(
+    chalk("   ")+chalk.bgCyan.black("csPrNnce:")+chalk.bgMagenta(displayPeerNonce)+
+    chalk("                   ")+
+    chalk(" ")+chalk.bgCyan.black("csSynced:")+chalk.bgMagenta(chainState.synchronized)+chalk.bgMagenta.yellow(" "+chainState.currentBlockCheckPointHash.checkPointHash.substring(0,8))+
+    chalk(" ")+chalk.bgCyan.black("TxHt:")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgMagenta.yellow(" "+chainState.transactionRootHash.substring(0,8))+
+    chalk(" ")+chalk.bgCyan.black("OxHt:")+chalk.bgMagenta(chainState.orderHeight)+chalk.bgMagenta.yellow(" "+chainState.orderRootHash.substring(0,8))
+  );
+
   /***
   console.log(chalk.bgCyan.black(" txHashHistory(4): ")+chalk.bgMagenta(JSON.stringify(chainState.transactionHashWeights)));
   for (nodesend in chainState.activeSynch.send){
@@ -1251,7 +1262,7 @@ var transactionValidator = async function(start,end){
         BlkDB.getBlock(calcCheckPointBlock,returnCheckPointBlock);
         //console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
       }else{
-        console.log("start was greater than or equal to end so just look at chain state hash")
+        //console.log("tx validator start was greater than or equal to end so just look at chain state hash")
       }
 
     }else if(csTransactionHeight.split(":")[0] == end){
@@ -1340,7 +1351,7 @@ var orderValidator = async function(start,end){
         BlkDB.getBlock(calcCheckPointBlock,returnCheckPointBlock);
         //console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
       }else{
-        console.log("start was greater than or equal to end so just look at chain state hash")
+        //console.log("order validator start was greater than or equal to end so just look at chain state hash")
       }
 
     }else if(csOrderHeight.split(":")[0] == end){
