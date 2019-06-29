@@ -63,6 +63,27 @@ var filename = "genesis.js";
 var tbh = "";
 //////pulls genesis.js file and sha256 hashes it into globalGenesisHash variable
 var output = fs.readFile(filename, 'utf8', function(err, data) {
+    var initialInvol = function(dataVar){
+      return new Promise((resolve) => {
+        console.log("invocation of involuntary verification process")
+        console.log(chalk.bgWhite.green(dataVar.toString()));
+        resolve("0xc3c4e43f3a97140b5d3e8536c50ac2ce21a23e0580123cd5204c7a343196875f");
+      });
+    }
+    var secondInvol = function(chainCallData){
+      console.log("calling second involuntary verification process ");
+      initialInvol("Egem Sapphire Chain File Network and State Verifications");
+    }
+    var thirdInvol = function(txHashVerification){
+      console.log("calling third involuntary verification to call EGEM chain");
+      web3.eth.getTransaction(txHashVerification).then(function(tx){
+        console.log("transaction data 2 is "+tx.input)
+        var txReplyData = web3.utils.hexToUtf8(tx.input);
+        console.log("in string format is "+txReplyData);
+        secondInvol(txReplyData);
+      })
+    }
+    Genesis.firstResponder(initialInvol,secondInvol,thirdInvol);
     if (err) throw err;
     tbh=data.replace(/(\r\n|\n|\r)/gm,"");//removes ALL line breaks
     if (Genesis.genesisGlobalHash == "This is the Genesis GLobal Hash for the EtherGem Sapphire Integrated Subchain TeamEGEM"){
