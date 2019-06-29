@@ -209,12 +209,12 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
         chainState.activeSynch.receive.splice(item, 1);
         //console.log("chainState.activeSynch.receive length in upd peer state "+chainState.activeSynch.receive.length);
       }else{
-        if(parseInt(new Date().getTime()/1000) - arrayCSReceive[item].utcTimeStamp > 60000){
+        if(parseInt(new Date().getTime()/1000) - parseInt(arrayCSReceive[item].utcTimeStamp) > 60000){
           chainState.activeSynch.receive.splice(item, 1);
           console.log("removing old record "+arrayCSReceive[item].peer);
         }
 
-        console.log(chalk.bgWhite.red("timestamp of this peer record "+parseInt(new Date().getTime()/1000) - arrayCSReceive[item].utcTimeStamp));
+        console.log(chalk.bgWhite.red("timestamp of this peer record "+parseInt(new Date().getTime()/1000)+" the other one"+arrayCSReceive[item].utcTimeStamp)+" the delta "+(parseInt(new Date().getTime()/1000) - parseInt(arrayCSReceive[item].utcTimeStamp)));
         //console.log("arrayCSReceive[item].peer "+arrayCSReceive[item].peer+" peer "+peer)
         //console.log("chainState.activeSynch.receive length in upd peer state "+chainState.activeSynch.receive.length);
       }
