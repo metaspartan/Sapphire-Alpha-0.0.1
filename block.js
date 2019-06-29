@@ -355,16 +355,16 @@ var Blockchain = class Blockchain {
             console.log("tnod id is "+tnod.id);
             isNodeFound = 1;
           }else{
-            console.log("tnod not there is "+id);
+            //console.log("tnod not there is "+id);
           }
 
 
           for(var eachNode in thisN.nodes){
             if(thisN.nodes[eachNode].id == id){
-              console.log("id found "+id)
+              //console.log("id found "+id)
               isNodeFound = 1;
             }else{
-              console.log("id NOT found "+thisN.nodes[eachNode].id+" "+id)
+              //console.log("id NOT found "+thisN.nodes[eachNode].id+" "+id)
             }
           }
 

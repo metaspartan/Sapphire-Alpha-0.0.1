@@ -1057,13 +1057,30 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             if(tobj && tobj.info){
               console.log(tobj.info.ip)
             }
-            console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
-            called = true;
-            localTempNode.random = "no";
+            let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
+            if(rnod){
+              if(rnod.nodeType > 1){
+                console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
+                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                called = true;
+                localTempNode.random = "no";
+              }
+            }else{
+              console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
+              peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+              called = true;
+              localTempNode.random = "no";
+            }
           }else{
             console.log("I DONT KNOW WHAT ELSE BUT PING ANYWAY");
-            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+            let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
+            if(rnod){
+              if(rnod.nodeType > 1){
+                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+              }
+            }else{
+              peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+            }
           }
           tempNodeCallBucket.push(localTempNode)
           i++;
@@ -1160,11 +1177,20 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           if(tobj && tobj.info){
             console.log(tobj.info.ip)
           }
-
-          console.log(chalk.bgCyan.black("well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-          peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
-          called = true;
-          localTempNode.random = "yes";
+          let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
+          if(rnod){
+            if(rnod.nodeType > 1){
+              console.log(chalk.bgCyan.black("well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
+              peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+              called = true;
+              localTempNode.random = "yes";
+            }
+          }else{
+            console.log(chalk.bgCyan.black("well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
+            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+            called = true;
+            localTempNode.random = "yes";
+          }
         }else if(called == false && peers[id] && (replyData+1) < chainState.peerNonce){
         //}else if(peers[id]){
           //console.log(peers2[id])
@@ -1173,15 +1199,35 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             console.log(tobj.info.ip)
           }
           if(parseInt(replyData) == parseInt(chainState.synchronized)){
-            console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
-            called = true;
-            localTempNode.random = "no";
+            let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
+            if(rnod){
+              if(rnod.nodeType > 1){
+                console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
+                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                called = true;
+                localTempNode.random = "no";
+              }
+            }else{
+              console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
+              peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+              called = true;
+              localTempNode.random = "no";
+            }
           }else if(parseInt(replyData+1) == parseInt(chainState.synchronized)){
-            console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
-            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
-            called = true;
-            localTempNode.random = "no";
+            let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
+            if(rnod){
+              if(rnod.nodeType > 1){
+                console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
+                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                called = true;
+                localTempNode.random = "no";
+              }
+            }else{
+              console.log(chalk.bgCyan.black("well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
+              peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+              called = true;
+              localTempNode.random = "no";
+            }
           }else{
             cbReset();
           }
@@ -3621,15 +3667,7 @@ function cliGetInput(){
       log("---------------");
       cliGetInput();
     }else if(userInput == "T"){//T is for talk but using it to initiate chain sync
-      //sneaking this chain synch in here...that is a "talk"
-      log(chalk.white("---------->   ")+chalk.green("sending ping for chain sync")+chalk.white("   <----------"));
-      for (let id in peers) {
-        // log("------------------------------------------------------");
-        // log(chalk.green("Sending ping for chain sync."));
-        // log("------------------------------------------------------");
-        //peers[id].conn.write("ChainSyncPing("+frankieCoin.getLength()+")");
-        peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
-      }
+      console.log("feature disabled");
       cliGetInput();
     }else if(userInput == "N"){//N is for Node info
       Genesis.fileHash();
