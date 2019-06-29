@@ -196,7 +196,7 @@ updatePeerTxHashArray = function(txHt,txHsh,increment){
   }
 }
 
-updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,nodeType,oxHt,oxHsh){
+updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,nodeType,oxHt,oxHsh,utcTS){
   //console.log("node state updater "+peer+" "+maxHeight+" "+chainCPH+" "+txHt+" "+txHsh)
   if(chainState.activeSynch.receive != undefined){
     var arrayCSReceive = chainState.activeSynch.receive;
@@ -209,6 +209,9 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
         chainState.activeSynch.receive.splice(item, 1);
         //console.log("chainState.activeSynch.receive length in upd peer state "+chainState.activeSynch.receive.length);
       }else{
+        if(parseInt(new Date().getTime()/1000) - arrayCSReceive[item].utcTimeStamp > 60000){
+          concole.log(chalk.bgWhite.red("timestamp of this peer record "+parseInt(new Date().getTime()/1000) - arrayCSReceive[item].utcTimeStamp))
+        }
         //console.log("arrayCSReceive[item].peer "+arrayCSReceive[item].peer+" peer "+peer)
         //console.log("chainState.activeSynch.receive length in upd peer state "+chainState.activeSynch.receive.length);
       }
@@ -220,7 +223,7 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
   updatePeerTxHashArray(txHt,txHsh,1);
   //console.log("just before push "+peer)
   //console.log("oxHeight"+oxHt+"oxHash"+oxHsh)
-  var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"peerOXHeight":oxHt,"peerOXHash":oxHsh,"longPeerNonce":longPeerNonce,"nodeType":nodeType}
+  var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"peerOXHeight":oxHt,"peerOXHash":oxHsh,"longPeerNonce":longPeerNonce,"nodeType":nodeType,"utcTimeStamp":utcTS}
   chainState.activeSynch.receive.push(insertPeer);
 
   //finally ping if necessary
@@ -2080,6 +2083,7 @@ var cbReset = async function(){
                 JSON.parse(data)["nodeStatePong"]["NodeType"],
                 JSON.parse(data)["nodeStatePong"]["orderHeight"],
                 JSON.parse(data)["nodeStatePong"]["orderRootHash"],
+                JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]
               )
             }
 
@@ -2107,6 +2111,7 @@ var cbReset = async function(){
                 JSON.parse(data)["nodeStatePing"]["NodeType"],
                 JSON.parse(data)["nodeStatePing"]["orderHeight"],
                 JSON.parse(data)["nodeStatePing"]["orderRootHash"],
+                JSON.parse(data)["nodeStatePing"]["utcTimeStamp"]
               )
               if(chainState.previousTxHeight > 0 && parseInt(chainState.previousTxHeight+1) == chainState.transactionHeight){
 
