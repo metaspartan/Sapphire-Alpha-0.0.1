@@ -277,6 +277,11 @@ var activeSync = function(timer){
   }else{
     var displayPeerNonce = chainState.peerNonce;
   }
+  if(chainState.currentBlockCheckPointHash.checkPointHash){
+    var checkPointHashDisplay = chainState.currentBlockCheckPointHash.checkPointHash;
+  }else{
+    var checkPointHashDisplay = ".data...";
+  }
   console.log(chalk.bgRed("AS TIMER "+timer))
   console.log(chalk.green("--------------------------------------------------------------------------------"));
   console.log(
@@ -290,7 +295,7 @@ var activeSync = function(timer){
   console.log(
     chalk("   ")+chalk.bgCyan.black("csPrNnce:")+chalk.bgMagenta(displayPeerNonce)+
     chalk("                   ")+
-    chalk(" ")+chalk.bgCyan.black("csSynced:")+chalk.bgMagenta(chainState.synchronized)+chalk.bgMagenta.yellow(" "+chainState.currentBlockCheckPointHash.checkPointHash.substring(0,8))+
+    chalk(" ")+chalk.bgCyan.black("csSynced:")+chalk.bgMagenta(chainState.synchronized)+chalk.bgMagenta.yellow(" "+checkPointHashDisplay.substring(0,8))+
     chalk(" ")+chalk.bgCyan.black("TxHt:")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgMagenta.yellow(" "+chainState.transactionRootHash.substring(0,8))+
     chalk(" ")+chalk.bgCyan.black("OxHt:")+chalk.bgMagenta(chainState.orderHeight)+chalk.bgMagenta.yellow(" "+chainState.orderRootHash.substring(0,8))
   );
