@@ -3186,11 +3186,7 @@ var cleanUpWaitingRemoveLag = async function(){
         connSeq2--
       }
     }
-    if(allWaitingLength == 0){
-      resolve(true);
-    }else{
-      resolve(false);
-    }
+    resolve(allWaitingLength);
   })
 }
 
@@ -4096,19 +4092,29 @@ var cbChainGrab = async function(data) {
             //rpcserver.openPort(1);
             chainState.isMining = false;
             cleanUpWaitingRemoveLag().then(function(reply){
-              if(reply == true){
+              if(reply == 0){
                 setTimeout(function(){
                   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-                },10000)
-              }else{
-                console.log("WE SHOULD CLOSE THE MINER HERE ALSO BUT LETS TRY TO REST CONNECTION FIRST");
+                },10000);
+              }else if(reply > 1 && reply < 3){
+                console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
+                setTimeout(function(){
+                  rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                },20000)
                 cbReset();
-                //rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+              }else{
+                console.log("WE RESET and SEND NODE STATE PONG (not done yet) ");
+                cbReset();
+                //send back nodeStatePong
               }
             }).catch(function(err){
               console.log("cleanUpWaitingRemoveLag has error "+err);
+              allWaiting = [];
+              allWaitingLength = 0;
+              setTimeout(function(){
+                rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+              },20000);
               cbReset();
-              rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
             })
 
           }else{
@@ -4824,21 +4830,30 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
 
                 chainState.isMining = false;//dows this neeed to be here?
                 cleanUpWaitingRemoveLag().then(function(reply){
-                  if(reply == true){
-                    rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-                  }else{
-                    console.log(chalk.bgRed("PERHAPS SHUT DOWN MINER AND SYNC HERE"));
+                  if(reply == 0){
+                    setTimeout(function(){
+                      rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                    },10000);
+                  }else if(reply > 1 && reply < 3){
+                    console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
+                    setTimeout(function(){
+                      rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                    },20000)
                     cbReset();
-                    //rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                  }else{
+                    console.log("WE RESET and SEND NODE STATE PONG (not done yet) ");
+                    cbReset();
+                    //send back nodeStatePong
                   }
                 }).catch(function(err){
                   console.log("cleanUpWaitingRemoveLag error in fBroadcast Peers "+err);
                   allWaiting = [];
                   allWaitingLength = 0;
                   //want to count the returns here
-                  setTimeout(function(){cbReset();},1000);
-                  rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-                  console.log("I make it past here miner error ");
+                  setTimeout(function(){
+                    rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                  },20000);
+                  cbReset();
                 })
 
               }
