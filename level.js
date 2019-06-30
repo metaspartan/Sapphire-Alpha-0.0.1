@@ -1203,13 +1203,21 @@ var getTransactionByHash = function(hash,cb){
 
 }
 
-var getTransactionReceiptsByAddress = function(address,cb){
+var getTransactionReceiptsByAddress = function(address,cb,start = 1,limit = 100){
 
   console.log("ALL Transaction Receipts for "+address);
   var txCollection = []
-  var stream = db.createReadStream();
+  var stream = db.createReadStream({fromAddress:address,toAddress:address});
+  var topLimit = 0;
   stream.on('data',function(data){
-    if(((data.key.toString().split(":")[0] == "tx") && (data.key.toString().split(":")[1]).toLowerCase() == address.toLowerCase()) || ((data.key.toString().split(":")[0] == "tx") && (data.key.toString().split(":")[2]).toLowerCase() == address.toLowerCase())){
+    if(
+        (
+          (data.key.toString().split(":")[0] == "tx")
+          && (data.key.toString().split(":")[1]).toLowerCase() == address.toLowerCase())
+          || ((data.key.toString().split(":")[0] == "tx")
+          && (data.key.toString().split(":")[2]).toLowerCase() == address.toLowerCase())
+          //&& topLimit < 100
+        ){
       console.log(data.key.toString());
 
 
@@ -1227,10 +1235,11 @@ var getTransactionReceiptsByAddress = function(address,cb){
       //var t = new Date(tsStart);
 
       var thisTx = txCollection.push({"fromAddress":JSON.parse(data.value)["fromAddress"],"toAddress":JSON.parse(data.value)["toAddress"],"ticker":JSON.parse(data.value)["ticker"],"amount":JSON.parse(data.value)["amount"],"hash":JSON.parse(data.value)["hash"],"date":t.toGMTString(),ts:t});
+      topLimit+=1;
     }
   })
   stream.on('close',function(){
-    cb(txCollection.sort(function(a, b){return b.ts - a.ts}));
+    cb(txCollection.sort(function(a, b){return b.ts - a.ts}).slice( start,parseInt(start+limit) ));
   })
 }
 

@@ -37,6 +37,7 @@ var startExplorer = function(chainState,cb){
     if(req.query.theValue.length == 42 || RegExp("^0x[a-fA-F0-9]{40}$").test(req.query.theValue)){
       console.log(req.query.theValue+"was called");
       var myBalanceReturn = [];
+      var endData = parseInt(parseInt(req.query.start)+parseInt(100));
       var addyBal = function(val){
         console.log("this address balance is ");
         console.log("------------------------");
@@ -47,8 +48,8 @@ var startExplorer = function(chainState,cb){
         console.log("------------------------");
         console.log(JSON.stringify(myBalanceReturn));
         getTransactionReceiptsByAddress(req.query.theValue,function(txCollection){
-          res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue,txCollection:txCollection});
-        })
+          res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue,txCollection:txCollection,startData:req.query.start,endData:endData,nextData:endData});
+        },parseInt(req.query.start),100)
         //res.render('address',{myBalanceReturn:myBalanceReturn,address:req.query.theValue});
       }
       getBalance(req.query.theValue,addyBal)
