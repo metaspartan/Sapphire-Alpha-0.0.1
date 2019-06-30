@@ -346,19 +346,13 @@ var Blockchain = class Blockchain {
 
           let tnod = thisN.nodes.find(p => p.id === id);
           if(tnod){
-            console.log("tnod id is "+tnod.id);
-            console.log("tnod id is "+tnod.id);
-            console.log("tnod id is "+tnod.id);
-            console.log("tnod id is "+tnod.id);
-            console.log("tnod id is "+tnod.id);
-            console.log("tnod id is "+tnod.id);
-            console.log("tnod id is "+tnod.id);
+            //console.log("tnod id is "+tnod.id);
             isNodeFound = 1;
           }else{
             //console.log("tnod not there is "+id);
           }
 
-
+          /***
           for(var eachNode in thisN.nodes){
             if(thisN.nodes[eachNode].id == id){
               //console.log("id found "+id)
@@ -367,7 +361,7 @@ var Blockchain = class Blockchain {
               //console.log("id NOT found "+thisN.nodes[eachNode].id+" "+id)
             }
           }
-
+          ***/
 
           if(isNodeFound == 0) {
 
