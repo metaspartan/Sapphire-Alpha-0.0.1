@@ -140,6 +140,7 @@ chainStateMonitor.peerCom = false;
 chainStateMonitor.rpcCom = false;
 chainStateMonitor.deletedPeers = [];
 chainStateMonitor.thanksCount = 0;
+chainStateMonitor.stuckPeers = [];//police my connections nodestatepong and synctrigger if needed
 
 var nodeType = {};
 nodeType.current = 3;//start as a Listener 3 with 1 miner and 2 rpc wallets
@@ -269,6 +270,35 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
 
 }
 
+var stuckPeerMonitor = function(id,incomingBLockHeight,chainStateHash){
+  var stPeer = chainStateMonitor.stuckPeers.find(sp => sp.peer === id);
+  if(stPeer){
+    stPeer.count+=1
+    if(stPeer.count > 2){
+      var syncTrigger = {"syncTrigger":incomingBLockHeight,"submitCurrrentChainStateHash":chainStateHash,"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
+      peers[peerId].conn.write(JSON.stringify(syncTrigger));
+    }
+    setTimeout(function(){
+      for(item in chainStateMonitor.stuckPeers){
+        if(chainStateMonitor.stuckPeers[item].peer == id){
+          chainStateMonitor.stuckPeers.splice(item,1);
+        }
+      }
+    },500);
+  }else{
+    var newStuckPeer = {"peer":id,"count":0}
+    chainStateMonitor.stuckPeers.push(newStuckPeer);
+  }
+}
+
+var removeStuckPeerMonitor = function(id){
+  for(item in chainStateMonitor.stuckPeers){
+    if(chainStateMonitor.stuckPeers[item].peer == id){
+      chainStateMonitor.stuckPeers.splice(item,1);
+    }
+  }
+}
+
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(timer){
   var blockHeightLength = Math.log(chainState.chainWalkHeight) * Math.LOG10E + 1 | 0;
@@ -339,6 +369,13 @@ var activeSync = function(timer){
           chalk(" ")+chalk.bgCyan.black("OXHt:")+chalk.bgMagenta.white(chainState.activeSynch.receive[nodercv].peerOXHeight)+chalk.bgMagenta.yellow(" "+thisPeerOXHASH.substring(0,8))+
           chalk(" ")+chalk.bgCyan.black("IP:")+chalk.bgRed.white(tobj.info.ip)
         )
+        //we are going to police our connections to make sure they are in sync
+        if(chainState.activeSynch.receive[nodercv].peerTxHeight < chainState.synchronized){
+          console.log("sending peer "+tobj.info.ip+" to stuck peer monitor");
+          stuckPeerMonitor(tobj.id,chainState.activeSynch.receive[nodercv].peerTxHeight,chainState.activeSynch.receive[nodercv].peerChainStateHash);
+        }else{
+          //remove the peer from stuckPeer Monitor
+        }
       }
     }
   }
@@ -2104,20 +2141,18 @@ var cbReset = async function(){
 
             //isSynching = yes
             chainState.isSynching=true;
-            console.log(chalk.bgRed(" DELETING BACK TO PREVIOUS CHECK POINT AND SYNC "+JSON.parse(data)["syncTrigger"]));
-            console.log("SUBMITED "+JSON.parse(data)["syncTrigger"]["submitCurrrentChainStateHash"]+" PEER "+JSON.parse(data)["syncTrigger"]["peerCurrrentChainStateHash"])
-            //var hairCut = (JSON.parse(data)["syncTrigger"] % frankieCoin.chainRiser);
-            //var lastRiser = parseInt(JSON.parse(data)["syncTrigger"] - hairCut)
-            chainClipper(JSON.parse(data)["syncTrigger"]).then(function(){
-              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1145);
+            console.log("SYNC TRIGGER called cliping chain from "+frankieCoin.blockHeight+" back one riser ");
+            BlkDB.deleteTransactions();
+            chainState.transactionHeight = 0;
+            chainState.transactionRootHash = '';
+            chainState.previousTxHeight = 0;
+            chainState.previousTxHash = '';
+            chainState.transactionHashWeights = [];
+            chainClipper(frankieCoin.blockHeight).then(function(){
+              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
             });
-
-            //setTimeout(function(){
-            //  peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
-            //},2000)
-            //var deltaToRiser = parseInt(frankieCoin.chainRiser - )
-
-
+            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
+            cbReset();
 
           }else if(JSON.parse(data)["fromAddress"]){
 
