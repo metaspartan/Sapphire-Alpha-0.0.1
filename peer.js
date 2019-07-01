@@ -1791,6 +1791,44 @@ var cbReset = async function(){
               frankieCoin.incrementPeerMaxHeight(peerId,chainState.synchronized);
               frankieCoin.incrementPeerNonce(peerId,chainState.synchronized);
               removeWaiting(peerId);
+
+              /***
+              var thanksReply = {"thanks":{
+                  "blockHeight":JSON.parse(data)["block"]["blockHeight"],
+                  "Height":parseInt(chainState.synchronized),
+                  "MaxHeight":parseInt(chainState.synchronized),
+                  "PeerNonce":parseInt(chainState.peerNonce),
+                  "GlobalHash":globalGenesisHash,
+                  "checkPointHash":chainState.checkPointHash,
+                  "currentBlockCheckPointHash":chainState.currentBlockCheckPointHash,
+                  "transactionHeight":chainState.transactionHeight,
+                  "transactionRootHash":chainState.transactionRootHash,
+                  "orderHeight":chainState.orderHeight,
+                  "orderRootHash":chainState.orderRootHash,
+                  "prevTxHeight":chainState.previousTxHeight,
+                  "previousTxHash":chainState.previousTxHash,
+                  "NodeType":nodeType.current,
+                  "transactionHashWeights":chainState.transactionHashWeights,
+                  "utcTimeStamp":parseInt(new Date().getTime()/1000)
+                }
+              };
+              ***/
+
+              //updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,nodeType,oxHt,oxHsh,utcTS){
+
+
+              updatePeerState(
+                peerId,
+                JSON.parse(data)["thanks"]["blockHeight"],
+                JSON.parse(data)["thanks"]["checkPointHash"],
+                JSON.parse(data)["thanks"]["transactionHeight"],
+                JSON.parse(data)["thanks"]["transactionRootHash"],
+                JSON.parse(data)["thanks"]["PeerNonce"],
+                JSON.parse(data)["thanks"]["NodeType"],
+                JSON.parse(data)["thanks"]["orderHeight"],
+                JSON.parse(data)["thanks"]["orderRootHash"],
+                JSON.parse(data)["thanks"]["utcTimeStamp"],
+              )
               updatePeerTxHashArray(JSON.parse(data)["thanks"]["transactionHeight"],JSON.parse(data)["thanks"]["transactionRootHash"],1);
               updatePeerTxHashArray(JSON.parse(data)["thanks"]["previousTxHeight"],JSON.parse(data)["thanks"]["previousTxHash"],1);
               var entireTxHashArray = JSON.parse(data)["thanks"]["transactionHashWeights"].sort(function(a,b){return parseInt(a.peerTxHeight) - parseInt(b.peerTxHeight)});
@@ -2074,14 +2112,39 @@ var cbReset = async function(){
                           //BlkDB.addTransactions(JSON.stringify(JSON.parse(data)["block"]["transactions"]),JSON.parse(data)["block"]["hash"],parseInt(JSON.parse(data)["block"]["blockHeight"]),thisBlockCheckPointHash,thisTempFunctionWillBeSameAsTransactionValidateCallBack,chainState.transactionRootHash);
 
                           var thanksReply = {"thanks":{
+                              "blockHeight":JSON.parse(data)["block"]["blockHeight"],
+                              "Height":parseInt(chainState.synchronized),
+                              "MaxHeight":parseInt(chainState.synchronized),
+                              "PeerNonce":parseInt(chainState.peerNonce),
+                              "GlobalHash":globalGenesisHash,
+                              "checkPointHash":chainState.checkPointHash,
+                              "currentBlockCheckPointHash":chainState.currentBlockCheckPointHash,
+                              "transactionHeight":chainState.transactionHeight,
+                              "transactionRootHash":chainState.transactionRootHash,
+                              "orderHeight":chainState.orderHeight,
+                              "orderRootHash":chainState.orderRootHash,
+                              "prevTxHeight":chainState.previousTxHeight,
+                              "previousTxHash":chainState.previousTxHash,
+                              "NodeType":nodeType.current,
+                              "transactionHashWeights":chainState.transactionHashWeights,
+                              "utcTimeStamp":parseInt(new Date().getTime()/1000)
+                            }
+                          };
+
+                          /***old version being removed
+                          var thanksReply = {"thanks":{
                             "blockHeight":JSON.parse(data)["block"]["blockHeight"],
                             "transactionHeight":chainState.transactionHeight,
                             "transactionRootHash":chainState.transactionRootHash,
                             "previousTxHeight":chainState.previousTxHeight,
                             "previousTxHash":chainState.previousTxHash,
-                            "transactionHashWeights":chainState.transactionHashWeights
+
                             }
                           };
+                          ***/
+
+
+
                           console.log(chalk.bgCyan.black.bold("THANKS "+thanksReply));
                           //peers[peerId].conn.write(thanksReply);
                           sendBackUncle(thanksReply,peerId);
