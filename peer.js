@@ -905,7 +905,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     if(isNaN(replyData)){
       console.log("NaN chain walk height is "+chainState.chainWalkHeight)
     }
-    console.log("NOT VALID NEED TO PING AT "+replyData+typeof(replyData));
+    console.log("908 NOT VALID NEED TO PING AT "+replyData+typeof(replyData));
     if(parseInt(replyData) > 2){
 
       console.log(" I am not sure the stuff below works as intended going to let nodestate ping fix this now ")
@@ -1161,9 +1161,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
     console.log("THIS IS THE CASE I AM TRAPPING chain walk height is "+chainState.chainWalkHeight+" REPLY DATA IS "+replyData);
     if(replyData < chainState.chainWalkHeight){
-      console.log("NOT VALID NEED TO PING AT TOP CASE ADDS ONE "+replyData+typeof(replyData+1)+" and chainstate issynching = "+chainState.isSynching);
+      console.log("1164 NOT VALID NEED TO PING AT TOP CASE ADDS ONE "+replyData+typeof(replyData+1)+" and chainstate issynching = "+chainState.isSynching);
     }else{
-      console.log("NOT VALID NEED TO PING AT BOTTOM CASE AS IS "+replyData+typeof(replyData)+" and chainstate issynching = "+chainState.isSynching);
+      console.log("1166 NOT VALID NEED TO PING AT BOTTOM CASE AS IS "+replyData+typeof(replyData)+" and chainstate issynching = "+chainState.isSynching);
     }
 
 
