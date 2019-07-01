@@ -1059,8 +1059,11 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       //can track the pinks to other nodes in one variable for stats
       var oldChainStateActiveSync = chainState.activeSynch;
       var tempNodeCallBucket = [];
+
+      console.log("ln 1063 peers 2 length is "+Object.keys(peers2).length)
+
       for (let id in peers2) {
-        console.log("peers 2 length is "+Object.keys(peers2).length)
+
         var localTempNode = {};
         localTempNode.nodeId = id;
         localTempNode.blockHeightCalled = parseInt(replyData+1);
@@ -1191,8 +1194,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     //can track the pinks to other nodes in one variable for stats
     var oldChainStateActiveSync = chainState.activeSynch;
     var tempNodeCallBucket = [];
+
+    console.log("ln 1195 peers 2 length is "+Object.keys(peers2).length)
+
     for (let id in peers2) {
-      console.log("peers 2 length is "+Object.keys(peers2).length)
       var localTempNode = {};
       localTempNode.nodeId = id;
       localTempNode.blockHeightCalled = parseInt(replyData+1);
