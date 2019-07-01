@@ -336,12 +336,9 @@ var activeSync = function(timer){
     console.log(chalk.bgCyan.black("blockHeight Called: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.send[nodesend].blockHeightCalled+" ")+chalk.bgCyan.black(" call synchronized: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.send[nodesend].callSynchronized+" "))
   }
   ***/
-  var nodenum = "0"
   console.log(chalk.green("--------------------------------------------------------------------------------"));
   for (nodercv in chainState.activeSynch.receive){
     if(chainState.activeSynch.receive[nodercv] != "undefined"){
-      nodenum++
-
       let tobj = frankieCoin.nodes.find(o => o.id === chainState.activeSynch.receive[nodercv].peer);
       if(tobj){
         if(chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash){
@@ -360,7 +357,7 @@ var activeSync = function(timer){
           var thisPeerOXHASH = "..data..."
         }
         console.log(
-          chalk.bgCyan.black("T("+nodenum+"):")+chalk.bgMagenta.white(chainState.activeSynch.receive[nodercv].nodeType)+
+          chalk.bgCyan.black("T("+nodercv+"):")+chalk.bgMagenta.white(chainState.activeSynch.receive[nodercv].nodeType)+
           chalk(" ")+chalk.bgCyan.black("OPNC:")+chalk.bgMagenta.white(chainState.activeSynch.receive[nodercv].longPeerNonce)+
           chalk(" ")+chalk.bgCyan.black("OPmaxht:")+chalk.bgMagenta.white(chainState.activeSynch.receive[nodercv].peerMaxHeight)+
           chalk(" ")+chalk.bgCyan.black("OPtxht:")+chalk.bgMagenta.white(chainState.activeSynch.receive[nodercv].peerTxHeight)+
