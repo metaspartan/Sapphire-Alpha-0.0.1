@@ -3978,9 +3978,9 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   }
   ***/
   console.log(chalk.bgGreen.black(" last ping receive: "));
-  console.log(chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce))
   for (nodercv in chainState.activeSynch.receive){
     if(chainState.activeSynch.receive[nodercv] != "undefined"){
+      console.log(chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce))
       let tobj = frankieCoin.nodes.find(o => o.id === chainState.activeSynch.receive[nodercv].peer);
       if(tobj && tobj.info){
         console.log(tobj.info.ip)
