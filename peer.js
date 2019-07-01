@@ -1943,7 +1943,8 @@ var cbReset = async function(){
             console.log(chalk.bgRed.white.bold("THE NEW BLOCK TX HEIGHT AND HASH"))
 
             if(
-              (JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"] == chainState.currentBlockCheckPointHash.checkPointHash)
+              (JSON.parse(data)["block"]["blockHeight"] == parseInt(JSON.parse(data)["PeerNonce"] + 1))
+              && (JSON.parse(data)["block"]["chainStateHash"]["checkPointHash"] == chainState.currentBlockCheckPointHash.checkPointHash)
               && (JSON.parse(data)["checkPointHash"] == chainState.checkPointHash)
               && (JSON.parse(data)["currentTransactionHeight"] == chainState.previousTxHeight)
               //&& (JSON.parse(data)["currentTransactionHeight"] == chainState.transactionHeight)//sending node gets it out before update
@@ -4448,6 +4449,28 @@ var myCallbackSell = function(data) {
     //tracking replies
     chainStateMonitor.thanksCount = 0;
 
+    /***
+    var thanksReply = {"thanks":{
+        "blockHeight":JSON.parse(data)["block"]["blockHeight"],
+        "Height":parseInt(chainState.synchronized),
+        "MaxHeight":parseInt(chainState.synchronized),
+        "PeerNonce":parseInt(chainState.peerNonce),
+        "GlobalHash":globalGenesisHash,
+        "checkPointHash":chainState.checkPointHash,
+        "currentBlockCheckPointHash":chainState.currentBlockCheckPointHash,
+        "transactionHeight":chainState.transactionHeight,
+        "transactionRootHash":chainState.transactionRootHash,
+        "orderHeight":chainState.orderHeight,
+        "orderRootHash":chainState.orderRootHash,
+        "prevTxHeight":chainState.previousTxHeight,
+        "previousTxHash":chainState.previousTxHash,
+        "NodeType":nodeType.current,
+        "transactionHashWeights":chainState.transactionHashWeights,
+        "utcTimeStamp":parseInt(new Date().getTime()/1000)
+      }
+    };
+    ***/
+
     broadcastPeers(JSON.stringify({
       checkPointHash:chainState.checkPointHash,
       currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
@@ -4456,7 +4479,9 @@ var myCallbackSell = function(data) {
       postBlockTransactionHeight:chainState.transactionHeight,
       postBlockTransactionHash:chainState.transactionRootHash,
       block:frankieCoin.getLatestBlock(),
-      deletedOrders:deletedOrders
+      deletedOrders:deletedOrders,
+      PeerNonce:parseInt(chainState.peerNonce),
+      utcTimeStamp:parseInt(new Date().getTime()/1000)
     }),"new-block");
     //broadcastPeers(JSON.stringify({checkPointHash:lastCheckPointHash,currentBlockCheckPointHash:lastCurrentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}));
   }else if(trigger == "order"){
@@ -4925,7 +4950,24 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           calculateCheckPoints(frankieCoin.blockHeight,'miner','');
         //}
         ///////////////////////////////////////////////////////////peers broadcast
-        fbroadcastPeersBlock('block','',deletedOrders);
+        if(parseInt(chainState.peerNonce + 1) == frankieCoin.getLatestBlock().blockHeight){//peer state has not changed sunce block arrived
+          fbroadcastPeersBlock('block','',deletedOrders);
+        }else{
+          //cant take any chances reset completely
+          chainState.isMining = false;
+          console.log("cliping chain from "+frankieCoin.blockHeight+" back one riser ");
+          BlkDB.deleteTransactions();
+          chainState.transactionHeight = 0;
+          chainState.transactionRootHash = '';
+          chainState.previousTxHeight = 0;
+          chainState.previousTxHash = '';
+          chainState.transactionHashWeights = [];
+          chainClipper(frankieCoin.blockHeight).then(function(){
+            BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
+          });
+          BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
+          cbReset();
+        }
         ////////////////////finally post the RPC get work block data for the miner
         var countPostMinerCalled = 0;
         var postMiner = async function(){
