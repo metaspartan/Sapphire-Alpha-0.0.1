@@ -99,6 +99,7 @@ var output = fs.readFile(filename, 'utf8', function(err, data) {
 ////////////////////////////////////////////////////////////////end genesis hash
 
 ////////////////////////////////////////////////////////////////synching section
+
 var chainState = {};//need to store in the db as chain state and put event lop for changes
 chainState.isSynching = false;
 chainState.isMining = false;
@@ -310,24 +311,23 @@ var activeSync = function(timer){
   if(chainState.currentBlockCheckPointHash.checkPointHash){
     var checkPointHashDisplay = chainState.currentBlockCheckPointHash.checkPointHash;
   }else{
-    var checkPointHashDisplay = ".data...";
+    var checkPointHashDisplay = "..data..";
   }
   console.log(chalk.bgRed("AS TIMER "+timer))
   console.log(chalk.green("--------------------------------------------------------------------------------"));
   console.log(
     chalk.bgCyan.black("CwHt:")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight))+
-    chalk(" ")+chalk.bgCyan.black("bcHT:")+chalk.bgMagenta(frankieCoin.blockHeight)+
     chalk(" ")+chalk.bgCyan.black("longPrHt:")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+
-    chalk(" ")+chalk.bgCyan.black("prevTxHt:")+chalk.bgMagenta(chainState.previousTxHeight)+chalk.bgMagenta.yellow(" "+chainState.previousTxHash.substring(0,8))+
-    chalk(" ")+chalk.bgCyan.black("TopBlkHt:")+chalk.bgMagenta(chainState.topBlock)+
+    chalk(" ")+chalk.bgCyan.black("prvTxHt:")+chalk.bgMagenta(chainState.previousTxHeight)+chalk.bgMagenta.yellow(" "+chainState.previousTxHash.substring(0,8))+
+    chalk(" ")+chalk.bgCyan.black("OxHt:    ")+chalk.bgMagenta(chainState.orderHeight)+chalk.bgMagenta.yellow(" "+chainState.orderRootHash.substring(0,8))+
     chalk(" ")+chalk.bgCyan.black("peers:")+chalk.bgMagenta(frankieCoin.nodes.length)
   );
   console.log(
-    chalk("   ")+chalk.bgCyan.black("csPrNnce:")+chalk.bgMagenta(displayPeerNonce)+
-    chalk("                   ")+
+    chalk.bgCyan.black("bcHT:")+chalk.bgMagenta(frankieCoin.blockHeight)+
+    chalk(" ")+chalk.bgCyan.black("csPrNnce:")+chalk.bgMagenta(displayPeerNonce)+
+    chalk(" ")+chalk.bgCyan.black("curTxHt:")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgMagenta.yellow(" "+chainState.transactionRootHash.substring(0,8))+
     chalk(" ")+chalk.bgCyan.black("csSynced:")+chalk.bgMagenta(chainState.synchronized)+chalk.bgMagenta.yellow(" "+checkPointHashDisplay.substring(0,8))+
-    chalk(" ")+chalk.bgCyan.black("TxHt:")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgMagenta.yellow(" "+chainState.transactionRootHash.substring(0,8))+
-    chalk(" ")+chalk.bgCyan.black("OxHt:")+chalk.bgMagenta(chainState.orderHeight)+chalk.bgMagenta.yellow(" "+chainState.orderRootHash.substring(0,8))
+    chalk(" ")+chalk.bgCyan.black("TopBlkHt:")+chalk.bgMagenta(chainState.topBlock)
   );
 
   /***
@@ -338,38 +338,29 @@ var activeSync = function(timer){
   ***/
   console.log(chalk.green("--------------------------------------------------------------------------------"));
   for (nodercv in chainState.activeSynch.receive){
-    if(chainState.activeSynch.receive[nodercv] != "undefined"){
-      let tobj = frankieCoin.nodes.find(o => o.id === chainState.activeSynch.receive[nodercv].peer);
+    var nodeobj = chainState.activeSynch.receive[nodercv]
+
+    if(nodeobj != "undefined"){
+      let tobj = frankieCoin.nodes.find(o => o.id === nodeobj.peer);
       if(tobj){
-        if(chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash){
-          var thisPeerCHKPTHASH = chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash;
-        }else{
-          var thisPeerCHKPTHASH = "..data..."
-        }
-        if(chainState.activeSynch.receive[nodercv].peerTxHash){
-          var thisPeerTXHASH = chainState.activeSynch.receive[nodercv].peerTxHash;
-        }else{
-          var thisPeerTXHASH = "..data..."
-        }
-        if(chainState.activeSynch.receive[nodercv].peerOXHash){
-          var thisPeerOXHASH = chainState.activeSynch.receive[nodercv].peerOXHash;
-        }else{
-          var thisPeerOXHASH = "..data..."
-        }
+        var thisPeerCHKPTHASH = nodeobj.peerChainStateHash.checkPointHash || "..data..";
+        var thisPeerTXHASH = nodeobj.peerTxHash || "..data..";
+        var thisPeerOXHASH = nodeobj.peerOXHash || "..data..";
+
         console.log(
-          chalk.bgCyan.black("T("+nodercv+"):")+chalk.bgMagenta.white(chainState.activeSynch.receive[nodercv].nodeType)+
-          chalk(" ")+chalk.bgCyan.black("OPNC:")+chalk.bgMagenta.white(chainState.activeSynch.receive[nodercv].longPeerNonce)+
-          chalk(" ")+chalk.bgCyan.black("OPmaxht:")+chalk.bgMagenta.white(chainState.activeSynch.receive[nodercv].peerMaxHeight)+
-          chalk(" ")+chalk.bgCyan.black("OPtxht:")+chalk.bgMagenta.white(chainState.activeSynch.receive[nodercv].peerTxHeight)+
-          chalk(" ")+chalk.bgCyan.black("CS:")+chalk.bgMagenta.white(chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber)+chalk.bgMagenta.yellow(" "+thisPeerCHKPTHASH.substring(0,8))+
-          chalk(" ")+chalk.bgCyan.black("TXHt:")+chalk.bgMagenta.white(chainState.activeSynch.receive[nodercv].peerTxHeight)+chalk.bgMagenta.yellow(" "+thisPeerTXHASH.substring(0,8))+
-          chalk(" ")+chalk.bgCyan.black("OXHt:")+chalk.bgMagenta.white(chainState.activeSynch.receive[nodercv].peerOXHeight)+chalk.bgMagenta.yellow(" "+thisPeerOXHASH.substring(0,8))+
+          chalk.bgCyan.black("T("+nodercv+"):")+chalk.bgMagenta.white(nodeobj.nodeType)+
+          chalk(" ")+chalk.bgCyan.black("OPNC:")+chalk.bgMagenta.white(nodeobj.longPeerNonce)+
+          chalk(" ")+chalk.bgCyan.black("OPmaxht:")+chalk.bgMagenta.white(nodeobj.peerMaxHeight)+
+          chalk(" ")+chalk.bgCyan.black("OPtxht:")+chalk.bgMagenta.white(nodeobj.peerTxHeight)+
+          chalk(" ")+chalk.bgCyan.black("CS:")+chalk.bgMagenta.white(nodeobj.peerChainStateHash.blockNumber)+chalk.bgMagenta.yellow(" "+thisPeerCHKPTHASH.substring(0,8))+
+          chalk(" ")+chalk.bgCyan.black("TXHt:")+chalk.bgMagenta.white(nodeobj.peerTxHeight)+chalk.bgMagenta.yellow(" "+thisPeerTXHASH.substring(0,8))+
+          chalk(" ")+chalk.bgCyan.black("OXHt:")+chalk.bgMagenta.white(nodeobj.peerOXHeight)+chalk.bgMagenta.yellow(" "+thisPeerOXHASH.substring(0,8))+
           chalk(" ")+chalk.bgCyan.black("IP:")+chalk.bgRed.white(tobj.info.ip)
         )
         //we are going to police our connections to make sure they are in sync
-        if(chainState.activeSynch.receive[nodercv].peerTxHeight < chainState.synchronized){
+        if(nodeobj.peerTxHeight < chainState.synchronized){
           console.log("sending peer "+tobj.info.ip+" to stuck peer monitor");
-          stuckPeerMonitor(tobj.id,chainState.activeSynch.receive[nodercv].peerTxHeight,chainState.activeSynch.receive[nodercv].peerChainStateHash);
+          stuckPeerMonitor(tobj.id,nodeobj.peerTxHeight,nodeobj.peerChainStateHash);
         }else{
           //remove the peer from stuckPeer Monitor
         }
@@ -4051,14 +4042,16 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   ***/
   console.log(chalk.bgGreen.black(" last ping receive: "));
   for (nodercv in chainState.activeSynch.receive){
-    if(chainState.activeSynch.receive[nodercv] != "undefined"){
-      console.log(chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].longPeerNonce))
-      let tobj = frankieCoin.nodes.find(o => o.id === chainState.activeSynch.receive[nodercv].peer);
+    var nodeobj = chainState.activeSynch.receive[nodercv]
+
+    if(nodeobj != "undefined"){
+      console.log(chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+nodeobj.longPeerNonce))
+      let tobj = frankieCoin.nodes.find(o => o.id === nodeobj.peer);
       if(tobj && tobj.info){
         console.log(tobj.info.ip)
       }
-      console.log(chalk.bgCyan.black("peer Max Height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerMaxHeight+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" "+chainState.activeSynch.receive[nodercv].peerTxHeight+" "))
-      console.log(chalk.bgCyan.black("CS Hash: ")+chalk.bgMagenta.white(" blockNo: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.blockNumber+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" ckPtHash: "+chainState.activeSynch.receive[nodercv].peerChainStateHash.checkPointHash+" "))
+      console.log(chalk.bgCyan.black("peer Max Height: ")+chalk.bgMagenta.white(" "+nodeobj.peerMaxHeight+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" "+nodeobj.peerTxHeight+" "))
+      console.log(chalk.bgCyan.black("CS Hash: ")+chalk.bgMagenta.white(" blockNo: "+nodeobj.peerChainStateHash.blockNumber+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" ckPtHash: "+nodeobj.peerChainStateHash.checkPointHash+" "))
     }
   }
   //log("------------------------------------------------------")
