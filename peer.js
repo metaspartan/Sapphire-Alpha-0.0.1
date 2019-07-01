@@ -271,13 +271,13 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
 
 }
 
-var stuckPeerMonitor = function(id,incomingBLockHeight,chainStateHash){
+var stuckPeerMonitor = function(id,incomingBlockHeight,chainStateHash){
   var stPeer = chainStateMonitor.stuckPeers.find(sp => sp.peer === id);
   if(stPeer){
     stPeer.count+=1
     if(stPeer.count > 2){
-      var syncTrigger = {"syncTrigger":incomingBLockHeight,"submitCurrrentChainStateHash":chainStateHash,"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
-      peers[peerId].conn.write(JSON.stringify(syncTrigger));
+      var syncTrigger = {"syncTrigger":incomingBlockHeight,"submitCurrrentChainStateHash":chainStateHash,"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
+      peers[id].conn.write(JSON.stringify(syncTrigger));
     }
     setTimeout(function(){
       for(item in chainStateMonitor.stuckPeers){
@@ -338,7 +338,7 @@ var activeSync = function(timer){
   ***/
   console.log(chalk.green("--------------------------------------------------------------------------------"));
   for (nodercv in chainState.activeSynch.receive){
-    nodeobj = chainState.activeSynch.receive[nodercv]
+    var nodeobj = chainState.activeSynch.receive[nodercv]
 
     if(nodeobj != "undefined"){
       let tobj = frankieCoin.nodes.find(o => o.id === nodeobj.peer);
@@ -4042,7 +4042,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   ***/
   console.log(chalk.bgGreen.black(" last ping receive: "));
   for (nodercv in chainState.activeSynch.receive){
-    nodeobj = chainState.activeSynch.receive[nodercv]
+    var nodeobj = chainState.activeSynch.receive[nodercv]
 
     if(nodeobj != "undefined"){
       console.log(chalk.bgCyan.black("LONG PEER NONCE: ")+chalk.bgMagenta.white(" "+nodeobj.longPeerNonce))
