@@ -1830,7 +1830,7 @@ var cbReset = async function(){
                 JSON.parse(data)["thanks"]["utcTimeStamp"],
               )
               updatePeerTxHashArray(JSON.parse(data)["thanks"]["transactionHeight"],JSON.parse(data)["thanks"]["transactionRootHash"],1);
-              updatePeerTxHashArray(JSON.parse(data)["thanks"]["previousTxHeight"],JSON.parse(data)["thanks"]["previousTxHash"],1);
+              updatePeerTxHashArray(JSON.parse(data)["thanks"]["prevTxHeight"],JSON.parse(data)["thanks"]["previousTxHash"],1);
               var entireTxHashArray = JSON.parse(data)["thanks"]["transactionHashWeights"].sort(function(a,b){return parseInt(a.peerTxHeight) - parseInt(b.peerTxHeight)});
               var ictr = 0;
               for(itemTxHash in entireTxHashArray){
