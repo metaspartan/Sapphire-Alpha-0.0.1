@@ -428,7 +428,7 @@ var adjustedTimeout = function() {
     slowCounter++;
   }else if((slowCounter % 4) == 0){//need a different trigger for transaction sync but for now ok
     tranSynch();
-    oxSynch()
+    oxSynch();
     slowCounter++;
   }else if(chainState.peerNonce < chainState.synchronized){
     //console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
@@ -566,7 +566,12 @@ var activePing = function(timer){
     console.log(chalk.yellow("---------------------------------------------------------------"));
     console.log(chalk.green("peer stats indicate you are synch to network"));
     console.log(chalk.yellow("---------------------------------------------------------------"));
+    if(chainState.transactionHeight < longestPeer){
+      tranSynch();
+      oxSynch();
+    }
   }
+
   if(chainState.isSynching = false){//keep in touch
     //console.log("is synching is FALSE");
     for(peer in frankieCoin.nodes){
