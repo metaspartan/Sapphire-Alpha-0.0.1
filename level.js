@@ -1161,7 +1161,7 @@ var addTransactionsFromStream = async function(transactions,blockhash,blknum,blo
 
   //will eventualy add a flag for if this is update or not or not
   if(blknum == 1){
-    console.log(chalk.bgRed("THE FIRST BLOCK IS ADDED IN STREAM "+blknum+txConfirmation));
+    console.log(chalk.bgRed("Line:1164 - THE FIRST BLOCK IS ADDED IN STREAM "+blknum+txConfirmation));
   }
   //console.log(chalk.bgRed("THE FIRST BLOCK IS ADDED IN STREAM "+blknum+txConfirmation));
 
@@ -1716,9 +1716,9 @@ var addOrdersFromStream = async function(orders,blockhash,blknum,block,cbUpdateC
 
   //will eventualy add a flag for if this is update or not or not
   if(blknum == 1){
-    console.log(chalk.bgRed("THE FIRST BLOCK IS ADDED IN STREAM "+blknum+oxConfirmation));
+    console.log(chalk.bgRed("Line:1719 - THE FIRST BLOCK IS ADDED IN STREAM "+blknum+oxConfirmation));
   }
-  console.log(chalk.bgRed("THE BLOCK IS ADDED IN STREAM "+blknum+oxConfirmation));
+  // console.log(chalk.bgRed("THE BLOCK IS ADDED IN STREAM "+blknum+oxConfirmation));
 
   cbUpdateChainStateOX(blknum,oxConfirmation);
 
