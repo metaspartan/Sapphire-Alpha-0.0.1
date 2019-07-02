@@ -199,6 +199,7 @@ updatePeerTxHashArray = function(txHt,txHsh,increment){
           BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
         });
         BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
+        cbReset();
         //process.exit();//going to add to profess monitor in index
       }else{
         shouldEnter = true;
@@ -2260,9 +2261,16 @@ var cbReset = async function(){
 
             //I have an uncle insert somewhere we maybe need to insert it
             BlkDB.deleteTransactions();
-            chainClipper(frankieCoin.blockHeight - 1).then(function(){
-              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight - 1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser - 1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1486);
+            chainState.transactionHeight = 0;
+            chainState.transactionRootHash = '';
+            chainState.previousTxHeight = 0;
+            chainState.previousTxHash = '';
+            chainState.transactionHashWeights = [];
+            chainClipper(parseInt(frankieCoin.blockHeight - 1)).then(function(){
+              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
             });
+            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
+            cbReset();
             //clipChainAt(parseInt(chainState.syncronized - 10))
 
           }else if(JSON.parse(data)["nodeStatePong"]){
@@ -2993,10 +3001,17 @@ var cbReset = async function(){
             console.log("SUBMITED "+JSON.parse(data)["syncTrigger"]["submitCurrrentChainStateHash"]+" PEER "+JSON.parse(data)["syncTrigger"]["peerCurrrentChainStateHash"])
             //var hairCut = (JSON.parse(data)["syncTrigger"] % frankieCoin.chainRiser);
             //var lastRiser = parseInt(JSON.parse(data)["syncTrigger"] - hairCut)
-            BlkDB.deleteTransactions();
+            chainState.transactionHeight = 0;
+            chainState.transactionRootHash = '';
+            chainState.previousTxHeight = 0;
+            chainState.previousTxHash = '';
+            chainState.transactionHashWeights = [];
             chainClipper(JSON.parse(data)["syncTrigger"]).then(function(){
               BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1816);
             });
+            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
+            cbReset();
+
 
             //setTimeout(function(){
             //  peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
@@ -3213,16 +3228,17 @@ var cbReset = async function(){
                 rpcserver.closePort();//need to establosh if this peer is mining and jst stop it until synch
                 //
                 //setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
-                BlkDB.deleteTransactions();
                 chainState.transactionHeight = 0;
                 chainState.transactionRootHash = '';
                 chainState.previousTxHeight = 0;
                 chainState.previousTxHash = '';
                 chainState.transactionHashWeights = [];
                 chainClipper(frankieCoin.blockHeight).then(function(){
-                  BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2027);
+                  BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
                 });
                 BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
+                cbReset();
+
               }
 
             }else{
