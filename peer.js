@@ -277,8 +277,25 @@ var stuckPeerMonitor = function(id,incomingBlockHeight,chainStateHash){
   if(stPeer){
     stPeer.count+=1
     if(stPeer.count > 2){
-      var syncTrigger = {"syncTrigger":incomingBlockHeight,"submitCurrrentChainStateHash":chainStateHash,"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
-      peers[id].conn.write(JSON.stringify(syncTrigger));
+      //var syncTrigger = {"syncTrigger":incomingBlockHeight,"submitCurrrentChainStateHash":chainStateHash,"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
+      peers[id].conn.write(JSON.stringify(
+        {"nodeStatePong":{
+            Height:parseInt(chainState.synchronized),
+            MaxHeight:parseInt(chainState.synchronized),
+            PeerNonce:parseInt(chainState.peerNonce),
+            GlobalHash:globalGenesisHash,
+            checkPointHash:chainState.checkPointHash,
+            currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+            transactionHeight:chainState.transactionHeight,
+            transactionRootHash:chainState.transactionRootHash,
+            orderHeight:chainState.orderHeight,
+            orderRootHash:chainState.orderRootHash,
+            prevTxHeight:chainState.previousTxHeight,
+            previousTxHash:chainState.previousTxHash,
+            NodeType:nodeType.current,
+            utcTimeStamp:parseInt(new Date().getTime()/1000)
+          }}
+        ));
     }
     setTimeout(function(){
       for(item in chainStateMonitor.stuckPeers){
