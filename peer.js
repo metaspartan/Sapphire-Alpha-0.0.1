@@ -316,18 +316,19 @@ var activeSync = function(timer){
   console.log(chalk.bgRed("AS TIMER "+timer))
   console.log(chalk.green("--------------------------------------------------------------------------------"));
   console.log(
-    chalk.bgCyan.black("CwHt:")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight))+
+    chalk(" ")+chalk.bgCyan.black("CwHt:")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight))+
     chalk(" ")+chalk.bgCyan.black("longPrHt:")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+
     chalk(" ")+chalk.bgCyan.black("prvTxHt:")+chalk.bgMagenta(chainState.previousTxHeight)+chalk.bgMagenta.yellow(" "+chainState.previousTxHash.substring(0,8))+
-    chalk(" ")+chalk.bgCyan.black("OxHt:    ")+chalk.bgMagenta(chainState.orderHeight)+chalk.bgMagenta.yellow(" "+chainState.orderRootHash.substring(0,8))+
-    chalk(" ")+chalk.bgCyan.black("peers:")+chalk.bgMagenta(frankieCoin.nodes.length)
-  );
-  console.log(
-    chalk.bgCyan.black("bcHT:")+chalk.bgMagenta(frankieCoin.blockHeight)+
-    chalk(" ")+chalk.bgCyan.black("csPrNnce:")+chalk.bgMagenta(displayPeerNonce)+
-    chalk(" ")+chalk.bgCyan.black("curTxHt:")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgMagenta.yellow(" "+chainState.transactionRootHash.substring(0,8))+
+    chalk(" ")+chalk.bgCyan.black("bcHT:")+chalk.bgMagenta(frankieCoin.blockHeight)+
     chalk(" ")+chalk.bgCyan.black("csSynced:")+chalk.bgMagenta(chainState.synchronized)+chalk.bgMagenta.yellow(" "+checkPointHashDisplay.substring(0,8))+
     chalk(" ")+chalk.bgCyan.black("TopBlkHt:")+chalk.bgMagenta(chainState.topBlock)
+  );
+  console.log(
+    chalk("       ")+chalk.bgCyan.black("PRNC:")+chalk.bgMagenta(displayPeerNonce)+
+    chalk("                                           ")+
+    chalk.bgCyan.black("TxHt:")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgMagenta.yellow(" "+chainState.transactionRootHash.substring(0,8))+
+    chalk(" ")+chalk.bgCyan.black("OxHt:")+chalk.bgMagenta(chainState.orderHeight)+chalk.bgMagenta.yellow(" "+chainState.orderRootHash.substring(0,8))+
+    chalk(" ")+chalk.bgCyan.black("peers:")+chalk.bgMagenta(frankieCoin.nodes.length)
   );
 
   /***
