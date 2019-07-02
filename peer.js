@@ -4303,10 +4303,6 @@ function ChainGrabRefresh(blocknum,cbChainGrab,chainRiser){
   //BlkDB.getBlockchain(99,cbChainGrab,ggHash)
   BlkDB.getBlockRange(blocknum,chainRiser,cbChainGrab);
   //maybe some other stuff like .then
-
-  if(chainState.chainWalkHeight > chainState.transactionHeight){
-    tranSynch();
-  }
 };
 
 /*-------THE SYNC CALLS ON STARTUP---------------*/
