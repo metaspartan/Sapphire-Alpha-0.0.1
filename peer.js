@@ -362,8 +362,12 @@ var activeSync = function(timer){
         if(nodeobj.peerTxHeight < chainState.synchronized){
           console.log("sending peer "+tobj.info.ip+" to stuck peer monitor");
           stuckPeerMonitor(tobj.id,nodeobj.peerTxHeight,nodeobj.peerChainStateHash);
-        }else{
+        }else if(nodeobj.peerTxHeight > chainState.transactionHeight){
+          tranSynch();
           //remove the peer from stuckPeer Monitor
+        }
+        if(nodeobj.peerOXHeight > chainState.orderHeight){
+          oxSynch();
         }
       }
     }
