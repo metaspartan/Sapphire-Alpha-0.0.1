@@ -875,7 +875,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
         }
         if(currentBlockToValidate == blockHeight){
           console.log("ping it "+currentBlockToValidate);
-          callback(false,parseInt(currentBlockToValidate),"");
+          callback(false,parseInt(currentBlockToValidate-1),"");
         }
         console.log(chalk.black.bgCyan("Block range validator data stream is complete at ")+chalk.bgMagenta(blockHeight));
 
