@@ -2670,6 +2670,89 @@ var getStateTrieRootHash = function(){
   return trie.root.toString('hex');
 }
 
+var createTransactionIndex = function(){
+
+  var txIndex = 25;
+
+  db.get("txidx").then(function(txi){
+
+    if(txi > 1){
+      txIndex = txi
+    }
+
+    console.log("you have index transaction records to checkpoint block "+txIndex);
+
+    var cbIndexBlock = function(txIndex){
+
+      var stream = db.createKeyStream();
+
+      var allTxInTime = []
+      stream.on('data',function(data){
+
+        if(data.toString().split(":")[0] == "tx" && data.toString().split(":")[5] < tsIndex){
+          db.get(data, function (err, value) {
+            console.log("value"+value.split(":")[5]);//timestamp
+            allTxInTime.push(value)
+          })
+        }
+
+      });
+
+      stream.on('close',function(){
+        var resultss = result.sort(function(a,b){
+          var x = JSON.parse(a)["price"];
+          //console.log("x "+x+a);
+          var y = JSON.parse(b)["price"];
+          //console.log("y "+y+b)
+          if (x < y) {return -1;}
+          if (x > y) {return 1;}
+          return 0
+        })
+        callBack(resultss);
+      });
+
+    }
+
+
+  }).catch(function(error){
+    console.log("you have no transaction records indexed creating index now");
+    db.put('txidx',1).then(function(){
+      createTransactionIndex();
+    })
+
+  });
+
+
+}
+
+var createOrderIndex = function(){
+  var stream = db.createKeyStream();
+
+  stream.on('data',function(data){
+
+    if(data.toString().split(":")[0] == "ox" && data.toString().split(":")[1] == "SELL" && data.toString().split(":")[2] == pairBuy && data.toString().split(":")[3] == pairSell){
+      db.get(data, function (err, value) {
+        console.log("value"+value);
+        result.push(value.toString());
+      })
+    }
+
+  });
+
+  stream.on('close',function(){
+    var resultss = result.sort(function(a,b){
+      var x = JSON.parse(a)["price"];
+      //console.log("x "+x+a);
+      var y = JSON.parse(b)["price"];
+      //console.log("y "+y+b)
+      if (x < y) {return -1;}
+      if (x > y) {return 1;}
+      return 0
+    })
+    callBack(resultss);
+  });
+}
+
 module.exports = {
     printChainState:printChainState,
     setChainState:setChainState,
