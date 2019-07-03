@@ -381,23 +381,11 @@ var activeSync = function(timer){
         var thisPeerOXHASH = nodeobj.peerOXHash || "..data..";
 
         var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-        var peerIP = tobj.info.ip;
 
-<<<<<<< HEAD
         if(tobj.info.ip.match(ipformat)){
-
+          //do nothing right now and probably change the logic to NEQ
         }else{
           frankieCoin.cleanNodes(frankieCoin.nodes,'id');
-=======
-        if(peerIP.match(ipformat)){
-          console.log()
-          console.log("This peer has a normal IP -> "+peerIP)
-          console.log()
-        }else{
-          console.log()
-          console.log("This peer has a weird IP -> "+peerIP)
-          console.log()
->>>>>>> 801d9a1c639911229845f63368178848cd2d0b9f
         }
 
         console.log(
