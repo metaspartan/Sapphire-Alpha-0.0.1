@@ -142,6 +142,8 @@ chainStateMonitor.rpcCom = false;
 chainStateMonitor.deletedPeers = [];
 chainStateMonitor.thanksCount = 0;
 chainStateMonitor.stuckPeers = [];//police my connections nodestatepong and synctrigger if needed
+chainStateMonitor.isTxValidationRunning = false;
+chainStateMonitor.isOxValidationRunning = false;
 
 var nodeType = {};
 nodeType.current = 3;//start as a Listener 3 with 1 miner and 2 rpc wallets
@@ -164,13 +166,13 @@ chainState = onChange(chainState, function (path, value, previousValue) {
   ***/
 
   if(path == "transactionRootHash"){
-    updatePeerTxHashArray(chainState.transactionHeight,chainState.transactionRootHash,1);
+    updatePeerTxHashArray(chainState.transactionHeight,chainState.transactionRootHash,1,false);
   }
 
 })
 //end chain state on change reporting
 
-updatePeerTxHashArray = function(txHt,txHsh,increment){
+updatePeerTxHashArray = function(txHt,txHsh,increment,thanks){
   var recordChainTransactionHeightRecord = {"peerTxHeight":txHt,"peerTxHash":txHsh,"counted":1}
   if(chainState.transactionHashWeights != undefined){
     var arrayTXHeight = chainState.transactionHashWeights.sort(function(a,b){return parseInt(a.peerTxHeight) - parseInt(b.peerTxHeight)})
@@ -182,7 +184,13 @@ updatePeerTxHashArray = function(txHt,txHsh,increment){
         chainState.transactionHashWeights[item].counted+=1;
         //console.log("setting shouldEnter = false")
         shouldEnter2 = false;
-      }else if(arrayTXHeight[item].peerTxHeight == txHt && arrayTXHeight[item].peerTxHash != txHsh && arrayTXHeight[item].counted <= increment){
+      }else if(
+        (
+          arrayTXHeight[item].peerTxHeight == txHt
+          && arrayTXHeight[item].peerTxHash != txHsh
+          && arrayTXHeight[item].counted <= increment
+        ) && thanks == false//new mined blocks throw thos off
+      ){
         //blockheight existed this may be an issue with you are on wrong chain
         var shouldEnter2 = false;
         console.log("THIS MEANS WRONG CHAIN OR SOLO MINING AND WILL NOW EXIT");
@@ -247,7 +255,7 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
     chainState.activeSynch.receive = [];
   }
 
-  updatePeerTxHashArray(txHt,txHsh,1);
+  updatePeerTxHashArray(txHt,txHsh,1,false);
   //console.log("just before push "+peer)
   //console.log("oxHeight"+oxHt+"oxHash"+oxHsh)
   var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"peerOXHeight":oxHt,"peerOXHash":oxHsh,"longPeerNonce":longPeerNonce,"nodeType":nodeType,"utcTimeStamp":utcTS}
@@ -1319,6 +1327,11 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 ///////////////////////////////////////////////////////////TRANSACTION VQLIDATOR
 var transactionValidator = async function(start,end){
 
+  if(chainStateMonitor.isTxValidationRunning == true){
+    console.log(" transactionValidator already running break");
+    return;
+  }
+
   var cbCheckChainStateTX = async function(csTransactionHeight){
 
     if(parseInt(csTransactionHeight.toString().split(":")[0]) <= end){
@@ -1381,7 +1394,8 @@ var transactionValidator = async function(start,end){
           await BlkDB.addTransactionsFromStream(JSON.parse(thisOneBlock)["transactions"],JSON.parse(thisOneBlock)["hash"],JSON.parse(thisOneBlock)["blockHeight"],thisOneBlock,updateChainStateTX,thisBlockCheckPointHash)
           start++;
           if(start == end){
-            console.log("break clause reached");
+            chainStateMonitor.isTxValidationRunning == false
+            console.log("transactionValidator break clause reached at "+end);
             return;
           }else{
             transactionValidator(start,end)
@@ -1407,6 +1421,11 @@ var transactionValidator = async function(start,end){
 
 ////////////////////////////////////////////////////////////////order validation
 var orderValidator = async function(start,end){
+
+  if(chainStateMonitor.isOxValidationRunning == true){
+    console.log(" orderValidator already running break");
+    return;
+  }
 
   var cbCheckChainStateOX = async function(csOrderHeight){
 
@@ -1470,7 +1489,8 @@ var orderValidator = async function(start,end){
           await BlkDB.addOrdersFromStream(JSON.parse(thisOneBlock)["orders"],JSON.parse(thisOneBlock)["hash"],JSON.parse(thisOneBlock)["blockHeight"],thisOneBlock,updateChainStateOX,thisBlockCheckPointHash,JSON.parse(thisOneBlock)["transactions"])
           start++;
           if(start == end){
-            console.log("break clause reached");
+            chainStateMonitor.isOxValidationRunning == false
+            console.log("orderValidator break clause reached at "+end);
             return;
           }else{
             orderValidator(start,end)
@@ -1848,13 +1868,13 @@ var cbReset = async function(){
                 JSON.parse(data)["thanks"]["orderRootHash"],
                 JSON.parse(data)["thanks"]["utcTimeStamp"],
               )
-              updatePeerTxHashArray(JSON.parse(data)["thanks"]["transactionHeight"],JSON.parse(data)["thanks"]["transactionRootHash"],1);
-              updatePeerTxHashArray(JSON.parse(data)["thanks"]["prevTxHeight"],JSON.parse(data)["thanks"]["previousTxHash"],1);
+              updatePeerTxHashArray(JSON.parse(data)["thanks"]["transactionHeight"],JSON.parse(data)["thanks"]["transactionRootHash"],1,true);
+              updatePeerTxHashArray(JSON.parse(data)["thanks"]["prevTxHeight"],JSON.parse(data)["thanks"]["previousTxHash"],1,true);
               var entireTxHashArray = JSON.parse(data)["thanks"]["transactionHashWeights"].sort(function(a,b){return parseInt(a.peerTxHeight) - parseInt(b.peerTxHeight)});
               var ictr = 0;
               for(itemTxHash in entireTxHashArray){
                 if(ictr > 2){
-                  updatePeerTxHashArray(entireTxHashArray[itemTxHash].peerTxHeight,entireTxHashArray[itemTxHash].peerTxHash,entireTxHashArray[itemTxHash].counted)
+                  updatePeerTxHashArray(entireTxHashArray[itemTxHash].peerTxHeight,entireTxHashArray[itemTxHash].peerTxHash,entireTxHashArray[itemTxHash].counted,true)
                 }
                 ictr++;
               }
@@ -4473,9 +4493,9 @@ var myCallbackSell = function(data) {
 
 //////////////////////////////////////////inter module parent child communicator
 
-  var lastCheckPointHash;//used to push checkPointHash to broascast peer calback
-  var lastCurrentBlockCheckPointHash;//same as above
-  var broadcastPeersBlock = function(trigger,order = '',deletedOrders){
+var lastCheckPointHash;//used to push checkPointHash to broascast peer calback
+var lastCurrentBlockCheckPointHash;//same as above
+var broadcastPeersBlock = function(trigger,order = '',deletedOrders){
   if(trigger == "block"){
     //sending the block to the peers
     log("------------------------------------------------------")
@@ -4991,6 +5011,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         }else{
           //cant take any chances reset completely
           chainState.isMining = false;
+          /***
           console.log("cliping chain from "+frankieCoin.blockHeight+" back one riser ");
           BlkDB.deleteTransactions();
           chainState.transactionHeight = 0;
@@ -5002,22 +5023,24 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
             BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
           });
           BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
+          ***/
           cbReset();
         }
         ////////////////////finally post the RPC get work block data for the miner
         var countPostMinerCalled = 0;
         var postMiner = async function(){
-          console.log(chalk.bgRed("POSTING FOR RPC DOES IT CHECK IMP CHILD "+allWaiting.length))
+          console.log(chalk.bgRed("POSTING FOR RPC and how many peers are we waiting on? "+allWaiting.length))
           if(allWaiting.length > 0){
 
             setTimeout(function(){
               if(countPostMinerCalled < 4 && chainStateMonitor.thanksCount < 2){//we call this 4 times then cleanup
+                chainState.isMining = false;//we dont want to start mining yet
                 console.log(chalk.bgWhite.black("calling postMiner countPostMinerCalled "+countPostMinerCalled))
                 console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                 postMiner();
               }else{
 
-                chainState.isMining = false;//dows this neeed to be here?
+                chainState.isMining = false;//until we set it to true
                 cleanUpWaitingRemoveLag().then(function(reply){
                   if(reply == 0){
                     setTimeout(function(){
