@@ -287,7 +287,7 @@ var stuckPeerMonitor = function(id,incomingBlockHeight,chainStateHash){
     if(stPeer.count > 2){
       console.log("sending node state pong to stuck peer from monitor "+id);
       //var syncTrigger = {"syncTrigger":incomingBlockHeight,"submitCurrrentChainStateHash":chainStateHash,"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
-      if(peers[id]){
+      if(peers[id] && peers[id].conn != undefined){
         peers[id].conn.write(JSON.stringify(
           {"nodeStatePong":{
               Height:parseInt(chainState.synchronized),
