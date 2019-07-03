@@ -383,15 +383,10 @@ var activeSync = function(timer){
         var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
         var peerIP = tobj.info.ip;
 
-        if(peerIP.match(ipformat)){
-          console.log()
-          console.log("This peer has a normal IP -> "+peerIP)
-          console.log()
+        if(tobj.info.ip.match(ipformat)){
+
         }else{
-          console.log()
-          console.log("This peer has a weird IP -> "+peerIP)
-          peerIP = peerIP.split(":")[3]
-          console.log(peerIP)
+          frankieCoin.cleanNodes(frankieCoin.nodes,'id');
         }
 
         console.log(
