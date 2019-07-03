@@ -326,6 +326,14 @@ var Blockchain = class Blockchain {
 
       registerNode(id,ip,port){
 
+        var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+
+        if(ip.match(ipformat)){
+          var nodeIP = ip;
+        }else{
+          var nodeIP = ip.split(":")[3];
+        }
+
         var nodeFromStorage = async function(thisN){
 
           var tempNodes = await thisN.cleanNodes(thisN.nodes,"id");
@@ -392,7 +400,7 @@ var Blockchain = class Blockchain {
               var thisnode = {
                 "index":indexOfThisNode,
                 "id":id,
-                "info":{"ip":ip,"port":port,"chainlength":thisN.chain.length,"maxHeight":thisN.chain.length,"synchBlock":0},
+                "info":{"ip":nodeIP,"port":port,"chainlength":thisN.chain.length,"maxHeight":thisN.chain.length,"synchBlock":0},
                 "ecdh":ecdh,
               };
 

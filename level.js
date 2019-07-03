@@ -228,6 +228,20 @@ var getNodes = function(){
   })
 }
 
+var deleteNodes = function(){
+  var stream = db.createReadStream();
+  stream.on('data',function(data){
+    if(data.key.toString().split(":")[0] == "node"){
+      console.log('key = '+data.key+" value = "+data.value.toString());
+      db.del(data.key).then(function(){
+        console.log("deleted node")
+      }).catch(function(err){
+          console.log("error deleting node "+err)
+      })
+    }
+  })
+}
+
 var getNodeById =   function(nodeId){
   return new Promise(function(resolve, reject) {
     var stream = db.createReadStream();
@@ -2787,6 +2801,7 @@ module.exports = {
     getAllPeerSafes:getAllPeerSafes,
     deleteSafe:deleteSafe,
     getNodes:getNodes,
+    deleteNodes:deleteNodes,
     getNodeById:getNodeById,
     addBlock:addBlock,
     getBlock:getBlock,

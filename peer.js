@@ -1697,7 +1697,10 @@ var port2;
 var sw;
 var sw2;
 //////////////////////////////////////////////////////core function asynchronous
-var cbReset = async function(){
+var cbReset = async function(full = false){
+  if(full == true){
+    BlkDB.deleteNodes();//normally we do not want to do this
+  }
   try{
     await sw.leave('egem-sfrx-001');
     await sw2.leave('egem-sfrx-002');
@@ -2312,7 +2315,7 @@ var cbReset = async function(){
             var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
             //////////////////////////////////////////////////////////////////////
 
-            var removalTransactions = franieCoin.getBlock(data.uncle.blockHeight).transactions;//need to find out who incremented their
+            var removalTransactions = frankieCoin.getBlock(data.uncle.blockHeight).transactions;//need to find out who incremented their
 
             //walk through all transactions in uncle block remove the last nonce
 
@@ -3454,12 +3457,8 @@ function cliGetInput(){
 
       cliGetInput();
     }else if(userInput == "MM"){
-      console.log("chain state chain walk height is "+chainState.chainWalkHeight);
-      console.log("chain state synchronized equals "+chainState.synchronized);
-      console.log("blockchain height is "+frankieCoin.blockHeight);
-      setTimeout(function(){
-        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2173);
-      },30)
+      //BlkDB.deleteNodes();
+      cbReset(true);//FULL TRUE DELETES NODE DATABASE
       cliGetInput();
     }else if(userInput == "MT"){
       //activePing();
