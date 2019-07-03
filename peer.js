@@ -681,6 +681,10 @@ var setChainStateTX = async function(validTXHeight,transactionCheckPointHash){
     chainState.previousTxHeight = tempPrevTXHt;
     chainState.previousTxHash = tempPrevTXHash;
   }
+  BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+transactionCheckPointHash);
+  if(validTXHeight%frankieCoin.chainRiser == 0){
+    BlkDB.addChainState("cs:transactionCheckPointHash:"+validTXHeight,transactionCheckPointHash);
+  }
   ////setting transaction level checks and heights
   var transactionValidator = async function(start,end){
     var cbTransactionHeightMonitor = async function(csTransactionHeight){
@@ -737,6 +741,10 @@ var setChainStateOX = async function(validOXHeight,orderCheckPointHash){
   if(chainState.previousOxHeight == chainState.orderHeight){
     chainState.previousOxHeight = tempPrevOXHt;
     chainState.previousOxHash = tempPrevOXHash;
+  }
+  BlkDB.addChainState("cs:orderHeight",chainState.orderHeight+":"+orderCheckPointHash);
+  if(validOXHeight%frankieCoin.chainRiser == 0){
+    BlkDB.addChainState("cs:orderCheckPointHash:"+validOXHeight,orderCheckPointHash);
   }
   ////setting transaction level checks and heights
   var orderValidator = async function(start,end){
