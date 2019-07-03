@@ -380,6 +380,19 @@ var activeSync = function(timer){
         var thisPeerTXHASH = nodeobj.peerTxHash || "..data..";
         var thisPeerOXHASH = nodeobj.peerOXHash || "..data..";
 
+        var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        var peerIP = tobj.info.ip;
+
+        if(peerIP.match(ipformat)){
+          console.log()
+          console.log("This peer has a normal IP -> "+peerIP)
+          console.log()
+        }else{
+          console.log()
+          console.log("This peer has a weird IP -> "+peerIP)
+          console.log()
+        }
+
         console.log(
           chalk.bgCyan.black("T("+nodercv+"):")+chalk.bgMagenta.white(nodeobj.nodeType)+
           chalk(" ")+chalk.bgCyan.black("OPNC:")+chalk.bgMagenta.white(nodeobj.longPeerNonce)+
