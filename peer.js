@@ -382,11 +382,9 @@ var activeSync = function(timer){
 
         var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
-        if(tobj.info.ip.match(ipformat)){
-          //do nothing right now and probably change the logic to NEQ
-        }else{
-          frankieCoin.cleanNodes(frankieCoin.nodes,'id');
-        }
+
+        frankieCoin.cleanNodes(frankieCoin.nodes,'id');
+
 
         console.log(
           chalk.bgCyan.black("T("+nodercv+"):")+chalk.bgMagenta.white(nodeobj.nodeType)+
