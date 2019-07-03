@@ -3170,7 +3170,7 @@ var cbReset = async function(){
 
                 }else if(frankieCoin.blockHeight == parseInt(peerBlockHeight)){
                   //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-                  if(peers[peerId]){
+                  if(peers[peerId] && peers[peerId].conn2!= undefined){
                     peers[peerId].conn2.write(JSON.stringify(frankieCoin.getLatestBlock()));
                     pongBack = true;
                   }
@@ -3197,13 +3197,19 @@ var cbReset = async function(){
               //setting a delay and pong back
               //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
               if(peers[peerId] && pongBack == true){
-                setTimeout(function(){if(peers[peerId]){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));}},300);
+                setTimeout(function(){
+                  if(peers[peerId] && peers[peerId].conn2 != undefined){
+                    peers[peerId].conn2.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+                  }
+                },300);
               }
               //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
             }else{
               log("Did not match this hash and this peer is an imposter");
               //peers[peerId].conn.write("Don't hack me bro");
-              peers[peerId].conn2.write(JSON.stringify({"BadPeer":{Height:1337}}));
+              if(peers[peerId] && peers[peerId].conn2 != undefined){
+                peers[peerId].conn2.write(JSON.stringify({"BadPeer":{Height:1337}}));
+              }
               ///tesst out setTimeout(function(){disconnet peers[peerId].conn.dissconnet();},1500);
             }
 
