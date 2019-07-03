@@ -5051,7 +5051,13 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                 chainState.isMining = false;//we dont want to start mining yet
                 console.log(chalk.bgWhite.black("calling postMiner countPostMinerCalled "+countPostMinerCalled))
                 console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-                postMiner();
+                
+                if(chainStateMonitor.thanksCount > 1){
+                  postMiner();
+                }else{
+                  setTimeout(function(){cbReset();},1500);
+                }
+
               }else{
 
                 chainState.isMining = false;//until we set it to true
