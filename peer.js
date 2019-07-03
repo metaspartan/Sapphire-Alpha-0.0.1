@@ -390,7 +390,8 @@ var activeSync = function(timer){
         }else{
           console.log()
           console.log("This peer has a weird IP -> "+peerIP)
-          console.log()
+          peerIP = peerIP.split(":")[3]
+          console.log(peerIP)
         }
 
         console.log(
@@ -401,7 +402,7 @@ var activeSync = function(timer){
           chalk(" ")+chalk.bgCyan.black("CS:")+chalk.bgMagenta.white(nodeobj.peerChainStateHash.blockNumber)+chalk.bgMagenta.yellow(" "+thisPeerCHKPTHASH.substring(0,8))+
           chalk(" ")+chalk.bgCyan.black("TXHt:")+chalk.bgMagenta.white(nodeobj.peerTxHeight)+chalk.bgMagenta.yellow(" "+thisPeerTXHASH.substring(0,8))+
           chalk(" ")+chalk.bgCyan.black("OXHt:")+chalk.bgMagenta.white(nodeobj.peerOXHeight)+chalk.bgMagenta.yellow(" "+thisPeerOXHASH.substring(0,8))+
-          chalk(" ")+chalk.bgCyan.black("IP:")+chalk.bgRed.white(tobj.info.ip)
+          chalk(" ")+chalk.bgCyan.black("IP:")+chalk.bgRed.white((tobj.info.ip.match(ipformat)?tobj.info.ip:tobj.info.ip.split(":")[3]))
         )
         //we are going to police our connections to make sure they are in sync
         if(nodeobj.peerTxHeight < chainState.synchronized){
