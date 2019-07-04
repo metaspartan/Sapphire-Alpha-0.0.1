@@ -1099,7 +1099,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         topEnd = chainState.synchronized
       }
 
-      transactionValidator(parseInt(startEnd),parseInt(topEnd));
+      //lets move this to a trnssync call
+      //transactionValidator(parseInt(startEnd),parseInt(topEnd));
     }
 
     //set the chain state validated height;
