@@ -1099,7 +1099,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         topEnd = chainState.synchronized
       }
 
-      //lets move this to a trnssync call
+      //lets move this to a trnssync call ONE - did not change results
       //transactionValidator(parseInt(startEnd),parseInt(topEnd));
     }
 
@@ -1218,7 +1218,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     if(topEnd >= chainState.synchronized){
       topEnd = chainState.synchronized
     }
-    transactionValidator(parseInt(startEnd),parseInt(topEnd));
+    //lets move this to a trnssync call TWO
+    //transactionValidator(parseInt(startEnd),parseInt(topEnd));
 
   }else if(replyData == "NaN"){
     console.log("chain walk height is WHAT FUNCTION TO RUN HERE "+chainState.chainWalkHeight);
@@ -2273,7 +2274,8 @@ var cbReset = async function(full = false){
                 topEnd = chainState.synchronized
               }
 
-              transactionValidator(parseInt(startEnd),parseInt(topEnd));
+              //lets move this to a trnssync call THREE
+              //transactionValidator(parseInt(startEnd),parseInt(topEnd));
 
             }else{
 
