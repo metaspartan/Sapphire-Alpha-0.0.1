@@ -251,11 +251,11 @@ function requestListener(request, response) {
           //doEet = true;
           var canMine = thisNodeCanMine();
           console.log("canMine = "+canMine);
-          if(canMine.split(":")[0] == canMine.split(":")[1] && canMine.split(":")[2] > 2){
+          if(canMine.split(":")[0] == canMine.split(":")[1] && canMine.split(":")[1] == canMine.split(":")[2] && canMine.split(":")[3] > 2){
             closeExplorer();//closes the explorer port on 3003
             isMining = true;//restricts the methods to only call getWork on this page
           }else{
-            console.log("not sure what action to take yet ?");
+            console.log(chalk.bgRed.white("note from RPC this node is not sync to mine we should call active sync processes"));
             closePort();
             setTimeout(function(){openPort(),15000})
             isMining = false;

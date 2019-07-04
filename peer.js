@@ -407,7 +407,7 @@ var activeSync = function(timer){
           //remove the peer from stuckPeer Monitor
           for(item in chainStateMonitor.stuckPeers){
             if(chainStateMonitor.stuckPeers[item].peer == nodeobj.peer){
-              console.log("removing stuck peer from monitor "+id);
+              console.log("removing stuck peer from monitor "+nodeobj.peer);
               chainStateMonitor.stuckPeers.splice(item,1);
             }
           }
@@ -5086,6 +5086,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                 console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
 
                 if(chainStateMonitor.thanksCount > 1){
+                  console.log(chalk.bgWhite.red.bold("POST MINER CALLED 5089"))
                   postMiner();
                 }else{
                   allWaiting = [];
@@ -5445,7 +5446,7 @@ var impcevent = function(callback){
 }
 //this is a function to turn off excess communications to miners
 var thisNodeCanMine = function(){
-  return chainState.peerNonce+":"+chainState.synchronized+":"+frankieCoin.nodes.length;
+  return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":"+frankieCoin.nodes.length;
 }
 var thisNodeIsMininig = function(){
   ExPl.closeExplorer;
