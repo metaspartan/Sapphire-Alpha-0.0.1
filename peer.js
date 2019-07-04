@@ -401,11 +401,21 @@ var activeSync = function(timer){
           console.log("sending peer "+tobj.info.ip+" to stuck peer monitor");
           stuckPeerMonitor(tobj.id,nodeobj.peerTxHeight,nodeobj.peerChainStateHash);
         }else if(nodeobj.peerTxHeight > chainState.transactionHeight){
-          tranSynch();
+          if(chainStateMonitor.isTxValidationRunning == false){
+            tranSynch();
+          }
           //remove the peer from stuckPeer Monitor
+          for(item in chainStateMonitor.stuckPeers){
+            if(chainStateMonitor.stuckPeers[item].peer == nodeobj.peer){
+              console.log("removing stuck peer from monitor "+id);
+              chainStateMonitor.stuckPeers.splice(item,1);
+            }
+          }
         }
         if(nodeobj.peerOXHeight > chainState.orderHeight){
-          oxSynch();
+          if(chainStateMonitor.isOxValidationRunning == false && chainState.transactionHeight == chainState.chainWalkHeight){
+            oxSynch();
+          }
         }
       }
     }
@@ -465,8 +475,12 @@ var adjustedTimeout = function() {
     //activePing();
     slowCounter++;
   }else if((slowCounter % 4) == 0){//need a different trigger for transaction sync but for now ok
-    tranSynch();
-    oxSynch();
+    if(chainStateMonitor.isTxValidationRunning == false){
+      tranSynch();
+    }
+    if(chainStateMonitor.isOxValidationRunning == false && chainState.transactionHeight == chainState.chainWalkHeight){
+      oxSynch();
+    }
     slowCounter++;
   }else if(chainState.peerNonce < chainState.synchronized){
     //console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
@@ -480,8 +494,12 @@ var adjustedTimeout = function() {
     activePing(parseInt(timerInterval+(slowCounter*37)));
     slowCounter++;
   }else{
-    tranSynch();
-    oxSynch();
+    if(chainStateMonitor.isTxValidationRunning == false){
+      tranSynch();
+    }
+    if(chainStateMonitor.isOxValidationRunning == false && chainState.transactionHeight == chainState.chainWalkHeight){
+      oxSynch();
+    }
     if((slowCounter % 4) == 0){
       activeSync(parseInt(timerInterval+(slowCounter*23)));
       activePing(parseInt(timerInterval+(slowCounter*21)));
@@ -605,8 +623,12 @@ var activePing = function(timer){
     console.log(chalk.green("peer stats indicate you are synch to network"));
     console.log(chalk.yellow("---------------------------------------------------------------"));
     if(chainState.transactionHeight < longestPeer){
-      tranSynch();
-      oxSynch();
+      if(chainStateMonitor.isTxValidationRunning == false){
+        tranSynch();
+      }
+      if(chainStateMonitor.isOxValidationRunning == false && chainState.transactionHeight == chainState.chainWalkHeight){
+        oxSynch();
+      }
     }
   }
 
@@ -5075,7 +5097,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
 
                 chainState.isMining = false;//until we set it to true
                 cleanUpWaitingRemoveLag().then(function(reply){
-                  if(reply == 0){
+                  if(reply == 0 || reply == 1){
                     setTimeout(function(){
                       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                     },10000);
@@ -5087,8 +5109,30 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                     cbReset();
                   }else{
                     console.log("WE RESET and SEND NODE STATE PONG (not done yet) ");
-                    cbReset();
                     //send back nodeStatePong
+                    for(let id in peers){
+                      if(peers[id] && peers[id].conn != undefined){
+                        peers[id].conn.write(JSON.stringify(
+                          {"nodeStatePong":{
+                            Height:parseInt(chainState.synchronized),
+                            MaxHeight:parseInt(chainState.synchronized),
+                            PeerNonce:parseInt(chainState.peerNonce),
+                            GlobalHash:globalGenesisHash,
+                            checkPointHash:chainState.checkPointHash,
+                            currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+                            transactionHeight:chainState.transactionHeight,
+                            transactionRootHash:chainState.transactionRootHash,
+                            orderHeight:chainState.orderHeight,
+                            orderRootHash:chainState.orderRootHash,
+                            prevTxHeight:chainState.previousTxHeight,
+                            previousTxHash:chainState.previousTxHash,
+                            NodeType:nodeType.current,
+                            utcTimeStamp:parseInt(new Date().getTime()/1000)
+                          }}));
+                      }
+                    }
+                    //want to count the returns here
+                    cbReset();
                   }
                 }).catch(function(err){
                   console.log("cleanUpWaitingRemoveLag error in fBroadcast Peers "+err);
