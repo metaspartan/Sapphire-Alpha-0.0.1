@@ -391,6 +391,8 @@ var activeSync = function(timer){
   }
   ***/
   console.log(chalk.green("--------------------------------------------------------------------------------"));
+  //adding a variable for how many peers are transaction synced
+  var peersTransactionSynched = 0;
   for (nodercv in chainState.activeSynch.receive){
     var nodeobj = chainState.activeSynch.receive[nodercv]
 
@@ -431,6 +433,13 @@ var activeSync = function(timer){
               console.log("removing stuck peer from monitor "+nodeobj.peer);
               chainStateMonitor.stuckPeers.splice(item,1);
             }
+          }
+        }else if(nodeobj.peerTxHeight = chainState.synchronized){
+          peersTransactionSynched+=1;
+          if(peersTransactionSynched > 2){
+            setTimeout(function(){
+              rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+            },10000);
           }
         }
         if(nodeobj.peerOXHeight > chainState.orderHeight){
@@ -2973,7 +2982,7 @@ var cbReset = async function(full = false){
 
           }else if(JSON.parse(data)["ChainSyncPong"]){
             //returned block from sunched peer and parses it for db
-            log(JSON.parse(data)["ChainSyncPong"]);
+            //log(JSON.parse(data)["ChainSyncPong"]);
             if(JSON.parse(data)["ChainSyncPong"]["GlobalHash"] == globalGenesisHash){
               log(chalk.green("Hash Matched good pong"))
               var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
@@ -3137,7 +3146,7 @@ var cbReset = async function(full = false){
 
           }else if(JSON.parse(data)["ChainSyncPing"]){
 
-            log(JSON.parse(data)["ChainSyncPing"]);
+            //log(JSON.parse(data)["ChainSyncPing"]);
             if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
               log(chalk.green("Global hashes matched!"));
               frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
@@ -3146,13 +3155,13 @@ var cbReset = async function(full = false){
               var pongBack = false;
 
                 //increment it by one to return the next block
-                peerBlockHeight++;
+                //peerBlockHeight++;
                 //returning the block
-                console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" <<<< the difference conn2 ");
+                console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight))+" <<<< the difference conn2 here ");
                 if(
                   (frankieCoin.getLength() > parseInt(peerBlockHeight))
                   && (chainState.synchronized > parseInt(peerBlockHeight))
-                  && ( (parseInt((frankieCoin.getLength() - parseInt(peerBlockHeight)) == 1) || (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0) )
+                  //&& ( parseInt(frankieCoin.getLength() - parseInt(peerBlockHeight)) == 1 || (parseInt((frankieCoin.getLength()+1) - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)) > 0 )
                   ){
                   console.log("this is properly flagged for streaming");
                   /***
@@ -3188,6 +3197,7 @@ var cbReset = async function(full = false){
                     var numRecordsToStream = 100;
                   }else{
                     var numRecordsToStream = parseInt(chainState.synchronized - JSON.parse(data)["ChainSyncPing"]["Height"]);
+                    console.log("should be in this case numRecordsToStream: "+numRecordsToStream)
                   }
                   //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream)
                   //var numRecordsToStream = parseInt(frankieCoin.synchronized);
@@ -3338,7 +3348,7 @@ var cbReset = async function(full = false){
 
           }else if(JSON.parse(data)["ChainSyncPong"]){
             //returned block from sunched peer and parses it for db
-            log(JSON.parse(data)["ChainSyncPong"]);
+            //log(JSON.parse(data)["ChainSyncPong"]);
             if(JSON.parse(data)["ChainSyncPong"]["GlobalHash"] == globalGenesisHash){
               log(chalk.green("Hash Matched good pong"))
               var peerBlockHeight = JSON.parse(data)["ChainSyncPong"]["Height"];
