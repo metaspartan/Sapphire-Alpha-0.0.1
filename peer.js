@@ -2291,9 +2291,13 @@ var cbReset = async function(full = false){
 
             }else{
 
-              console.log("UNCLE OR ON WRONG CHAIN")
+              console.log("ELSE CONDITION REACHED - NEED TO ADD AN UNCLE CHECK BUT MOST LIKELY NOT SYNC so calling ActiveSync for now ");
+
+              activeSync();
+
+              //leaving this here to finish the uncle validations
               var uncleReply = JSON.stringify({uncle:JSON.parse(data),chainState:chainState})
-              peers[peerId].conn2.write(JSON.stringify(uncleReply));
+              //peers[peerId].conn2.write(JSON.stringify(uncleReply));
               //sendbackUncle(uncleReply,peerId)
               //peers[peerId].conn.write(JSON.stringify(syncTrigger));
               //if I log this information on the chain state I can see it quickly
@@ -2303,6 +2307,8 @@ var cbReset = async function(full = false){
               //this.addOmmer(tmpOmmer);
               //and return the last block to the sending peer...
               //callback({"uncle":{"blockNumber":parseInt(this.chain.length-1),"block":inBlock}},peerId);
+              //leaving this here to finish the uncle validations
+
 
             }
 
@@ -3325,7 +3331,7 @@ var cbReset = async function(full = false){
                 peers[peerId].conn2.write("---------------------------------");
                 peers[peerId].conn2.write("THIS PEER IS NOW SYNCHED");
                 peers[peerId].conn2.write("---------------------------------");
-                
+
               }else{
 
                 console.log(chalk.bgRed.white("CONN2 CHAIN SYNC PONG and peer block height is ")+chalk.bgMagenta.white(peerBlockHeight));
