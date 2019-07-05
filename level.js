@@ -14,9 +14,13 @@ var transactionRiser = 100;
 //chain state set function from peer
 var pushChainState;
 var chainState;
-var setChainState = function(chs,cs){
+var pushChainStateMonitor;
+var getChainStateMonitor;
+var setChainState = function(chs,cs,chsm,csm){
   pushChainState = chs;
   chainState = cs;
+  pushChainStateMonitor = chsm;
+  chainStateMonitor = csm;
 }
 
 var printChainState = function(){
@@ -816,6 +820,15 @@ var getBlockRange = function(blockHeight,riser,callback){
 ///////////////////////this function validates a range of blocks for chain symch
 var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRiser,calledFrom){
 
+      if(chainStateMonitor.isBlockRangeValidating == true){
+        console.log(chalk.bgRed.red("block range validate already called exiting this time calledFram is "+calledFrom));
+        return;
+      }else{
+        pushChainStateMonitor("isBlockRangeValidating",true);
+        console.log(chalk.bgCyan.black("block range validate "+chalk.bgMagenta.white(calledFrom)+" BLOCKHEIGHT: "+chalk.bgMagenta.white(blockHeight)+" RISER: "+chalk.bgMagenta.white(riser)));
+        console.log("BLOCKHEIGHT: "+blockHeight+"RISER: "+riser);
+      }
+
       //console.log("BLOCKHEIGHT: "+blockHeight);
       //console.log("RISER: "+riser);
       //console.log("CALLED FROM "+calledFrom)
@@ -854,6 +867,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
                 //console.log(" YES THIS IS MY CHECK cs:"+parseInt(currentBlockToValidate-chainRiser)+":"+JSON.parse(riserAgo)["hash"]);
                 db.get("cs:"+parseInt(currentBlockToValidate-chainRiser)+":"+JSON.parse(riserAgo)["hash"],function (err, value) {
                   if(err){
+                    pushChainStateMonitor("isBlockRangeValidating",false)
                     callback(false,parseInt(JSON.parse(currentBlockToValidate-chainRiser)["blockHeight"]-1),"");
                   }else{
                     //console.log("--------------------------------------------------");
@@ -874,9 +888,11 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
               //I can set a flag here to load transactions from the block
 
               //set the state validated height
+              pushChainStateMonitor("isBlockRangeValidating",false);
               callback(true,parseInt(JSON.parse(isValidBlock)["blockHeight"]),JSON.parse(isValidBlock)["hash"]);
 
             }else{
+              pushChainStateMonitor("isBlockRangeValidating",false);
               callback(false,parseInt(JSON.parse(isValidBlock)["blockHeight"]-1),"");
             }
             currentBlockHash = JSON.parse(isValidBlock)["hash"];
@@ -889,8 +905,10 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
         }
         if(currentBlockToValidate == blockHeight){
           console.log("ping it "+currentBlockToValidate);
+          pushChainStateMonitor("isBlockRangeValidating",false);
           callback(false,parseInt(currentBlockToValidate-1),"");
         }
+        pushChainStateMonitor("isBlockRangeValidating",false);
         console.log(chalk.black.bgCyan("Block range validator data stream is complete at ")+chalk.bgMagenta(blockHeight));
 
         /***

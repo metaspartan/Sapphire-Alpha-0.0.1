@@ -142,6 +142,7 @@ chainStateMonitor.rpcCom = false;
 chainStateMonitor.deletedPeers = [];
 chainStateMonitor.thanksCount = 0;
 chainStateMonitor.stuckPeers = [];//police my connections nodestatepong and synctrigger if needed
+chainStateMonitor.isBlockRangeValidating = false;
 chainStateMonitor.isTxValidationRunning = false;
 chainStateMonitor.isOxValidationRunning = false;
 
@@ -334,6 +335,25 @@ var removeStuckPeerMonitor = function(id){
 
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(timer){
+
+  //the most important part of activesync is the sync
+  if(chainState.chainWalkHeight == 1){
+    setTimeout(function(){
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
+    },timer)
+  }else if(parseInt(chainState.peerNonce) > parseInt(chainState.chainWalkHeight)){
+    setTimeout(function(){
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
+    },timer)
+  }else{
+
+    console.log("blockrange validate called as else condition line 436")
+    setTimeout(function(){
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
+    },timer)
+
+  }
+
   var blockHeightLength = Math.log(chainState.chainWalkHeight) * Math.LOG10E + 1 | 0;
   if(chainState.peerNonce == "0"){
     var displayPeerNonce = ("0").padStart(blockHeightLength,"0");
@@ -421,20 +441,6 @@ var activeSync = function(timer){
     }
   }
   console.log(chalk.green("--------------------------------------------------------------------------------"));
-  if(chainState.chainWalkHeight == 1){
-    setTimeout(function(){
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
-    },timer)
-  }else if(parseInt(chainState.peerNonce) > parseInt(chainState.chainWalkHeight)){
-    setTimeout(function(){
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
-    },timer)
-  }else{
-    setTimeout(function(){
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,128);
-    },timer)
-  }
-
 
 }
 
@@ -816,8 +822,14 @@ var getChainState = function(){
 var setChainState = function(stateParam,paramValue){
   chainState[stateParam] = paramValue;
 }
+var getChainStateMonitor = function(){
+  return chainStateMonitor;
+}
+var setChainStateMonitor = function(stateParam,paramValue){
+  chainStateMonitor[stateParam] = paramValue;
+}
 sapphirechain.setChainState(getChainState);
-BlkDB.setChainState(setChainState,getChainState);
+BlkDB.setChainState(setChainState,getChainState,setChainStateMonitor,getChainStateMonitor);
 ///end chain state set function
 
 //chainState.accountsTrie = 0;
@@ -3313,9 +3325,12 @@ var cbReset = async function(full = false){
                 peers[peerId].conn2.write("---------------------------------");
                 peers[peerId].conn2.write("THIS PEER IS NOW SYNCHED");
                 peers[peerId].conn2.write("---------------------------------");
+                
               }else{
-                console.log("CONN2 NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....");
+
+                console.log(chalk.bgRed.white("CONN2 CHAIN SYNC PONG and peer block height is ")+chalk.bgMagenta.white(peerBlockHeight));
                 //
+                /****
                 rpcserver.closePort();//need to establosh if this peer is mining and jst stop it until synch
                 //
                 //setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));},300);
@@ -3329,6 +3344,7 @@ var cbReset = async function(full = false){
                 });
                 BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
                 cbReset();
+                ****/
 
               }
 
