@@ -436,11 +436,6 @@ var activeSync = function(timer){
           }
         }else if(nodeobj.peerTxHeight = chainState.synchronized){
           peersTransactionSynched+=1;
-          if(peersTransactionSynched > 2){
-            setTimeout(function(){
-              rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-            },10000);
-          }
         }
         if(nodeobj.peerOXHeight > chainState.orderHeight){
           if(chainStateMonitor.isOxValidationRunning == false && chainState.transactionHeight == chainState.chainWalkHeight){
@@ -449,6 +444,11 @@ var activeSync = function(timer){
         }
       }
     }
+  }
+  if(peersTransactionSynched > 2){
+    setTimeout(function(){
+      rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+    },10000);
   }
   console.log(chalk.green("--------------------------------------------------------------------------------"));
 
