@@ -3346,9 +3346,29 @@ var cbReset = async function(full = false){
               //if chain is not synched ping back to synched peer
               if(peerBlockHeight == chainState.synchronized){
               //if(frankieCoin.inSynch==true && frankieCoin.inSynchBlockHeight == frankieCoin.longestPeerBlockHeight){
-                peers[peerId].conn2.write("---------------------------------");
-                peers[peerId].conn2.write("THIS PEER IS NOW SYNCHED");
-                peers[peerId].conn2.write("---------------------------------");
+
+                //this used to be a message saying the peer is synched now we will just nodestate pong
+                if(peers[peerId] && peers[peerId].conn != undefined){
+                  peers[peerId].conn.write(JSON.stringify(
+                    {"nodeStatePong":{
+                      Height:parseInt(chainState.synchronized),
+                      MaxHeight:parseInt(chainState.synchronized),
+                      PeerNonce:parseInt(chainState.peerNonce),
+                      GlobalHash:globalGenesisHash,
+                      checkPointHash:chainState.checkPointHash,
+                      currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+                      transactionHeight:chainState.transactionHeight,
+                      transactionRootHash:chainState.transactionRootHash,
+                      orderHeight:chainState.orderHeight,
+                      orderRootHash:chainState.orderRootHash,
+                      prevTxHeight:chainState.previousTxHeight,
+                      previousTxHash:chainState.previousTxHash,
+                      NodeType:nodeType.current,
+                      utcTimeStamp:parseInt(new Date().getTime()/1000)
+                    }}
+                  ));
+                }
+
 
               }else{
 
