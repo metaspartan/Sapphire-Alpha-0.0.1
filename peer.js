@@ -1339,7 +1339,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               if(rnod.nodeType > 1){
                 console.log(chalk.bgCyan.black("1249 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
                 if(stuckCheck == true){
-                  peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                  peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                   stuckCheck = false;
                   chainStateMonitor.isChainStuck = 0;
                 }else{
@@ -3149,7 +3149,11 @@ var cbReset = async function(full = false){
                 peerBlockHeight++;
                 //returning the block
                 console.log(frankieCoin.chainRiser+" <<<< chain riser "+(frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser)+" <<<< the difference conn2 ");
-                if((frankieCoin.getLength() > parseInt(peerBlockHeight)) && (chainState.synchronized > parseInt(peerBlockHeight)) && (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0){
+                if(
+                  (frankieCoin.getLength() > parseInt(peerBlockHeight))
+                  && (chainState.synchronized > parseInt(peerBlockHeight))
+                  && ( (parseInt((frankieCoin.getLength() - parseInt(peerBlockHeight)) == 1) || (frankieCoin.getLength() - parseInt(peerBlockHeight)) / parseInt(frankieCoin.chainRiser) > 0) )
+                  ){
                   console.log("this is properly flagged for streaming");
                   /***
                   var pongBackBlockStream = function(blockData){
