@@ -445,8 +445,9 @@ var activeSync = function(timer){
       }
     }
   }
-  if(peersTransactionSynched > 2){
+  if(peersTransactionSynched > 3){
     setTimeout(function(){
+      console.log("450 posting rpc for mininng because 3 or more peers match tx ");
       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
     },10000);
   }
@@ -2272,6 +2273,7 @@ var cbReset = async function(full = false){
                           sendBackUncle(thanksReply,peerId);
 
                           //add it to the RPC for miner
+                          console.log("2277 posting rpc for mininng POST THANKS PREP AND SEND ");
                           rpcserver.postRPCforMiner({block:JSON.parse(data)["block"]});
 
                           BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
@@ -4382,11 +4384,13 @@ var cbChainGrab = async function(data) {
             cleanUpWaitingRemoveLag().then(function(reply){
               if(reply == 0){
                 setTimeout(function(){
+                  console.log("4387 posting rpc for mininng because 3 or more peers match tx ");
                   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                 },10000);
               }else if(reply > 1 && reply < 3){
                 console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
                 setTimeout(function(){
+                  console.log("4393 posting rpc for mininng because 3 or more peers match tx ");
                   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                 },20000)
                 cbReset();
@@ -4400,6 +4404,7 @@ var cbChainGrab = async function(data) {
               allWaiting = [];
               allWaitingLength = 0;
               setTimeout(function(){
+                console.log("4406 posting rpc for mininng because 3 or more peers match tx ");
                 rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
               },20000);
               cbReset();
@@ -4407,6 +4412,7 @@ var cbChainGrab = async function(data) {
 
           }else{
             setTimeout(function(){
+              console.log("4415 posting rpc for mininng because 3 or more peers match tx ");
               rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
             },5000)
           }
@@ -4416,7 +4422,7 @@ var cbChainGrab = async function(data) {
 
     }else{
       console.log("IN CALLBACK YOU NEVER SET IF THERE ARE NO RETURNS");
-
+      console.log("4424 posting rpc for mininng this one is called on startup ");
       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
     }
   }
@@ -5173,11 +5179,13 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                 cleanUpWaitingRemoveLag().then(function(reply){
                   if(reply == 0 || reply == 1){
                     setTimeout(function(){
+                      console.log("5182 posting rpc for mininng because 3 or more peers match tx ");
                       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                     },10000);
                   }else if(reply > 1 && reply < 3){
                     console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
                     setTimeout(function(){
+                      console.log("5187 posting rpc for mininng because 3 or more peers match tx ");
                       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                     },20000)
                     cbReset();
@@ -5214,6 +5222,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                   allWaitingLength = 0;
                   //want to count the returns here
                   setTimeout(function(){
+                    console.log("5224 posting rpc for mininng because 3 or more peers match tx ");
                     rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                   },20000);
                   cbReset();
@@ -5226,6 +5235,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           }else{
             console.log(chalk.bgGreen.black.bold("THIS IS THE CASE YOU DID NOT SET"));
             setTimeout(function(){
+              console.log("5237 posting rpc for mininng because 3 or more peers match tx ");
               rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
             },10000)
           }
