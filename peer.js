@@ -384,6 +384,8 @@ var activeSync = function(timer){
     chalk(" ")+chalk.bgCyan.black("peers:")+chalk.bgMagenta(frankieCoin.nodes.length)
   );
 
+  frankieCoin.nodes = frankieCoin.cleanNodes(frankieCoin.nodes,'id');
+
   /***
   console.log(chalk.bgCyan.black(" txHashHistory(4): ")+chalk.bgMagenta(JSON.stringify(chainState.transactionHashWeights)));
   for (nodesend in chainState.activeSynch.send){
@@ -404,9 +406,6 @@ var activeSync = function(timer){
         var thisPeerOXHASH = nodeobj.peerOXHash || "..data..";
 
         var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
-
-
-        frankieCoin.nodes = frankieCoin.cleanNodes(frankieCoin.nodes,'id');
 
         if(nodeobj.longPeerNonce > chainState.topBlock){
           chainState.topBlock = nodeobj.longPeerNonce;
@@ -4405,9 +4404,33 @@ var cbChainGrab = async function(data) {
                 },20000)
                 cbReset();
               }else{
-                console.log("WE RESET and SEND NODE STATE PONG (not done yet) ");
-                cbReset();
-                //send back nodeStatePong
+
+                console.log("4408 WE RESET and SEND NODE STATE PONG (not done yet) ");
+
+                for(let id in peers){
+                  if(peers[id] && peers[id].conn != undefined){
+                    peers[id].conn.write(JSON.stringify(
+                      {"nodeStatePong":{
+                        Height:parseInt(chainState.synchronized),
+                        MaxHeight:parseInt(chainState.synchronized),
+                        PeerNonce:parseInt(chainState.peerNonce),
+                        GlobalHash:globalGenesisHash,
+                        checkPointHash:chainState.checkPointHash,
+                        currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+                        transactionHeight:chainState.transactionHeight,
+                        transactionRootHash:chainState.transactionRootHash,
+                        orderHeight:chainState.orderHeight,
+                        orderRootHash:chainState.orderRootHash,
+                        prevTxHeight:chainState.previousTxHeight,
+                        previousTxHash:chainState.previousTxHash,
+                        NodeType:nodeType.current,
+                        utcTimeStamp:parseInt(new Date().getTime()/1000)
+                      }}));
+                  }
+                }
+
+                setTimeout(function(){cbReset();},2000);
+
               }
             }).catch(function(err){
               console.log("cleanUpWaitingRemoveLag has error "+err);
@@ -5192,7 +5215,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                       console.log("5182 posting rpc for mininng because 3 or more peers match tx ");
                       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                     },10000);
-                  }else if(reply > 1 && reply < 3){
+                  }else if(reply > 1){
                     console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
                     setTimeout(function(){
                       console.log("5187 posting rpc for mininng because 3 or more peers match tx ");
@@ -5200,7 +5223,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                     },20000)
                     cbReset();
                   }else{
-                    console.log("WE RESET and SEND NODE STATE PONG (not done yet) ");
+                    console.log("5226 WE RESET and SEND NODE STATE PONG (not done yet) ");
                     //send back nodeStatePong
                     for(let id in peers){
                       if(peers[id] && peers[id].conn != undefined){
@@ -5224,7 +5247,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                       }
                     }
                     //want to count the returns here
-                    cbReset();
+                    setTimeout(function(){cbReset();},2000);
                   }
                 }).catch(function(err){
                   console.log("cleanUpWaitingRemoveLag error in fBroadcast Peers "+err);
