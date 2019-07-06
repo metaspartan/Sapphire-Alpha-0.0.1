@@ -457,6 +457,7 @@ var activeSync = function(timer){
   if(peersTransactionSynched > 3){
     setTimeout(function(){
       console.log("450 posting rpc for mininng because 3 or more peers match tx ");
+      console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
     },10000);
   }
@@ -2283,6 +2284,7 @@ var cbReset = async function(full = false){
 
                           //add it to the RPC for miner
                           console.log("2277 posting rpc for mininng POST THANKS PREP AND SEND ");
+                          console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                           rpcserver.postRPCforMiner({block:JSON.parse(data)["block"]});
 
                           BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
@@ -4394,12 +4396,14 @@ var cbChainGrab = async function(data) {
               if(reply == 0){
                 setTimeout(function(){
                   console.log("4387 posting rpc for mininng cleanUpWaitingRemoveLag reply 0 ");
+                  console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                 },10000);
               }else if(reply > 1){
                 console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
                 setTimeout(function(){
                   console.log("4393 posting rpc for mininng cleanUpWaitingRemoveLag reply 1 to 3 ");
+                  console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                 },20000)
                 cbReset();
@@ -4438,6 +4442,7 @@ var cbChainGrab = async function(data) {
               allWaitingLength = 0;
               setTimeout(function(){
                 console.log("4406 posting rpc for mininng cleanUpWaitingRemoveLag errors ");
+                console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                 rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
               },20000);
               cbReset();
@@ -4446,6 +4451,7 @@ var cbChainGrab = async function(data) {
           }else{
             setTimeout(function(){
               console.log("4415 posting rpc for mininng because 3 or more peers match tx ");
+              console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
               rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
             },5000)
           }
@@ -4456,6 +4462,7 @@ var cbChainGrab = async function(data) {
     }else{
       console.log("IN CALLBACK YOU NEVER SET IF THERE ARE NO RETURNS");
       console.log("4424 posting rpc for mininng this one is called on startup ");
+      console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
     }
   }
@@ -5192,18 +5199,23 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           if(allWaiting.length > 0){
 
             setTimeout(function(){
-              if(countPostMinerCalled < 4 && chainStateMonitor.thanksCount < 2){//we call this 4 times then cleanup
+              if(countPostMinerCalled < 4 && chainStateMonitor.thanksCount < 2){//we call this 4 times then cleanup but if thanks is higher than 2 we are good
                 chainState.isMining = false;//we dont want to start mining yet
                 console.log(chalk.bgWhite.black("calling postMiner countPostMinerCalled "+countPostMinerCalled))
                 console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
 
                 if(chainStateMonitor.thanksCount > 1){
+
                   console.log(chalk.bgWhite.red.bold("POST MINER CALLED 5089"))
                   postMiner();
+
                 }else{
+
+                  console.log(chalk.bgRed.white("this case needs to be looked at if it is getting triggered a lot"));
                   allWaiting = [];
                   allWaitingLength = 0;
-                  setTimeout(function(){cbReset();},1500);
+                  setTimeout(function(){cbReset();},1000);
+
                 }
 
               }else{
@@ -5213,17 +5225,20 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                   if(reply == 0 || reply == 1){
                     setTimeout(function(){
                       console.log("5182 posting rpc for mininng because 3 or more peers match tx ");
+                      console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                     },10000);
                   }else if(reply > 1){
                     console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
                     setTimeout(function(){
                       console.log("5187 posting rpc for mininng because 3 or more peers match tx ");
+                      console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                     },20000)
                     cbReset();
                   }else{
                     console.log("5226 WE RESET and SEND NODE STATE PONG (not done yet) ");
+                    console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                     //send back nodeStatePong
                     for(let id in peers){
                       if(peers[id] && peers[id].conn != undefined){
@@ -5256,6 +5271,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                   //want to count the returns here
                   setTimeout(function(){
                     console.log("5224 posting rpc for mininng because 3 or more peers match tx ");
+                    console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                     rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                   },20000);
                   cbReset();
@@ -5268,9 +5284,10 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           }else{
             console.log(chalk.bgGreen.black.bold("THIS IS THE CASE YOU DID NOT SET"));
             setTimeout(function(){
-              console.log("5237 posting rpc for mininng because 3 or more peers match tx ");
+              console.log("5237 posting rpc for mininng as else condition to thanks ");
+              console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
               rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-            },10000)
+            },15000)
           }
         }
         postMiner();
