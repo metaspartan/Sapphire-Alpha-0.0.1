@@ -4397,7 +4397,7 @@ var cbChainGrab = async function(data) {
                   console.log("4387 posting rpc for mininng cleanUpWaitingRemoveLag reply 0 ");
                   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                 },10000);
-              }else if(reply > 1 && reply < 3){
+              }else if(reply > 1){
                 console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
                 setTimeout(function(){
                   console.log("4393 posting rpc for mininng cleanUpWaitingRemoveLag reply 1 to 3 ");
