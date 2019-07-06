@@ -408,6 +408,9 @@ var activeSync = function(timer){
 
         frankieCoin.nodes = frankieCoin.cleanNodes(frankieCoin.nodes,'id');
 
+        if(nodeobj.longPeerNonce > chainState.topBlock){
+          chainState.topBlock = nodeobj.longPeerNonce;
+        }
 
         console.log(
           chalk.bgCyan.black("T("+nodercv+"):")+chalk.bgMagenta.white(nodeobj.nodeType)+
@@ -444,6 +447,10 @@ var activeSync = function(timer){
         }
       }
     }
+  }
+  //in this case other peers reported a higher chain height in their clusters so we need to get there asap
+  if(chainState.topBlock > chainState.chainWalkHeight){
+    cbReset();
   }
   if(peersTransactionSynched > 3){
     setTimeout(function(){
@@ -4384,13 +4391,13 @@ var cbChainGrab = async function(data) {
             cleanUpWaitingRemoveLag().then(function(reply){
               if(reply == 0){
                 setTimeout(function(){
-                  console.log("4387 posting rpc for mininng because 3 or more peers match tx ");
+                  console.log("4387 posting rpc for mininng cleanUpWaitingRemoveLag reply 0 ");
                   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                 },10000);
               }else if(reply > 1 && reply < 3){
                 console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
                 setTimeout(function(){
-                  console.log("4393 posting rpc for mininng because 3 or more peers match tx ");
+                  console.log("4393 posting rpc for mininng cleanUpWaitingRemoveLag reply 1 to 3 ");
                   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                 },20000)
                 cbReset();
@@ -4404,7 +4411,7 @@ var cbChainGrab = async function(data) {
               allWaiting = [];
               allWaitingLength = 0;
               setTimeout(function(){
-                console.log("4406 posting rpc for mininng because 3 or more peers match tx ");
+                console.log("4406 posting rpc for mininng cleanUpWaitingRemoveLag errors ");
                 rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
               },20000);
               cbReset();
