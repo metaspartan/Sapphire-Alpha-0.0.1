@@ -450,7 +450,9 @@ var activeSync = function(timer){
   }
   //in this case other peers reported a higher chain height in their clusters so we need to get there asap
   if(chainState.topBlock > chainState.chainWalkHeight){
-    cbReset();
+    setTimeout(function(){
+      cbReset();
+    },500)
   }
   if(peersTransactionSynched > 3){
     setTimeout(function(){
