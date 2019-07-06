@@ -140,6 +140,7 @@ var chainStateMonitor = {};
 chainStateMonitor.peerCom = false;
 chainStateMonitor.rpcCom = false;
 chainStateMonitor.longPeerNonce = 0;
+chainStateMonitor.rpcBlock = 0;
 chainStateMonitor.deletedPeers = [];
 chainStateMonitor.thanksCount = 0;
 chainStateMonitor.stuckPeers = [];//police my connections nodestatepong and synctrigger if needed
@@ -456,11 +457,12 @@ var activeSync = function(timer){
       //cbReset();
     },500)
   }
-  if(peersTransactionSynched > 3){
+  if(peersTransactionSynched > 3 && chainStateMonitor.rpcBlock < chainState.topBlock){
     setTimeout(function(){
       console.log("450 posting rpc for mininng because 3 or more peers match tx ");
       console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+      chainStateMonitor.rpcBlock = chainState.topBlock;
     },10000);
   }
   console.log(chalk.green("--------------------------------------------------------------------------------"));
@@ -2287,7 +2289,12 @@ var cbReset = async function(full = false){
                           //add it to the RPC for miner
                           console.log("2277 posting rpc for mininng POST THANKS PREP AND SEND ");
                           console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-                          rpcserver.postRPCforMiner({block:JSON.parse(data)["block"]});
+
+                          if(chainStateMonitor.rpcBlock < chainState.topBlock){
+                            rpcserver.postRPCforMiner({block:JSON.parse(data)["block"]});
+                            chainStateMonitor.rpcBlock = chainState.topBlock;
+                          }
+
 
                           BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
 
@@ -4396,18 +4403,24 @@ var cbChainGrab = async function(data) {
             chainState.isMining = false;
             cleanUpWaitingRemoveLag().then(function(reply){
               if(reply == 0){
-                setTimeout(function(){
-                  console.log("4387 posting rpc for mininng cleanUpWaitingRemoveLag reply 0 ");
-                  console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-                  rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-                },10000);
+                if(chainStateMonitor.rpcBlock < chainState.topBlock){
+                  setTimeout(function(){
+                    console.log("4387 posting rpc for mininng cleanUpWaitingRemoveLag reply 0 ");
+                    console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
+                    rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                    chainStateMonitor.rpcBlock = chainState.topBlock;
+                  },10000);
+                }
               }else if(reply > 1){
                 console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
-                setTimeout(function(){
-                  console.log("4393 posting rpc for mininng cleanUpWaitingRemoveLag reply 1 to 3 ");
-                  console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-                  rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-                },20000)
+                if(chainStateMonitor.rpcBlock < chainState.topBlock){
+                  setTimeout(function(){
+                    console.log("4393 posting rpc for mininng cleanUpWaitingRemoveLag reply 1 to 3 ");
+                    console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
+                    rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                    chainStateMonitor.rpcBlock = chainState.topBlock;
+                  },20000);
+                }
                 cbReset();
               }else{
 
@@ -4442,11 +4455,14 @@ var cbChainGrab = async function(data) {
               console.log("cleanUpWaitingRemoveLag has error "+err);
               allWaiting = [];
               allWaitingLength = 0;
-              setTimeout(function(){
-                console.log("4406 posting rpc for mininng cleanUpWaitingRemoveLag errors ");
-                console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-                rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-              },20000);
+              if(chainStateMonitor.rpcBlock < chainState.topBlock){
+                setTimeout(function(){
+                  console.log("4406 posting rpc for mininng cleanUpWaitingRemoveLag errors ");
+                  console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
+                  rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                  chainStateMonitor.rpcBlock = chainState.topBlock;
+                },20000);
+              }
               cbReset();
             })
 
@@ -4454,7 +4470,10 @@ var cbChainGrab = async function(data) {
             setTimeout(function(){
               console.log("4415 posting rpc for mininng because 3 or more peers match tx ");
               console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-              rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+              if(chainStateMonitor.rpcBlock < chainState.topBlock){
+                rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                chainStateMonitor.rpcBlock = chainState.topBlock;
+              }
             },5000)
           }
         }
@@ -4465,7 +4484,10 @@ var cbChainGrab = async function(data) {
       console.log("IN CALLBACK YOU NEVER SET IF THERE ARE NO RETURNS");
       console.log("4424 posting rpc for mininng this one is called on startup ");
       console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-      rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+      if(chainStateMonitor.rpcBlock < chainState.topBlock){
+        rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+        chainStateMonitor.rpcBlock = chainState.topBlock;
+      }
     }
   }
   postMiner();
@@ -5229,18 +5251,24 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                 chainState.isMining = false;//until we set it to true
                 cleanUpWaitingRemoveLag().then(function(reply){
                   if(reply == 0 || reply == 1){
-                    setTimeout(function(){
-                      console.log("5182 posting rpc for mininng because 3 or more peers match tx ");
-                      console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-                      rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-                    },10000);
+                    if(chainStateMonitor.rpcBlock < chainState.topBlock){
+                      setTimeout(function(){
+                        console.log("5182 posting rpc for mininng because 3 or more peers match tx ");
+                        console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
+                        rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                        chainStateMonitor.rpcBlock = chainState.topBlock;
+                      },10000);
+                    }
                   }else if(reply > 1){
                     console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
-                    setTimeout(function(){
-                      console.log("5187 posting rpc for mininng because 3 or more peers match tx ");
-                      console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-                      rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-                    },20000)
+                    if(chainStateMonitor.rpcBlock < chainState.topBlock){
+                      setTimeout(function(){
+                        console.log("5187 posting rpc for mininng because 3 or more peers match tx ");
+                        console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
+                        rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                        chainStateMonitor.rpcBlock = chainState.topBlock;
+                      },20000);
+                    }
                     cbReset();
                   }else{
                     console.log("5226 WE RESET and SEND NODE STATE PONG (not done yet) ");
@@ -5275,11 +5303,14 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                   allWaiting = [];
                   allWaitingLength = 0;
                   //want to count the returns here
-                  setTimeout(function(){
-                    console.log("5224 posting rpc for mininng because 3 or more peers match tx ");
-                    console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-                    rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-                  },20000);
+                  if(chainStateMonitor.rpcBlock < chainState.topBlock){
+                    setTimeout(function(){
+                      console.log("5224 posting rpc for mininng because 3 or more peers match tx ");
+                      console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
+                      rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                      chainStateMonitor.rpcBlock = chainState.topBlock;
+                    },20000);
+                  }
                   cbReset();
                 })
 
@@ -5289,11 +5320,14 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
 
           }else{
             console.log(chalk.bgGreen.black.bold("THIS IS THE CASE YOU DID NOT SET"));
-            setTimeout(function(){
-              console.log("5237 posting rpc for mininng as else condition to thanks ");
-              console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-              rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-            },15000)
+            if(chainStateMonitor.rpcBlock < chainState.topBlock){
+              setTimeout(function(){
+                console.log("5237 posting rpc for mininng as else condition to thanks ");
+                console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
+                rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                chainStateMonitor.rpcBlock = chainState.topBlock;
+              },15000);
+            }
           }
         }
         postMiner();
