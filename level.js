@@ -2704,11 +2704,11 @@ var getStateTrieRootHash = function(){
 
 var createTransactionIndex = function(){
 
-  var txIndex = 25;
+  var txIndex = 0;
 
   db.get("txidx").then(function(txi){
 
-    if(txi > 1){
+    if(txi > 0){
       txIndex = txi
     }
 
@@ -2748,7 +2748,7 @@ var createTransactionIndex = function(){
 
   }).catch(function(error){
     console.log("you have no transaction records indexed creating index now");
-    db.put('txidx',1).then(function(){
+    db.put('txidx',0).then(function(){
       createTransactionIndex();
     })
 

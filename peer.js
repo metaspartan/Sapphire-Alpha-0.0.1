@@ -139,6 +139,7 @@ chainState.activeSynch = [];
 var chainStateMonitor = {};
 chainStateMonitor.peerCom = false;
 chainStateMonitor.rpcCom = false;
+chainStateMonitor.longPeerNonce = 0;
 chainStateMonitor.deletedPeers = [];
 chainStateMonitor.thanksCount = 0;
 chainStateMonitor.stuckPeers = [];//police my connections nodestatepong and synctrigger if needed
@@ -205,10 +206,10 @@ updatePeerTxHashArray = function(txHt,txHsh,increment,thanks){
         chainState.previousTxHeight = 0;
         chainState.previousTxHash = '';
         chainState.transactionHashWeights = [];
+        BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
         chainClipper(frankieCoin.blockHeight).then(function(){
           BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
         });
-        BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
         cbReset();
         //process.exit();//going to add to profess monitor in index
       }else{
@@ -407,8 +408,8 @@ var activeSync = function(timer){
 
         var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
-        if(nodeobj.longPeerNonce > chainState.topBlock){
-          chainState.topBlock = nodeobj.longPeerNonce;
+        if(nodeobj.longPeerNonce > chainState.topBlock || nodeobj.longPeerNonce > chainStateMonitor.longPeerNonce){
+          chainStateMonitor.longPeerNonce = nodeobj.longPeerNonce;
         }
 
         console.log(
@@ -448,7 +449,7 @@ var activeSync = function(timer){
     }
   }
   //in this case other peers reported a higher chain height in their clusters so we need to get there asap
-  if(chainState.topBlock > chainState.chainWalkHeight){
+  if(chainState.topBlock > chainState.chainWalkHeight || chainStateMonitor.longPeerNonce > chainState.chainWalkHeight){
     setTimeout(function(){
       activeSync();
       //cbReset();
@@ -2361,10 +2362,10 @@ var cbReset = async function(full = false){
             chainState.previousTxHeight = 0;
             chainState.previousTxHash = '';
             chainState.transactionHashWeights = [];
+            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
             chainClipper(frankieCoin.blockHeight).then(function(){
               BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
             });
-            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
             cbReset();
 
           }else if(JSON.parse(data)["fromAddress"]){
@@ -2405,10 +2406,10 @@ var cbReset = async function(full = false){
             chainState.previousTxHeight = 0;
             chainState.previousTxHash = '';
             chainState.transactionHashWeights = [];
+            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
             chainClipper(parseInt(frankieCoin.blockHeight - 1)).then(function(){
               BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
             });
-            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
             cbReset();
             //clipChainAt(parseInt(chainState.syncronized - 10))
 
@@ -3632,10 +3633,10 @@ function cliGetInput(){
       chainState.previousTxHeight = 0;
       chainState.previousTxHash = '';
       chainState.transactionHashWeights = [];
+      BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
       chainClipper(frankieCoin.blockHeight).then(function(){
         BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
       });
-      BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
       cbReset();
       cliGetInput();
     }else if(userInput == "CLIP2"){
@@ -4383,10 +4384,10 @@ var cbChainGrab = async function(data) {
             chainState.previousTxHeight = 0;
             chainState.previousTxHash = '';
             chainState.transactionHashWeights = [];
+            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
             chainClipper(frankieCoin.blockHeight).then(function(){
               BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
             });
-            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
             cbReset();
             //process.exit();//this is going to be added to the index.js process monitor
           }else if(allWaiting.length == 0){//only one peer left
@@ -4735,7 +4736,10 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
 
     log(chalk.blue("Current prev hash is: "+chalk.green(frankieCoin.getLatestBlock().hash)+"\nIncoming block previous hash is: "+JSON.parse(childData)["createBlock"]["block"]["previousHash"]));
 
-    if((frankieCoin.getLatestBlock().hash == JSON.parse(childData)["createBlock"]["block"]["previousHash"]) && JSON.parse(childData)["createBlock"]["block"]["timestamp"] != "1541437502148"){
+    if(
+        (frankieCoin.getLatestBlock().hash == JSON.parse(childData)["createBlock"]["block"]["previousHash"])
+        && JSON.parse(childData)["createBlock"]["block"]["timestamp"] != "1541437502148"
+      ){
       //block from miner is commmitted though internal miner - could chainge this to a direct call
 
       var deletedOrders = [];
@@ -5166,30 +5170,31 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         chainState.chainWalkHeight = frankieCoin.blockHeight;
         chainState.chainWalkHash = frankieCoin.getLatestBlock()["hash"];//block 1 hash
         chainState.synchronized = frankieCoin.blockHeight;//when we are synched at a block it gets updated
+
         chainState.topBlock = frankieCoin.blockHeight;
 
         //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
           calculateCheckPoints(frankieCoin.blockHeight,'miner','');
         //}
         ///////////////////////////////////////////////////////////peers broadcast
-        if(parseInt(chainState.peerNonce + 1) == frankieCoin.getLatestBlock().blockHeight){//peer state has not changed sunce block arrived
+        console.log("about to broadcast peers block parseInt(chainState.peerNonce + 1) "+parseInt(chainState.peerNonce + 1)+" frankieCoin.getLatestBlock().blockHeight "+frankieCoin.getLatestBlock().blockHeight+" parseInt(chainState.topBlock) "+parseInt(chainState.topBlock));
+        if(parseInt(chainState.peerNonce + 1) == frankieCoin.getLatestBlock().blockHeight && parseInt(chainStateMonitor.longPeerNonce) < frankieCoin.getLatestBlock().blockHeight){//peer state has not changed sunce block arrived
           fbroadcastPeersBlock('block','',deletedOrders);
         }else{
           //cant take any chances reset completely
           chainState.isMining = false;
-          /***
-          console.log("cliping chain from "+frankieCoin.blockHeight+" back one riser ");
+
+          console.log("MINED AN UNCLE AND CAUGHT IT BEFORE SEND OUT cliping chain from "+frankieCoin.blockHeight+" back one riser ");
           BlkDB.deleteTransactions();
           chainState.transactionHeight = 0;
           chainState.transactionRootHash = '';
           chainState.previousTxHeight = 0;
           chainState.previousTxHash = '';
           chainState.transactionHashWeights = [];
+          BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
           chainClipper(frankieCoin.blockHeight).then(function(){
             BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
           });
-          BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
-          ***/
           cbReset();
         }
         ////////////////////finally post the RPC get work block data for the miner
