@@ -371,11 +371,12 @@ var activeSync = function(timer){
   console.log(chalk.green("--------------------------------------------------------------------------------"));
   console.log(
     chalk(" ")+chalk.bgCyan.black("CwHt:")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight))+
-    chalk(" ")+chalk.bgCyan.black("longPrHt:")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+
     chalk(" ")+chalk.bgCyan.black("prvTxHt:")+chalk.bgMagenta(chainState.previousTxHeight)+chalk.bgMagenta.yellow(" "+chainState.previousTxHash.substring(0,8))+
     chalk(" ")+chalk.bgCyan.black("bcHT:")+chalk.bgMagenta(frankieCoin.blockHeight)+
     chalk(" ")+chalk.bgCyan.black("csSynced:")+chalk.bgMagenta(chainState.synchronized)+chalk.bgMagenta.yellow(" "+checkPointHashDisplay.substring(0,8))+
-    chalk(" ")+chalk.bgCyan.black("TopBlkHt:")+chalk.bgMagenta(chainState.topBlock)
+    chalk(" ")+chalk.bgCyan.black("TopBlkHt:")+chalk.bgMagenta(chainState.topBlock)+
+    chalk(" ")+chalk.bgCyan.black("longPrHt:")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+
+    chalk(" ")+chalk.bgCyan.black("CSMlongPr:")+chalk.bgMagenta(parseInt(chainStateMonitor.longPeerNonce))
   );
   console.log(
     chalk("       ")+chalk.bgCyan.black("PRNC:")+chalk.bgMagenta(displayPeerNonce)+
