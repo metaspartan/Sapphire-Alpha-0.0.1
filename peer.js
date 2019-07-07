@@ -1410,7 +1410,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       console.log("1289 NEITHER CASE WAS CALLED calling cbreset unless this cs peer nonce = 0 : "+chainState.peerNonce);
 
       if(chainState.peerNonce > 0){
-        cbReset();
+        setTimeout(function(){
+          cbReset();
+        },5000);
       }
 
     }
