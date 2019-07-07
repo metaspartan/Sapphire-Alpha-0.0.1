@@ -4762,7 +4762,10 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
     if(
         (frankieCoin.getLatestBlock().hash == JSON.parse(childData)["createBlock"]["block"]["previousHash"])
         && JSON.parse(childData)["createBlock"]["block"]["timestamp"] != "1541437502148"
+        && parseInt(frankieCoin.getLatestBlock().blockHeight) == chainStateMonitor.longPeerNonce
       ){
+
+      chainStateMonitor.longPeerNonce+=1;
       //block from miner is commmitted though internal miner - could chainge this to a direct call
 
       var deletedOrders = [];
@@ -5201,7 +5204,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         //}
         ///////////////////////////////////////////////////////////peers broadcast
         console.log("about to broadcast peers block parseInt(chainState.peerNonce + 1) "+parseInt(chainState.peerNonce + 1)+" frankieCoin.getLatestBlock().blockHeight "+frankieCoin.getLatestBlock().blockHeight+" parseInt(chainState.topBlock) "+parseInt(chainState.topBlock));
-        if(parseInt(chainState.peerNonce + 1) == frankieCoin.getLatestBlock().blockHeight && parseInt(chainStateMonitor.longPeerNonce) < frankieCoin.getLatestBlock().blockHeight){//peer state has not changed sunce block arrived
+        if(parseInt(chainState.peerNonce + 1) == frankieCoin.getLatestBlock().blockHeight && parseInt(chainStateMonitor.longPeerNonce) == frankieCoin.getLatestBlock().blockHeight){//peer state has not changed sunce block arrived
           fbroadcastPeersBlock('block','',deletedOrders);
         }else{
           //cant take any chances reset completely
