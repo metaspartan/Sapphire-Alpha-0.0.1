@@ -463,7 +463,7 @@ var activeSync = function(timer){
       //cbReset();
     },500)
   }
-  if(peersTransactionSynched > 3 && chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight < chainStateMonitor.longPeerNonce){
+  if(peersTransactionSynched > 3 && chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
     setTimeout(function(){
       console.log("450 posting rpc for mininng because 3 or more peers match tx ");
       console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
@@ -2315,7 +2315,7 @@ var cbReset = async function(full = false){
                           console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
 
                           //if(chainStateMonitor.rpcBlock < chainState.topBlock){
-                          if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight < chainStateMonitor.longPeerNonce){
+                          if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
                             rpcserver.postRPCforMiner({block:JSON.parse(data)["block"]});
                             chainStateMonitor.rpcBlock = chainState.topBlock;
                           }
@@ -4443,7 +4443,7 @@ var cbChainGrab = async function(data) {
             cleanUpWaitingRemoveLag().then(function(reply){
               if(reply == 0){
                 //if(chainStateMonitor.rpcBlock < chainState.topBlock){
-                if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight < chainStateMonitor.longPeerNonce){
+                if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
                   setTimeout(function(){
                     console.log("4387 posting rpc for mininng cleanUpWaitingRemoveLag reply 0 ");
                     console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
@@ -4454,7 +4454,7 @@ var cbChainGrab = async function(data) {
               }else if(reply > 1){
                 console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
                 //if(chainStateMonitor.rpcBlock < chainState.topBlock){
-                if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight < chainStateMonitor.longPeerNonce){
+                if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
                   setTimeout(function(){
                     console.log("4393 posting rpc for mininng cleanUpWaitingRemoveLag reply 1 to 3 ");
                     console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
@@ -4497,7 +4497,7 @@ var cbChainGrab = async function(data) {
               allWaiting = [];
               allWaitingLength = 0;
               //if(chainStateMonitor.rpcBlock < chainState.topBlock){
-              if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight < chainStateMonitor.longPeerNonce){
+              if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
                 setTimeout(function(){
                   console.log("4406 posting rpc for mininng cleanUpWaitingRemoveLag errors ");
                   console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
@@ -4513,7 +4513,7 @@ var cbChainGrab = async function(data) {
               console.log("4415 posting rpc for mininng because 3 or more peers match tx ");
               console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
               //if(chainStateMonitor.rpcBlock < chainState.topBlock){
-              if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight < chainStateMonitor.longPeerNonce){
+              if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
                 rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                 chainStateMonitor.rpcBlock = chainState.topBlock;
               }
@@ -4530,7 +4530,7 @@ var cbChainGrab = async function(data) {
         console.log("4424 posting rpc for mininng this one is called on startup ");
         console.log(chainStateMonitor)
         console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-        if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight < chainStateMonitor.longPeerNonce){
+        if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
           rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
           chainStateMonitor.rpcBlock = chainState.topBlock;
         }
@@ -5307,7 +5307,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                 cleanUpWaitingRemoveLag().then(function(reply){
                   if(reply == 0 || reply == 1){
                     //if(chainStateMonitor.rpcBlock < chainState.topBlock){
-                    if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight < chainStateMonitor.longPeerNonce){
+                    if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
                       setTimeout(function(){
                         console.log("5182 posting rpc for mininng because 3 or more peers match tx ");
                         console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
@@ -5318,7 +5318,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                   }else if(reply > 1){
                     console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
                     //if(chainStateMonitor.rpcBlock < chainState.topBlock){
-                    if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight < chainStateMonitor.longPeerNonce){
+                    if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
                       setTimeout(function(){
                         console.log("5187 posting rpc for mininng because 3 or more peers match tx ");
                         console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
@@ -5361,7 +5361,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                   allWaitingLength = 0;
                   //want to count the returns here
                   //if(chainStateMonitor.rpcBlock < chainState.topBlock){
-                  if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight < chainStateMonitor.longPeerNonce){
+                  if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
                     setTimeout(function(){
                       console.log("5224 posting rpc for mininng because 3 or more peers match tx ");
                       console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
@@ -5379,7 +5379,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           }else{
             console.log(chalk.bgGreen.black.bold("THIS IS THE CASE YOU DID NOT SET"));
             //if(chainStateMonitor.rpcBlock < chainState.topBlock){
-            if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight < chainStateMonitor.longPeerNonce){
+            if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
               setTimeout(function(){
                 console.log("5237 posting rpc for mininng as else condition to thanks ");
                 console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
