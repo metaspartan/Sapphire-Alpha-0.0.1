@@ -1650,7 +1650,7 @@ var addOrdersFromStream = async function(orders,blockhash,blknum,block,cbUpdateC
 
   var hexBlockNum = ("000000000000000" + blknum.toString(16)).substr(-16);
 
-  console.log(orders+" <--"+typeof(orders))
+  //console.log(orders+" <--"+typeof(orders))
 
   for(var key in orders) {
     if(orders.hasOwnProperty(key)){
