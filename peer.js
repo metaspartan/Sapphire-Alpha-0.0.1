@@ -543,7 +543,7 @@ var adjustedTimeout = function() {
     if(chainStateMonitor.isOxValidationRunning == false && chainState.transactionHeight == chainState.chainWalkHeight && chainState.chainWalkHeight > 1){
       oxSynch();
     }
-    console.log("lower in else slow counter is "+slowCounter)
+    console.log("lower in else slow counter is "+slowCounter+" isOxValidationRunning "+chainStateMonitor.isOxValidationRunning)
     if((slowCounter % 4) == 0){
       activeSync(parseInt(timerInterval+(slowCounter*23)));
       activePing(parseInt(timerInterval+(slowCounter*21)));
@@ -1450,7 +1450,7 @@ var transactionValidator = async function(start,end,or = false){
 
   if(chainState.peerNonce > chainState.chainWalkHeight){
     console.log(chalk.bgRed.white(" transactionValidator called before chain height is up break"));
-    chainStateMonitor.isTxValidationRunning = false
+    chainStateMonitor.isTxValidationRunning = false;
     return;
   }
 
@@ -1542,11 +1542,13 @@ var transactionValidator = async function(start,end,or = false){
 ///////////////////////////////////////////////////////////TRANSACTION VALIDATOR
 
 ////////////////////////////////////////////////////////////////order validation
-var orderValidator = async function(start,end){
+var orderValidator = async function(start,end,or = false){
 
-  if(chainStateMonitor.isOxValidationRunning == true){
+  if(chainStateMonitor.isOxValidationRunning == true && or == false){
     console.log(" orderValidator already running break");
     return;
+  }else{
+    chainStateMonitor.isOxValidationRunning = true
   }
 
   var cbCheckChainStateOX = async function(csOrderHeight){
@@ -1611,11 +1613,11 @@ var orderValidator = async function(start,end){
           await BlkDB.addOrdersFromStream(JSON.parse(thisOneBlock)["orders"],JSON.parse(thisOneBlock)["hash"],JSON.parse(thisOneBlock)["blockHeight"],thisOneBlock,updateChainStateOX,thisBlockCheckPointHash,JSON.parse(thisOneBlock)["transactions"])
           start++;
           if(start == end){
-            chainStateMonitor.isOxValidationRunning == false
+            chainStateMonitor.isOxValidationRunning = false;
             console.log("orderValidator break clause reached at "+end);
             return;
           }else{
-            orderValidator(start,end)
+            orderValidator(start,end,true)
           }
 
         }
