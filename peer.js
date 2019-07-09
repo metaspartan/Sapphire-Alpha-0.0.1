@@ -1347,19 +1347,21 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           if(tobj && tobj.info){
             console.log(tobj.info.ip)
           }
-          let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
-          if(rnod){
-            if(rnod.nodeType > 1){
-              console.log(chalk.bgCyan.black("1227 well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
+          if(chainState.activeSynch.receive){
+            let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
+            if(rnod){
+              if(rnod.nodeType > 1){
+                console.log(chalk.bgCyan.black("1227 well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
+                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                called = true;
+                localTempNode.random = "yes";
+              }
+            }else{
+              console.log(chalk.bgCyan.black("1233 well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
               peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
               called = true;
               localTempNode.random = "yes";
             }
-          }else{
-            console.log(chalk.bgCyan.black("1233 well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
-            called = true;
-            localTempNode.random = "yes";
           }
         }else if(called == false && peers[id] && (replyData+1) < chainState.peerNonce){
         //}else if(peers[id]){
@@ -1390,19 +1392,21 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               localTempNode.random = "no";
             }
           }else if(parseInt(replyData+1) == parseInt(chainState.synchronized)){
-            let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
-            if(rnod){
-              if(rnod.nodeType > 1){
-                console.log(chalk.bgCyan.black("1264 well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)));
+            if(chainState.activeSynch.receive){
+              let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
+              if(rnod){
+                if(rnod.nodeType > 1){
+                  console.log(chalk.bgCyan.black("1264 well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)));
+                  peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                  called = true;
+                  localTempNode.random = "no";
+                }
+              }else{
+                console.log(chalk.bgCyan.black("1270 well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
                 peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                 called = true;
                 localTempNode.random = "no";
               }
-            }else{
-              console.log(chalk.bgCyan.black("1270 well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
-              peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
-              called = true;
-              localTempNode.random = "no";
             }
           }else{
             console.log("1276 cb reset called")
