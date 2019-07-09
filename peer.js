@@ -445,7 +445,7 @@ var activeSync = function(timer){
               chainStateMonitor.stuckPeers.splice(item,1);
             }
           }
-        }else if(nodeobj.peerTxHeight = chainState.synchronized && chainState.chainWalkHeight > 1){
+        }else if(nodeobj.peerTxHeight == chainState.synchronized && chainState.chainWalkHeight > 1){
           peersTransactionSynched+=1;
         }
         if(nodeobj.peerOXHeight > chainState.orderHeight){
@@ -478,7 +478,7 @@ var activeSync = function(timer){
 var tranSynch = function(){
   var startEnd = parseInt(chainState.transactionHeight+1);
   var topEnd = parseInt(startEnd+500);
-  //console.log("want to call TXVLDY with start "+startEnd+" and top "+topEnd+" and syncronized "+chainState.synchronized)
+  console.log("want to call TXVLDY with start "+startEnd+" and top "+topEnd+" and syncronized "+chainState.synchronized+" is already running "+chainStateMonitor.isTxValidationRunning);
   if(topEnd >= chainState.synchronized){
     topEnd = chainState.synchronized
   }
@@ -557,7 +557,8 @@ var adjustedTimeout = function() {
     slowCounter = 1;
   }
 }
-setTimeout(adjustedTimeout, chainState.interval);
+//I cannot call this here as it conflicts so calling lower in start up stuff
+//setTimeout(adjustedTimeout, chainState.interval);
 
 var activePing = function(timer){
   //we should get longestPeer first
@@ -1266,14 +1267,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
   }else if(isValid == false && replyData == chainState.peerNonce && replyData > chainState.transactionHeight){
 
     //here we might try calling the tx validator
-    var startEnd = parseInt(chainState.transactionHeight+1);
-    var topEnd = parseInt(startEnd+500);
-    console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
-    if(topEnd >= chainState.synchronized){
-      topEnd = chainState.synchronized
-    }
-    //lets move this to a trnssync call TWO
-    //transactionValidator(parseInt(startEnd),parseInt(topEnd));
+    tranSynch();
 
   }else if(replyData == "NaN"){
     console.log("chain walk height is WHAT FUNCTION TO RUN HERE "+chainState.chainWalkHeight);
@@ -1438,15 +1432,21 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 /////////////////////////////////////////////////////////////END CHAIN VALIDATOR
 
 ///////////////////////////////////////////////////////////TRANSACTION VQLIDATOR
-var transactionValidator = async function(start,end){
+var transactionValidator = async function(start,end,or = false){
 
-  if(chainStateMonitor.isTxValidationRunning == true){
+  //console.log("transaction validator called start "+start+" end "+end+" chainstate trasnaction height "+chainState.transactionHeight);
+  //console.log("tx is already running "+chainStateMonitor.isTxValidationRunning);
+
+  if(chainStateMonitor.isTxValidationRunning == true && or == false){
     console.log(" transactionValidator already running break");
     return;
+  }else{
+    chainStateMonitor.isTxValidationRunning = true
   }
 
   if(chainState.peerNonce > chainState.chainWalkHeight){
     console.log(chalk.bgRed.white(" transactionValidator called before chain height is up break"));
+    chainStateMonitor.isTxValidationRunning = false
     return;
   }
 
@@ -1512,11 +1512,11 @@ var transactionValidator = async function(start,end){
           await BlkDB.addTransactionsFromStream(JSON.parse(thisOneBlock)["transactions"],JSON.parse(thisOneBlock)["hash"],JSON.parse(thisOneBlock)["blockHeight"],thisOneBlock,updateChainStateTX,thisBlockCheckPointHash)
           start++;
           if(start == end){
-            chainStateMonitor.isTxValidationRunning == false
+            chainStateMonitor.isTxValidationRunning = false
             console.log("transactionValidator break clause reached at "+end);
             return;
           }else{
-            transactionValidator(start,end)
+            transactionValidator(start,end,true)
           }
 
         }
@@ -2349,12 +2349,7 @@ var cbReset = async function(full = false){
               console.log("this node sent in a treansaction height of "+JSON.parse(data)["currentTransactionHeight"]);
               console.log("one of you needs to sync your transactions I will trigger yours");
 
-              var startEnd = parseInt(chainState.transactionHeight+1);
-              var topEnd = parseInt(startEnd+500);
-              console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
-              if(topEnd >= chainState.synchronized){
-                topEnd = chainState.synchronized
-              }
+              tranSynch();
 
               //lets move this to a trnssync call THREE
               //transactionValidator(parseInt(startEnd),parseInt(topEnd));
@@ -4346,6 +4341,7 @@ var callBackEntireDatabase = function(data){
 
 //the idea is to sync the chain data before progression so we start with a callback of data store limited by number of blocks
 var cbChainGrab = async function(data) {
+
   console.log("chain grab callback...")
   //log('got data: '+data.toString());//test for input
 
@@ -4364,7 +4360,7 @@ var cbChainGrab = async function(data) {
     }else{
       //block existed
       //log("block exists in chain data: "+JSON.parse(data[obj])["blockHeight"]);
-      //frankieCoin.blockHeight = parseInt(JSON.parse(data[obj])["blockHeight"]);
+      frankieCoin.blockHeight = parseInt(JSON.parse(data[obj])["blockHeight"]);
     }
     blockHeightPtr++;
   }
@@ -4552,11 +4548,13 @@ var cbChainGrab = async function(data) {
 function ChainGrab(blocknum){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
   //BlkDB.getBlockchain(99,cbChainGrab,globalGenesisHash)
+
   var currentHeight = function(val){
     console.log("this is what we called "+val);
     BlkDB.getBlockRange(val,frankieCoin.chainRiser,cbChainGrab)
   }
   BlkDB.getChainStateParam("blockHeight",currentHeight);
+
   var resetTransactionHeight = function(val){
     console.log(chalk.bgGreen("in chain grab setting transaction state based on "+val))
     if(val != 0){
@@ -4564,6 +4562,7 @@ function ChainGrab(blocknum){
     }
   }
   BlkDB.getChainStateParam("transactionHeight",resetTransactionHeight);
+
   var resetOrderHeight = function(val){
     console.log(chalk.bgGreen("in chain grab setting transaction state based on "+val))
     if(val != 0){
@@ -4572,8 +4571,10 @@ function ChainGrab(blocknum){
   }
   BlkDB.getChainStateParam("orderHeight",resetOrderHeight);
 
+  setTimeout(adjustedTimeout, 10000);
   //maybe some other stuff like .then
 };
+
 function ChainGrabRefresh(blocknum,cbChainGrab,chainRiser){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
   console.log("called chain grab refresh with blockNum "+blocknum+" chainRiser "+chainRiser)
