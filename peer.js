@@ -476,7 +476,7 @@ var activeSync = function(timer){
 }
 
 var tranSynch = function(){
-  var startEnd = parseInt(chainState.transactionHeight+1);
+  var startEnd = parseInt(parseInt(chainState.transactionHeight)+1);
   var topEnd = parseInt(startEnd+500);
   if(topEnd >= chainState.synchronized){
     topEnd = chainState.synchronized
@@ -487,7 +487,7 @@ var tranSynch = function(){
 }
 
 var oxSynch = function(){
-  var startEnd = parseInt(chainState.orderHeight+1);
+  var startEnd = parseInt(parseInt(chainState.orderHeight)+1);
   var topEnd = parseInt(startEnd+500);
   //console.log("want to call OXVLDY with start "+startEnd+" and top "+topEnd+" and syncronized "+chainState.synchronized)
   if(topEnd >= chainState.synchronized){
@@ -4553,23 +4553,43 @@ var cbChainGrab = async function(data) {
 
 };
 //a function call for datastore
-function ChainGrab(blocknum){
+async function ChainGrab(blocknum){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
   //BlkDB.getBlockchain(99,cbChainGrab,globalGenesisHash)
+  function chainHeight() {
+    return new Promise(resolve => {
+      var currentHeight = async function(val){
+        console.log("this is what we called "+val);
 
-  var currentHeight = function(val){
-    console.log("this is what we called "+val);
-    BlkDB.getBlockRange(val,frankieCoin.chainRiser,cbChainGrab)
-  }
-  BlkDB.getChainStateParam("blockHeight",currentHeight);
+        function transactionHeight() {
+          return new Promise(resolve => {
+            var resetTransactionHeight = function(val){
+              console.log(chalk.bgGreen("in chain grab setting transaction state based on "+val))
+              resolve(() => {
+                if(val != 0){
+                  setChainStateTX(val.split(":")[0],val.split(":")[1]);
+                }
+              })
+            }
 
-  var resetTransactionHeight = function(val){
-    console.log(chalk.bgGreen("in chain grab setting transaction state based on "+val))
-    if(val != 0){
-      setChainStateTX(val.split(":")[0],val.split(":")[1]);
-    }
+            BlkDB.getChainStateParam("transactionHeight",resetTransactionHeight)
+
+          });
+        }
+
+        await transactionHeight();
+
+        resolve(
+          BlkDB.getBlockRange(val,frankieCoin.chainRiser,cbChainGrab)
+        )
+      }
+      BlkDB.getChainStateParam("blockHeight",currentHeight);
+    });
   }
-  BlkDB.getChainStateParam("transactionHeight",resetTransactionHeight);
+
+  await chainHeight();
+
+
 
   var resetOrderHeight = function(val){
     console.log(chalk.bgGreen("in chain grab setting transaction state based on "+val))
@@ -4597,11 +4617,11 @@ isSynching = true;
 
 console.log("calling chain grab 4568 startup")
 setTimeout(function(){ChainGrab();},3000);
-/*-------THE DYNC CALLS ON STARTUP---------------*/
+/*-------THE SYNC CALLS ON STARTUP---------------*/
 
 //end by now we will know if synched or not and enable or disable mining
 log("------------------------------------------------------")
-log(chalk.green("CHAIN SYNCED"))//not true need to edit this comment based on a parameter
+log(chalk.green("CHAIN STARTUP ROUTINE"));
 log("------------------------------------------------------")
 /////////////////////////////////////////////////////////////END synch the chain
 
