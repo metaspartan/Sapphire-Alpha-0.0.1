@@ -478,10 +478,10 @@ var activeSync = function(timer){
 var tranSynch = function(){
   var startEnd = parseInt(chainState.transactionHeight+1);
   var topEnd = parseInt(startEnd+500);
-  console.log("want to call TXVLDY with start "+startEnd+" and top "+topEnd+" and syncronized "+chainState.synchronized+" is already running "+chainStateMonitor.isTxValidationRunning);
   if(topEnd >= chainState.synchronized){
     topEnd = chainState.synchronized
   }
+  console.log("want to call TXVLDY with start "+startEnd+" and top "+topEnd+" and syncronized "+chainState.synchronized+" is already running "+chainStateMonitor.isTxValidationRunning);
 
   transactionValidator(parseInt(startEnd),parseInt(topEnd));
 }
@@ -1527,7 +1527,8 @@ var transactionValidator = async function(start,end,or = false){
         BlkDB.getBlock(calcCheckPointBlock,returnCheckPointBlock);
         //console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
       }else{
-        //console.log("tx validator start was greater than or equal to end so just look at chain state hash")
+        chainStateMonitor.isTxValidationRunning = false;
+        console.log("tx validator start was greater than or equal to end so just look at chain state hash");
       }
 
     }else if(csTransactionHeight.split(":")[0] == end){
@@ -1624,7 +1625,8 @@ var orderValidator = async function(start,end,or = false){
         BlkDB.getBlock(calcCheckPointBlock,returnCheckPointBlock);
         //console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
       }else{
-        //console.log("order validator start was greater than or equal to end so just look at chain state hash")
+        chainStateMonitor.isOxValidationRunning = false;
+        console.log("order validator start was greater than or equal to end so just look at chain state hash");
       }
 
     }else if(csOrderHeight.split(":")[0] == end){
