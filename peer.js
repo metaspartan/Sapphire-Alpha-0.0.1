@@ -620,8 +620,6 @@ var activePing = function(timer){
             }
         },timer)
       }
-
-
     }
   }
   //console.log(nodesInChain);
@@ -1362,6 +1360,12 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               called = true;
               localTempNode.random = "yes";
             }
+          }else{
+            console.log("perhaps we should call the ping here because there is no activeSynch.receive yet")
+            console.log(chalk.bgCyan.black("1367 well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
+            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+            called = true;
+            localTempNode.random = "yes";
           }
         }else if(called == false && peers[id] && (replyData+1) < chainState.peerNonce){
         //}else if(peers[id]){
@@ -1422,12 +1426,14 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     chainState.activeSynch = {"send":tempNodeCallBucket,"receive":oldChainStateActiveSync.receive};
     //finally if neither was called should I make a move here?
     if(called == false){//might leave this might change to activeSync
-      console.log("1289 NEITHER CASE WAS CALLED calling cbreset unless this cs peer nonce = 0 : "+chainState.peerNonce);
+      console.log("1289 NEITHER CASE WAS CALLED calling cbreset unless this cs peer nonce = 0 or 1 : "+chainState.peerNonce);
 
-      if(chainState.peerNonce > 0){
+      if(chainState.peerNonce > 1){
         setTimeout(function(){
           cbReset();
         },5000);
+      }else{
+        activePing(10);
       }
 
     }
