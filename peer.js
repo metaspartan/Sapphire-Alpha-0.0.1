@@ -631,7 +631,7 @@ var activePing = function(timer){
       frankieCoin.longestPeerBlockHeight = longestPeer;
     }
   }
-  if(chainState.synchronized > longestPeer){
+  if(chainState.synchronized > longestPeer && chainState.synchronized > chainStateMonitor.longPeerNonce){
     console.log(chalk.yellow("---------------------------------------------------------------"));
     console.log(chalk.red("peer stats indicate you are ahead of network or are starting up"));
     console.log(chalk.yellow("---------------------------------------------------------------"));
