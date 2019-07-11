@@ -510,7 +510,7 @@ var adjustedTimeout = function() {
     //console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     //console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync(parseInt(timerInterval+(slowCounter*79)));
-    //activePing();
+    activePing(10);
     slowCounter++;
   }else if((slowCounter % 4) == 0){//need a different trigger for transaction sync but for now ok
     if(chainStateMonitor.isTxValidationRunning == false && chainState.chainWalkHeight > 1){
@@ -533,7 +533,7 @@ var adjustedTimeout = function() {
   }else if(isSynching == false && chainState.isSynching == false && slowCounter < 10){
     console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching+" and slow counter = "+slowCounter);
     //console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
-    activeSync(parseInt(timerInterval+(slowCounter*35)));
+    setTimeout(function(){activeSync(parseInt(timerInterval+(slowCounter*35)))},1000);
     activePing(parseInt(timerInterval+(slowCounter*37)));
     slowCounter++;
   }else{
@@ -545,8 +545,10 @@ var adjustedTimeout = function() {
     }
     console.log("lower in else slow counter is "+slowCounter+" isOxValidationRunning "+chainStateMonitor.isOxValidationRunning)
     if((slowCounter % 4) == 0){
-      activeSync(parseInt(timerInterval+(slowCounter*23)));
       activePing(parseInt(timerInterval+(slowCounter*21)));
+    }
+    if((slowCounter % 3) == 0){
+      activeSync(parseInt(timerInterval+(slowCounter*23)));
     }
     slowCounter++;
     //console.log("chain is not synching so is it sync? ")
@@ -561,6 +563,7 @@ var adjustedTimeout = function() {
 //setTimeout(adjustedTimeout, chainState.interval);
 
 var activePing = function(timer){
+
   //we should get longestPeer first
   console.log(chalk.bgRed("AP TIMER "+timer))
   var nodesInChain = frankieCoin.retrieveNodes();
@@ -571,7 +574,7 @@ var activePing = function(timer){
       var pingCaller = true;
       for(aId in chainState.activeSynch.receive){
         if(chainState.activeSynch.receive[aId].peer == id && chainState.activeSynch.receive[aId].nodeType > 1){
-          //console.log("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType);
+          //console.log(chalk.bgCyan.black.bold("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType));
           setTimeout(function(){
             if(peers[id] && peers[id].conn != undefined){
               peers[id].conn.write(JSON.stringify(
@@ -598,6 +601,7 @@ var activePing = function(timer){
       }
 
       if(pingCaller){
+        //console.log(chalk.bgCyan.black.bold("is this one ever firing? "));
         setTimeout(function(){
           if(peers[id] && peers[id].conn != undefined){
             peers[id].conn.write(JSON.stringify(
@@ -676,7 +680,7 @@ var activePing = function(timer){
   }
 
   if(chainState.isSynching == false){//keep in touch
-    //console.log("is synching is FALSE");
+    console.log("is synching is FALSE active ping was called tho");
     for(peer in frankieCoin.nodes){
 
     }
@@ -1078,7 +1082,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     chainState.chainWalkHash = replyHash;
     chainState.topBlock = replyData;
 
-    //console.log("VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
+    console.log("VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
 
     //i just set the chainWalkHeight from reply data so ofc that part is equal verify why written this way
     if( (parseInt(replyData) == parseInt(chainState.chainWalkHeight)) && (parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight) ) ){
@@ -1086,9 +1090,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       //BlkDB.addTransactionsFromStream(JSON.parse(blockData)["transactions"],JSON.parse(blockData)["hash"],JSON.parse(blockData)["blockHeight"])
       chainState.synchronized = parseInt(replyData);
     }else{
-      //console.log("do we enter the else ? ");
+      console.log("do we enter the else ? ");
       //console.log(parseInt(replyData) == parseInt(chainState.chainWalkHeight) == parseInt(frankieCoin.blockHeight));
-      //console.log("AND THE VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
+      console.log("AND THE VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
     }
 
     //console.log(chalk.black.bgCyan("BLOCK HEIGHT VALIDATED TO (CW PEER VERSION)")+chalk.bgMagenta(replyData),chalk.bgBlue(replyHash));
