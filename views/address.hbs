@@ -3,7 +3,7 @@
 
 <script>
   var callMe = function(myval){
-   window.location.href = '/address?theValue='+myval;
+   window.location.href = '/address?theValue='+myval+'&start='+start;
   }
 </script>
 
@@ -29,8 +29,8 @@
     {{#each txCollection}}
 
         <tr>
-          <td><span class="title-span">From:</span></td><td><a href="/address?theValue={{fromAddress}}">{{fromAddress}}</a></td>
-          <td><span class="title-span">To:</span></td><td><a href="/address?theValue={{toAddress}}">{{toAddress}}</a></td>
+          <td><span class="title-span">From:</span></td><td><a href="/address?theValue={{fromAddress}}&start=1">{{fromAddress}}</a></td>
+          <td><span class="title-span">To:</span></td><td><a href="/address?theValue={{toAddress}}&start=1">{{toAddress}}</a></td>
           <td><span class="title-span">Ticker:</span></td><td>{{ticker}}</td>
           <td><span class="title-span">Amount:</span></td><td>{{amount}}</td>
           <!--<td><span class="title-span">Hash:</span></td><td><a href="/address?theValue={{hash}}">{{hash}}</a></td>-->
