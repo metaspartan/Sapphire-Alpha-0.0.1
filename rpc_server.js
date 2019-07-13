@@ -251,13 +251,20 @@ function requestListener(request, response) {
           //doEet = true;
           var canMine = thisNodeCanMine();
           console.log("canMine = "+canMine);
-          if(canMine.split(":")[0] == canMine.split(":")[1] && canMine.split(":")[1] == canMine.split(":")[2] && canMine.split(":")[3] > 2){
+          if(
+            canMine.split(":")[0] == canMine.split(":")[1]
+            && canMine.split(":")[1] == canMine.split(":")[2]
+            && canMine.split(":")[3] > 2
+            && canMine.split(":")[4] <= canMine.split(":")[0]
+            //&& true == false//obviously used for testing
+          ){
+            console.log(chalk.bgWhite.green.bold("mining enabled from RPC"));
             closeExplorer();//closes the explorer port on 3003
             isMining = true;//restricts the methods to only call getWork on this page
           }else{
             console.log(chalk.bgRed.white("note from RPC this node is not sync to mine we should call active sync processes"));
             closePort();
-            setTimeout(function(){openPort(),15000})
+            //setTimeout(function(){openPort(),15000})
             isMining = false;
           }
           //this signifies that this is a miner and we need to turn off explorer and other RPC for orders and such

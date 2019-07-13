@@ -5717,10 +5717,10 @@ var impcevent = function(callback){
 }
 //this is a function to turn off excess communications to miners
 var thisNodeCanMine = function(){
-  return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":"+frankieCoin.nodes.length;
+  return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":"+frankieCoin.nodes.length+":"+chainStateMonitor.longPeerNonce;
 }
 var thisNodeIsMininig = function(){
-  ExPl.closeExplorer;
+  ExPl.closeExplorer();
   chainState.isMining = true;
   nodeType.current = 1;
 }
