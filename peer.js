@@ -689,6 +689,47 @@ var activePing = function(timer){
   }
 }
 
+var minerPing = function(){
+
+  //we should get longestPeer first
+  console.log(chalk.bgBlue("MINER PING "))
+  var nodesInChain = frankieCoin.retrieveNodes();
+  for (let id in peers) {
+    if(peers[id].conn != undefined){
+
+      //this ping is specifically for miners
+      for(aId in chainState.activeSynch.receive){
+        if(chainState.activeSynch.receive[aId].peer == id && chainState.activeSynch.receive[aId].nodeType == 1){
+          //console.log(chalk.bgCyan.black.bold("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType));
+          setTimeout(function(){
+            if(peers[id] && peers[id].conn != undefined){
+              peers[id].conn.write(JSON.stringify(
+                {"nodeStatePing":{
+                  Height:parseInt(chainState.synchronized),
+                  MaxHeight:parseInt(chainState.synchronized),
+                  PeerNonce:parseInt(chainState.peerNonce),
+                  GlobalHash:globalGenesisHash,
+                  checkPointHash:chainState.checkPointHash,
+                  currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+                  transactionHeight:chainState.transactionHeight,
+                  transactionRootHash:chainState.transactionRootHash,
+                  orderHeight:chainState.orderHeight,
+                  orderRootHash:chainState.orderRootHash,
+                  prevTxHeight:chainState.previousTxHeight,
+                  previousTxHash:chainState.previousTxHash,
+                  NodeType:nodeType.current,
+                  utcTimeStamp:parseInt(new Date().getTime()/1000)
+                }}));
+            }
+          },100)
+          console.log(chalk.bgBlue("MINER PING FIRED OFF "))
+        }
+      }
+    }
+  }
+
+}
+
 var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
 
     if(blockNum > frankieCoin.chainRiser){
@@ -5300,7 +5341,10 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           //cant take any chances reset completely
           chainState.isMining = false;
 
-          console.log("MINED AN UNCLE AND CAUGHT IT BEFORE SEND OUT cliping chain from "+frankieCoin.blockHeight+" back one riser ");
+          console.log(chalk.bgRed.white("MINED AN UNCLE AND CAUGHT IT BEFORE SEND OUT cliping chain from "+frankieCoin.blockHeight+" back one riser "));
+          console.log(chalk.bgRed.white("MINED AN UNCLE AND CAUGHT IT BEFORE SEND OUT cliping chain from "+frankieCoin.blockHeight+" back one riser "));
+          console.log(chalk.bgRed.white("MINED AN UNCLE AND CAUGHT IT BEFORE SEND OUT cliping chain from "+frankieCoin.blockHeight+" back one riser "));
+
           BlkDB.deleteTransactions();
           chainState.transactionHeight = 0;
           chainState.transactionRootHash = '';
@@ -5309,15 +5353,17 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
           chainState.transactionHashWeights = [];
           BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
           chainClipper(frankieCoin.blockHeight).then(function(){
-            console.log("calling brv line 5743");
+            console.log("calling brv line 5316");
             BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
           });
           cbReset();
+          return;
         }
         ////////////////////finally post the RPC get work block data for the miner
         var countPostMinerCalled = 0;
         var postMiner = async function(){
-          console.log(chalk.bgRed("POSTING FOR RPC and how many peers are we waiting on? "+allWaiting.length))
+          console.log(chalk.bgBlue.white("LOOKING FOR THANK YOU BEFORE POSTING RPC and waiting on ? "+allWaiting.length+" peers to reply "));
+          console.log(chalk.bgWhite.red.bold(" thanks count is "+chainStateMonitor.thanksCount));
           if(allWaiting.length > 0){
 
             setTimeout(function(){
@@ -5339,6 +5385,14 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                   setTimeout(function(){cbReset();},1000);
 
                 }
+
+              }else if(chainStateMonitor.thanksCount == 0){
+
+                console.log(chalk.bgMagenta.white.bold(" WE HAVE NO THANK YOUS ")+chalk.bgRed.white.bold(" WE WANT TO WAIT UNTIL ACTIVE SYNC RESETS MINING "));
+                chainState.isMining = false;//until we set it to true
+                allWaiting = [];
+                allWaitingLength = 0;
+                setTimeout(function(){cbReset();},200);
 
               }else{
 
@@ -5454,7 +5508,9 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
     process.stdout.clearLine();
     process.stdout.cursorTo(0);
     process.stdout.write(chalk.green("work returned to miner"));
-    log(JSON.parse(childData)["getWorkForMiner"])
+    log(JSON.parse(childData)["getWorkForMiner"]);
+    //what we really want is an active ping to miners only
+    minerPing();
   }else if(isJSON(childData) && JSON.parse(childData)["getOrderBook"]){
     log("now we are gonna have some fun")
     impceventcaller("returning from function","maybe the calling peer is not necessary");
@@ -5717,6 +5773,7 @@ var impcevent = function(callback){
 }
 //this is a function to turn off excess communications to miners
 var thisNodeCanMine = function(){
+  minerPing();
   return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":"+frankieCoin.nodes.length+":"+chainStateMonitor.longPeerNonce;
 }
 var thisNodeIsMininig = function(){
