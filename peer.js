@@ -350,7 +350,7 @@ var activeSync = function(timer){
   }else if( parseInt(chainState.chainWalkHeight) < parseInt(chainState.peerNonce) ){
     //setTimeout(function(){
       console.log("calling brv line 352");
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
     //},timer)
   }else if( parseInt(chainState.chainWalkHeight) < parseInt(chainStateMonitor.longPeerNonce) ){
     if( parseInt(chainState.chainWalkHeight) == parseInt(chainState.peerNonce) ){
@@ -392,15 +392,15 @@ var activeSync = function(timer){
     chalk(" ")+chalk.bgCyan.black("CwHt:")+chalk.bgMagenta(parseInt(chainState.chainWalkHeight))+
     chalk(" ")+chalk.bgCyan.black("prvTxHt:")+chalk.bgMagenta(chainState.previousTxHeight)+chalk.bgMagenta.yellow(" "+chainState.previousTxHash.substring(0,8))+
     chalk(" ")+chalk.bgCyan.black("bcHT:")+chalk.bgMagenta(frankieCoin.blockHeight)+
-    chalk(" ")+chalk.bgCyan.black("csSynced:")+chalk.bgMagenta(chainState.synchronized)+chalk.bgMagenta.yellow(" "+checkPointHashDisplay.substring(0,8))+
     chalk(" ")+chalk.bgCyan.black("TopBlkHt:")+chalk.bgMagenta(chainState.topBlock)+
     chalk(" ")+chalk.bgCyan.black("longPrHt:")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+
     chalk(" ")+chalk.bgCyan.black("CSMlongPr:")+chalk.bgMagenta(parseInt(chainStateMonitor.longPeerNonce))
   );
   console.log(
     chalk("       ")+chalk.bgCyan.black("PRNC:")+chalk.bgMagenta(displayPeerNonce)+
-    chalk("                                           ")+
-    chalk.bgCyan.black("TxHt:")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgMagenta.yellow(" "+chainState.transactionRootHash.substring(0,8))+
+    chalk("                   ")+
+    chalk(" ")+chalk.bgCyan.black("csSynced:")+chalk.bgMagenta(chainState.synchronized)+chalk.bgMagenta.yellow(" "+checkPointHashDisplay.substring(0,8))+
+    chalk(" ")+chalk.bgCyan.black("TxHt:")+chalk.bgMagenta(chainState.transactionHeight)+chalk.bgMagenta.yellow(" "+chainState.transactionRootHash.substring(0,8))+
     chalk(" ")+chalk.bgCyan.black("OxHt:")+chalk.bgMagenta(chainState.orderHeight)+chalk.bgMagenta.yellow(" "+chainState.orderRootHash.substring(0,8))+
     chalk(" ")+chalk.bgCyan.black("peers:")+chalk.bgMagenta(frankieCoin.nodes.length)
   );
