@@ -1464,8 +1464,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               }
             }
           }else{
-            console.log("1276 cb reset called")
-            cbReset();
+            console.log("1276 reply data +1 called")
+            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+            //console.log("1276 cb reset called")
+            //cbReset();
           }
 
         }
