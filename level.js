@@ -867,7 +867,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
                 //console.log(" YES THIS IS MY CHECK cs:"+parseInt(currentBlockToValidate-chainRiser)+":"+JSON.parse(riserAgo)["hash"]);
                 db.get("cs:"+parseInt(currentBlockToValidate-chainRiser)+":"+JSON.parse(riserAgo)["hash"],function (err, value) {
                   if(err){
-                    pushChainStateMonitor("isBlockRangeValidating",false)
+                    //pushChainStateMonitor("isBlockRangeValidating",false)
                     callback(false,parseInt(JSON.parse(currentBlockToValidate-chainRiser)["blockHeight"]-1),"");
                   }else{
                     //console.log("--------------------------------------------------");
@@ -888,11 +888,11 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
               //I can set a flag here to load transactions from the block
 
               //set the state validated height
-              pushChainStateMonitor("isBlockRangeValidating",false);
+              //pushChainStateMonitor("isBlockRangeValidating",false);
               callback(true,parseInt(JSON.parse(isValidBlock)["blockHeight"]),JSON.parse(isValidBlock)["hash"]);
 
             }else{
-              pushChainStateMonitor("isBlockRangeValidating",false);
+              //pushChainStateMonitor("isBlockRangeValidating",false);
               callback(false,parseInt(JSON.parse(isValidBlock)["blockHeight"]-1),"");
             }
             currentBlockHash = JSON.parse(isValidBlock)["hash"];
@@ -908,7 +908,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
           pushChainStateMonitor("isBlockRangeValidating",false);
           callback(false,parseInt(currentBlockToValidate-1),"");
         }
-        pushChainStateMonitor("isBlockRangeValidating",false);
+        //pushChainStateMonitor("isBlockRangeValidating",false);
         console.log(chalk.black.bgCyan("Block range validator data stream is complete at ")+chalk.bgMagenta(blockHeight));
 
         /***

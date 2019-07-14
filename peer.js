@@ -926,6 +926,7 @@ var getChainStateMonitor = function(){
   return chainStateMonitor;
 }
 var setChainStateMonitor = function(stateParam,paramValue){
+  console.log("stateParam "+stateParam+" value "+paramValue);
   chainStateMonitor[stateParam] = paramValue;
 }
 sapphirechain.setChainState(getChainState);
@@ -1436,7 +1437,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               if(rnod.nodeType > 1){
                 console.log(chalk.bgCyan.black("1249 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
                 if(stuckCheck == true){
-                  peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                  console.log("stuck true at 1440")
+                  peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                   stuckCheck = false;
                   chainStateMonitor.isChainStuck = 0;
                 }else{
@@ -1447,7 +1449,14 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               }
             }else{
               console.log(chalk.bgCyan.black("1255 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-              peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+              if(stuckCheck == true){
+                console.log("stuck true at 1440")
+                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                stuckCheck = false;
+                chainStateMonitor.isChainStuck = 0;
+              }else{
+                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+              }
               called = true;
               localTempNode.random = "no";
             }
