@@ -341,22 +341,35 @@ var removeStuckPeerMonitor = function(id){
 //activeping process that keeps in touch with other nodes and synch based on isSynching
 var activeSync = function(timer){
 
-  //the most important part of activesync is the sync
+  //the most important part of activesync is the sync either the chainWalkHeight = 1, is less than a peerNonce OR is GTE to peerNonce in which case we check the longpeernonce
   if(chainState.chainWalkHeight == 1){
     setTimeout(function(){
       console.log("calling brv line 347");
       BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,345);
     },timer)
-  }else if(parseInt(chainState.peerNonce) > parseInt(chainState.chainWalkHeight)){
+  }else if( parseInt(chainState.chainWalkHeight) < parseInt(chainState.peerNonce) ){
     //setTimeout(function(){
       console.log("calling brv line 352");
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
     //},timer)
+  }else if( parseInt(chainState.chainWalkHeight) < parseInt(chainStateMonitor.longPeerNonce) ){
+    if( parseInt(chainState.chainWalkHeight) == parseInt(chainState.peerNonce) ){
+      console.log(chalk.bgBlue.white.bold(" pinged the miners because a longer block has been discovered "))
+      minerPing();
+    }
+    //setTimeout(function(){
+      console.log("calling brv line 358");
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
+    //},timer)
+  }else if( parseInt(chainState.chainWalkHeight) == parseInt(chainState.peerNonce) ){
+
+      console.log("chainState.chainWalkHeight equals chainState.peerNonce so we might be synch what to do here? ");
+
   }else{
 
-    console.log("blockrange validate called as else condition line 436")
+    console.log("I DONT KNOW WHAT ELSE CAN HAPPEN SO FLAGG THIS IF SEEN blockrange validate called as else condition line 366")
     setTimeout(function(){
-      console.log("calling brv line 359");
+      console.log("calling brv line 369");
       BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,355);
     },timer)
 
