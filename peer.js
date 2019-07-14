@@ -1202,16 +1202,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       });
     }
 
-    if(isValid == chainState.peerNonce && isValid > chainState.TransactionHeight){
-      var startEnd = parseInt(chainState.transactionHeight+1);
-      var topEnd = parseInt(startEnd+500);
-      //console.log("want to call TXVLDY with "+topEnd+" and "+chainState.synchronized)
-      if(topEnd >= chainState.synchronized){
-        topEnd = chainState.synchronized
-      }
-
-      //lets move this to a trnssync call ONE - did not change results
-      //transactionValidator(parseInt(startEnd),parseInt(topEnd));
+    if(isValid == chainState.peerNonce && chainState.peerNonce > 1 && isValid > chainState.TransactionHeight){
+      console.log(chalk.bgBlue.white.bold("1206 This case is the chain transaction height needs to catch up and I am not sure if ever gets called"));
+      tranSynch();
     }
 
     //set the chain state validated height;
@@ -1458,13 +1451,13 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
               if(rnod){
                 if(rnod.nodeType > 1){
-                  console.log(chalk.bgCyan.black("1264 well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)));
+                  console.log(chalk.bgCyan.black("1264 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)));
                   peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                   called = true;
                   localTempNode.random = "no";
                 }
               }else{
-                console.log(chalk.bgCyan.black("1270 well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)))
+                console.log(chalk.bgCyan.black("1270 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
                 peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                 called = true;
                 localTempNode.random = "no";
