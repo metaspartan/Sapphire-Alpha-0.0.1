@@ -350,7 +350,12 @@ var activeSync = function(timer){
   }else if( parseInt(chainState.chainWalkHeight) < parseInt(chainState.peerNonce) ){
     //setTimeout(function(){
       console.log("calling brv line 352");
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
+      if(chainState.chainWalkHeight > 1){
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
+      }else{
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
+      }
+
     //},timer)
   }else if( parseInt(chainState.chainWalkHeight) < parseInt(chainStateMonitor.longPeerNonce) ){
     if( parseInt(chainState.chainWalkHeight) == parseInt(chainState.peerNonce) ){
