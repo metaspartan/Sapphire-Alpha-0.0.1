@@ -358,21 +358,14 @@ var activeSync = function(timer){
 
     //},timer)
   }else if( parseInt(chainState.chainWalkHeight) < parseInt(chainStateMonitor.longPeerNonce) ){
-
     if( parseInt(chainState.chainWalkHeight) == parseInt(chainState.peerNonce) ){
       console.log(chalk.bgBlue.white.bold(" pinged the miners because a longer block has been discovered "))
       minerPing();
-      setTimeout(function(){
-        console.log("calling brv line 358");
-        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
-      },100)
-    }else{
-      //setTimeout(function(){
-        console.log("calling brv line 358");
-        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
-      //},timer)
     }
-
+    //setTimeout(function(){
+      console.log("calling brv line 358");
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
+    //},timer)
   }else if( parseInt(chainState.chainWalkHeight) == parseInt(chainState.peerNonce) ){
 
       console.log("chainState.chainWalkHeight equals chainState.peerNonce so we might be synch what to do here? ");
