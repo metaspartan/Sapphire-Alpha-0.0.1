@@ -358,6 +358,7 @@ var activeSync = function(timer){
 
     //},timer)
   }else if( parseInt(chainState.chainWalkHeight) < parseInt(chainStateMonitor.longPeerNonce) ){
+
     if( parseInt(chainState.chainWalkHeight) == parseInt(chainState.peerNonce) ){
       console.log(chalk.bgBlue.white.bold(" pinged the miners because a longer block has been discovered "))
       minerPing();
@@ -4394,19 +4395,19 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
     frankieCoin.inSynchBlockHeight = peerMaxHeight;
     chainState.peerNonce = peerMaxHeight;
     chainState.isSynching = false;
-    chainState.interval = 25000;
+    chainState.interval = 4000;
   }else if(parseInt(peerMaxHeight - frankieCoin.getLength()) > 2500){
     //chainState.isSynching = false;
-    if(chainState.interval == 10000 && chainState.synchronized < 10){
+    if(chainState.interval == 3000 && chainState.synchronized < 10){
       console.log("calling active sync now ");
       activeSync();
     }
-    chainState.interval = 10000;
+    chainState.interval = 3000;
   }else if(parseInt(peerMaxHeight - frankieCoin.getLength()) > 1000){
     //chainState.isSynching = false;
-    chainState.interval = 8000;
+    chainState.interval = 2000;
   }else{
-    chainState.interval = 4000;
+    chainState.interval = 1000;
     log("------------------------------------------------------")
     //chainState.isSynching = false;//if I set to true here it stops
   }
