@@ -2445,7 +2445,7 @@ var cbReset = async function(full = false){
               //leaving this here to finish the uncle validations
               var uncleReply = JSON.stringify({uncle:JSON.parse(data),chainState:chainState})
               //peers[peerId].conn2.write(JSON.stringify(uncleReply));
-              sendbackUncle(uncleReply,peerId)
+              sendBackUncle(uncleReply,peerId)
               //peers[peerId].conn.write(JSON.stringify(syncTrigger));
               //if I log this information on the chain state I can see it quickly
 
