@@ -2438,14 +2438,14 @@ var cbReset = async function(full = false){
 
             }else{
 
-              console.log("ELSE CONDITION REACHED - NEED TO ADD AN UNCLE CHECK BUT MOST LIKELY NOT SYNC so calling ActiveSync for now ");
+              console.log(chalk.bgBlue.red.bold("ELSE CONDITION REACHED - NEED TO ADD AN UNCLE CHECK BUT MOST LIKELY NOT SYNC so calling semnd uncle for now "));
 
-              activeSync();
+              //activeSync();
 
               //leaving this here to finish the uncle validations
               var uncleReply = JSON.stringify({uncle:JSON.parse(data),chainState:chainState})
               //peers[peerId].conn2.write(JSON.stringify(uncleReply));
-              //sendbackUncle(uncleReply,peerId)
+              sendbackUncle(uncleReply,peerId)
               //peers[peerId].conn.write(JSON.stringify(syncTrigger));
               //if I log this information on the chain state I can see it quickly
 
@@ -2485,7 +2485,7 @@ var cbReset = async function(full = false){
 
           }else if(JSON.parse(data)["uncle"]){
 
-            //ver first thing is stop communicating until this reqind happens
+            //ver first thing is stop communicating until this rewind happens
             rpcserver.closePort();
             sw.closePort();
             sw2.closePort();
@@ -2496,6 +2496,23 @@ var cbReset = async function(full = false){
 
             console.log("starting uncle rewind here "+data.uncle.blockHeight);
 
+            ////////////////////////////////////////////////////////TEMP PROCESS
+            BlkDB.deleteTransactions();
+            chainState.transactionHeight = 0;
+            chainState.transactionRootHash = '';
+            chainState.previousTxHeight = 0;
+            chainState.previousTxHash = '';
+            chainState.transactionHashWeights = [];
+            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
+            chainClipper(frankieCoin.blockHeight).then(function(){
+              console.log("calling brv line 5316");
+              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
+            });
+            cbReset();
+            ////////////////////////////////////////////////////END TEMP PROCESS
+
+            //////////////////////////////////////////////////////PROPER PROCESS
+            /***
             ////////////////////////first step is get bock number check point hash for previpus block
             var blockNum = parseInt(data.uncle.blockHeight-1);
             //calculating this 2 times but needed at addBlock for transations to verify properly
@@ -2524,7 +2541,8 @@ var cbReset = async function(full = false){
             });
             cbReset();
             //clipChainAt(parseInt(chainState.syncronized - 10))
-
+            //////////////////////////////////////////////////END PROPER PROCESS
+            *****/
           }else if(JSON.parse(data)["nodeStatePong"]){
 
             var nSPongPeercurrentCPH = JSON.stringify(JSON.parse(data)["nodeStatePong"]["currentBlockCheckPointHash"]);
