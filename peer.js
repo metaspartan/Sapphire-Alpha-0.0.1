@@ -5550,8 +5550,9 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
     process.stdout.cursorTo(0);
     process.stdout.write(chalk.green("work returned to miner"));
     log(JSON.parse(childData)["getWorkForMiner"]);
-    //what we really want is an active ping to miners only
-    minerPing();
+    //what we really want is an active ping to miners only and this does not work
+    //minerPing();
+
   }else if(isJSON(childData) && JSON.parse(childData)["getOrderBook"]){
     log("now we are gonna have some fun")
     impceventcaller("returning from function","maybe the calling peer is not necessary");
@@ -5814,7 +5815,7 @@ var impcevent = function(callback){
 }
 //this is a function to turn off excess communications to miners
 var thisNodeCanMine = function(){
-  minerPing();
+  //minerPing();
   return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":"+frankieCoin.nodes.length+":"+chainStateMonitor.longPeerNonce;
 }
 var thisNodeIsMininig = function(){
