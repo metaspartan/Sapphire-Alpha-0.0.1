@@ -274,10 +274,10 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
       let rnod = chainState.activeSynch.receive.find(q => q.peer == peer);
       if(rnod){
         if(rnod.nodeType > 1){
-          peers[peer].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+          peers[peer].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
         }
       }else{
-        peers[peer].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+        peers[peer].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
       }
 
     }
