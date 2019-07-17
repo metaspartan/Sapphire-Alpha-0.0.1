@@ -488,7 +488,7 @@ var activeSync = function(timer){
       console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
       chainStateMonitor.rpcBlock = chainState.topBlock;
-    },10000);
+    },5000);
   }
   console.log(chalk.green("--------------------------------------------------------------------------------"));
 
@@ -532,7 +532,7 @@ var adjustedTimeout = function() {
     activePing(10);
     slowCounter++;
   }else if((slowCounter % 4) == 0){//need a different trigger for transaction sync but for now ok
-    if(chainStateMonitor.isTxValidationRunning == false && chainState.chainWalkHeight > 1){
+    if(chainStateMonitor.isTxValidationRunning == false && chainState.chainWalkHeight > 1 && chainState.transactionHeight < chainState.chainWalkHeight){
       tranSynch();
     }
     if(chainStateMonitor.isOxValidationRunning == false && chainState.transactionHeight == chainState.chainWalkHeight && chainState.chainWalkHeight > 1){
@@ -4545,7 +4545,7 @@ var cbChainGrab = async function(data) {
                     console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                     rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                     chainStateMonitor.rpcBlock = chainState.topBlock;
-                  },10000);
+                  },3000);
                 }
               }else if(reply > 1){
                 console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
@@ -4556,7 +4556,7 @@ var cbChainGrab = async function(data) {
                     console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                     rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                     chainStateMonitor.rpcBlock = chainState.topBlock;
-                  },20000);
+                  },5000);
                 }
                 cbReset();
               }else{
@@ -4599,7 +4599,7 @@ var cbChainGrab = async function(data) {
                   console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                   chainStateMonitor.rpcBlock = chainState.topBlock;
-                },20000);
+                },3000);
               }
               cbReset();
             })
@@ -5447,7 +5447,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                         console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                         rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                         chainStateMonitor.rpcBlock = chainState.topBlock;
-                      },10000);
+                      },3000);
                     }
                   }else if(reply > 1){
                     console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
@@ -5458,7 +5458,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                         console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                         rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                         chainStateMonitor.rpcBlock = chainState.topBlock;
-                      },20000);
+                      },5000);
                     }
                     cbReset();
                   }else{
@@ -5501,14 +5501,14 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                       console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                       rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                       chainStateMonitor.rpcBlock = chainState.topBlock;
-                    },20000);
+                    },5000);
                   }
                   cbReset();
                 })
 
               }
               countPostMinerCalled+=1;
-            },10000)
+            },3000)
 
           }else{
             console.log(chalk.bgGreen.black.bold("THIS IS THE CASE YOU DID NOT SET"));
