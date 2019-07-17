@@ -150,7 +150,7 @@ let routes = {
                     }
                     promiseArr.push(execPromise);
                 } else if ((key === 'getWorkForMiner' || key === 'createBlock') && isMining == true){
-                    console.log("ONLY MINING IS ACCEPTED ON PORT")
+                    console.log("ONLY MINING IS ACCEPTED ON PORT key is "+key)
                     let execPromise = methods[key].exec.call(null, _json[key]);
                     if (!(execPromise instanceof Promise)) {
                         throw new Error(`exec on ${key} did not return a promise`);
