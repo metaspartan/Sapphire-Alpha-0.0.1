@@ -127,7 +127,7 @@ chainState.previousOxHeight = 0;
 chainState.previousOxHash = '';
 chainState.orderHashWeights = [];
 //activesynch
-chainState.interval = 10000;
+chainState.interval = 3000;
 chainState.activeSynch = [];
 
 //need a snall array holding nodes with wieght score
@@ -519,6 +519,7 @@ var oxSynch = function(){
 //maybe turn slowCounter into chainstate var
 var slowCounter = 0;
 var adjustedTimeout = function() {
+  console.log(chalk.bgMagenta.white.bold("adjustedTimeout called with chainState.interval "+chainState.interval));
   if(chainState.peerNonce == chainState.synchronized){
     chainStateMonitor.peerCom = true;
   }
@@ -538,7 +539,7 @@ var adjustedTimeout = function() {
     if(chainStateMonitor.isOxValidationRunning == false && chainState.transactionHeight == chainState.chainWalkHeight && chainState.chainWalkHeight > 1){
       oxSynch();
     }
-    console.log("upper slow counter is "+slowCounter)
+    console.log("upper mod 4 slow counter is "+slowCounter)
 
       //activeSync(parseInt(timerInterval+(slowCounter*23)));
       activePing(parseInt(timerInterval+(slowCounter*21)));
@@ -557,16 +558,20 @@ var adjustedTimeout = function() {
     slowCounter++;
   }else{
     if(chainStateMonitor.isTxValidationRunning == false && chainState.chainWalkHeight > 1){
+      console.log("lower transync "+slowCounter)
       tranSynch();
     }
     if(chainStateMonitor.isOxValidationRunning == false && chainState.transactionHeight == chainState.chainWalkHeight && chainState.chainWalkHeight > 1){
+      console.log("lower oxsync "+slowCounter)
       oxSynch();
     }
     console.log("lower in else slow counter is "+slowCounter+" isOxValidationRunning "+chainStateMonitor.isOxValidationRunning)
     if((slowCounter % 4) == 0){
+      console.log("lower mod 4 slow counter is "+slowCounter)
       activePing(parseInt(timerInterval+(slowCounter*21)));
     }
     if((slowCounter % 3) == 0){
+      console.log("lower mod 3 slow counter is "+slowCounter)
       activeSync(parseInt(timerInterval+(slowCounter*23)));
     }
     slowCounter++;
@@ -4691,7 +4696,7 @@ async function ChainGrab(blocknum){
   }
   BlkDB.getChainStateParam("orderHeight",resetOrderHeight);
 
-  setTimeout(adjustedTimeout, 10000);
+  setTimeout(adjustedTimeout, 3000);
   //maybe some other stuff like .then
 };
 
