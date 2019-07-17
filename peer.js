@@ -5334,8 +5334,8 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         //temporarily setting these here to be pushed in broadcastPeersBlock above because they are set in the addBlock function now
         lastCheckPointHash = chainState.checkPointHash;
         lastCurrentBlockCheckPointHash = chainState.currentBlockCheckPointHash;
-        log(JSON.parse(childData)["address"]+" aha this is my mined block "+JSON.stringify(JSON.parse(childData)["createBlock"]["block"]))
-        frankieCoin.addPendingTransactionsToMinedBLock(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);
+        log(JSON.parse(childData)["miner"]+"aha this is my mined block "+JSON.stringify(JSON.parse(childData)["createBlock"]["block"]))
+        frankieCoin.addPendingTransactionsToMinedBLock(JSON.parse(childData)["miner"],JSON.parse(childData)["createBlock"]["block"]);
         //franks.mpt3(JSON.parse(childData)["address"],JSON.parse(childData)["createBlock"]["block"]);//need to swap fpr next line but test it
 
         //calculating this 2 times but needed at addBlock for transations to verify properly

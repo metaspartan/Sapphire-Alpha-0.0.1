@@ -832,8 +832,16 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
       //console.log("BLOCKHEIGHT: "+blockHeight);
       //console.log("RISER: "+riser);
       //console.log("CALLED FROM "+calledFrom)
-
-      var stream = db.createReadStream();
+      var getStarted = blockHeight;
+      if(blockHeight > chainRiser){
+        getStarted = parseInt(blockHeight - chainRiser);
+      }
+      var startingBlockRange = ("000000000000000" + parseInt(getStarted).toString(16)).substr(-16);
+      var endingBlockRange = ("000000000000000" + parseInt(riser).toString(16)).substr(-16);
+      var stream = db.createReadStream({
+        gte: 'sfblk:'+startingBlockRange,
+        lte: 'sfblk:'+endingBlockRange+'~'
+      });
       var dataStream = [];
       var currentBlockToValidate = blockHeight;
       var currentBlockHash = blockHash;
@@ -849,7 +857,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
           if((thisDataItem.key.toString().split(":")[0] == "sfblk") && (parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)) == parseInt(currentBlockToValidate)) && (parseInt(currentBlockToValidate) <= parseInt(riser)) ){
 
 
-            //console.log("top "+currentBlockToValidate+" current hash "+currentBlockHash);
+            console.log("top "+currentBlockToValidate+" current hash "+currentBlockHash);
             //console.log("second "+parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)));
             //console.log("why below 10 "+thisDataItem.key.toString());
 
@@ -1235,11 +1243,30 @@ var getTransactionByHash = function(hash,cb){
 
 }
 
-var getTransactionReceiptsByAddress = function(address,cb,start = 1,limit = 100){
+var getTransactionReceiptsByAddress = async function(address,cb,start = 1,limit = 100){
+
+  var startTimeStamp;
+  var endTimeStamp;
+
+  var getTimeStamps = async function(){
+    var timeStartFunction = function(blkStart){
+      startTimeStamp = JSON.parse(blkStart)["timestamp"];
+    }
+    getBlock(parseInt(start),timeStartFunction);
+    var timeEndFunction = function(blkEnd){
+      endTimeStamp = JSON.parse(blkEnd)["timestamp"];
+    }
+    getBlock(parseInt(start+limit),timeEndFunction);
+  }
+
+  await getTimeStamps();
 
   console.log("ALL Transaction Receipts for "+address);
   var txCollection = []
-  var stream = db.createReadStream({fromAddress:address,toAddress:address});
+  //var stream = db.createReadStream({fromAddress:address,toAddress:address});
+  var stream = db.createReadStream({gte:'tx:00000000',lte:'tx:sapphire~'+address.toLowerCase().substring(10,42)+'~'});
+  //var stream = db.createReadStream({gte:'tx:00000000',lte:'tx:sapphire~'+address.toLowerCase().substring(10,42)+endTimeStamp+"~"});
+  //var stream = db.createReadStream({gte:'tx:00000000',lte:'tx:sapphire~'+address.toLowerCase().substring(10,42)+'~',fromAddress:address,toAddress:address});
   var topLimit = 0;
   stream.on('data',function(data){
     if(
@@ -1250,7 +1277,7 @@ var getTransactionReceiptsByAddress = function(address,cb,start = 1,limit = 100)
           && (data.key.toString().split(":")[2]).toLowerCase() == address.toLowerCase())
           //&& topLimit < 100
         ){
-      console.log(data.key.toString());
+      //console.log(data.key.toString());
 
 
       if(data.key.toString().split(":")[4].toString().length == 10){
