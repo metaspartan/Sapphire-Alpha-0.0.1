@@ -377,7 +377,7 @@ var activeSync = function(timer){
       console.log("calling brv line 377");
       BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
     //},timer)
-  }else if( parseInt(chainState.chainWalkHeight) == parseInt(chainState.peerNonce) == parseInt(chainState.synchronized)){
+  }else if( parseInt(chainState.chainWalkHeight) == parseInt(chainState.peerNonce) && parseInt(chainState.chainWalkHeight) == parseInt(chainState.synchronized)){
 
       console.log("chainState.chainWalkHeight equals chainState.peerNonce equals chainState.synchronized so we might be synch what to do here? ");
 
