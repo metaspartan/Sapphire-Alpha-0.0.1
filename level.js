@@ -856,8 +856,10 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
           var thisDataItem = dataStream[dataItem];
           if((thisDataItem.key.toString().split(":")[0] == "sfblk") && (parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)) == parseInt(currentBlockToValidate)) && (parseInt(currentBlockToValidate) <= parseInt(riser)) ){
 
+            if(currentBlockToValidate%500 == 0){
+              console.log("block range validate top "+currentBlockToValidate+" current hash "+currentBlockHash);
+            }
 
-            console.log("top "+currentBlockToValidate+" current hash "+currentBlockHash);
             //console.log("second "+parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)));
             //console.log("why below 10 "+thisDataItem.key.toString());
 
