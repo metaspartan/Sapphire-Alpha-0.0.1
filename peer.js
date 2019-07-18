@@ -561,7 +561,7 @@ var adjustedTimeout = function() {
       activePing(parseInt(timerInterval+(slowCounter*21)));
 
     slowCounter++;
-  }else if(chainState.peerNonce < chainState.synchronized){
+  }else if(chainState.peerNonce > chainState.synchronized){
     //console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     //console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync(parseInt(timerInterval+(slowCounter*81)));
