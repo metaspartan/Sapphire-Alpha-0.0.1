@@ -148,6 +148,7 @@ chainStateMonitor.isBlockRangeValidating = false;
 chainStateMonitor.isTxValidationRunning = false;
 chainStateMonitor.isOxValidationRunning = false;
 chainStateMonitor.isChainStuck = 0;
+chainStateMonitor.wasChainStuck = "0:0";
 
 var nodeType = {};
 nodeType.current = 3;//start as a Listener 3 with 1 miner and 2 rpc wallets
@@ -375,7 +376,11 @@ var activeSync = function(timer){
     }
     //setTimeout(function(){
       console.log("calling brv line 377");
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
+      if(chainState.chainWalkHeight == chainStateMonitor.isChainStuck){
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
+      }else{
+        BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
+      }
     //},timer)
   }else if( parseInt(chainState.chainWalkHeight) == parseInt(chainState.peerNonce) && parseInt(chainState.chainWalkHeight) == parseInt(chainState.synchronized)){
 
@@ -530,10 +535,14 @@ var oxSynch = function(){
 var slowCounter = 0;
 var adjustedTimeout = function() {
 
-  console.log(chalk.bgGreen.white.bold(chainState.chainWalkHeight+" HEIGHT <<< IS CHAIN STUCK HEIGHT >>> "+chainStateMonitor.isChainStuck));
-  if(chainStateMonitor.isChainStuck < chainState.chainWalkHeight){
-    chainStateMonitor.isChainStuck = chainState.chainWalkHeight;
+  console.log(chalk.bgGreen.white.bold(chainState.chainWalkHeight+" HEIGHT <<< IS CHAIN STUCK HEIGHT >>> "+chainStateMonitor.isChainStuck+" chainStateMonitor.wasChainStuck "+chainStateMonitor.wasChainStuck));
+
+  if(parseInt(chainStateMonitor.wasChainStuck.split(":")[0]) == chainStateMonitor.isChainStuck){
+    chainStateMonitor.wasChainStuck = chainStateMonitor.isChainStuck+":"+parseInt(parseInt(chainStateMonitor.wasChainStuck.split(":")[1])+1);
+  }else{
+    chainStateMonitor.wasChainStuck = chainStateMonitor.isChainStuck+":0";
   }
+  chainStateMonitor.isChainStuck = chainState.chainWalkHeight;
 
   console.log(chalk.bgMagenta.white.bold("adjustedTimeout called with chainState.interval "+chainState.interval));
   if(chainState.peerNonce == chainState.synchronized){
