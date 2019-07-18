@@ -375,8 +375,9 @@ var activeSync = function(timer){
       minerPing();
     }
     //setTimeout(function(){
-      console.log("calling brv line 377");
-      if(chainState.chainWalkHeight == chainStateMonitor.isChainStuck){
+      console.log("calling brv line 377 chainStateMonitor.wasChainStuck "+chainStateMonitor.wasChainStuck);
+      //we can adjust the waschainstuck counter value down maybe
+      if(chainState.chainWalkHeight == parseInt(chainStateMonitor.wasChainStuck.split(":")[0]) && parseInt(chainStateMonitor.wasChainStuck.split(":")[1]) > 1){
         BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
       }else{
         BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
