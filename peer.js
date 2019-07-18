@@ -347,7 +347,7 @@ var activeSync = function(timer){
       console.log("calling brv line 347");
       BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,345);
     },timer)
-  }else if( parseInt(chainState.chainWalkHeight) < parseInt(chainState.synchronized) ||  parseInt(chainState.chainWalkHeight) > parseInt(chainState.synchronized) ){
+  }else if( parseInt(chainState.chainWalkHeight) < parseInt(chainState.synchronized) ){
 
       if(chainState.chainWalkHeight > 1 && parseInt(frankieCoin.longestPeerBlockHeight) == parseInt(chainStateMonitor.longPeerNonce)){
         console.log("calling brv line 353");
@@ -356,7 +356,6 @@ var activeSync = function(timer){
         console.log("calling brv line 356");
         BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
       }
-      
   }else if( parseInt(chainState.chainWalkHeight) < parseInt(chainState.synchronized) && parseInt(chainState.chainWalkHeight) < parseInt(chainState.peerNonce) ){
     //setTimeout(function(){
       if(chainState.chainWalkHeight > 1 && parseInt(frankieCoin.longestPeerBlockHeight) == parseInt(chainStateMonitor.longPeerNonce)){
@@ -530,6 +529,12 @@ var oxSynch = function(){
 //maybe turn slowCounter into chainstate var
 var slowCounter = 0;
 var adjustedTimeout = function() {
+
+  console.log(chalk.bgGreen.white.bold(chainState.chainWalkHeight+" HEIGHT <<< IS CHAIN STUCK HEIGHT >>> "+chainStateMonitor.isChainStuck));
+  if(chainStateMonitor.isChainStuck < chainState.chainWalkHeight){
+    chainStateMonitor.isChainStuck = chainState.chainWalkHeight;
+  }
+
   console.log(chalk.bgMagenta.white.bold("adjustedTimeout called with chainState.interval "+chainState.interval));
   if(chainState.peerNonce == chainState.synchronized){
     chainStateMonitor.peerCom = true;
@@ -4491,7 +4496,7 @@ var cbChainGrab = async function(data) {
   setTimeout(function(){
     //console.log(frankieCoin.blockHeight);
     if(frankieCoin.blockHeight > 1){
-      console.log("calling brv line 4352");
+      console.log("calling brv line 4352 THIS IS IN CHAINGRAB STARTUP CONDITION");
       BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(frankieCoin.blockHeight+frankieCoin.chainRiser+1),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,2718);
 
     }
