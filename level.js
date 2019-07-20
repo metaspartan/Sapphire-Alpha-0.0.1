@@ -794,7 +794,7 @@ var getBlockRange = function(blockHeight,riser,callback){
     var chainBlockHeight=blockHeight;
     chainBlockHeight-=riser;
 
-      //console.log("riser: "+riser+" blockHeight: "+blockHeight+" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
+      console.log("riser: "+riser+" blockHeight: "+blockHeight+" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
       var returner = [];
       var stream = db.createReadStream();
       stream.on('data',function(data){
@@ -826,7 +826,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
       }else{
         pushChainStateMonitor("isBlockRangeValidating",true);
         console.log(chalk.bgCyan.black("block range validate "+chalk.bgMagenta.white(calledFrom)+" BLOCKHEIGHT: "+chalk.bgMagenta.white(blockHeight)+" RISER: "+chalk.bgMagenta.white(riser)));
-        console.log("BLOCKHEIGHT: "+blockHeight+"RISER: "+riser);
+        console.log("BLOCKHEIGHT: "+blockHeight+"RISER: "+riser+"CALLED FROM "+calledFrom);
       }
 
       //console.log("BLOCKHEIGHT: "+blockHeight);
@@ -916,7 +916,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
         if(currentBlockToValidate == blockHeight){
           console.log("ping it "+currentBlockToValidate);
           pushChainStateMonitor("isBlockRangeValidating",false);
-          callback(false,parseInt(currentBlockToValidate-1),"");
+          callback(false,parseInt(parseInt(currentBlockToValidate)-1),"");
         }
         //pushChainStateMonitor("isBlockRangeValidating",false);
         console.log(chalk.black.bgCyan("Block range validator data stream is complete at ")+chalk.bgMagenta(blockHeight));
@@ -2661,7 +2661,7 @@ var importFromJSONStream = async function(cb,blockNum,cbChainGrab,chainRiser,inc
       //console.log(content);
   } catch (e) {
       console.log(chalk.bgRed(e+" WHAT?? <-----------"))
-      //return false;
+      return false;
   }
 
   console.log("IMPORT FROM JSON STREAM ...")

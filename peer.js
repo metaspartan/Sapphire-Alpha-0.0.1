@@ -147,6 +147,7 @@ chainStateMonitor.stuckPeers = [];//police my connections nodestatepong and sync
 chainStateMonitor.isBlockRangeValidating = false;
 chainStateMonitor.isTxValidationRunning = false;
 chainStateMonitor.isOxValidationRunning = false;
+chainStateMonitor.isAdjustedTimeoutRunning = false;
 chainStateMonitor.isChainStuck = 0;
 chainStateMonitor.wasChainStuck = "0:0";
 
@@ -541,7 +542,14 @@ var oxSynch = function(){
 
 //maybe turn slowCounter into chainstate var
 var slowCounter = 0;
-var adjustedTimeout = function() {
+var adjustedTimeout = function(or = false) {
+
+  if(chainStateMonitor.isAdjustedTimeoutRunning == true && or == false){
+    console.log(" adjustedTimeout already running break");
+    return;
+  }else{
+    chainStateMonitor.isAdjustedTimeoutRunning = true;
+  }
 
   console.log(chalk.bgGreen.white.bold(chainState.chainWalkHeight+" HEIGHT <<< IS CHAIN STUCK HEIGHT >>> "+chainStateMonitor.isChainStuck+" chainStateMonitor.wasChainStuck "+chainStateMonitor.wasChainStuck));
 
@@ -611,7 +619,7 @@ var adjustedTimeout = function() {
     //console.log("chain is not synching so is it sync? ")
   }
   //console.log("synching again in "+chainState.interval)
-  setTimeout(adjustedTimeout, chainState.interval);
+  setTimeout(function(){adjustedTimeout(true)}, chainState.interval);
   if(slowCounter == 14){
     slowCounter = 1;
   }
@@ -1035,7 +1043,7 @@ var addyBal = function(val){
 //////////////////////////////////////////////////////////////////CHAIN VAIDATOR
 var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
 
-  //console.log(chalk.bgRed(replyData+" << replydata and then replyhash >> "+replyHash));
+  console.log(chalk.bgRed(replyData+" << replydata and then replyhash >> "+replyHash));
 
   if(isValid == true){
     if(chainState.chainWalkHeight == replyData){
@@ -1048,6 +1056,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
       //   //peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(replyData),GlobalHash:globalGenesisHash}}));
       // }
     }
+
     chainState.chainWalkHeight = replyData;
     chainState.chainWalkHash = replyHash;
     chainState.topBlock = replyData;
@@ -1059,15 +1068,15 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
       //console.log("AND THE VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
     }
     //console.log("VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
-    //console.log("BLOCK HEIGHT VALIDATED TO (CW STARTUP VERSION) "+replyData,replyHash);
+    console.log("BLOCK HEIGHT VALIDATED TO (CW STARTUP VERSION) "+replyData,replyHash);
     //set the chain state validated height;
     //now that we are valid we are going to check 3 blocks back to see if it is a candidate for chain state
     //console.log("TRUE OR FALSE? "+parseInt(replyData)+" "+(parseInt(replyData) > 3)+" "+(parseInt(replyData - 3))+" "+parseInt(frankieCoin.chainRiser))
     if( parseInt(replyData) > 3 && (parseInt(replyData - 3) % parseInt(frankieCoin.chainRiser)) == 0 ){
       var checkPoint = parseInt(replyData - 3);
       var pongBackBlock = function(blockData){
-        //console.log("in pong back block");
-        //console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
+        console.log("in pong back block");
+        console.log("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"]);
         BlkDB.addChainState("cs:"+checkPoint+":"+JSON.parse(blockData)["hash"],JSON.parse(blockData)["hash"]);
         chainState.checkPointHash = "cs:"+checkPoint+":"+JSON.parse(blockData)["hash"];
       }
@@ -1126,10 +1135,14 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     if(isNaN(replyData)){
       console.log("NaN chain walk height is "+chainState.chainWalkHeight+" replyData "+replyData+" isVAlid "+isValid)
     }
-    console.log("908 NOT VALID NEED TO PING AT "+replyData+typeof(replyData));
+    console.log("908 NOT VALID NEED TO PING AT replyData "+replyData+" isVAlid "+isValid);
     if(parseInt(replyData) > 2){
 
-      console.log(" I am not sure the stuff below works as intended going to let nodestate ping fix this now ")
+      console.log(" I am not sure the stuff below works as intended going to let nodestate ping fix this now ");
+
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,416);
+
+      //setTimeout(adjustedTimeout,100);
       /***
       var clipHeight = parseInt(replyData-3)
       chainClipperReduce(frankieCoin.blockHeight,clipHeight).then(function(){
@@ -1194,7 +1207,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       console.log("AND THE VALUES "+replyData+" "+chainState.chainWalkHeight+" "+frankieCoin.blockHeight+" "+chainState.synchronized);
     }
 
-    //console.log(chalk.black.bgCyan("BLOCK HEIGHT VALIDATED TO (CW PEER VERSION)")+chalk.bgMagenta(replyData),chalk.bgBlue(replyHash));
+    console.log(chalk.black.bgCyan("BLOCK HEIGHT VALIDATED TO (CW PEER VERSION)")+chalk.bgMagenta(replyData),chalk.bgBlue(replyHash));
     //now that we are valid we are going to check 3 blocks back to see if it is a candidate for chain state
     //console.log("TRUE OR FALSE? "+parseInt(replyData)+" "+(parseInt(replyData) > 3)+" "+(parseInt(replyData - 3))+" "+parseInt(frankieCoin.chainRiser))
     if( parseInt(replyData) > 3 && (parseInt(replyData - 3) % parseInt(frankieCoin.chainRiser)) == 0 ){
@@ -1374,10 +1387,17 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
   }else{
 
+
+    ///////////////////////////////////////////SETS THE SYNC TRIGGER START BLOCK
     console.log("THIS IS THE CASE I AM TRAPPING chain walk height is "+chainState.chainWalkHeight+" REPLY DATA IS "+replyData);
+    var myChainSyncTrigger = replyData;
     if(replyData < chainState.chainWalkHeight){
-      console.log("1248 NOT VALID NEED TO PING AT TOP CASE ADDS ONE "+replyData+typeof(replyData+1)+" and chainstate issynching = "+chainState.isSynching);
+
+      console.log("1248 NOT VALID NEED TO PING AT TOP CASE ADDS ONE "+parseInt(replyData+1)+" and chainstate issynching = "+chainState.isSynching);
+      myChainSyncTrigger+=1;
+
     }else if(replyData == chainState.chainWalkHeight && chainState.chainWalkHeight < chainState.peerNonce){
+
       console.log("1250 NOT VALID NEED TO PING AT TOP CASE ADDS ONE "+replyData+typeof(replyData+1)+" and chainstate issynching = "+chainState.isSynching);
       console.log("AND IN THIS CASE ARE WE STUCK? chainStateMonitor.isChainStuck: "+chainStateMonitor.isChainStuck+" chainState.chainWalkHeight "+chainState.chainWalkHeight);
 
@@ -1390,7 +1410,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
 
     }else{
+
       console.log("1252 NOT VALID NEED TO PING AT BOTTOM CASE AS IS "+replyData+typeof(replyData)+" and chainstate issynching = "+chainState.isSynching);
+
     }
 
 
@@ -1453,20 +1475,20 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             if(rnod){
               if(rnod.nodeType > 1){
                 console.log(chalk.bgCyan.black("1227 well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(myChainSyncTrigger),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                 called = true;
                 localTempNode.random = "yes";
               }
             }else{
               console.log(chalk.bgCyan.black("1233 well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-              peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+              peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(myChainSyncTrigger),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
               called = true;
               localTempNode.random = "yes";
             }
           }else{
             console.log("perhaps we should call the ping here because there is no activeSynch.receive yet")
             console.log(chalk.bgCyan.black("1367 well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(myChainSyncTrigger),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
             called = true;
             localTempNode.random = "yes";
           }
@@ -1492,11 +1514,13 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
                 localTempNode.random = "no";
               }
             }else{
-              console.log(chalk.bgCyan.black("1255 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
+
               if(chainState.chainWalkHeight == parseInt(chainStateMonitor.wasChainStuck.split(":")[0]) && parseInt(chainStateMonitor.wasChainStuck.split(":")[1]) > 0){
                 console.log("stuck true at 1501")
+                console.log(chalk.bgCyan.black("1507 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
                 peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
               }else{
+                console.log(chalk.bgCyan.black("1510 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
                 peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
               }
               called = true;
@@ -1510,7 +1534,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
                   //this might not be needed but trying it out
                   if(chainState.synchronized < chainState.peerNonce){
-                    console.log(chalk.bgCyan.black("1514 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)));
+                    console.log(chalk.bgCyan.black("1514 well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)));
                     peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                   }else{
                     console.log(chalk.bgCyan.black("1517 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)));
@@ -1549,7 +1573,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         setTimeout(function(){
           cbReset();
         },5000);
-      }else{
+      }else if(chainState.chainWalkHeight > 1){
         activePing(10);
       }
 
@@ -4395,8 +4419,7 @@ var franks = miner(frankieCoin);
 log("------------------------------------------------------")
 log(chalk.green("CHAIN SHOULD SYNC AUTOMATICALLY"))
 log("------------------------------------------------------")
-//internal data blockheiht
-var blockHeightPtr = 1;
+
 function cbGetBlock(data){
   JSON.stringify(data);
 }
@@ -4463,6 +4486,8 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
     chainState.peerNonce = peerMaxHeight;
     chainState.isSynching = false;
     chainState.interval = 4000;
+    adjustedTimeout();
+
   }else if(parseInt(peerMaxHeight - frankieCoin.getLength()) > 2500){
     //chainState.isSynching = false;
     if(chainState.interval == 3000 && chainState.synchronized < 10){
@@ -4502,27 +4527,43 @@ var cbChainGrab = async function(data) {
     if(typeof thisGetBlock === "undefined" || thisGetBlock === null){
       //block not in memory
       //console.log("block does not exist "+data[obj]);
+      console.log(chalk.green("block loaded into memory ")+chalk.yellow(JSON.parse(data[obj])["blockHeight"]));
       var tempBlock = data[obj];
       frankieCoin.addBlockFromDataStream(tempBlock,"sending in block "+JSON.parse(tempBlock)["blockHeight"]);
       frankieCoin.blockHeight = parseInt(JSON.parse(tempBlock)["blockHeight"]);
+      chainState.chainWalkHeight = parseInt(JSON.parse(tempBlock)["blockHeight"]);
+      chainState.chainWalkHash = parseInt(JSON.parse(tempBlock)["hash"]);
+
+      console.log(chalk.bgBlue.yellow.bold("calling the calculate check points in chaingrab top "+chainState.chainWalkHeight));
+      calculateCheckPoints(frankieCoin.blockHeight,'miner','');
+
+      chainState.synchronized = parseInt(JSON.parse(tempBlock)["blockHeight"]);
+      chainState.topBlock = parseInt(JSON.parse(tempBlock)["blockHeight"]);
 
     }else{
       //block existed
-      //log("block exists in chain data: "+JSON.parse(data[obj])["blockHeight"]);
+      console.log(chalk.magenta("block already in memory: ")+chalk.yellow(JSON.parse(data[obj])["blockHeight"]));
       frankieCoin.blockHeight = parseInt(JSON.parse(data[obj])["blockHeight"]);
+      chainState.chainWalkHeight = parseInt(JSON.parse(data[obj])["blockHeight"]);
+      chainState.chainWalkHash = parseInt(JSON.parse(data[obj])["hash"]);
+
+      console.log(chalk.bgBlue.yellow.bold("calling the calculate check points in chaingrab bottom"));
+      calculateCheckPoints(frankieCoin.blockHeight,'miner','');
+
+      chainState.synchronized = parseInt(JSON.parse(data[obj])["blockHeight"]);
+      chainState.topBlock = parseInt(JSON.parse(data[obj])["blockHeight"]);
     }
-    blockHeightPtr++;
   }
   //log(chalk.blue("BlocHeightPtr: "+ chalk.green(blockHeightPtr)));
 
   setTimeout(function(){
-    //console.log(frankieCoin.blockHeight);
+    console.log("4529 check frankieCoin.blockHeight "+frankieCoin.blockHeight+" chainState.chainWalkHeight "+chainState.chainWalkHeight+" calling with "+parseInt(chainState.chainWalkHeight+1));
     if(frankieCoin.blockHeight > 1){
       console.log("calling brv line 4352 THIS IS IN CHAINGRAB STARTUP CONDITION");
-      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(frankieCoin.blockHeight+frankieCoin.chainRiser+1),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,2718);
+      //BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(frankieCoin.blockHeight+frankieCoin.chainRiser+1),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,2718);
 
     }
-  },1000);
+  },5000);
   //this is where we call a function with the blockHeight pointer that finds out the peerBlockHeight and then download missing data
   /***
   for (let id in peers) {
@@ -4555,138 +4596,145 @@ var cbChainGrab = async function(data) {
   BlkDB.addChainState("cs:blockHeight",parseInt(frankieCoin.blockHeight));
   //console.log("about to send this to rpc "+JSON.stringify({block:frankieCoin.getLatestBlock()}))
 
-  var countPostMinerCalled = 0;
-  var postMiner = function(){
-    console.log(chalk.bgRed("POSTING FOR RPC DOES IT CHECK CB CHAIN GRAB "+allWaiting.length))
-    if(allWaiting.length > 0){
+  if(parseInt(frankieCoin.blockHeight) > 1){
+    var countPostMinerCalled = 0;
+    var postMiner = function(){
+      console.log(chalk.bgRed("POSTING FOR RPC DOES IT CHECK CB CHAIN GRAB "+allWaiting.length))
+      if(allWaiting.length > 0){
 
-      setTimeout(function(){
-        if(countPostMinerCalled < 4){//recursion number of calls in 500 ms increments (osoese is recursion woot)
-          postMiner();
-        }else{
-          if(allWaiting.length == allWaitingLength){
-            console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
-            console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
-            console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
-            console.log("cliping chain from "+frankieCoin.blockHeight+" back one riser ");
-            BlkDB.deleteTransactions();
-            chainState.transactionHeight = 0;
-            chainState.transactionRootHash = '';
-            chainState.previousTxHeight = 0;
-            chainState.previousTxHash = '';
-            chainState.transactionHashWeights = [];
-            BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
-            chainClipper(frankieCoin.blockHeight).then(function(){
-              console.log("calling brv line 4411");
-              BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
-            });
-            cbReset();
-            //process.exit();//this is going to be added to the index.js process monitor
-          }else if(allWaiting.length == 0){//only one peer left
-            //rpcserver.openPort(1);
-            chainState.isMining = false;
-            cleanUpWaitingRemoveLag().then(function(reply){
-              if(reply == 0){
+        setTimeout(function(){
+          if(countPostMinerCalled < 4){//recursion number of calls in 500 ms increments (osoese is recursion woot)
+            postMiner();
+          }else{
+            if(allWaiting.length == allWaitingLength){
+              console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
+              console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
+              console.log(chalk.bgRed.white("NO THANK YOU RESPONSES MEANS YOU ARE ROGUE MINING"));
+              console.log("cliping chain from "+frankieCoin.blockHeight+" back one riser ");
+              BlkDB.deleteTransactions();
+              chainState.transactionHeight = 0;
+              chainState.transactionRootHash = '';
+              chainState.previousTxHeight = 0;
+              chainState.previousTxHash = '';
+              chainState.transactionHashWeights = [];
+              BlkDB.addChainState("cs:transactionHeight",chainState.transactionHeight+":"+'');
+              chainClipper(frankieCoin.blockHeight).then(function(){
+                console.log("calling brv line 4411");
+                BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
+              });
+              cbReset();
+              //process.exit();//this is going to be added to the index.js process monitor
+            }else if(allWaiting.length == 0){//only one peer left
+              //rpcserver.openPort(1);
+              chainState.isMining = false;
+              cleanUpWaitingRemoveLag().then(function(reply){
+                if(reply == 0 || reply == 1){
+                  //if(chainStateMonitor.rpcBlock < chainState.topBlock){
+                  if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
+                    setTimeout(function(){
+                      console.log("4387 posting rpc for mininng cleanUpWaitingRemoveLag reply 0 ");
+                      console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
+                      rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                      chainStateMonitor.rpcBlock = chainState.topBlock;
+                    },3000);
+                  }
+                }else if(reply > 1){
+                  console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
+                  //if(chainStateMonitor.rpcBlock < chainState.topBlock){
+                  if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
+                    setTimeout(function(){
+                      console.log("4393 posting rpc for mininng cleanUpWaitingRemoveLag reply 1 to 3 ");
+                      console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
+                      rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+                      chainStateMonitor.rpcBlock = chainState.topBlock;
+                    },5000);
+                  }
+                  cbReset();
+                }else{
+
+                  console.log("4408 WE RESET and SEND NODE STATE PONG (not done yet) ");
+
+                  for(let id in peers){
+                    if(peers[id] && peers[id].conn != undefined){
+                      peers[id].conn.write(JSON.stringify(
+                        {"nodeStatePong":{
+                          Height:parseInt(chainState.synchronized),
+                          MaxHeight:parseInt(chainState.synchronized),
+                          PeerNonce:parseInt(chainState.peerNonce),
+                          GlobalHash:globalGenesisHash,
+                          checkPointHash:chainState.checkPointHash,
+                          currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+                          transactionHeight:chainState.transactionHeight,
+                          transactionRootHash:chainState.transactionRootHash,
+                          orderHeight:chainState.orderHeight,
+                          orderRootHash:chainState.orderRootHash,
+                          prevTxHeight:chainState.previousTxHeight,
+                          previousTxHash:chainState.previousTxHash,
+                          NodeType:nodeType.current,
+                          utcTimeStamp:parseInt(new Date().getTime()/1000)
+                        }}));
+                    }
+                  }
+
+                  setTimeout(function(){cbReset();},2000);
+
+                }
+              }).catch(function(err){
+                console.log("cleanUpWaitingRemoveLag has error "+err);
+                allWaiting = [];
+                allWaitingLength = 0;
                 //if(chainStateMonitor.rpcBlock < chainState.topBlock){
                 if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
                   setTimeout(function(){
-                    console.log("4387 posting rpc for mininng cleanUpWaitingRemoveLag reply 0 ");
+                    console.log("4406 posting rpc for mininng cleanUpWaitingRemoveLag errors ");
                     console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                     rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                     chainStateMonitor.rpcBlock = chainState.topBlock;
                   },3000);
                 }
-              }else if(reply > 1){
-                console.log("WE RESET and SET LONGER TIMEOUT to give lagging peers a chance");
+                cbReset();
+              })
+
+            }else{
+              setTimeout(function(){
+                console.log("4415 posting rpc for mininng because 3 or more peers match tx ");
+                console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                 //if(chainStateMonitor.rpcBlock < chainState.topBlock){
                 if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
-                  setTimeout(function(){
-                    console.log("4393 posting rpc for mininng cleanUpWaitingRemoveLag reply 1 to 3 ");
-                    console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-                    rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-                    chainStateMonitor.rpcBlock = chainState.topBlock;
-                  },5000);
-                }
-                cbReset();
-              }else{
-
-                console.log("4408 WE RESET and SEND NODE STATE PONG (not done yet) ");
-
-                for(let id in peers){
-                  if(peers[id] && peers[id].conn != undefined){
-                    peers[id].conn.write(JSON.stringify(
-                      {"nodeStatePong":{
-                        Height:parseInt(chainState.synchronized),
-                        MaxHeight:parseInt(chainState.synchronized),
-                        PeerNonce:parseInt(chainState.peerNonce),
-                        GlobalHash:globalGenesisHash,
-                        checkPointHash:chainState.checkPointHash,
-                        currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
-                        transactionHeight:chainState.transactionHeight,
-                        transactionRootHash:chainState.transactionRootHash,
-                        orderHeight:chainState.orderHeight,
-                        orderRootHash:chainState.orderRootHash,
-                        prevTxHeight:chainState.previousTxHeight,
-                        previousTxHash:chainState.previousTxHash,
-                        NodeType:nodeType.current,
-                        utcTimeStamp:parseInt(new Date().getTime()/1000)
-                      }}));
-                  }
-                }
-
-                setTimeout(function(){cbReset();},2000);
-
-              }
-            }).catch(function(err){
-              console.log("cleanUpWaitingRemoveLag has error "+err);
-              allWaiting = [];
-              allWaitingLength = 0;
-              //if(chainStateMonitor.rpcBlock < chainState.topBlock){
-              if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
-                setTimeout(function(){
-                  console.log("4406 posting rpc for mininng cleanUpWaitingRemoveLag errors ");
-                  console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                   rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
                   chainStateMonitor.rpcBlock = chainState.topBlock;
-                },3000);
-              }
-              cbReset();
-            })
-
-          }else{
-            setTimeout(function(){
-              console.log("4415 posting rpc for mininng because 3 or more peers match tx ");
-              console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-              //if(chainStateMonitor.rpcBlock < chainState.topBlock){
-              if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
-                rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-                chainStateMonitor.rpcBlock = chainState.topBlock;
-              }
-            },5000)
+                }
+              },5000)
+            }
           }
-        }
-        countPostMinerCalled+=1;
-      },500)
+          countPostMinerCalled+=1;
+        },500)
 
-    }else{
+      }else{
 
-      setTimeout(function(){
-        console.log("IN CALLBACK YOU NEVER SET IF THERE ARE NO RETURNS");
-        console.log("4424 posting rpc for mininng this one is called on startup ");
-        console.log(chainStateMonitor)
-        console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
-        if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
-          rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
-          chainStateMonitor.rpcBlock = chainState.topBlock;
-        }
-      },3000);
+        console.log("this logic makes no sense to me why post rpc ?");
+        console.log("chainState.chainWalkHeight "+chainState.chainWalkHeight);
+        console.log("chainState.topBlock "+chainState.topBlock);
+        console.log("frankieCoin.blockHeight "+frankieCoin.blockHeight);
 
+        /***
+        setTimeout(function(){
+          console.log("IN CALLBACK YOU NEVER SET IF THERE ARE NO RETURNS");
+          console.log("4424 posting rpc for mininng this one is called on startup ");
+          console.log(chainStateMonitor)
+          console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
+          if(chainStateMonitor.rpcBlock < chainState.topBlock && chainState.chainWalkHeight <= chainStateMonitor.longPeerNonce){
+            rpcserver.postRPCforMiner({block:frankieCoin.getLatestBlock()});
+            chainStateMonitor.rpcBlock = chainState.topBlock;
+          }
+        },3000);
+        ***/
+
+      }
 
     }
-
+    postMiner();
   }
-  postMiner();
-
 
   //need to open back up synching
   isSynching = false;
@@ -4700,7 +4748,11 @@ async function ChainGrab(blocknum){
   function chainHeight() {
     return new Promise(resolve => {
       var currentHeight = async function(val){
-        console.log("this is what we called "+val);
+        console.log("4714 chaingrab called "+val);
+
+        //chainState.chainWalkHeight = parseInt(val);
+        //chainState.synchronized = parseInt(val);
+        //chainState.topBlock = parseInt(val);
 
         function transactionHeight() {
           return new Promise(resolve => {
@@ -4720,9 +4772,10 @@ async function ChainGrab(blocknum){
 
         await transactionHeight();
 
-        resolve(
-          BlkDB.getBlockRange(val,frankieCoin.chainRiser,cbChainGrab)
-        )
+        console.log(" 4741 calling cbChainGrab "+val);
+        BlkDB.getBlockRange(val,frankieCoin.chainRiser,cbChainGrab)
+
+        resolve(console.log("right after the 4741 call "))
       }
       BlkDB.getChainStateParam("blockHeight",currentHeight);
     });
@@ -4730,17 +4783,17 @@ async function ChainGrab(blocknum){
 
   await chainHeight();
 
-
-
   var resetOrderHeight = function(val){
-    console.log(chalk.bgGreen("in chain grab setting transaction state based on "+val))
+    console.log(chalk.bgGreen("in chain grab setting orders state based on "+val))
     if(val != 0){
       setChainStateOX(val.split(":")[0],val.split(":")[1]);
     }
   }
   BlkDB.getChainStateParam("orderHeight",resetOrderHeight);
 
-  setTimeout(adjustedTimeout, 3000);
+  BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
+
+  setTimeout(adjustedTimeout, 30000);
   //maybe some other stuff like .then
 };
 
