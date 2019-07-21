@@ -802,24 +802,31 @@ var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
       var riserOffset = (parseInt(blockNum) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
       var checkPointBlock = frankieCoin.getBlockFromIndex(parseInt(riserOffset+1));///getCheckpoint
       checkPointBlock = JSON.stringify(checkPointBlock);
-      console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
 
-      var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
-      //var blockNumHash = await JSON.parse(BlkDB.getBlock(blockNum))["hash"];
-      //console.log("blockNumHash: "+blockNumHash);
+      try{
+        console.log("CALCULATED CHECK POINT IS "+JSON.parse(checkPointBlock)["blockHeight"]+" Hash "+JSON.parse(checkPointBlock)["hash"]);
 
-      var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+        var blockNumHash = JSON.parse(JSON.stringify(frankieCoin.getBlock(blockNum)))["hash"];
+        //var blockNumHash = await JSON.parse(BlkDB.getBlock(blockNum))["hash"];
+        //console.log("blockNumHash: "+blockNumHash);
 
-      if(source == "miner"){
-        chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
-        chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
-        return 1;
-      }else if(source == "peer" && incomingCheckHash.split(":")[0] == blockNum && incomingCheckHash.split(":")[1] == thisBlockCheckPointHash){
-        chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
-        chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
-        return 1;
-      }else{
-        return 2;
+        var thisBlockCheckPointHash = sapphirechain.Hash(blockNumHash+JSON.parse(checkPointBlock)["hash"]);
+
+        if(source == "miner"){
+          chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
+          chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
+          return 1;
+        }else if(source == "peer" && incomingCheckHash.split(":")[0] == blockNum && incomingCheckHash.split(":")[1] == thisBlockCheckPointHash){
+          chainState.previousBlockCheckPointHash = chainState.currentBlockCheckPointHash;
+          chainState.currentBlockCheckPointHash = {"blockNumber":blockNum,"checkPointHash":thisBlockCheckPointHash};
+          return 1;
+        }else{
+          return 2;
+        }
+
+      }catch(err){
+        console.log("ERROR FOUND at 805 and "+blockNum)
+        return;
       }
 
       //console.log(JSON.stringify(chainState.previousBlockCheckPointHash))
@@ -1103,6 +1110,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
     ***/
 
     if(chainState.chainWalkHeight == parseInt(frankieCoin.blockHeight-1)){
+      console.log("calling calculateCheckPoints 1106");
       calculateCheckPoints(
         parseInt(frankieCoin.blockHeight-1),
         'miner',
@@ -1115,6 +1123,7 @@ var cbBlockChainValidatorStartUp = function(isValid,replyData,replyHash){
         }
       });
     }else if(chainState.chainWalkHeight == frankieCoin.blockHeight){
+      console.log("calling calculateCheckPoints 1119");
       calculateCheckPoints(
         frankieCoin.blockHeight,
         'miner',
@@ -1235,6 +1244,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     ***/
 
     if(chainState.chainWalkHeight == parseInt(frankieCoin.blockHeight-1)){
+      console.log("calling calculateCheckPoints 1240");
       calculateCheckPoints(
         parseInt(frankieCoin.blockHeight-1),
         'miner',
@@ -1247,6 +1257,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         }
       });
     }else if(chainState.chainWalkHeight == frankieCoin.blockHeight){
+      console.log("calling calculateCheckPoints 1253");
       calculateCheckPoints(
         frankieCoin.blockHeight,
         'miner',
@@ -2301,6 +2312,7 @@ var cbReset = async function(full = false){
                 console.log(chalk.bgBlue("chainState.topBlock: ")+chalk.black.bgCyan(chainState.topblock));
                 console.log(chalk.bgRed("                                                    "));
                 //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
+                  console.log("calling calculateCheckPoints 2308");
                   calculateCheckPoints(
                     frankieCoin.blockHeight,
                     'peer',
@@ -2336,6 +2348,7 @@ var cbReset = async function(full = false){
                 console.log(chalk.bgGreen("                                                    "));
 
                 //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
+                  console.log("calling calculateCheckPoints 2344");
                   calculateCheckPoints(
                     frankieCoin.blockHeight,
                     'peer',
@@ -2479,6 +2492,7 @@ var cbReset = async function(full = false){
                           BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
 
                           //miner call
+                          console.log("calling calculateCheckPoints 2488");
                           calculateCheckPoints(frankieCoin.blockHeight,'miner','');
 
                       }else if(parseInt(response == 2)){
@@ -4534,7 +4548,7 @@ var cbChainGrab = async function(data) {
       chainState.chainWalkHeight = parseInt(JSON.parse(tempBlock)["blockHeight"]);
       chainState.chainWalkHash = parseInt(JSON.parse(tempBlock)["hash"]);
 
-      console.log(chalk.bgBlue.yellow.bold("calling the calculate check points in chaingrab top "+chainState.chainWalkHeight));
+      console.log("calling calculateCheckPoints 4544 frankieCoin.blockHeight "+frankieCoin.blockHeight);
       calculateCheckPoints(frankieCoin.blockHeight,'miner','');
 
       chainState.synchronized = parseInt(JSON.parse(tempBlock)["blockHeight"]);
@@ -4547,7 +4561,7 @@ var cbChainGrab = async function(data) {
       chainState.chainWalkHeight = parseInt(JSON.parse(data[obj])["blockHeight"]);
       chainState.chainWalkHash = parseInt(JSON.parse(data[obj])["hash"]);
 
-      console.log(chalk.bgBlue.yellow.bold("calling the calculate check points in chaingrab bottom"));
+      console.log("calling calculateCheckPoints 4557");
       calculateCheckPoints(frankieCoin.blockHeight,'miner','');
 
       chainState.synchronized = parseInt(JSON.parse(data[obj])["blockHeight"]);
@@ -4745,14 +4759,32 @@ var cbChainGrab = async function(data) {
 async function ChainGrab(blocknum){
   //BlockchainDB.getBlockchain(99,cbChainGrab);
   //BlkDB.getBlockchain(99,cbChainGrab,globalGenesisHash)
+  var currCWH;
   function chainHeight() {
     return new Promise(resolve => {
       var currentHeight = async function(val){
         console.log("4714 chaingrab called "+val);
 
-        //chainState.chainWalkHeight = parseInt(val);
-        //chainState.synchronized = parseInt(val);
-        //chainState.topBlock = parseInt(val);
+        chainState.chainWalkHeight = parseInt(val);
+        chainState.synchronized = parseInt(val);
+        chainState.topBlock = parseInt(val);
+
+
+        var getBlockHeightInformation = async function(startupBlockHeight){
+
+          var getDatabaseBlockHash = function(blkEnd){
+            currCWH = JSON.parse(blkEnd)["hash"];
+            chainState.chainWalkHash = currCWH;
+            console.log("returning chain walk hash "+currCWH);
+            //calculateCheckPoints(startupBlockHeight,'miner','');
+          }
+          BlkDB.getBlock(parseInt(startupBlockHeight),getDatabaseBlockHash);
+
+          return;
+
+        }
+
+        await getBlockHeightInformation(val);
 
         function transactionHeight() {
           return new Promise(resolve => {
@@ -4773,7 +4805,7 @@ async function ChainGrab(blocknum){
         await transactionHeight();
 
         console.log(" 4741 calling cbChainGrab "+val);
-        BlkDB.getBlockRange(val,frankieCoin.chainRiser,cbChainGrab)
+
 
         resolve(console.log("right after the 4741 call "))
       }
@@ -4791,7 +4823,8 @@ async function ChainGrab(blocknum){
   }
   BlkDB.getChainStateParam("orderHeight",resetOrderHeight);
 
-  BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,2216);
+  BlkDB.getBlockRange(parseInt(chainState.chainWalkHeight),frankieCoin.chainRiser,cbChainGrab)
+  //BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,currCWH,frankieCoin.chainRiser,4811);
 
   setTimeout(adjustedTimeout, 30000);
   //maybe some other stuff like .then
@@ -5474,6 +5507,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
         chainState.topBlock = frankieCoin.blockHeight;
 
         //if(frankieCoin.blockHeight > frankieCoin.chainRiser){
+          console.log("calling calculateCheckPoints 5504");
           calculateCheckPoints(frankieCoin.blockHeight,'miner','');
         //}
         ///////////////////////////////////////////////////////////peers broadcast
@@ -5918,7 +5952,8 @@ var impcevent = function(callback){
 //this is a function to turn off excess communications to miners
 var thisNodeCanMine = function(){
   //minerPing();
-  return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":"+frankieCoin.nodes.length+":"+chainStateMonitor.longPeerNonce;
+  //return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":"+frankieCoin.nodes.length+":"+chainStateMonitor.longPeerNonce;
+  return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":4:"+chainStateMonitor.longPeerNonce;
 }
 var thisNodeIsMininig = function(){
   ExPl.closeExplorer();
