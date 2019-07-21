@@ -2230,6 +2230,7 @@ var cbReset = async function(full = false){
           //{checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}
           }else if(JSON.parse(data)["checkPointHash"] && JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
 
+            console.log("INCOMING block "+JSON.parse(data));
 
             var riserOffset = (parseInt(JSON.parse(data)["block"]["blockHeight"]) % parseInt(frankieCoin.chainRiser));//keep in mind it is plus 1 for chain
 
