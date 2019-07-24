@@ -2080,7 +2080,7 @@ var cbReset = async function(full = false){
         let chunk;
         while (null !== (chunk = this.read())) {
           //console.log(`Received ${chunk.length} bytes of data.`);
-          //console.log(chunk.toString());
+          console.log(chunk.toString());
           //console.log("<== ");
           incomingStream+=chunk.toString()
           incomingBufferArray.push(chunk.toString());
@@ -2094,7 +2094,7 @@ var cbReset = async function(full = false){
 
 
         //console.log("type of is "+typeof(data)+JSON.stringify(data));
-        //log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
+        log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
 
 
         // callback returning verified uncles ALSO USED FOR THANKS post processing probably needs a rename
@@ -4997,7 +4997,7 @@ var broadcastPeersBlock = function(trigger,order = '',deletedOrders){
   if(trigger == "block"){
     //sending the block to the peers
     log("------------------------------------------------------")
-    log(chalk.bgGreen("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
+    log(chalk.bgGreen/white.bold("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
     log("------------------------------------------------------")
 
     //tracking replies
