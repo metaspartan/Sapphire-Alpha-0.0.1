@@ -344,7 +344,7 @@ var removeStuckPeerMonitor = function(id){
 var activeSync = function(timer){
 
   if(timer == undefined){
-    timer = 2000;
+    timer = 4019;
   }
   //the most important part of activesync is the sync either the chainWalkHeight = 1, is less than a peerNonce OR is GTE to peerNonce in which case we check the longpeernonce
   if(chainState.chainWalkHeight == 1){
@@ -4997,7 +4997,7 @@ var broadcastPeersBlock = function(trigger,order = '',deletedOrders){
   if(trigger == "block"){
     //sending the block to the peers
     log("------------------------------------------------------")
-    log(chalk.bgGreen/white.bold("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
+    log(chalk.bgGreen.white.bold("BROADCASTING QUARRY MINED BLOCK TO PEERS"))
     log("------------------------------------------------------")
 
     //tracking replies
