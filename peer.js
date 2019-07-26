@@ -5560,6 +5560,8 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                   console.log(chalk.bgRed.white("this case needs to be looked at if it is getting triggered a lot"));
                   allWaiting = [];
                   allWaitingLength = 0;
+                  //node Type set back to 3
+                  nodeType.current = 3;
                   setTimeout(function(){cbReset();},1000);
 
                 }
