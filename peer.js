@@ -2080,8 +2080,9 @@ var cbReset = async function(full = false){
         let chunk;
         while (null !== (chunk = this.read())) {
           //console.log(`Received ${chunk.length} bytes of data.`);
+          console.log("conn1 chunk ==>");
           console.log(chunk.toString());
-          //console.log("<== ");
+          console.log("<== conn1 chunk");
           incomingStream+=chunk.toString()
           incomingBufferArray.push(chunk.toString());
         }
@@ -2691,7 +2692,8 @@ var cbReset = async function(full = false){
                 JSON.parse(data)["nodeStatePing"]["orderRootHash"],
                 JSON.parse(data)["nodeStatePing"]["utcTimeStamp"]
               )
-              if(chainState.previousTxHeight > 0 && parseInt(chainState.previousTxHeight+1) == chainState.transactionHeight){
+              //if(chainState.previousTxHeight > 0 && parseInt(chainState.previousTxHeight+1) == chainState.transactionHeight){
+              if(chainState.previousTxHeight > 0){
 
                 if(peers[peerId] && peers[peerId].conn != undefined){
                   peers[peerId].conn.write(JSON.stringify(
@@ -3329,8 +3331,10 @@ var cbReset = async function(full = false){
         let chunk;
         while (null !== (chunk = this.read())) {
           //console.log(`Received ${chunk.length} bytes of data.`);
-          //console.log(chunk.toString());
-          //console.log("<== ");
+
+          console.log("conn2 chunk ==>");
+          console.log(chunk.toString());
+          console.log("<== conn2 chunk");
           incomingStream2+=chunk.toString()
           incomingBufferArray2.push(chunk.toString());
         }
