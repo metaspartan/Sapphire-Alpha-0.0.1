@@ -2134,7 +2134,10 @@ var cbReset = async function(full = false){
         if(isJSON(data.toString())){
 
           console.log("is json")
-          console.log(data.toString().substr(0,200));
+          console.log(data.toString().substr(0,500));
+          if(JSON.parse(data)["checkPointHash"] && JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
+            console.log("IT SHOWS IT HERE");
+          }
 
           if(JSON.parse(data)["thanks"]){
 
