@@ -2133,6 +2133,8 @@ var cbReset = async function(full = false){
   ////////////////////////////////////////////begin the if block for incoming data
         if(isJSON(data.toString())){
 
+          console.log("is json")
+
           if(JSON.parse(data)["thanks"]){
 
             //console.log("you got a thanks from "+peerId);
@@ -2219,7 +2221,9 @@ var cbReset = async function(full = false){
                 }else{
                   console.log("validatedSender "+validatedSender.toLowerCase()+" does not equal "+addressFrom.replace(/['"]+/g, '').toLowerCase());
                 }
-            }else if(JSON.parse(message)["order"]){
+            }
+
+            if(JSON.parse(message)["order"]){
                 console.log("TTTTTTTTTTTTTTTTTTTT    OXOXOXOXOXOXOXO    TTTTTTTTTTTTTTTTTTTTTTTTTT");
                 var order = JSON.stringify(JSON.parse(message)["order"]);
                 var addressFrom = JSON.stringify(JSON.parse(order)["fromAddress"]).replace(/['"/]+/g, '');
@@ -2247,16 +2251,21 @@ var cbReset = async function(full = false){
             }else{
                 console.log("SOME OTHER TRANSMISSION NOT FORMATTED CORRECTLY")
             }
-          }else if(JSON.parse(data)["deletableOrders"]){
+          }
+
+          if(JSON.parse(data)["deletableOrders"]){
             var getDeleteableOrders = JSON.parse(data)["deletableOrders"];
             console.log("these will be the deleted orders....%%%%%%%%%%%%%%%%%%");
             for(oxdel in getDeleteableOrders){
               console.log(JSON.stringify(getDeleteableOrders[oxdel]));
             }
-  ////////////////////////////////////////////////////////////incomeing peer block
-          }else if(JSON.parse(data)["previousHash"]){/////////need more refinement
+
+          }
+
+          ////////////////////////////////////////////////////////////incomeing peer block
+          //if(JSON.parse(data)["previousHash"]){/////////need more refinement
           //{checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}
-          //}else if(JSON.parse(data)["checkPointHash"] && JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
+          if(JSON.parse(data)["checkPointHash"] && JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
 
             console.log("INCOMING block "+JSON.parse(data));
 
@@ -2577,7 +2586,9 @@ var cbReset = async function(full = false){
 
 
 
-          }else if(JSON.parse(data)["syncTrigger"]){
+          }
+
+          if(JSON.parse(data)["syncTrigger"]){
 
             //isSynching = yes
             chainState.isSynching=true;
@@ -2595,11 +2606,9 @@ var cbReset = async function(full = false){
             });
             cbReset();
 
-          }else if(JSON.parse(data)["fromAddress"]){
+          }
 
-            log("well, this is an order and we need to give it a transaction id when mined");
-
-          }else if(JSON.parse(data)["uncle"]){
+          if(JSON.parse(data)["uncle"]){
 
             //ver first thing is stop communicating until this rewind happens
             rpcserver.closePort();
@@ -2659,7 +2668,9 @@ var cbReset = async function(full = false){
             //clipChainAt(parseInt(chainState.syncronized - 10))
             //////////////////////////////////////////////////END PROPER PROCESS
             *****/
-          }else if(JSON.parse(data)["nodeStatePong"]){
+          }
+
+          if(JSON.parse(data)["nodeStatePong"]){
 
             var nSPongPeercurrentCPH = JSON.stringify(JSON.parse(data)["nodeStatePong"]["currentBlockCheckPointHash"]);
             //console.log("NODE STATE PONG "+JSON.parse(nSPongPeercurrentCPH)["blockNumber"]+" AND YOU "+chainState.synchronized)
@@ -2693,7 +2704,9 @@ var cbReset = async function(full = false){
               )
             }
 
-          }else if(JSON.parse(data)["nodeStatePing"]){
+          }
+
+          if(JSON.parse(data)["nodeStatePing"]){
 
             var nSPingPeercurrentCPH = JSON.stringify(JSON.parse(data)["nodeStatePing"]["currentBlockCheckPointHash"]);
             //console.log("NODE STATE PONG "+JSON.parse(nSPingPeercurrentCPH)["blockNumber"]+" AND YOU "+chainState.synchronized)
@@ -2750,7 +2763,9 @@ var cbReset = async function(full = false){
 
             }
 
-          }else if(JSON.parse(data)["ChainSyncPing"]){
+          }
+
+          if(JSON.parse(data)["ChainSyncPing"]){
 
             console.log(chalk.bgCyan.black(JSON.stringify(JSON.parse(data)["ChainSyncPing"])));
             if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash && (parseInt(JSON.parse(data)["ChainSyncPing"]["PeerNonce"]) == chainState.peerNonce) && chainState.isMining == false){
@@ -2872,13 +2887,17 @@ var cbReset = async function(full = false){
               ///tesst out setTimeout(function(){disconnet peers[peerId].conn.dissconnet();},1500);
             }
 
-          }else if(JSON.parse(data)["BadPeer"]){
+          }
+
+          if(JSON.parse(data)["BadPeer"]){
             log("------------------------------------------------------");
             log(chalk.red("You modified your code base please update and try again"));
             log("------------------------------------------------------");
             process.exit();
             exit();
-          }else if(JSON.parse(data)["peerSafe"]){//PEER SAFE MESSAGES
+          }
+
+          if(JSON.parse(data)["peerSafe"]){//PEER SAFE MESSAGES
             //log(chalk.bgRed("------------------------------------------------------"));
             //log(chalk.red("THIS IS A PEER SAFE MESSAGE AND WILL BE HIDDEN"));
             //log(chalk.bgRed("------------------------------------------------------"));
@@ -3206,9 +3225,13 @@ var cbReset = async function(full = false){
                 //peers[frankieCoin.nodes[i]["id"]].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:secretPeerMSG,secretAction:secretAction,encoded:encryptedMessageToSend,public:ecdhPubKeyHex}}));
               }
             }
-          }else if(JSON.parse(data)["pongBlockStream"] && isSynching == true){
+          }
+
+          if(JSON.parse(data)["pongBlockStream"] && isSynching == true){
             console.log("Extra peer returned synch message but synch is in progress so ignoring")
-          }else if(JSON.parse(data)["pongBlockStream"] && isSynching == false){
+          }
+
+          if(JSON.parse(data)["pongBlockStream"] && isSynching == false){
 
             isSynching = true;
             chainState.isSynching = true;
@@ -3243,7 +3266,9 @@ var cbReset = async function(full = false){
             //console.log("Data stream import initialized");
             //DatSyncLink.grabDataFile(mydata,cbRefreshDB);
 
-          }else if(JSON.parse(data)["ChainSyncPong"]){
+          }
+
+          if(JSON.parse(data)["ChainSyncPong"]){
             //returned block from sunched peer and parses it for db
             //log(JSON.parse(data)["ChainSyncPong"]);
             if(JSON.parse(data)["ChainSyncPong"]["GlobalHash"] == globalGenesisHash){
