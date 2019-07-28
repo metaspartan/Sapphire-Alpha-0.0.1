@@ -2135,7 +2135,7 @@ var cbReset = async function(full = false){
 
           console.log("is json")
           console.log(data.toString().substr(0,500));
-          if(JSON.parse(data)["checkPointHash"] && JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
+          if(JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
             console.log("IT SHOWS IT HERE");
           }
 
@@ -2269,7 +2269,7 @@ var cbReset = async function(full = false){
           ////////////////////////////////////////////////////////////incomeing peer block
           //if(JSON.parse(data)["previousHash"]){/////////need more refinement
           //{checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}
-          if(JSON.parse(data)["checkPointHash"] && JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
+          if(JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
 
             console.log("INCOMING block "+JSON.parse(data));
 
