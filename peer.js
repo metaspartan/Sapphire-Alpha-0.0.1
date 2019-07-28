@@ -2077,14 +2077,43 @@ var cbReset = async function(full = false){
 
         //console.log("BLOCK STREAM "+this.readableHighWaterMark);
 
+        console.log(chalk.bgYellow.blue.bold("READABLE"));
         let chunk;
         while (null !== (chunk = this.read())) {
           //console.log(`Received ${chunk.length} bytes of data.`);
-          console.log("conn1 chunk ==>");
-          console.log(chunk.toString());
-          console.log("<== conn1 chunk");
+
+          var showLog = true;
+
           incomingStream+=chunk.toString()
           incomingBufferArray.push(chunk.toString());
+
+          if(isJSON(chunk.toString() && chunk.toString().includes('{"nodeStatePing"'))){
+            console.log(chalk.bgMagenta.white.bold("NODE STATE PING"));
+            showLog = false;
+          }
+
+          if(isJSON(chunk.toString() && chunk.toString().includes('{"nodeStatePong"'))){
+            console.log(chalk.bgBlue.white.bold("NODE STATE PONG"));
+            showLog = false;
+          }
+
+          if(
+            isJSON(chunk.toString())
+            && chunk.toString().includes('"checkPointHash"')
+            && chunk.toString().includes('"block"')
+          ){
+            console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
+            console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
+            console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
+            showLog = false;
+          }
+
+          if(showLog == true){
+            console.log("conn1 chunk ==>");
+            console.log(chunk.toString());
+            console.log("<== conn1 chunk");
+          }
+
         }
 
       });
@@ -2093,9 +2122,9 @@ var cbReset = async function(full = false){
       conn.on('data', data => {
         // Here we handle incomming messages
 
-
+        console.log(chalk.bgYellow.blue.bold("DATA"));
         //console.log("type of is "+typeof(data)+JSON.stringify(data));
-        log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
+        //log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
 
 
         // callback returning verified uncles ALSO USED FOR THANKS post processing probably needs a rename
@@ -3307,8 +3336,25 @@ var cbReset = async function(full = false){
         if(incomingStream2.startsWith('{"blockHeight"}') || incomingStream2.startsWith('[{"ox:') || incomingStream2.startsWith('[{"tx:') || incomingStream2.startsWith('[{"sfblk:')){
 
           console.log(chalk.bgRed("data stream ended"));
+
+          if(incomingStream2.includes('{"blockHeight"')){
+            console.log(chalk.bgBlue.white.bold("CONN2 >> ")+chalk.bgYellow.blue.bold("BLOCKHEIGHT"));
+          }
+          if(incomingStream2.includes('{"ox:')){
+            console.log(chalk.bgBlue.white.bold("CONN2 >> ")+chalk.bgYellow.blue.bold("OX"));
+          }
+          if(incomingStream2.includes('{"tx:')){
+            console.log(chalk.bgBlue.white.bold("CONN2 >> ")+chalk.bgYellow.blue.bold("TX"));
+          }
+          if(incomingStream2.includes('{"sfblk:')){
+            console.log(chalk.bgBlue.white.bold("CONN2 >> ")+chalk.bgYellow.blue.bold("SFBLK"));
+          }
+
+          console.log(incomingStream2.substr(0,2000))
+
           console.log(chalk.bgRed("data stream ended"));
           console.log(chalk.bgRed("data stream ended"));
+
           //console.log("CONN 2 this is on end "+incomingStream2);
           console.log("CONN 2 Importing the data file to the db and then calling the memory synch");
 
@@ -3332,11 +3378,15 @@ var cbReset = async function(full = false){
         while (null !== (chunk = this.read())) {
           //console.log(`Received ${chunk.length} bytes of data.`);
 
+          /***
           console.log("conn2 chunk ==>");
           console.log(chunk.toString());
           console.log("<== conn2 chunk");
+          ***/
+
           incomingStream2+=chunk.toString()
           incomingBufferArray2.push(chunk.toString());
+
         }
 
       });
