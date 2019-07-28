@@ -2098,9 +2098,7 @@ var cbReset = async function(full = false){
           }
 
           if(
-            isJSON(chunk.toString())
-            && chunk.toString().includes('"checkPointHash"')
-            && chunk.toString().includes('"block"')
+            chunk.toString().includes('"block"')
           ){
             console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
             console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
