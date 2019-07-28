@@ -2134,6 +2134,7 @@ var cbReset = async function(full = false){
         if(isJSON(data.toString())){
 
           console.log("is json")
+          console.log(data.toString().substr(0,200));
 
           if(JSON.parse(data)["thanks"]){
 
