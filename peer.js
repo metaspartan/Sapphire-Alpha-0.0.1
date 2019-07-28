@@ -2254,9 +2254,9 @@ var cbReset = async function(full = false){
               console.log(JSON.stringify(getDeleteableOrders[oxdel]));
             }
   ////////////////////////////////////////////////////////////incomeing peer block
-          //}else if(JSON.parse(data)["previousHash"]){/////////need more refinement
+          }else if(JSON.parse(data)["previousHash"]){/////////need more refinement
           //{checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}
-          }else if(JSON.parse(data)["checkPointHash"] && JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
+          //}else if(JSON.parse(data)["checkPointHash"] && JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
 
             console.log("INCOMING block "+JSON.parse(data));
 
