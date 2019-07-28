@@ -451,7 +451,7 @@ var activeSync = function(timer){
 
     if(nodeobj != "undefined"){
       let tobj = frankieCoin.nodes.find(o => o.id === nodeobj.peer);
-      if(tobj){
+      if(tobj && nodeobj.peerChainStateHash){
         var thisPeerCHKPTHASH = nodeobj.peerChainStateHash.checkPointHash || "..data..";
         var thisPeerTXHASH = nodeobj.peerTxHash || "..data..";
         var thisPeerOXHASH = nodeobj.peerOXHash || "..data..";
@@ -2077,7 +2077,8 @@ var cbReset = async function(full = false){
 
         //console.log("BLOCK STREAM "+this.readableHighWaterMark);
 
-        console.log(chalk.bgYellow.blue.bold("READABLE"));
+        //console.log(chalk.bgYellow.blue.bold("READABLE"));
+
         let chunk;
         while (null !== (chunk = this.read())) {
           //console.log(`Received ${chunk.length} bytes of data.`);
@@ -2088,28 +2089,28 @@ var cbReset = async function(full = false){
           incomingBufferArray.push(chunk.toString());
 
           if(isJSON(chunk.toString() && chunk.toString().includes('{"nodeStatePing"'))){
-            console.log(chalk.bgMagenta.white.bold("NODE STATE PING"));
+            //console.log(chalk.bgMagenta.white.bold("NODE STATE PING"));
             showLog = false;
           }
 
           if(isJSON(chunk.toString() && chunk.toString().includes('{"nodeStatePong"'))){
-            console.log(chalk.bgBlue.white.bold("NODE STATE PONG"));
+            //console.log(chalk.bgBlue.white.bold("NODE STATE PONG"));
             showLog = false;
           }
 
           if(
             chunk.toString().includes('"block"')
           ){
-            console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
-            console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
-            console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
+            //console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
+            //console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
+            //console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
             showLog = true;
           }
 
           if(showLog == true){
-            console.log("conn1 chunk ==>");
-            console.log(chunk.toString());
-            console.log("<== conn1 chunk");
+            //console.log("conn1 chunk ==>");
+            //console.log(chunk.toString());
+            //console.log("<== conn1 chunk");
           }
 
         }
@@ -2120,7 +2121,7 @@ var cbReset = async function(full = false){
       conn.on('data', data => {
         // Here we handle incomming messages
 
-        console.log(chalk.bgYellow.blue.bold("DATA"));
+        //console.log(chalk.bgYellow.blue.bold("DATA"));
         //console.log("type of is "+typeof(data)+JSON.stringify(data));
         //log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
 
@@ -2133,11 +2134,8 @@ var cbReset = async function(full = false){
   ////////////////////////////////////////////begin the if block for incoming data
         if(isJSON(data.toString())){
 
-          console.log("is json")
-          console.log(data.toString().substr(0,500));
-          if(JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
-            console.log("IT SHOWS IT HERE");
-          }
+          //console.log("is json")
+          //console.log(data.toString().substr(0,500));
 
           if(JSON.parse(data)["thanks"]){
 
