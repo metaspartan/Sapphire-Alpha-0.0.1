@@ -2103,7 +2103,7 @@ var cbReset = async function(full = false){
             console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
             console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
             console.log(chalk.bgBlue.white.bold("THIS IS A CREATE BLOCK"));
-            showLog = false;
+            showLog = true;
           }
 
           if(showLog == true){
@@ -2135,9 +2135,7 @@ var cbReset = async function(full = false){
 
           console.log("is json")
           console.log(data.toString().substr(0,500));
-          if( (JSON.parse(data)["checkPointHash"] && JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"])
-          || (JSON.parse(data)["nodeStatePing"] && JSON.parse(data)["nodeStatePing"]["checkPointHash"] && JSON.parse(data)["nodeStatePing"]["currentBlockCheckPointHash"] && JSON.parse(data)["nodeStatePing"]["block"])
-          ){
+          if(JSON.parse(data)["checkPointHash"] && JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
             console.log("IT SHOWS IT HERE");
           }
 
@@ -2271,9 +2269,7 @@ var cbReset = async function(full = false){
           ////////////////////////////////////////////////////////////incomeing peer block
           //if(JSON.parse(data)["previousHash"]){/////////need more refinement
           //{checkPointHash:chainState.checkPointHash,currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,block:frankieCoin.getLatestBlock()}
-          if( (JSON.parse(data)["checkPointHash"] && JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"])
-          || (JSON.parse(data)["nodeStatePing"] && JSON.parse(data)["nodeStatePing"]["checkPointHash"] && JSON.parse(data)["nodeStatePing"]["currentBlockCheckPointHash"] && JSON.parse(data)["nodeStatePing"]["block"])
-          ){
+          if(JSON.parse(data)["checkPointHash"] && JSON.parse(data)["currentBlockCheckPointHash"] && JSON.parse(data)["block"]){
 
             console.log("INCOMING block "+JSON.parse(data));
 
