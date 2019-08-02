@@ -4906,7 +4906,7 @@ async function ChainGrab(blocknum){
   BlkDB.getBlockRange(parseInt(chainState.chainWalkHeight),frankieCoin.chainRiser,cbChainGrab)
   //BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,currCWH,frankieCoin.chainRiser,4811);
 
-  setTimeout(adjustedTimeout, 5000);
+  setTimeout(adjustedTimeout, 15000);
   //maybe some other stuff like .then
 };
 
