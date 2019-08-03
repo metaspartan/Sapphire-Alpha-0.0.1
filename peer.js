@@ -2032,9 +2032,7 @@ var cbReset = async function(full = false){
       console.log(Object.keys(err))
       console.log(err.code)
       if(err.code == 'EADDRINUSE'){
-        return new Promise(resolve=>{
-          setTimeout(resolve,3000)
-        })
+        await sleep(3000)
       }
 
     })
