@@ -1032,7 +1032,9 @@ var getConnectionConfig = async function(ntwk){
       })
 
       const ntwk = swarm(config);
+      console.log("makes it past swarm");
       resolve(ntwk);
+      console.log("past resolve");
     }
     BlkDB.getChainParamsByName(globalGenesisHash,'nodePersistantId',callBackNodePersistence);
   })
