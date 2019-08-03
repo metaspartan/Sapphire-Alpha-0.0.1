@@ -2009,7 +2009,7 @@ var cbReset = async function(full = false){
 
     sw.on('error',function(err){
       console.log(Object.keys(err)+err.code)
-      if(err.code == 'EACCES'){
+      if(err.code == 'EADDRINUSE'){
         console.log("SWITCHING PORT")
       }
       port = getPort();
