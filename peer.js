@@ -2002,9 +2002,18 @@ var cbReset = async function(full = false){
     sw = await getConnectionConfig(this);
 
     sw2 = await getConnectionConfig(this);
-    
+
     sw.listen(port,function(){
       console.log('sw running on port '+port)
+    })
+
+    sw.on('error',function(err){
+      console.log(Object.keys(err)+err.code)
+      if(err.code == 'EACCES'){
+        console.log("SWITCHING PORT")
+      }
+      port = getPort();
+      cbReset();
     })
 
     sw2.listen(port2,function(){
