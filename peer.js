@@ -2023,6 +2023,18 @@ var cbReset = async function(full = false){
       console.log('sw2 running on port '+port2)
     })
 
+    sw2.on('error',async function(err){
+
+      console.log(Object.keys(err))
+      console.log(err.code)
+      if(err.code == 'EADDRINUSE'){
+        console.log("SWITCHING PORT")
+        port2 = await getPort();
+        await setTimeout(function(){cbReset();},2000)
+      }
+
+    })
+
     sw.join('egem-sfrx-001') // can be any id/name/hash
     sw2.join('egem-sfrx-002')//second teier peers
     sw.maxConnections = 4;//testing this out for node organization
