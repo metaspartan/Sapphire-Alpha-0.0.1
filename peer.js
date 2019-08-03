@@ -483,6 +483,7 @@ var activeSync = function(timer){
         //just make sure we are up to par
         if(chainState.transactionHeight < chainState.chainWalkHeight){
           tranSynch();
+          return;
         }
         //we are going to police our connections to make sure they are in sync
         if(nodeobj.peerTxHeight < chainState.synchronized){
