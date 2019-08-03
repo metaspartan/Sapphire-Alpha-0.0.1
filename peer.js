@@ -2007,13 +2007,16 @@ var cbReset = async function(full = false){
       console.log('sw running on port '+port)
     })
 
-    sw.on('error',function(err){
-      console.log(Object.keys(err)+err.code)
+    sw.on('error',async function(err){
+
+      console.log(Object.keys(err))
+      console.log(err.code)
       if(err.code == 'EADDRINUSE'){
         console.log("SWITCHING PORT")
+        port = await getPort();
+        await setTimeout(function(){cbReset();},2000)
       }
-      port = getPort();
-      cbReset();
+
     })
 
     sw2.listen(port2,function(){
