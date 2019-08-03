@@ -4799,7 +4799,7 @@ var cbChainGrab = async function(data) {
                     chainStateMonitor.rpcBlock = chainState.topBlock;
                   },3000);
                 }
-                cbReset();
+                setTimeout(function(){cbReset();},1000);
               })
 
             }else{
