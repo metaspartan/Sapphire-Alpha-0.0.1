@@ -480,6 +480,10 @@ var activeSync = function(timer){
           chalk(" ")+chalk.bgCyan.black("OXHt:")+chalk.bgMagenta.white(nodeobj.peerOXHeight)+chalk.bgMagenta.yellow(" "+thisPeerOXHASH.substring(0,8))+
           chalk(" ")+chalk.bgCyan.black("IP:")+chalk.bgRed.white((tobj.info.ip.match(ipformat)?tobj.info.ip:tobj.info.ip.split(":")[3]))
         )
+        //just make sure we are up to par
+        if(chainState.transactionHeight < chainState.chainWalkHeight){
+          tranSynch();
+        }
         //we are going to police our connections to make sure they are in sync
         if(nodeobj.peerTxHeight < chainState.synchronized){
           console.log("nodeobj.peerTxHeight "+nodeobj.peerTxHeight)
