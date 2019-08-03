@@ -2003,10 +2003,11 @@ var cbReset = async function(full = false){
 
     sw2 = await getConnectionConfig(this);
 
-    function sleep(ms){
-        return new Promise(resolve=>{
-            setTimeout(resolve,ms)
-        })
+    function msleep(n) {
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, n);
+    }
+    function sleep(n) {
+      msleep(n*1000);
     }
 
     sw.listen(port,function(){
@@ -2018,7 +2019,7 @@ var cbReset = async function(full = false){
       console.log(Object.keys(err))
       console.log(err.code)
       if(err.code == 'EADDRINUSE'){
-        await sleep(3000)
+        await sleep(3000);
       }
 
     })
