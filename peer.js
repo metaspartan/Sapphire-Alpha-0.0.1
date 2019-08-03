@@ -1032,9 +1032,7 @@ var getConnectionConfig = async function(ntwk){
       })
 
       const ntwk = swarm(config);
-      console.log("makes it past swarm");
       resolve(ntwk);
-      console.log("past resolve");
     }
     BlkDB.getChainParamsByName(globalGenesisHash,'nodePersistantId',callBackNodePersistence);
   })
@@ -2007,10 +2005,12 @@ var cbReset = async function(full = false){
 
     sw.listen(port,function(){
       console.log('sw running on port '+port)
-    });
+    }).catch(console.log("error case sw"))
+
     sw2.listen(port2,function(){
       console.log('sw2 running on port '+port2)
     });
+
     sw.join('egem-sfrx-001') // can be any id/name/hash
     sw2.join('egem-sfrx-002')//second teier peers
     sw.maxConnections = 4;//testing this out for node organization
