@@ -2012,9 +2012,11 @@ var cbReset = async function(full = false){
       console.log(Object.keys(err))
       console.log(err.code)
       if(err.code == 'EADDRINUSE'){
+        /*****
         console.log("SWITCHING PORT")
         port = await getPort();
         await setTimeout(function(){cbReset();},2000)
+        *****/
       }
 
     })
@@ -2028,9 +2030,11 @@ var cbReset = async function(full = false){
       console.log(Object.keys(err))
       console.log(err.code)
       if(err.code == 'EADDRINUSE'){
+        /*****
         console.log("SWITCHING PORT")
         port2 = await getPort();
         await setTimeout(function(){cbReset();},2000)
+        *****/
       }
 
     })
