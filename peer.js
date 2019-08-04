@@ -394,7 +394,8 @@ var activeSync = function(timer){
 
           setTimeout(function(){
             cbReset();
-          },1000)
+          },5000)
+          return;
 
         }else{
           BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,349);
@@ -406,6 +407,8 @@ var activeSync = function(timer){
   }else if( parseInt(chainState.chainWalkHeight) == parseInt(chainState.peerNonce) && parseInt(chainState.chainWalkHeight) == parseInt(chainState.synchronized)){
 
       console.log("chainState.chainWalkHeight equals chainState.peerNonce equals chainState.synchronized so we might be synch what to do here? ");
+      chainState.isSynching = false;
+      console.log("CHAIN IS SYNC 410");
 
   }else{
 
@@ -436,7 +439,8 @@ var activeSync = function(timer){
     chalk(" ")+chalk.bgCyan.black("bcHT:")+chalk.bgMagenta(frankieCoin.blockHeight)+
     chalk(" ")+chalk.bgCyan.black("TopBlkHt:")+chalk.bgMagenta(chainState.topBlock)+
     chalk(" ")+chalk.bgCyan.black("longPrHt:")+chalk.bgMagenta(parseInt(frankieCoin.longestPeerBlockHeight))+
-    chalk(" ")+chalk.bgCyan.black("CSMlongPr:")+chalk.bgMagenta(parseInt(chainStateMonitor.longPeerNonce))
+    chalk(" ")+chalk.bgCyan.black("CSMlongPr:")+chalk.bgMagenta(parseInt(chainStateMonitor.longPeerNonce))+
+    chalk(" ")+chalk.bgCyan.black("CS&isSynching:")+chalk.bgMagenta(chainState.isSynching)+" "+chalk.bgMagenta(isSynching)
   );
   console.log(
     chalk("       ")+chalk.bgCyan.black("PRNC:")+chalk.bgMagenta(displayPeerNonce)+
@@ -1201,7 +1205,14 @@ function getRandomInt(max) {
 //////////////////////////////////////////////////////////////////CHAIN VAIDATOR
 var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
-  chainState.isSynching = true;
+  if((chainState.peerNonce == chainState.synchronized == chainState.transactionHeight == chainStateMonitor.longPeerNonce) && (chainState.synchronized > 2)){
+    chainState.isSynching = false;
+    console.log("CHAIN IS SYNC");
+    return;
+  }else{
+    chainState.isSynching = true;
+  }
+
 
   if(isValid == true){
 
@@ -4625,6 +4636,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
     frankieCoin.inSynchBlockHeight = peerMaxHeight;
     chainState.peerNonce = peerMaxHeight;
     chainState.isSynching = false;
+    isSynching = false;
     chainState.interval = 4000;
     adjustedTimeout();
 
@@ -6080,8 +6092,8 @@ var impcevent = function(callback){
 //this is a function to turn off excess communications to miners
 var thisNodeCanMine = function(){
   //minerPing();
-  //return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":"+frankieCoin.nodes.length+":"+chainStateMonitor.longPeerNonce;
-  return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":4:"+chainStateMonitor.longPeerNonce;
+  return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":"+frankieCoin.nodes.length+":"+chainStateMonitor.longPeerNonce;
+  //return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":4:"+chainStateMonitor.longPeerNonce;
 }
 var thisNodeIsMininig = function(){
   ExPl.closeExplorer();

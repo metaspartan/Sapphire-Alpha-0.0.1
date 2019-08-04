@@ -821,7 +821,7 @@ var getBlockRange = function(blockHeight,riser,callback){
 var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRiser,calledFrom){
 
       if(chainStateMonitor.isBlockRangeValidating == true){
-        console.log(chalk.bgRed.red("block range validate already called exiting this time calledFram is "+calledFrom));
+        console.log(chalk.bgRed.red("block range validate already called exiting this time calledFrom is "+calledFrom));
         return;
       }else{
         pushChainStateMonitor("isBlockRangeValidating",true);
