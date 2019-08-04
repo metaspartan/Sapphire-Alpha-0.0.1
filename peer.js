@@ -284,6 +284,10 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
 
     }
 
+  }else if(txHt > chainState.transactionHeight){
+    tranSynch();
+  }else if(oxHt > chainState.orderHeight && txHt == chainState.transactionHeight){
+    oxSynch();
   }
 
 }
