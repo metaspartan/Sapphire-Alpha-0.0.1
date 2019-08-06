@@ -269,25 +269,25 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
   var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"peerOXHeight":oxHt,"peerOXHash":oxHsh,"longPeerNonce":longPeerNonce,"nodeType":nodeType,"utcTimeStamp":utcTS}
   chainState.activeSynch.receive.push(insertPeer);
 
-  //finally ping if necessary
+  //finally ping if necessary [NOTE: commenting out all calls for now to test results I think this is the error point]
   if(txHt > chainState.synchronized){
 
     if(peers[peer] && peers[peer].conn2 != undefined){
       let rnod = chainState.activeSynch.receive.find(q => q.peer == peer);
       if(rnod){
         if(rnod.nodeType > 1){
-          peers[peer].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+          //peers[peer].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
         }
       }else{
-        peers[peer].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+        //peers[peer].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
       }
 
     }
 
   }else if(txHt > chainState.transactionHeight){
-    tranSynch();
+    //tranSynch();
   }else if(oxHt > chainState.orderHeight && txHt == chainState.transactionHeight){
-    oxSynch();
+    //oxSynch();
   }
 
 }
