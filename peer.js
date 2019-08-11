@@ -574,7 +574,7 @@ var activeSync = function(timer){
         //we are going to police our connections to make sure they are in sync
         if(nodeobj.peerTxHeight < chainState.synchronized){
           console.log("nodeobj.peerTxHeight "+nodeobj.peerTxHeight)
-          console.log("sending peer "+tobj.info.ip+" to stuck peer monitor");
+          console.log("sending peer "+nodeobj.ip+" to stuck peer monitor");
           stuckPeerMonitor(nodeobj.id,nodeobj.peerTxHeight,nodeobj.peerChainStateHash);
         }else if(nodeobj.peerTxHeight > chainState.transactionHeight){
           if(chainStateMonitor.isTxValidationRunning == false && chainState.chainWalkHeight == chainState.peerNonce){
