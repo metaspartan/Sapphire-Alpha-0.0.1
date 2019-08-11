@@ -47,6 +47,7 @@ var request = require('request');
 ///////////////////////Mining stuff : blockchain algo and mining initializations
 var sapphirechain = require("./block.js");
 sapphirechain.setBlockchainDB(BlkDB);
+const PEERS = new sapphirechain.Peers();
 var BLAKE2s = require("./blake2s.js");
 var Miner = require("./miner.js");
 Miner.setSapphireChain(sapphirechain);
@@ -266,6 +267,24 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
   updatePeerTxHashArray(txHt,txHsh,1,false);
   //console.log("just before push "+peer)
   //console.log("oxHeight"+oxHt+"oxHash"+oxHsh)
+
+  ////////////////////////THE NEW WAY PEERS ARE STORED AND UPDATED IN ONE OBJECT
+  var currentPeer = PEERS.peers.find(o => o.id === peer)
+
+  currentPeer.timestamp = utcTS;
+  currentPeer.nodeType = nodeType;//starts at 3 read only 2 is api and 1 is miner
+  currentPeer.longPeerNonce = longPeerNonce;//where is this set
+  //currentPeer.longPeerTxHeight = 0;//long peer txheight pulled from txhasharray
+  currentPeer.peerMaxHeight = maxHeight;
+  //currentPeer.peerTxHeight = 0;
+  currentPeer.peerChainStateHash = chainCPH;
+  currentPeer.peerTxHeight = txHt;
+  currentPeer.peerTxHash = txHsh;
+  currentPeer.peerOxHeight = oxHt;
+  currentPeer.peerOXHash = oxHsh;
+  ///////////////////////END THE NEW WAY PEERS ARE STORED AND UPDATED IN ONE OBJ
+
+
   var insertPeer = {"peer":peer,"peerMaxHeight":maxHeight,"peerChainStateHash":chainCPH,"peerTxHeight":txHt,"peerTxHash":txHsh,"peerOXHeight":oxHt,"peerOXHash":oxHsh,"longPeerNonce":longPeerNonce,"nodeType":nodeType,"utcTimeStamp":utcTS}
   chainState.activeSynch.receive.push(insertPeer);
 
@@ -462,6 +481,8 @@ var activeSync = function(timer){
   console.log(chalk.green("--------------------------------------------------------------------------------"));
   //adding a variable for how many peers are transaction synced
   var peersTransactionSynched = 0;
+
+/*****
   for (nodercv in chainState.activeSynch.receive){
     var nodeobj = chainState.activeSynch.receive[nodercv]
 
@@ -520,6 +541,64 @@ var activeSync = function(timer){
       }
     }
   }
+****/
+
+  for (nodercv in PEERS.peers){
+    var nodeobj = PEERS.peers[nodercv]
+
+    if(nodeobj != "undefined"){
+
+        var thisPeerCHKPTHASH = nodeobj.peerChainStateHash.checkPointHash || "..data..";
+        var thisPeerTXHASH = nodeobj.peerTxHash || "..data..";
+        var thisPeerOXHASH = nodeobj.peerOXHash || "..data..";
+
+        if(nodeobj.longPeerNonce > chainState.topBlock || nodeobj.longPeerNonce > chainStateMonitor.longPeerNonce){
+          chainStateMonitor.longPeerNonce = nodeobj.longPeerNonce;
+        }
+
+        console.log(
+          chalk.bgCyan.black("T("+nodercv+"):")+chalk.bgMagenta.white(nodeobj.nodeType)+
+          chalk(" ")+chalk.bgCyan.black("OPNC:")+chalk.bgMagenta.white(nodeobj.longPeerNonce)+
+          chalk(" ")+chalk.bgCyan.black("OPmaxht:")+chalk.bgMagenta.white(nodeobj.peerMaxHeight)+
+          chalk(" ")+chalk.bgCyan.black("OPtxht:")+chalk.bgMagenta.white(nodeobj.peerTxHeight)+
+          chalk(" ")+chalk.bgCyan.black("CS:")+chalk.bgMagenta.white(nodeobj.peerChainStateHash.blockNumber)+chalk.bgMagenta.yellow(" "+thisPeerCHKPTHASH.substring(0,8))+
+          chalk(" ")+chalk.bgCyan.black("TXHt:")+chalk.bgMagenta.white(nodeobj.peerTxHeight)+chalk.bgMagenta.yellow(" "+thisPeerTXHASH.substring(0,8))+
+          chalk(" ")+chalk.bgCyan.black("OXHt:")+chalk.bgMagenta.white(nodeobj.peerOxHeight)+chalk.bgMagenta.yellow(" "+thisPeerOXHASH.substring(0,8))+
+          chalk(" ")+chalk.bgCyan.black("IP:")+chalk.bgRed.white(nodeobj.ip)
+        )
+        //just make sure we are up to par
+        if(chainState.transactionHeight < chainState.chainWalkHeight){
+          tranSynch();
+          return;
+        }
+        //we are going to police our connections to make sure they are in sync
+        if(nodeobj.peerTxHeight < chainState.synchronized){
+          console.log("nodeobj.peerTxHeight "+nodeobj.peerTxHeight)
+          console.log("sending peer "+tobj.info.ip+" to stuck peer monitor");
+          stuckPeerMonitor(nodeobj.id,nodeobj.peerTxHeight,nodeobj.peerChainStateHash);
+        }else if(nodeobj.peerTxHeight > chainState.transactionHeight){
+          if(chainStateMonitor.isTxValidationRunning == false && chainState.chainWalkHeight == chainState.peerNonce){
+            tranSynch();
+          }
+          //remove the peer from stuckPeer Monitor
+          for(item in chainStateMonitor.stuckPeers){
+            if(chainStateMonitor.stuckPeers[item].peer == nodeobj.peer){
+              console.log("removing stuck peer from monitor "+nodeobj.peer);
+              chainStateMonitor.stuckPeers.splice(item,1);
+            }
+          }
+        }else if(nodeobj.peerTxHeight == chainState.synchronized && chainState.chainWalkHeight > 1){
+          peersTransactionSynched+=1;
+        }
+        if(nodeobj.peerOXHeight > chainState.orderHeight){
+          if(chainStateMonitor.isOxValidationRunning == false && chainState.transactionHeight == chainState.chainWalkHeight && chainState.chainWalkHeight > 1){
+            oxSynch();
+          }
+        }
+
+    }
+  }
+
   //in this case other peers reported a higher chain height in their clusters so we need to get there asap
   if(chainState.topBlock > chainState.chainWalkHeight || chainStateMonitor.longPeerNonce > chainState.chainWalkHeight){
     setTimeout(function(){
@@ -2067,16 +2146,29 @@ var cbReset = async function(full = false){
 
       if(info.id != Buffer.from(chainState.nodePersistantId).toString('hex')){
 
-        frankieCoin.registerNode(peerId,info.host,info.port,frankieCoin.length);
-        BlkDB.addNode("node:"+peerId+":connection",{"host":info.host,"port":info.port}).then(function(){
-          //log(chalk.green("Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
-          log(chalk.bgBlue('New Peer id: '+ chalk.bold(peerId)));
-          var tempNodeCallerID = sapphirechain.ReDuex(peerId);
-          //console.log("tempcallerNodeid "+tempNodeCallerID);
-          ///////////////WE MIGHT WANT TO RESERVE THE CALL BELOW FOR SYNCHED PEERS
-          directMessage(tempNodeCallerID+':0:0:')//this is establishing the encryption to the peer
+        if(PEERS.peers.find(o => o.id === peerId)){
+          //then this peer is aleady in the line up
+        }else{
+          console.log("peer connection "+peerId);
+          var addingPeer = new sapphirechain.Peer(peerId,info.host,info.port);
+          PEERS.peers.push(addingPeer)
+          addingPeer.conn = conn;
 
-        });
+          /////this is the old stuff working it into new process
+          frankieCoin.registerNode(peerId,info.host,info.port,frankieCoin.length);
+          BlkDB.addNode("node:"+peerId+":connection",{"host":info.host,"port":info.port}).then(function(){
+            //log(chalk.green("Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
+            log(chalk.bgBlue('New Peer id: '+ chalk.bold(peerId)));
+            var tempNodeCallerID = sapphirechain.ReDuex(peerId);
+            //console.log("tempcallerNodeid "+tempNodeCallerID);
+            ///////////////WE MIGHT WANT TO RESERVE THE CALL BELOW FOR SYNCHED PEERS
+            directMessage(tempNodeCallerID+':0:0:')//this is establishing the encryption to the peer
+
+          });
+
+        }
+
+
       }
 
       conn.on('timeout', () => {

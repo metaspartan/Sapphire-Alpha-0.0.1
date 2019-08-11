@@ -195,6 +195,82 @@ Hash8 = function(inputs,decoder = ""){
   return thishash;
 }
 
+var Peer = class Peer {
+    //we can do an address validation and kick back false
+    constructor(id, ip, port, timestamp = parseInt(new Date().getTime()/1000)){
+
+        this.id = id;
+        this.index = ReDuex(id);
+        this.setIp = function(ip){
+          var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+          if(ip.match(ipformat)){
+            this.ip = ip;
+          }else{
+            this.ip = ip.split(":")[3];
+          }
+        };
+        this.setIp(ip);
+        this.port = port;
+        this.nonce = 0;
+        this.increment = function(){
+          this.nonce+=1;
+        };
+        this.timestamp = timestamp;
+
+        //connections
+        this.conn = {};
+        this.conn2 = {};
+
+        //blockchain stats
+        this.nodeType = 3;//starts at 3 read only 2 is api and 1 is miner
+        this.longPeerNonce = 0;//where is this set
+        this.longPeerTxHeight = 0;//long peer txheight pulled from txhasharray
+        this.peerMaxHeight = 0;
+        this.peerTxHeight = 0;
+        this.txHsh = '';
+        this.peerChainStateHash = {};
+        this.peerTxHeight = 0;
+        this.peerOxHeight = 0;
+
+        //ecdh
+        var options = {
+            hashName: 'sha256',
+            hashLength: 32,
+            macName: 'sha256',
+            macLength: 32,
+            curveName: 'secp256k1',
+            symmetricCypherName: 'aes-256-ecb',
+            iv: null, // iv is used in symmetric cipher, set null if cipher is in ECB mode.
+            keyFormat: 'uncompressed',
+            s1: null, // optional shared information1
+            s2: null // optional shared information2
+        };
+        this.ecdh = crypto.createECDH(options.curveName);
+        this.ecdh.generateKeys();
+        this.keyPair = bitcoin.ECPair.makeRandom();
+
+
+        /***
+        var thisnode = {
+          "index":indexOfThisNode,
+          "id":id,
+          "info":{"ip":nodeIP,"port":port,"chainlength":thisN.chain.length,"maxHeight":thisN.chain.length,"synchBlock":0},
+          "ecdh":ecdh,
+        };
+
+        thisN.nodes.push(thisnode);
+        ***/
+
+    }
+
+}
+
+var Peers = class Peers {
+  constructor(){
+    this.peers = [];
+  }
+}
+
 var Block = class Block {
 
     constructor(
@@ -1319,6 +1395,8 @@ module.exports = {
     Ommer:Ommer,
     Transaction:Transaction,
     Order:Order,
+    Peer:Peer,
+    Peers:Peers,
     Block:Block,
     Blockchain:Blockchain,
     setBlockchainDB:setBlockchainDB,
