@@ -291,16 +291,8 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
   //finally ping if necessary
   if(txHt > chainState.synchronized){
 
-    if(peers[peer] && peers[peer].conn2 != undefined){
-      let rnod = chainState.activeSynch.receive.find(q => q.peer == peer);
-      if(rnod){
-        if(rnod.nodeType > 1){
-          peers[peer].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
-        }
-      }else{
-        peers[peer].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
-      }
-
+    if(PEERS.peers.find(o => o.id === peer) && JSON.stringify(PEERS.peers.find(o => o.id === peer).conn2) != "{}"){
+      PEERS.peers.find(o => o.id === peer).conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
     }
 
   }else if(txHt > chainState.transactionHeight){
@@ -318,8 +310,8 @@ var stuckPeerMonitor = function(id,incomingBlockHeight,chainStateHash){
     if(stPeer.count > 2){
       console.log("sending node state pong to stuck peer from monitor "+id);
       //var syncTrigger = {"syncTrigger":incomingBlockHeight,"submitCurrrentChainStateHash":chainStateHash,"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
-      if(peers[id] && peers[id].conn != undefined){
-        peers[id].conn.write(JSON.stringify(
+      if(PEERS.peers.find(o => o.id === id) && PEERS.peers.find(o => o.id === id).conn != undefined){
+        PEERS.peers.find(o => o.id === id).conn.write(JSON.stringify(
           {"nodeStatePong":{
               Height:parseInt(chainState.synchronized),
               MaxHeight:parseInt(chainState.synchronized),
@@ -732,17 +724,18 @@ var activePing = function(timer){
   //we should get longestPeer first
   console.log(chalk.bgRed("AP TIMER "+timer))
   var nodesInChain = frankieCoin.retrieveNodes();
-  for (let id in peers) {
-    if(peers[id].conn != undefined){
+  for (let id in PEERS.peers) {
+    if(PEERS.peers[id].conn != undefined){
 
       //this is a sync ping and we dont want to interupt miners so weeind out miners
       var pingCaller = true;
-      for(aId in chainState.activeSynch.receive){
-        if(chainState.activeSynch.receive[aId].peer == id && chainState.activeSynch.receive[aId].nodeType > 1){
+      //for(aId in chainState.activeSynch.receive){
+        //if(chainState.activeSynch.receive[aId].peer == id && chainState.activeSynch.receive[aId].nodeType > 1){
+        if(PEERS.peers[id].nodeType > 1){
           //console.log(chalk.bgCyan.black.bold("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType));
           setTimeout(function(){
-            if(peers[id] && peers[id].conn != undefined){
-              peers[id].conn.write(JSON.stringify(
+            if(PEERS.peers[id] && PEERS.peers[id].conn != undefined){
+              PEERS.peers[id].conn.write(JSON.stringify(
                 {"nodeStatePing":{
                   Height:parseInt(chainState.synchronized),
                   MaxHeight:parseInt(chainState.synchronized),
@@ -763,13 +756,13 @@ var activePing = function(timer){
           },timer)
           pingCaller = false;
         }
-      }
+      //}
 
       if(pingCaller){
         //console.log(chalk.bgCyan.black.bold("is this one ever firing? "));
         setTimeout(function(){
-          if(peers[id] && peers[id].conn != undefined){
-            peers[id].conn.write(JSON.stringify(
+          if(PEERS.peers[id] && PEERS.peers[id].conn != undefined){
+            PEERS.peers[id].conn.write(JSON.stringify(
               {"nodeStatePing":{
                 Height:parseInt(chainState.synchronized),
                 MaxHeight:parseInt(chainState.synchronized),
@@ -2278,7 +2271,7 @@ var cbReset = async function(full = false){
 
         // callback returning verified uncles ALSO USED FOR THANKS post processing probably needs a rename
         var sendBackUncle = function(msg,peerId){
-          peers[peerId].conn.write(JSON.stringify(msg));
+          PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify(msg));
         }
 
   ////////////////////////////////////////////begin the if block for incoming data
@@ -2513,7 +2506,7 @@ var cbReset = async function(full = false){
                     }else if(response == 2){
                       console.log("chain state response is not normal "+response);
                       var syncTrigger = {"syncTrigger":incomingBLockHeight,"submitCurrrentChainStateHash":JSON.parse(data)["block"]["chainStateHash"],"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
-                      peers[peerId].conn.write(JSON.stringify(syncTrigger));
+                      PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify(syncTrigger));
                       //peerId
                     }else{
                       console.log("chain state response "+response);
@@ -2887,8 +2880,8 @@ var cbReset = async function(full = false){
               //if(chainState.previousTxHeight > 0 && parseInt(chainState.previousTxHeight+1) == chainState.transactionHeight){
               if(chainState.previousTxHeight > 0){
 
-                if(peers[peerId] && peers[peerId].conn != undefined){
-                  peers[peerId].conn.write(JSON.stringify(
+                if(PEERS.peers.find(o => o.id === peerId) && PEERS.peers.find(o => o.id === peerId).conn != undefined){
+                  PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify(
                     {"nodeStatePong":{
                         Height:parseInt(chainState.synchronized),
                         MaxHeight:parseInt(chainState.synchronized),
@@ -2971,7 +2964,7 @@ var cbReset = async function(full = false){
                   //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream)
                   //var numRecordsToStream = parseInt(frankieCoin.synchronized);
                   BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
-                    peers[peerId].conn2.write(jsonStream);
+                    PEERS.peers.find(o => o.id === peerId).conn2.write(jsonStream);
                     //console.log("wrote this "+jsonStream);
                     //peers[peerId].conn2.end();
                     console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
@@ -2979,9 +2972,9 @@ var cbReset = async function(full = false){
 
                   setTimeout(function(){
                     BlkDB.dumpToStreamTXOXRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
-                      peers[peerId].conn2.write(jsonStream);
+                      PEERS.peers.find(o => o.id === peerId).conn2.write(jsonStream);
                       //console.log("wrote this "+jsonStream);
-                      peers[peerId].conn2.end();
+                      PEERS.peers.find(o => o.id === peerId).conn2.end();
                       console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
                     })
                   },4000)
@@ -2993,7 +2986,7 @@ var cbReset = async function(full = false){
                   //okay this is a legitimate pong
                   if(chainState.synchronized > peerBlockHeight){
                     var pongBackBlock = function(blockData){
-                      peers[peerId].conn.write(blockData.toString());
+                      PEERS.peers.find(o => o.id === peerId).conn.write(blockData.toString());
                     }
                     BlkDB.getBlock(parseInt(peerBlockHeight),pongBackBlock);
                     pongBack = true;
@@ -3005,7 +2998,7 @@ var cbReset = async function(full = false){
 
                 }else if(frankieCoin.blockHeight == parseInt(peerBlockHeight)){
                   //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-                  peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
+                  PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
                   pongBack = true;
                 }else if((peerBlockHeight > frankieCoin.blockHeight) && (peerBlockHeight == (frankieCoin.blockHeight+1))){
                   //setTimeout(function(){peers[peerId].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));},3000);
@@ -3028,14 +3021,14 @@ var cbReset = async function(full = false){
 
               //setting a delay and pong back
               //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
-              if(peers[peerId] && pongBack == true){
-                setTimeout(function(){if(peers[peerId]){peers[peerId].conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));}},300);
+              if(PEERS.peers.find(o => o.id === peerId) && pongBack == true){
+                setTimeout(function(){if(PEERS.peers.find(o => o.id === peerId)){PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));}},300);
               }
               //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
             }else{
               log("Did not match this hash and this peer is an imposter");
               //peers[peerId].conn.write("Don't hack me bro");
-              peers[peerId].conn.write(JSON.stringify({"BadPeer":{Height:1337}}));
+              PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify({"BadPeer":{Height:1337}}));
               ///tesst out setTimeout(function(){disconnet peers[peerId].conn.dissconnet();},1500);
             }
 
@@ -3133,7 +3126,7 @@ var cbReset = async function(full = false){
                         returnSafes.push(JSON.stringify(addy));
                       }
 
-                      peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:returnSafes,secretAction:"DepositAddressList",encoded:"nodata",public:ecdhPubKeyHex}}));
+                      PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:returnSafes,secretAction:"DepositAddressList",encoded:"nodata",public:ecdhPubKeyHex}}));
                     }else{
                       console.log("There are no unspent txo available for this addresss on this coin")
                     }
@@ -3191,7 +3184,7 @@ var cbReset = async function(full = false){
 
                       BlkDB.addUpdateSafe(peerId+":"+egemAccount+":BTC:"+blake2sAddress,JSON.stringify({secretPeerID:secretPeerID,ticker:"BTC",coinAddress:publicAddress,addressPK:privateKeyHex,egemAccount:egemAccount,public:ecdhPubKeyHex}))
 
-                      peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
+                      PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
 
                       //need to broadcast to all peer BUT this peer the encrypted information
                       for(peer2s in peers){
@@ -3225,7 +3218,7 @@ var cbReset = async function(full = false){
                       console.log("private key is "+privateKey);
                       console.log("BTC address is: "+publicAddress);
 
-                      peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
+                      PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
 
                       //need to broadcast to all peer BUT this peer the encrypted information
 
@@ -3358,7 +3351,7 @@ var cbReset = async function(full = false){
                       //chainState.datapack = signature+":"+message+":"+bitcoinMessage.verify(message, address, signature);
                       var signatureProofReturn = signature.toString('base64')+":"+message+":"+bitcoinMessage.verify(message, address, signature);
 
-                      peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:signatureProofReturn,secretAction:"DepositAddressProof",encoded:"nodata",public:ecdhPubKeyHex}}));
+                      PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:signatureProofReturn,secretAction:"DepositAddressProof",encoded:"nodata",public:ecdhPubKeyHex}}));
                       //peers[peerId].conn.write(JSON.stringify({peerSafe:{secretPeerID:secretPeerID,secretPeerMSG:publicAddress,secretAction:"DepositAddress",encoded:"nodata",public:ecdhPubKeyHex}}));
                     }
 
@@ -3430,12 +3423,12 @@ var cbReset = async function(full = false){
               //if chain is not synched ping back to synched peer
               if(peerBlockHeight == chainState.synchronized){
               //if(frankieCoin.inSynch==true && frankieCoin.inSynchBlockHeight == frankieCoin.longestPeerBlockHeight){
-                peers[peerId].conn.write("---------------------------------");
-                peers[peerId].conn.write("THIS PEER IS NOW SYNCHED");
-                peers[peerId].conn.write("---------------------------------");
+                PEERS.peers.find(o => o.id === peerId).conn.write("---------------------------------");
+                PEERS.peers.find(o => o.id === peerId).conn.write("THIS PEER IS NOW SYNCHED");
+                PEERS.peers.find(o => o.id === peerId).conn.write("---------------------------------");
               }else{
                 console.log("CONN1 NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
-                setTimeout(function(){peers[peerId].conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),PeerNonce:parseInt(chainState.peerNonce),GlobalHash:globalGenesisHash}}));},300);
+                setTimeout(function(){PEERS.peers.find(o => o.id === peerId).conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),PeerNonce:parseInt(chainState.peerNonce),GlobalHash:globalGenesisHash}}));},300);
                 /***
                 chainClipper(frankieCoin.blockHeight).then(function(){
                   BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1687);
@@ -3447,7 +3440,7 @@ var cbReset = async function(full = false){
               log("------------------------------------------------------");
               log(chalk.red("You are communicating with a bad actor and we must stop this connection"));
               log("------------------------------------------------------");
-              peers[peerId].conn.write("Stop hacking me bro");
+              PEERS.peers.find(o => o.id === peerId).conn.write("Stop hacking me bro");
               //peers[peerId].connection.close()//?;
             }
           }
@@ -3579,7 +3572,7 @@ var cbReset = async function(full = false){
         //log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
         // callback returning verified uncles post processing probably needs a rename
         var sendBackUncle = function(msg,peerId){
-          peers[peerId].conn2.write(JSON.stringify(msg));
+          PEERS.peers.find(o => o.id === peerId).conn2.write(JSON.stringify(msg));
         }
 
   ////////////////////////////////////////////begin the if block for incoming data
@@ -3672,11 +3665,11 @@ var cbReset = async function(full = false){
                   }
                   //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream)
                   //var numRecordsToStream = parseInt(frankieCoin.synchronized);
-                  if(peers[peerId]){
+                  if(PEERS.peers.find(o => o.id === peerId)){
                     BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
-                      peers[peerId].conn2.write(jsonStream);
+                      PEERS.peers.find(o => o.id === peerId).conn2.write(jsonStream);
                       console.log("wrote this "+jsonStream);
-                      peers[peerId].conn2.end();
+                      PEERS.peers.find(o => o.id === peerId).conn2.end();
                       console.log("the streams then condition is met and num records to stream was "+numRecordsToStream);
                     })
                   }
@@ -3701,7 +3694,7 @@ var cbReset = async function(full = false){
                   //okay this is a legitimate pong
                   if(chainState.synchronized > peerBlockHeight){
                     var pongBackBlock = function(blockData){
-                      peers[peerId].conn2.write(blockData.toString());
+                      PEERS.peers.find(o => o.id === peerId).conn2.write(blockData.toString());
                     }
                     BlkDB.getBlock(parseInt(peerBlockHeight),pongBackBlock);
                     pongBack = true;
@@ -3713,8 +3706,8 @@ var cbReset = async function(full = false){
 
                 }else if(frankieCoin.blockHeight == parseInt(peerBlockHeight)){
                   //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-                  if(peers[peerId] && peers[peerId].conn2!= undefined){
-                    peers[peerId].conn2.write(JSON.stringify(frankieCoin.getLatestBlock()));
+                  if(PEERS.peers.find(o => o.id === peerId) && PEERS.peers.find(o => o.id === peerId).conn2 != undefined){
+                    PEERS.peers.find(o => o.id === peerId).conn2.write(JSON.stringify(frankieCoin.getLatestBlock()));
                     pongBack = true;
                   }
 
@@ -3739,10 +3732,10 @@ var cbReset = async function(full = false){
 
               //setting a delay and pong back
               //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
-              if(peers[peerId] && pongBack == true){
+              if(PEERS.peers.find(o => o.id === peerId) && pongBack == true){
                 setTimeout(function(){
-                  if(peers[peerId] && peers[peerId].conn2 != undefined){
-                    peers[peerId].conn2.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+                  if(PEERS.peers.find(o => o.id === peerId) && PEERS.peers.find(o => o.id === peerId).conn2 != undefined){
+                    PEERS.peers.find(o => o.id === peerId).conn2.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
                   }
                 },300);
               }
@@ -3750,8 +3743,8 @@ var cbReset = async function(full = false){
             }else{
               log("Did not match this hash and this peer is an imposter");
               //peers[peerId].conn.write("Don't hack me bro");
-              if(peers[peerId] && peers[peerId].conn2 != undefined){
-                peers[peerId].conn2.write(JSON.stringify({"BadPeer":{Height:1337}}));
+              if(PEERS.peers.find(o => o.id === peerId) && PEERS.peers.find(o => o.id === peerId).conn2 != undefined){
+                PEERS.peers.find(o => o.id === peerId).conn2.write(JSON.stringify({"BadPeer":{Height:1337}}));
               }
               ///tesst out setTimeout(function(){disconnet peers[peerId].conn.dissconnet();},1500);
             }
@@ -3830,8 +3823,8 @@ var cbReset = async function(full = false){
               //if(frankieCoin.inSynch==true && frankieCoin.inSynchBlockHeight == frankieCoin.longestPeerBlockHeight){
 
                 //this used to be a message saying the peer is synched now we will just nodestate pong
-                if(peers[peerId] && peers[peerId].conn != undefined){
-                  peers[peerId].conn.write(JSON.stringify(
+                if(PEERS.peers.find(o => o.id === peerId) && PEERS.peers.find(o => o.id === peerId).conn != undefined){
+                  PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify(
                     {"nodeStatePong":{
                       Height:parseInt(chainState.synchronized),
                       MaxHeight:parseInt(chainState.synchronized),
@@ -3878,7 +3871,7 @@ var cbReset = async function(full = false){
               log("------------------------------------------------------");
               log(chalk.red("You are communicating with a bad actor and we must stop this connection"));
               log("------------------------------------------------------");
-              peers[peerId].conn2.write("Stop hacking me bro");
+              PEERS.peers.find(o => o.id === peerId).conn2.write("Stop hacking me bro");
               //peers[peerId].connection.close()//?;
             }
           }
