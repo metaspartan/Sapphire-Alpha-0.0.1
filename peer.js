@@ -2147,7 +2147,7 @@ var cbReset = async function(full = false){
       if(info.id != Buffer.from(chainState.nodePersistantId).toString('hex')){
 
         if(PEERS.peers.find(o => o.id === peerId)){
-          PEERS.peers(find(o => o.id === peerId)).conn = conn;
+          PEERS.peers.find(o => o.id === peerId).conn = conn;
           //then this peer is aleady in the line up
         }else{
           console.log("peer connection "+peerId);
