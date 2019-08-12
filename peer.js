@@ -2147,6 +2147,7 @@ var cbReset = async function(full = false){
       if(info.id != Buffer.from(chainState.nodePersistantId).toString('hex')){
 
         if(PEERS.peers.find(o => o.id === peerId)){
+          PEERS.peers(find(o => o.id === peerId)).conn = conn;
           //then this peer is aleady in the line up
         }else{
           console.log("peer connection "+peerId);
@@ -3481,6 +3482,11 @@ var cbReset = async function(full = false){
       //log(chalk.blue(JSON.stringify(info)));
       const seq2 = connSeq2
       const peerId = info.id.toString('hex');
+
+      if(PEERS.peers.find(o => o.id === peerId)){
+        PEERS.peers.find(o => o.id === peerId).conn2 = conn2;
+        //then this peer is aleady in the line up
+      }
 
       if(info.id != chainState.nodePersistantId){
 
@@ -6184,7 +6190,7 @@ var impcevent = function(callback){
 //this is a function to turn off excess communications to miners
 var thisNodeCanMine = function(){
   //minerPing();
-  return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":"+frankieCoin.nodes.length+":"+chainStateMonitor.longPeerNonce;
+  return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":"+PEERS.peers.length+":"+chainStateMonitor.longPeerNonce;
   //return chainState.peerNonce+":"+chainState.synchronized+":"+chainState.transactionHeight+":4:"+chainStateMonitor.longPeerNonce;
 }
 var thisNodeIsMininig = function(){
