@@ -542,7 +542,7 @@ var activeSync = function(timer){
   for (nodercv in PEERS.peers){
     var nodeobj = PEERS.peers[nodercv]
 
-    if(nodeobj != "undefined"){
+    if(nodeobj != "undefined" && nodeobj.peerChainStateHash){
 
         var thisPeerCHKPTHASH = nodeobj.peerChainStateHash.checkPointHash || "..data..";
         var thisPeerTXHASH = nodeobj.peerTxHash || "..data..";
