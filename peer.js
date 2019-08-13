@@ -271,17 +271,21 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
   ////////////////////////THE NEW WAY PEERS ARE STORED AND UPDATED IN ONE OBJECT
   var currentPeer = PEERS.peers.find(o => o.id === peer)
 
-  currentPeer.timestamp = utcTS;
-  currentPeer.nodeType = nodeType;//starts at 3 read only 2 is api and 1 is miner
-  currentPeer.longPeerNonce = longPeerNonce;//where is this set
-  //currentPeer.longPeerTxHeight = 0;//long peer txheight pulled from txhasharray
-  currentPeer.peerMaxHeight = maxHeight;
-  //currentPeer.peerTxHeight = 0;
-  currentPeer.peerChainStateHash = chainCPH;
-  currentPeer.peerTxHeight = txHt;
-  currentPeer.peerTxHash = txHsh;
-  currentPeer.peerOxHeight = oxHt;
-  currentPeer.peerOXHash = oxHsh;
+  if(currentPeer){
+    currentPeer.timestamp = utcTS;
+    currentPeer.nodeType = nodeType;//starts at 3 read only 2 is api and 1 is miner
+    currentPeer.longPeerNonce = longPeerNonce;//where is this set
+    //currentPeer.longPeerTxHeight = 0;//long peer txheight pulled from txhasharray
+    currentPeer.peerMaxHeight = maxHeight;
+    //currentPeer.peerTxHeight = 0;
+    currentPeer.peerChainStateHash = chainCPH;
+    currentPeer.peerTxHeight = txHt;
+    currentPeer.peerTxHash = txHsh;
+    currentPeer.peerOxHeight = oxHt;
+    currentPeer.peerOXHash = oxHsh;
+  }
+
+
   ///////////////////////END THE NEW WAY PEERS ARE STORED AND UPDATED IN ONE OBJ
 
 
