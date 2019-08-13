@@ -2138,10 +2138,16 @@ var cbReset = async function(full = false){
       const peerId = info.id.toString('hex');
 
       if(info.id != Buffer.from(chainState.nodePersistantId).toString('hex')){
-
+        var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        var infoHost = info.host;
+        if(!infoHost.match(ipformat)){
+          infoHost = ip.split(":")[3];
+        }
         if(PEERS.peers.find(o => o.id === peerId)){
           PEERS.peers.find(o => o.id === peerId).conn = conn;
           //then this peer is aleady in the line up
+        }else if(PEERS.peers.find(o => o.ip === infoHost)){
+          PEERS.peers.find(o => o.ip === infoHost).conn = conn;
         }else{
           console.log("peer connection "+peerId);
           var addingPeer = new sapphirechain.Peer(peerId,info.host,info.port);
