@@ -2141,7 +2141,7 @@ var cbReset = async function(full = false){
         var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
         var infoHost = info.host;
         if(!infoHost.match(ipformat)){
-          infoHost = ip.split(":")[3];
+          infoHost = infoHost.split(":")[3];
         }
         if(PEERS.peers.find(o => o.id === peerId)){
           PEERS.peers.find(o => o.id === peerId).conn = conn;
