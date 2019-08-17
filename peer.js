@@ -3948,20 +3948,20 @@ var cleanUpWaitingRemoveLag = async function(){
 }
 
 var broadcastPeers = function(message,waiting = null){
-  for (let id in peers){
-    if(peers[id] && peers[id].conn != undefined && chainStateMonitor.deletedPeers.indexOf(id) < 0){
+  for (let id in PEERS.peers){
+    if(PEERS.peers[id] && PEERS.peers[id].conn != undefined && chainStateMonitor.deletedPeers.indexOf(id) < 0){
       if(waiting != null){
         setWaiting(id,function(reply){console.log("reply")})
       }
-      peers[id].conn.write(message)
+      PEERS.peers[id].conn.write(message)
     }
   }
 }
 
 var broadcastPeers2 = function(message){
-  for (let id in peers){
-    if(peers[id] && peers[id].conn2 != undefined){
-      peers[id].conn2.write(message)
+  for (let id in PEERS.peers){
+    if(PEERS.peers[id] && PEERS.peers[id].conn2 != undefined){
+      PEERS.peers[id].conn2.write(message)
     }
   }
 }
