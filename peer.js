@@ -856,16 +856,10 @@ var minerPing = function(){
   //we should get longestPeer first
   console.log(chalk.bgBlue("MINER PING "))
   var nodesInChain = frankieCoin.retrieveNodes();
-  for (let id in peers) {
-    if(peers[id].conn != undefined){
-
-      //this ping is specifically for miners
-      for(aId in chainState.activeSynch.receive){
-        if(chainState.activeSynch.receive[aId].peer == id && chainState.activeSynch.receive[aId].nodeType == 1){
-          //console.log(chalk.bgCyan.black.bold("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType));
+  for (let id in PEERS.peers) {
+    if(PEERS.peers[id].conn != undefined){
           setTimeout(function(){
-            if(peers[id] && peers[id].conn != undefined){
-              peers[id].conn.write(JSON.stringify(
+              PEERS.peers[id].conn.write(JSON.stringify(
                 {"nodeStatePing":{
                   Height:parseInt(chainState.synchronized),
                   MaxHeight:parseInt(chainState.synchronized),
@@ -882,14 +876,9 @@ var minerPing = function(){
                   NodeType:nodeType.current,
                   utcTimeStamp:parseInt(new Date().getTime()/1000)
                 }}));
-            }
           },100)
-          console.log(chalk.bgBlue("MINER PING FIRED OFF "))
-        }
       }
     }
-  }
-
 }
 
 var calculateCheckPoints = async function(blockNum,source,incomingCheckHash){
@@ -2293,13 +2282,15 @@ var cbReset = async function(full = false){
           if(JSON.parse(data)["thanks"]){
 
             //console.log("you got a thanks from "+peerId);
-            let tobj = frankieCoin.nodes.find(o => o.id === peerId);
+            let tobj = PEERS.peers.find(o => o.id === peerId);
             if(tobj.info){
               chainStateMonitor.thanksCount+=1;
-              console.log(chalk.bgRed.white.bold("you got a thanks from "+tobj.info.ip));
+              console.log(chalk.bgRed.white.bold("you got a thanks from "+tobj.ip));
               console.log(chalk.bgCyan.black(JSON.stringify(JSON.parse(data)["thanks"])));
               chainState.peerNonce = chainState.synchronized;
+              PEERS.peers.find(o => o.id === peerId).peerMaxHeight = chainState.synchronized;
               frankieCoin.incrementPeerMaxHeight(peerId,chainState.synchronized);
+              //PEERS.peers.find(o => o.id === peerId).peerMaxHeight = chainState.synchronized;
               frankieCoin.incrementPeerNonce(peerId,chainState.synchronized);
               removeWaiting(peerId);
 
@@ -4713,6 +4704,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
       console.log(chalk.bgCyan.black("peer Max Height: ")+chalk.bgMagenta.white(" "+nodeobj.peerMaxHeight+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" "+nodeobj.peerTxHeight+" "))
       console.log(chalk.bgCyan.black("CS Hash: ")+chalk.bgMagenta.white(" blockNo: "+nodeobj.peerChainStateHash.blockNumber+" ")+chalk.bgCyan.black(" peer tx height: ")+chalk.bgMagenta.white(" ckPtHash: "+nodeobj.peerChainStateHash.checkPointHash+" "))
     }
+
   }
   //log("------------------------------------------------------")
   //log(longestPeer+" <<lp   mh>>"+peerMaxHeight+"<<mh    pl>> "+peerLength)
