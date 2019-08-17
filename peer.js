@@ -3667,7 +3667,7 @@ var cbReset = async function(full = false){
                   }
                   //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream)
                   //var numRecordsToStream = parseInt(frankieCoin.synchronized);
-                  if(PEERS.peers.find(o => o.id === peerId)){
+                  if(PEERS.peers.find(o => o.id === peerId) && PEERS.peers.find(o => o.id === peerId).conn2.write){
                     BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
                       PEERS.peers.find(o => o.id === peerId).conn2.write(jsonStream);
                       console.log("wrote this "+jsonStream);
