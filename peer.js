@@ -3609,7 +3609,8 @@ var cbReset = async function(full = false){
 
           }else if(JSON.parse(data)["ChainSyncPing"]){
 
-            log(JSON.parse(data)["ChainSyncPing"]);
+            console.log("chain sync ping "+JSON.parse(data)["ChainSyncPing"]);
+
             if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
               log(chalk.green("Global hashes matched!"));
               frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
