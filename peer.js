@@ -2270,7 +2270,10 @@ var cbReset = async function(full = false){
 
         // callback returning verified uncles ALSO USED FOR THANKS post processing probably needs a rename
         var sendBackUncle = function(msg,peerId){
-          PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify(msg));
+          let tobj = PEERS.peers.find(o => o.id === peerId);
+          if(tobj && tobj.conn != undefined){
+            tobj.conn.write(JSON.stringify(msg));
+          }
         }
 
   ////////////////////////////////////////////begin the if block for incoming data
@@ -2283,12 +2286,12 @@ var cbReset = async function(full = false){
 
             //console.log("you got a thanks from "+peerId);
             let tobj = PEERS.peers.find(o => o.id === peerId);
-            if(tobj.info){
+            if(tobj.ip){
               chainStateMonitor.thanksCount+=1;
               console.log(chalk.bgRed.white.bold("you got a thanks from "+tobj.ip));
               console.log(chalk.bgCyan.black(JSON.stringify(JSON.parse(data)["thanks"])));
               chainState.peerNonce = chainState.synchronized;
-              PEERS.peers.find(o => o.id === peerId).peerMaxHeight = chainState.synchronized;
+              tobj.peerMaxHeight = chainState.synchronized;
               frankieCoin.incrementPeerMaxHeight(peerId,chainState.synchronized);
               //PEERS.peers.find(o => o.id === peerId).peerMaxHeight = chainState.synchronized;
               frankieCoin.incrementPeerNonce(peerId,chainState.synchronized);
