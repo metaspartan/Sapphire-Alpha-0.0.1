@@ -3427,7 +3427,10 @@ var cbReset = async function(full = false){
                 PEERS.peers.find(o => o.id === peerId).conn.write("---------------------------------");
               }else{
                 console.log("CONN1 NOT REALLY SYNCHED AND NOT SURE IF SHOULD BE PinGIN BACK HERE ....")
-                setTimeout(function(){PEERS.peers.find(o => o.id === peerId).conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),PeerNonce:parseInt(chainState.peerNonce),GlobalHash:globalGenesisHash}}));},300);
+                if(PEERS.peers.find(o => o.id === peerId).conn2.write){
+                  setTimeout(function(){PEERS.peers.find(o => o.id === peerId).conn2.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),PeerNonce:parseInt(chainState.peerNonce),GlobalHash:globalGenesisHash}}));},300);
+                }
+
                 /***
                 chainClipper(frankieCoin.blockHeight).then(function(){
                   BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1687);
