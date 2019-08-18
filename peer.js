@@ -2817,6 +2817,7 @@ var cbReset = async function(full = false){
             //console.log("THIS PEER UTC TIME IS "+JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]+" and you "+checkYourUTCTime+" and diff is "+Math.abs(checkYourUTCTime - JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]));
 
             if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
+              PEERS.peers.find(o => o.id == peerId).peerMaxHeight = parseInt(JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
               frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
               frankieCoin.incrementPeerNonce(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
               BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
@@ -2850,6 +2851,7 @@ var cbReset = async function(full = false){
             }
 
             if(JSON.parse(data)["nodeStatePing"]["GlobalHash"] == globalGenesisHash){//will add more to this
+              PEERS.peers.find(o => o.id == peerId).peerMaxHeight = parseInt(JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
               frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
               frankieCoin.incrementPeerNonce(peerId,JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
               BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
@@ -2914,6 +2916,7 @@ var cbReset = async function(full = false){
               )
             ){
               log(chalk.green("Global hashes matched!"));
+              PEERS.peers.find(o => o.id == peerId).peerMaxHeight = parseInt(JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
               frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
               BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
               var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
@@ -3614,6 +3617,7 @@ var cbReset = async function(full = false){
 
             if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash){
               log(chalk.green("Global hashes matched!"));
+              PEERS.peers.find(o => o.id == peerId).peerMaxHeight = parseInt(JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
               frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
               BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
               var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
