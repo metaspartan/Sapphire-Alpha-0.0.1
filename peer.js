@@ -2853,7 +2853,9 @@ var cbReset = async function(full = false){
             }
 
             if(JSON.parse(data)["nodeStatePing"]["GlobalHash"] == globalGenesisHash){//will add more to this
-              PEERS.peers.find(o => o.id === peerId).peerMaxHeight = parseInt(JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
+              if(PEERS.peers.find(o => o.id === peerId)){
+                PEERS.peers.find(o => o.id === peerId).peerMaxHeight = parseInt(JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
+              }
               frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
               frankieCoin.incrementPeerNonce(peerId,JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
               BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePing"]["MaxHeight"]);
@@ -3745,7 +3747,7 @@ var cbReset = async function(full = false){
               //setTimeout(function(){peers[peerId].conn.write("ChainSyncPong("+peerBlockHeight+")");},5000);
               if(PEERS.peers.find(o => o.id === peerId) && pongBack == true){
                 setTimeout(function(){
-                  if(PEERS.peers.find(o => o.id === peerId) && PEERS.peers.find(o => o.id === peerId).conn2 != undefined){
+                  if(PEERS.peers.find(o => o.id === peerId) && PEERS.peers.find(o => o.id === peerId).conn2.write != undefined){
                     PEERS.peers.find(o => o.id === peerId).conn2.write(JSON.stringify({"ChainSyncPong":{Height:peerBlockHeight,MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
                   }
                 },300);
@@ -3754,7 +3756,7 @@ var cbReset = async function(full = false){
             }else{
               log("Did not match this hash and this peer is an imposter");
               //peers[peerId].conn.write("Don't hack me bro");
-              if(PEERS.peers.find(o => o.id === peerId) && PEERS.peers.find(o => o.id === peerId).conn2 != undefined){
+              if(PEERS.peers.find(o => o.id === peerId) && PEERS.peers.find(o => o.id === peerId).conn2.write != undefined){
                 PEERS.peers.find(o => o.id === peerId).conn2.write(JSON.stringify({"BadPeer":{Height:1337}}));
               }
               ///tesst out setTimeout(function(){disconnet peers[peerId].conn.dissconnet();},1500);
