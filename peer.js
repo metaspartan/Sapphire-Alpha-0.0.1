@@ -857,7 +857,7 @@ var minerPing = function(){
 
   //we should get longestPeer first
   console.log(chalk.bgBlue("MINER PING "))
-  var nodesInChain = frankieCoin.retrieveNodes();
+  //var nodesInChain = frankieCoin.retrieveNodes();
   for (let id in PEERS.peers) {
     if(PEERS.peers[id].conn != undefined){
           setTimeout(function(){
@@ -2902,7 +2902,17 @@ var cbReset = async function(full = false){
           if(JSON.parse(data)["ChainSyncPing"]){
 
             console.log(chalk.bgCyan.black(JSON.stringify(JSON.parse(data)["ChainSyncPing"])));
-            if(JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash && (parseInt(JSON.parse(data)["ChainSyncPing"]["PeerNonce"]) == chainState.peerNonce) && chainState.isMining == false){
+            if(
+              (
+                JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash
+                && (parseInt(JSON.parse(data)["ChainSyncPing"]["PeerNonce"]) == chainState.peerNonce)
+                && chainState.isMining == false
+              ) || (
+                JSON.parse(data)["ChainSyncPing"]["GlobalHash"] == globalGenesisHash
+                && (parseInt(JSON.parse(data)["ChainSyncPing"]["PeerNonce"]) == 0)
+                && chainState.isMining == false
+              )
+            ){
               log(chalk.green("Global hashes matched!"));
               frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
               BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
@@ -4661,7 +4671,7 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   log("------------------------------------------------------")
   log(chalk.green("CHAIN SYNCING"))
   log("------------------------------------------------------")
-  var nodesInChain = frankieCoin.retrieveNodes();
+  //var nodesInChain = frankieCoin.retrieveNodes();
   var longestPeer = 0;
   for(node in PEERS.peers){
     console.log("PEER MAX HEIGHT "+PEERS.peers[node].peerMaxHeight)
@@ -4696,8 +4706,8 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   //log("------------------------------------------------------")
   log(longestPeer+" <<lp   mh>>"+peerMaxHeight+"<<mh    pl>> "+peerLength)
 
-  frankieCoin.incrementPeerNonce(nodesInChain[node]["id"],peerLength);
-  BlkDB.addNode("node:"+nodesInChain[node]["id"]+":peerBlockHeight",peerLength);
+  //frankieCoin.incrementPeerNonce(nodesInChain[node]["id"],peerLength);
+  //BlkDB.addNode("node:"+nodesInChain[node]["id"]+":peerBlockHeight",peerLength);
   //log(JSON.stringify(nodesInChain));
   //the pong us set to be one higher from the ping and is above the chain length
   /*****
