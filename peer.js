@@ -295,7 +295,7 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
   //finally ping if necessary
   if(txHt > chainState.synchronized){
 
-    if(PEERS.peers.find(o => o.id === peer) && PEERS.peers.find(o => o.id === peer).conn2 != undefined){
+    if(PEERS.peers.find(o => o.id === peer) && PEERS.peers.find(o => o.id === peer).conn2.write != undefined){
       PEERS.peers.find(o => o.id === peer).conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
     }
 
@@ -314,7 +314,7 @@ var stuckPeerMonitor = function(id,incomingBlockHeight,chainStateHash){
     if(stPeer.count > 2){
       console.log("sending node state pong to stuck peer from monitor "+id);
       //var syncTrigger = {"syncTrigger":incomingBlockHeight,"submitCurrrentChainStateHash":chainStateHash,"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
-      if(PEERS.peers.find(o => o.id === id) && PEERS.peers.find(o => o.id === id).conn != undefined){
+      if(PEERS.peers.find(o => o.id === id) && PEERS.peers.find(o => o.id === id).conn.write != undefined){
         PEERS.peers.find(o => o.id === id).conn.write(JSON.stringify(
           {"nodeStatePong":{
               Height:parseInt(chainState.synchronized),
