@@ -295,7 +295,7 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
   //finally ping if necessary
   if(txHt > chainState.synchronized){
 
-    if(PEERS.peers.find(o => o.id === peer) && JSON.stringify(PEERS.peers.find(o => o.id === peer).conn2) != "{}"){
+    if(PEERS.peers.find(o => o.id === peer) && PEERS.peers.find(o => o.id === peer).conn2 != undefined){
       PEERS.peers.find(o => o.id === peer).conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
     }
 
