@@ -211,9 +211,9 @@ var Peer = class Peer {
         };
         this.setIp(ip);
         this.port = port;
-        this.nonce = 0;
+        this.callNonce = 0;
         this.increment = function(){
-          this.nonce+=1;
+          this.callNonce+=1;
         };
         this.timestamp = timestamp;
 
