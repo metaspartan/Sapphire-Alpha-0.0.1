@@ -2817,7 +2817,7 @@ var cbReset = async function(full = false){
             //console.log("THIS PEER UTC TIME IS "+JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]+" and you "+checkYourUTCTime+" and diff is "+Math.abs(checkYourUTCTime - JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]));
 
             if(JSON.parse(data)["nodeStatePong"]["GlobalHash"] == globalGenesisHash){//will add more to this
-              PEERS.peers.find(o => o.id === peerId).peerMaxHeight = parseInt(JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
+              //PEERS.peers.find(o => o.id === peerId).peerMaxHeight = parseInt(JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
               frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
               frankieCoin.incrementPeerNonce(peerId,JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
               BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["nodeStatePong"]["MaxHeight"]);
