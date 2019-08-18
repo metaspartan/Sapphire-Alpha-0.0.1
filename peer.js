@@ -3708,6 +3708,7 @@ var cbReset = async function(full = false){
                     pongBack = true;
                   }else{
                     console.log("you are not synchronized to the peers and we should call a block synch");
+                    console.log(" peer block height "+parseInt(peerBlockHeight)+" your block height "+frankieCoin.getLength())
                     //call chainWalker
                     chainWalker(peerBlockHeight,cbBlockChainValidatorStartUp);
                   }
