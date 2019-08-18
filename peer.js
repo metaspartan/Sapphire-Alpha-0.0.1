@@ -1424,7 +1424,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               if(tobj2.nodeType > 1){
                 console.log("this node type is "+tobj2.nodeType);
                 console.log(chalk.bgCyan.black("well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
               }
             }
             called = true;
@@ -1434,24 +1434,24 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             //console.log(peers2[id])
             console.log("THIS IS WHERE I AM PINGING TODAY 778"+(replyData+1) < chainState.peerNonce)
             let tobj = PEERS.peers.find(o => o.id === id);
-            if(tobj && tobj.info){
-              console.log(tobj.info.ip)
+            if(tobj){
+              console.log(tobj.ip)
             }
             let rnod = PEERS.peers.find(q => q.peer == id);
             if(rnod){
               if(rnod.nodeType > 1){
                 console.log(chalk.bgCyan.black("1324 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
                 if(chainState.chainWalkHeight == parseInt(chainStateMonitor.wasChainStuck.split(":")[0]) && parseInt(chainStateMonitor.wasChainStuck.split(":")[1]) <= 1){
-                  peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                  PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                 }else{
-                  peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                  PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                 }
                 called = true;
                 localTempNode.random = "no";
               }
             }else{
               console.log(chalk.bgCyan.black("1334 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-              peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+              PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
               called = true;
               localTempNode.random = "no";
             }
@@ -1460,10 +1460,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             let rnod = PEERS.peers.find(q => q.peer == id);
             if(rnod){
               if(rnod.nodeType > 1){
-                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
               }
             }else{
-              peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+              PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
             }
           }
           tempNodeCallBucket.push(localTempNode)
@@ -4468,13 +4468,13 @@ function cliGetInput(){
           // log("------------------------------------------------------");
           // log(chalk.green("Sending ping for chain sync."));
           // log("------------------------------------------------------");
-          let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
+          let rnod = PEERS.peers.find(q => q.peer == id);
           if(rnod){
             if(rnod.nodeType > 1){
-              peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+              PEERS.peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
             }
           }else{
-            peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
+            PEERS.peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),MaxHeight:parseInt(chainState.synchronized),GlobalHash:globalGenesisHash}}));
           }
 
         }
@@ -4821,7 +4821,9 @@ var cbChainGrab = async function(data) {
   console.log(chalk.bgRed.yellow.bold("PREVIPUSLY THIS CALL WAS COMMENTED OUT AND WORKING WELL SO MONOTOR IT CALLING SUBMIT BLOCK"));
   for (let id in PEERS.peers) {
     //chain sync ping
-    PEERS.peers.find(o => o.id === peer).conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+    if(PEERS.peers[id] && PEERS.peers[id].conn.write){
+      PEERS.peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+    }
   }
   console.log("------------------------------------------------------");
   console.log("------------------------------------------------------");
