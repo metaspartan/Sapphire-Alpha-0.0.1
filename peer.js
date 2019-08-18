@@ -2984,7 +2984,7 @@ var cbReset = async function(full = false){
 
 
                   //pongBack = true;//not sure about this since this is a stream
-                }else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
+                }else if(frankieCoin.getLength() >= parseInt(peerBlockHeight)){
                   //okay this is a legitimate pong
                   if(chainState.synchronized > peerBlockHeight){
                     var pongBackBlock = function(blockData){
@@ -3700,7 +3700,7 @@ var cbReset = async function(full = false){
                   //pongBack = true;//not sure about this since this is a stream
                 }else if(frankieCoin.getLength() > parseInt(peerBlockHeight)){
                   //okay this is a legitimate pong
-                  if(chainState.synchronized > peerBlockHeight){
+                  if(chainState.synchronized >= peerBlockHeight){
                     var pongBackBlock = function(blockData){
                       PEERS.peers.find(o => o.id === peerId).conn2.write(blockData.toString());
                     }
