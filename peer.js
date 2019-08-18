@@ -790,10 +790,12 @@ var activePing = function(timer){
   }
   //console.log(nodesInChain);
   var longestPeer = 0;
-  for(node in nodesInChain){
-    if(parseInt(nodesInChain[node]["info"]["chainlength"]) > longestPeer){
-      longestPeer = parseInt(nodesInChain[node]["info"]["maxHeight"]);
+  for(node in PEERS.peers){
+    if(parseInt(PEERS.peers[node].maxHeight) > longestPeer){
+      longestPeer = parseInt(PEERS.peers[node].maxHeight);
+      console.log("longest peer is "+chainState.peerNonce)
       chainState.peerNonce = longestPeer;
+      console.log("longest peer after is "+chainState.peerNonce)
       frankieCoin.longestPeerBlockHeight = longestPeer;
     }
   }
@@ -1417,7 +1419,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             if(tobj && tobj.info){
               console.log(tobj.info.ip)
             }
-            let tobj2 = chainState.activeSynch.receive.find(p => p.peer === id);
+            let tobj2 = PEERS.peers.find(p => p.peer === id);
             if(tobj2){
               if(tobj2.nodeType > 1){
                 console.log("this node type is "+tobj2.nodeType);
@@ -1431,11 +1433,11 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           //}else if(peers[id]){
             //console.log(peers2[id])
             console.log("THIS IS WHERE I AM PINGING TODAY 778"+(replyData+1) < chainState.peerNonce)
-            let tobj = frankieCoin.nodes.find(o => o.id === id);
+            let tobj = PEERS.peers.find(o => o.id === id);
             if(tobj && tobj.info){
               console.log(tobj.info.ip)
             }
-            let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
+            let rnod = PEERS.peers.find(q => q.peer == id);
             if(rnod){
               if(rnod.nodeType > 1){
                 console.log(chalk.bgCyan.black("1324 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
@@ -1455,7 +1457,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
             }
           }else{
             console.log("I DONT KNOW WHAT ELSE BUT PING ANYWAY");
-            let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
+            let rnod = PEERS.peers.find(q => q.peer == id);
             if(rnod){
               if(rnod.nodeType > 1){
                 peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
@@ -1550,13 +1552,13 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
     console.log("ln 1195 peers 2 length is "+Object.keys(peers2).length)
 
-    for (let id in peers2) {
+    for (let id in PEERS.peers) {
       var localTempNode = {};
       localTempNode.nodeId = id;
       localTempNode.blockHeightCalled = parseInt(replyData+1);
       localTempNode.callSynchronized = chainState.synchronized;
 
-      if(peers2[id].conn2 != undefined){
+      if(PEERS.peers[id].conn2 != undefined){
         //log("------------------------------------------------------");
         //log(chalk.green("Sending ping for chain sync in cbBlockChainValidator bottom"));
         //log("------------------------------------------------------");
@@ -1570,49 +1572,49 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
         //if(random == i && peers[id]){
           //console.log(peers2[id])
           //console.log(peers2[id])
-          let tobj = frankieCoin.nodes.find(o => o.id === id);
-          if(tobj && tobj.info){
-            console.log(tobj.info.ip)
+          let tobj = PEERS.peers.find(o => o.id === id);
+          if(tobj){
+            console.log(tobj.ip)
           }
-          if(chainState.activeSynch.receive){
-            let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
+          if(PEERS.peers){
+            let rnod = PEERS.peers.find(q => q.peer == id);
             if(rnod){
               if(rnod.nodeType > 1){
                 console.log(chalk.bgCyan.black("1227 well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(myChainSyncTrigger),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(myChainSyncTrigger),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                 called = true;
                 localTempNode.random = "yes";
               }
             }else{
               console.log(chalk.bgCyan.black("1233 well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-              peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(myChainSyncTrigger),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+              PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(myChainSyncTrigger),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
               called = true;
               localTempNode.random = "yes";
             }
           }else{
             console.log("perhaps we should call the ping here because there is no activeSynch.receive yet")
             console.log(chalk.bgCyan.black("1367 well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(myChainSyncTrigger),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+            PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(myChainSyncTrigger),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
             called = true;
             localTempNode.random = "yes";
           }
         }else if(called == false && peers[id] && (replyData+1) < chainState.peerNonce){
         //}else if(peers[id]){
           //console.log(peers2[id])
-          let tobj = frankieCoin.nodes.find(o => o.id === id);
-          if(tobj && tobj.info){
-            console.log(tobj.info.ip)
+          let tobj = PEERS.peers.find(o => o.id === id);
+          if(tobj){
+            console.log(tobj.ip)
           }
           if(parseInt(replyData) == parseInt(chainState.synchronized)){
-            let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
+            let rnod = PEERS.peers.find(q => q.peer == id);
             if(rnod){
               if(rnod.nodeType > 1){
                 console.log(chalk.bgCyan.black("1249 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
                 if(chainState.chainWalkHeight == parseInt(chainStateMonitor.wasChainStuck.split(":")[0]) && parseInt(chainStateMonitor.wasChainStuck.split(":")[1]) > 0){
                   console.log("stuck true at 1488")
-                  peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                  PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                 }else{
-                  peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                  PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                 }
                 called = true;
                 localTempNode.random = "no";
@@ -1622,10 +1624,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               if(chainState.chainWalkHeight == parseInt(chainStateMonitor.wasChainStuck.split(":")[0]) && parseInt(chainStateMonitor.wasChainStuck.split(":")[1]) > 0){
                 console.log("stuck true at 1501")
                 console.log(chalk.bgCyan.black("1507 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
               }else{
                 console.log(chalk.bgCyan.black("1510 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
               }
               called = true;
               localTempNode.random = "no";
@@ -1639,10 +1641,10 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
                   //this might not be needed but trying it out
                   if(chainState.synchronized < chainState.peerNonce){
                     console.log(chalk.bgCyan.black("1514 well, we are calling bottom chainSyncPing with "+parseInt(replyData+1)+" and "+parseInt(chainState.synchronized)));
-                    peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                    PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                   }else{
                     console.log(chalk.bgCyan.black("1517 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)));
-                    peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                    PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                   }
                   //end might not be needed
                   called = true;
@@ -1650,14 +1652,14 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
                 }
               }else{
                 console.log(chalk.bgCyan.black("1270 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-                peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+                PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
                 called = true;
                 localTempNode.random = "no";
               }
             }
           }else{
             console.log("1276 reply data +1 called")
-            peers2[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+            PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
             //console.log("1276 cb reset called")
             //cbReset();
           }
@@ -2286,14 +2288,13 @@ var cbReset = async function(full = false){
 
             //console.log("you got a thanks from "+peerId);
             let tobj = PEERS.peers.find(o => o.id === peerId);
-            if(tobj.ip){
+            if(tobj){
               chainStateMonitor.thanksCount+=1;
               console.log(chalk.bgRed.white.bold("you got a thanks from "+tobj.ip));
               console.log(chalk.bgCyan.black(JSON.stringify(JSON.parse(data)["thanks"])));
               chainState.peerNonce = chainState.synchronized;
               tobj.peerMaxHeight = chainState.synchronized;
               frankieCoin.incrementPeerMaxHeight(peerId,chainState.synchronized);
-              //PEERS.peers.find(o => o.id === peerId).peerMaxHeight = chainState.synchronized;
               frankieCoin.incrementPeerNonce(peerId,chainState.synchronized);
               removeWaiting(peerId);
 
@@ -4678,9 +4679,9 @@ var ChainSynchHashCheck = function(peerLength,peerMaxHeight){
   log("------------------------------------------------------")
   var nodesInChain = frankieCoin.retrieveNodes();
   var longestPeer = 0;
-  for(node in nodesInChain){
-    if(parseInt(nodesInChain[node]["info"]["chainlength"]) > longestPeer){
-      longestPeer = parseInt(nodesInChain[node]["info"]["chainlength"]);
+  for(node in PEERS.peers){
+    if(parseInt(PEERS.peers[node].maxHeight) > longestPeer){
+      longestPeer = parseInt(PEERS.peers[node].maxHeight);
       frankieCoin.longestPeerBlockHeight = longestPeer;
     }
   }
@@ -4813,18 +4814,24 @@ var cbChainGrab = async function(data) {
 
     }
   },5000);
+
   //this is where we call a function with the blockHeight pointer that finds out the peerBlockHeight and then download missing data
-  /***
-  for (let id in peers) {
+  console.log("------------------------------------------------------");
+  console.log("------------------------------------------------------");
+  console.log(chalk.bgRed.yellow.bold("PREVIPUSLY THIS CALL WAS COMMENTED OUT AND WORKING WELL SO MONOTOR IT CALLING SUBMIT BLOCK"));
+  for (let id in PEERS.peers) {
     //chain sync ping
-    peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:frankieCoin.getLength(),GlobalHash:globalGenesisHash}}));
+    PEERS.peers.find(o => o.id === peer).conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
   }
+  console.log("------------------------------------------------------");
+  console.log("------------------------------------------------------");
+
   //finally we set the RPC block which is updated by peer synch processes
   //this is where we SUBMIT WORK leaving it to eeror right now
-  log("------------------------------------------------------");
-  log(chalk.green("CALLING SUBMIT BLOCK"));
-  log("------------------------------------------------------");
-  ***?
+  console.log("------------------------------------------------------");
+  console.log(chalk.green("CALLING SUBMIT BLOCK"));
+  console.log("------------------------------------------------------");
+
 
   /*****
   var options = {
@@ -5058,6 +5065,7 @@ async function ChainGrab(blocknum){
   }
   BlkDB.getChainStateParam("orderHeight",resetOrderHeight);
 
+  //console.log("START UP CALLING getBlockRange with parseInt(chainState.chainWalkHeight) "+parseInt(chainState.chainWalkHeight)+" frankieCoin.chainRiser "+frankieCoin.chainRiser)
   BlkDB.getBlockRange(parseInt(chainState.chainWalkHeight),frankieCoin.chainRiser,cbChainGrab)
   //BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,currCWH,frankieCoin.chainRiser,4811);
 

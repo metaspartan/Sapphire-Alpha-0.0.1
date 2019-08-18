@@ -792,7 +792,9 @@ var getBlockRange = function(blockHeight,riser,callback){
 
 
     var chainBlockHeight=blockHeight;
-    chainBlockHeight-=riser;
+    if(blockHeight > riser){
+      chainBlockHeight-=riser;
+    }
 
       console.log("riser: "+riser+" blockHeight: "+blockHeight+" chainBlockHeight: "+chainBlockHeight+" hexBlockNum: "+parseInt(chainBlockHeight,16))
       var returner = [];
