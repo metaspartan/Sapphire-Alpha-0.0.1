@@ -2920,7 +2920,9 @@ var cbReset = async function(full = false){
               )
             ){
               log(chalk.green("Global hashes matched!"));
-              PEERS.peers.find(o => o.id == peerId).peerMaxHeight = parseInt(JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
+              if(PEERS.peers.find(o => o.id == peerId)){
+                PEERS.peers.find(o => o.id == peerId).peerMaxHeight = parseInt(JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
+              }
               frankieCoin.incrementPeerMaxHeight(peerId,JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
               BlkDB.addNode("node:"+peerId+":MaxHeight",JSON.parse(data)["ChainSyncPing"]["MaxHeight"]);
               var peerBlockHeight = JSON.parse(data)["ChainSyncPing"]["Height"];
