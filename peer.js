@@ -3040,7 +3040,7 @@ var cbReset = async function(full = false){
             }else{
               log("Did not match this hash and this peer is an imposter");
               //peers[peerId].conn.write("Don't hack me bro");
-              PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify({"BadPeer":{Height:1337}}));
+              //PEERS.peers.find(o => o.id === peerId).conn.write(JSON.stringify({"BadPeer":{Height:1337}}));
               ///tesst out setTimeout(function(){disconnet peers[peerId].conn.dissconnet();},1500);
             }
 
