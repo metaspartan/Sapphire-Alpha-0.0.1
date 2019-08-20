@@ -2583,6 +2583,9 @@ var cbReset = async function(full = false){
 
 
                           //increment the internal peer nonce of sending party to track longest chain
+                          if(PEERS.peers.find(o => o.id === peerId)){
+                            PEERS.peers.find(o => o.id === peerId).peerMaxHeight = parseInt(JSON.parse(data)["block"]["blockHeight"]);
+                          }
                           frankieCoin.incrementPeerNonce(peerId,JSON.parse(data)["block"]["blockHeight"]);
                           BlkDB.addNode("node:"+peerId+":peerBlockHeight",JSON.parse(data)["block"]["blockHeight"]);
                           //logging the block added to chain for console
