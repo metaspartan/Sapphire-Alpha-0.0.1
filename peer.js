@@ -295,9 +295,11 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
   //finally ping if necessary
   if(txHt > chainState.synchronized){
 
+
     if(PEERS.peers.find(o => o.id === peer) && PEERS.peers.find(o => o.id === peer).conn2.write != undefined){
-      PEERS.peers.find(o => o.id === peer).conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+      //PEERS.peers.find(o => o.id === peer).conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
     }
+
 
   }else if(txHt > chainState.transactionHeight){
     tranSynch();
@@ -2306,7 +2308,7 @@ var cbReset = async function(full = false){
 
               //updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,nodeType,oxHt,oxHsh,utcTS){
 
-
+              //this is actually updating it with the past information
               updatePeerState(
                 peerId,
                 JSON.parse(data)["thanks"]["blockHeight"],
@@ -2581,6 +2583,20 @@ var cbReset = async function(full = false){
 
                         log(chalk.bgGreen("SUCCESSFUL BLOCK ADD? "+successfulBlockAdd));
 
+                          /*****maybe we ru this here...
+                          updatePeerState(
+                            peerId,
+                            JSON.parse(data)["nodeStatePong"]["MaxHeight"],
+                            JSON.parse(data)["nodeStatePong"]["currentBlockCheckPointHash"],
+                            JSON.parse(data)["nodeStatePong"]["transactionHeight"],
+                            JSON.parse(data)["nodeStatePong"]["transactionRootHash"],
+                            JSON.parse(data)["nodeStatePong"]["PeerNonce"],
+                            JSON.parse(data)["nodeStatePong"]["NodeType"],
+                            JSON.parse(data)["nodeStatePong"]["orderHeight"],
+                            JSON.parse(data)["nodeStatePong"]["orderRootHash"],
+                            JSON.parse(data)["nodeStatePong"]["utcTimeStamp"]
+                          )
+                          *****/
 
                           //increment the internal peer nonce of sending party to track longest chain
                           if(PEERS.peers.find(o => o.id === peerId)){
