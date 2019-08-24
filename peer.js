@@ -1492,7 +1492,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     ///////////////////////////////////////////SETS THE SYNC TRIGGER START BLOCK
     console.log("THIS IS THE CASE I AM TRAPPING chain walk height is "+chainState.chainWalkHeight+" REPLY DATA IS "+replyData);
     var myChainSyncTrigger = replyData;
-    if(replyData < chainState.chainWalkHeight){
+    if(replyData < chainState.chainWalkHeight && replyData > 0){
 
       console.log("1248 NOT VALID NEED TO PING AT TOP CASE ADDS ONE "+parseInt(replyData+1)+" and chainstate issynching = "+chainState.isSynching);
       myChainSyncTrigger+=1;
