@@ -4851,7 +4851,7 @@ var cbChainGrab = async function(data) {
   for (let id in PEERS.peers) {
     //chain sync ping
     if(PEERS.peers[id] && PEERS.peers[id].conn.write){
-      PEERS.peers[id].conn.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+      PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
     }
   }
   console.log("------------------------------------------------------");
