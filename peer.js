@@ -429,6 +429,8 @@ var activeSync = function(timer){
 
   }else{
 
+    console.log("SHOULD THIS BE SYNCED?")
+    console.log("chainState.chainWalkHeight: "+parseInt(chainState.chainWalkHeight)+"chainState.peerNonce "+parseInt(chainState.peerNonce)+"chainState.chainWalkHeight "+parseInt(chainState.chainWalkHeight)+"chainState.synchronized "+parseInt(chainState.synchronized))
     console.log("I DONT KNOW WHAT ELSE CAN HAPPEN SO FLAGG THIS IF SEEN blockrange validate called as else condition line 366")
     setTimeout(function(){
       console.log("calling brv line 369");
@@ -1567,7 +1569,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
           if(PEERS.peers){
             let rnod = PEERS.peers[id];
-            if(rnod){
+            if(rnod && rnod.conn2.write){
               if(rnod.nodeType > 1){
                 console.log(chalk.bgCyan.black("1227 well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
                 PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(myChainSyncTrigger),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
@@ -2273,6 +2275,7 @@ var cbReset = async function(full = false){
           if(JSON.parse(data)["thanks"]){
 
             //console.log("you got a thanks from "+peerId);
+            chainState.peerNonce = parseInt(JSON.parse(data)["thanks"]["blockHeight"]);
             let tobj = PEERS.peers.find(o => o.id === peerId);
             if(tobj){
               chainStateMonitor.thanksCount+=1;
@@ -2284,7 +2287,7 @@ var cbReset = async function(full = false){
               frankieCoin.incrementPeerNonce(peerId,chainState.synchronized);
               removeWaiting(peerId);
 
-              /***
+              /***for reference and keep in mind the reply everything below blockheight is from previous block
               var thanksReply = {"thanks":{
                   "blockHeight":JSON.parse(data)["block"]["blockHeight"],
                   "Height":parseInt(chainState.synchronized),
@@ -2309,6 +2312,7 @@ var cbReset = async function(full = false){
               //updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,nodeType,oxHt,oxHsh,utcTS){
 
               //this is actually updating it with the past information
+              /***
               updatePeerState(
                 peerId,
                 JSON.parse(data)["thanks"]["blockHeight"],
@@ -2321,6 +2325,7 @@ var cbReset = async function(full = false){
                 JSON.parse(data)["thanks"]["orderRootHash"],
                 JSON.parse(data)["thanks"]["utcTimeStamp"],
               )
+              ***/
               updatePeerTxHashArray(JSON.parse(data)["thanks"]["transactionHeight"],JSON.parse(data)["thanks"]["transactionRootHash"],1,true);
               updatePeerTxHashArray(JSON.parse(data)["thanks"]["prevTxHeight"],JSON.parse(data)["thanks"]["previousTxHash"],1,true);
               var entireTxHashArray = JSON.parse(data)["thanks"]["transactionHashWeights"].sort(function(a,b){return parseInt(a.peerTxHeight) - parseInt(b.peerTxHeight)});
@@ -2651,23 +2656,24 @@ var cbReset = async function(full = false){
                             }
                           };
 
-                          /***old version being removed
-                          var thanksReply = {"thanks":{
-                            "blockHeight":JSON.parse(data)["block"]["blockHeight"],
-                            "transactionHeight":chainState.transactionHeight,
-                            "transactionRootHash":chainState.transactionRootHash,
-                            "previousTxHeight":chainState.previousTxHeight,
-                            "previousTxHash":chainState.previousTxHash,
-
-                            }
-                          };
-                          ***/
-
-
-
                           console.log(chalk.bgCyan.black.bold("THANKS "+thanksReply));
-                          //peers[peerId].conn.write(thanksReply);
+                          //must use the sendBackUncle function to reply in this area there is no access to conn or conn2
                           sendBackUncle(thanksReply,peerId);
+
+                          /***for reference this is what is sent - and may be able to be used as a repropogation
+                          broadcastPeers(JSON.stringify({
+                            checkPointHash:chainState.checkPointHash,
+                            currentBlockCheckPointHash:chainState.currentBlockCheckPointHash,
+                            currentTransactionHeight:chainState.previousTxHeight,
+                            currentTransactionRootHash:chainState.previousTxHash,
+                            postBlockTransactionHeight:chainState.transactionHeight,
+                            postBlockTransactionHash:chainState.transactionRootHash,
+                            block:frankieCoin.getLatestBlock(),
+                            deletedOrders:deletedOrders,
+                            PeerNonce:parseInt(chainState.peerNonce),
+                            utcTimeStamp:parseInt(new Date().getTime()/1000)
+                          }),"new-block");
+                          ***/
 
                           //add it to the RPC for miner
                           console.log("2277 posting rpc for mininng POST THANKS PREP AND SEND ");
@@ -4847,7 +4853,7 @@ var cbChainGrab = async function(data) {
   //this is where we call a function with the blockHeight pointer that finds out the peerBlockHeight and then download missing data
   console.log("------------------------------------------------------");
   console.log("------------------------------------------------------");
-  console.log(chalk.bgRed.yellow.bold("PREVIPUSLY THIS CALL WAS COMMENTED OUT AND WORKING WELL SO MONOTOR IT CALLING SUBMIT BLOCK"));
+  console.log(chalk.bgRed.yellow.bold("PREVIOUSLY THIS CALL WAS COMMENTED OUT AND WORKING WELL SO MONOTOR IT CALLING SUBMIT BLOCK"));
   for (let id in PEERS.peers) {
     //chain sync ping
     if(PEERS.peers[id] && PEERS.peers[id].conn.write){
@@ -5737,7 +5743,7 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
 
         }
 
-        await console.log(chalk.bgRed("FIRST OFF CAN I DO A TIME OUT HERE AND "+frankieCoin.getLatestBlock().timestamp+" comares to "+JSON.parse(childData)["createBlock"]["block"]["timestamp"]))
+        await console.log(chalk.bgRed("FIRST OFF CAN I DO A TIME OUT HERE AND "+frankieCoin.getLatestBlock().timestamp+" compares to "+JSON.parse(childData)["createBlock"]["block"]["timestamp"]))
         //////////////going to have to make this sequential in a callback or chain
 
         //temporarily setting these here to be pushed in broadcastPeersBlock above because they are set in the addBlock function now
