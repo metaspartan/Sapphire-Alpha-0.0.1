@@ -4849,7 +4849,7 @@ var cbChainGrab = async function(data) {
     console.log("4529 check frankieCoin.blockHeight "+frankieCoin.blockHeight+" chainState.chainWalkHeight "+chainState.chainWalkHeight+" calling with "+parseInt(chainState.chainWalkHeight+1));
     if(frankieCoin.blockHeight > 1){
       console.log("calling brv line 4352 THIS IS IN CHAINGRAB STARTUP CONDITION");
-      //BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(frankieCoin.blockHeight+frankieCoin.chainRiser+1),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,2718);
+      BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(frankieCoin.blockHeight+frankieCoin.chainRiser+1),cbBlockChainValidatorStartUp,chainState.chainWalkHash,frankieCoin.chainRiser,2718);
 
     }
   },5000);
