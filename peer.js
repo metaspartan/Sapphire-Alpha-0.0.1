@@ -4860,7 +4860,7 @@ var cbChainGrab = async function(data) {
   console.log(chalk.bgRed.yellow.bold("PREVIOUSLY THIS CALL WAS COMMENTED OUT AND WORKING WELL SO MONOTOR IT CALLING SUBMIT BLOCK"));
   for (let id in PEERS.peers) {
     //chain sync ping
-    if(PEERS.peers[id] && PEERS.peers[id].conn.write){
+    if(PEERS.peers[id] && PEERS.peers[id].conn2.write){
       PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
     }
   }
