@@ -2720,7 +2720,7 @@ var cbReset = async function(full = false){
                           }
 
                           console.log("calling brv line 2314");
-                          BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight+1),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
+                          BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
 
                           //miner call
                           console.log("calling calculateCheckPoints 2488");

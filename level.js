@@ -862,7 +862,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
               console.log("block range validate top "+currentBlockToValidate+" current hash "+currentBlockHash);
             }
 
-            //console.log("second "+parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)));
+            console.log("second "+parseInt(parseInt(thisDataItem.key.toString().split(":")[1],16).toString(10)));
             //console.log("why below 10 "+thisDataItem.key.toString());
 
             /////perform the validation
