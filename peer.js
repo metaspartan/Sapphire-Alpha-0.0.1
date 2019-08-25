@@ -264,6 +264,13 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
     chainState.activeSynch.receive = [];
   }
 
+  for(id in PEERS.peers){
+    if(PEERS.peers[id].conn2 == "{}"){
+      cbReset();
+      return;
+    }
+  }
+
   updatePeerTxHashArray(txHt,txHsh,1,false);
   //console.log("just before push "+peer)
   //console.log("oxHeight"+oxHt+"oxHash"+oxHsh)
@@ -4166,10 +4173,14 @@ function cliGetInput(){
       //BlkDB.getChainParamsBlockHeight(globalGenesisHash);
       cliGetInput();
     }else if(userInput == "PP"){
-      for (let id in peers) {
-        console.log(peers[id].conn);
+      for (let id in PEERS.peers) {
+        console.log(PEERS.peers[id]);
+        console.log("and from the db : ")
+        BlkDB.getNodeById(PEERS.peers[id].id).then(function(nde){
+          console.log(nde);
+        })
       }
-      BlkDB.getNodes();
+      //BlkDB.getNodes();
       cliGetInput();
     }else if(userInput.startsWith("PM(")){
 
