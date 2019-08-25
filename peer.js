@@ -649,6 +649,7 @@ var oxSynch = function(){
 
 //maybe turn slowCounter into chainstate var
 var slowCounter = 0;
+var lastCounterCall = "Not Set Yet"
 var adjustedTimeout = function(or = false) {
 
   if(chainStateMonitor.isAdjustedTimeoutRunning == true && or == false){
@@ -658,7 +659,20 @@ var adjustedTimeout = function(or = false) {
     chainStateMonitor.isAdjustedTimeoutRunning = true;
   }
 
-  console.log(chalk.bgGreen.white.bold(chainState.chainWalkHeight+" HEIGHT <<< IS CHAIN STUCK HEIGHT >>> "+chainStateMonitor.isChainStuck+" chainStateMonitor.wasChainStuck "+chainStateMonitor.wasChainStuck));
+  console.log(
+    chalk.yellow.bold(
+      chalk.bgBlack.green.bold("CWHT: ")
+      +chainState.chainWalkHeight
+      +chalk.bgBlack.green.bold(" STUCKHT: ")
+      +chainStateMonitor.isChainStuck
+      +chalk.bgBlack.green.bold(" WASSTUCKHT: ")
+      +chainStateMonitor.wasChainStuck
+      +chalk.bgBlack.green.bold(" SLOWCT: ")
+      +chalk.red.bold(slowCounter)
+      +chalk.bgBlack.green.bold(" LAST: ")
+      +chalk.red.bold(lastCounterCall)
+    )
+  );
 
   if(parseInt(chainStateMonitor.wasChainStuck.split(":")[0]) == chainStateMonitor.isChainStuck){
     chainStateMonitor.wasChainStuck = chainStateMonitor.isChainStuck+":"+parseInt(parseInt(chainStateMonitor.wasChainStuck.split(":")[1])+1);
@@ -673,8 +687,9 @@ var adjustedTimeout = function(or = false) {
   }
   var timerInterval = 1013;
   frankieCoin.isChainSynch(chainState.synchronized);
-  if(slowCounter == 0 || (slowCounter % 2) == 0){
-    console.log("upper mod 2 slow counter is "+slowCounter)
+  if(slowCounter == 0 || (slowCounter % 2) == 0 && (slowCounter % 4) != 0){
+    lastCounterCall = "upper mod 2";
+    //console.log("upper mod 2 slow counter is "+slowCounter)
     //console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     //console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync(parseInt(timerInterval+(slowCounter*79)));
@@ -687,13 +702,15 @@ var adjustedTimeout = function(or = false) {
     if(chainStateMonitor.isOxValidationRunning == false && chainState.transactionHeight == chainState.chainWalkHeight && chainState.chainWalkHeight > 1){
       oxSynch();
     }
-    console.log("upper mod 4 slow counter is "+slowCounter)
+    lastCounterCall = "upper mod 4";
+    //console.log("upper mod 4 slow counter is "+slowCounter)
 
       //activeSync(parseInt(timerInterval+(slowCounter*23)));
       activePing(parseInt(timerInterval+(slowCounter*21)));
 
     slowCounter++;
   }else if(chainState.peerNonce > chainState.synchronized){
+    lastCounterCall = "peer nonce higher as and ap call";
     //console.log("calling active sync with issynching = "+isSynching+" and chainstate.issynching = "+chainState.isSynching);
     //console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     activeSync(parseInt(timerInterval+(slowCounter*81)));
@@ -703,23 +720,28 @@ var adjustedTimeout = function(or = false) {
     //console.log("calling active sync with chainState.peerNonce = "+chainState.peerNonce+" and chainState.synchronized = "+chainState.synchronized);
     setTimeout(function(){activeSync(parseInt(timerInterval+(slowCounter*35)))},1000);
     activePing(parseInt(timerInterval+(slowCounter*37)));
+    lastCounterCall = "as and ap called";
     slowCounter++;
   }else{
     if(chainStateMonitor.isTxValidationRunning == false && chainState.chainWalkHeight > 1){
-      console.log("lower transync "+slowCounter)
+      lastCounterCall = "lower transync "+slowCounter;
+      //console.log("lower transync "+slowCounter)
       tranSynch();
     }
     if(chainStateMonitor.isOxValidationRunning == false && chainState.transactionHeight == chainState.chainWalkHeight && chainState.chainWalkHeight > 1){
-      console.log("lower oxsync "+slowCounter)
+      lastCounterCall = "lower oxsync "+slowCounter;
+      //console.log("lower oxsync "+slowCounter)
       oxSynch();
     }
-    console.log("lower in else slow counter is "+slowCounter+" isOxValidationRunning "+chainStateMonitor.isOxValidationRunning)
-    if((slowCounter % 4) == 0){
-      console.log("lower mod 4 slow counter is "+slowCounter)
+    //console.log("lower in else slow counter is "+slowCounter+" isOxValidationRunning "+chainStateMonitor.isOxValidationRunning)
+    if((slowCounter % 11) == 0){
+      lastCounterCall=lastCounterCall+" and lower mod 4";
+      //console.log("lower mod 4 slow counter is "+slowCounter)
       activePing(parseInt(timerInterval+(slowCounter*21)));
     }
-    if((slowCounter % 3) == 0){
-      console.log("lower mod 3 slow counter is "+slowCounter)
+    if((slowCounter % 13) == 0){
+      lastCounterCall=lastCounterCall+" and lower mod 3";
+      //console.log("lower mod 3 slow counter is "+slowCounter)
       activeSync(parseInt(timerInterval+(slowCounter*23)));
     }
     slowCounter++;
@@ -854,9 +876,10 @@ var activePing = function(timer){
     }
   }
 
+  //keeping this function as a cleanup
   if(chainState.isSynching == false){//keep in touch
-    console.log("is synching is FALSE active ping was called tho");
-    for(peer in frankieCoin.nodes){
+    //console.log("is synching is FALSE active ping was called tho");
+    for(peer in PEERS.peers){
 
     }
   }else{
@@ -1505,7 +1528,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       if(replyData > 0){
         myChainSyncTrigger+=1;
       }else{
-        myChainSyncTrigger = 2;
+        myChainSyncTrigger=2;
       }
 
     }else if(replyData == chainState.chainWalkHeight && chainState.chainWalkHeight < chainState.peerNonce){
@@ -3717,7 +3740,9 @@ var cbReset = async function(full = false){
                   }
                   //BlkDB.dumpToStreamFIleRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream)
                   //var numRecordsToStream = parseInt(frankieCoin.synchronized);
+                  console.log("right before the call to stream requester")
                   if(PEERS.peers.find(o => o.id === peerId) && PEERS.peers.find(o => o.id === peerId).conn2.write){
+                    console.log("in the call to stream requester")
                     BlkDB.dumpToStreamBlockRange(cbGetStream,peers[peerId],JSON.parse(data)["ChainSyncPing"]["Height"],numRecordsToStream).then(function(jsonStream){
                       PEERS.peers.find(o => o.id === peerId).conn2.write(jsonStream);
                       console.log("wrote this "+jsonStream);
@@ -4871,7 +4896,9 @@ var cbChainGrab = async function(data) {
   console.log(chalk.bgRed.yellow.bold("PREVIOUSLY THIS CALL WAS COMMENTED OUT AND WORKING WELL SO MONOTOR IT CALLING SUBMIT BLOCK"));
   for (let id in PEERS.peers) {
     //chain sync ping
+    console.log("calling chain sync ping on startup to "+PEERS.peers[id].ip)
     if(PEERS.peers[id] && PEERS.peers[id].conn2.write){
+      console.log("called "+PEERS.peers[id].ip)
       PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(chainState.synchronized),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
     }
   }
