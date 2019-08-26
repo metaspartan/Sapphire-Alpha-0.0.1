@@ -1614,7 +1614,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               }
             }else{
               console.log(chalk.bgCyan.black("1233 well, we are calling top chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-              PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(myChainSyncTrigger),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+              if(PEERS.peers[id].conn2.write){
+                PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(myChainSyncTrigger),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
+              }
               called = true;
               localTempNode.random = "yes";
             }
