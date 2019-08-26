@@ -3787,7 +3787,7 @@ var cbReset = async function(full = false){
 
                 }else if(frankieCoin.blockHeight == parseInt(peerBlockHeight)){
                   //peers[peerId].conn.write(JSON.stringify(frankieCoin.getLatestBlock()));
-                  if(PEERS.peers.find(o => o.id === peerId) && PEERS.peers.find(o => o.id === peerId).conn2 != undefined){
+                  if(PEERS.peers.find(o => o.id === peerId) && PEERS.peers.find(o => o.id === peerId).conn2.write){
                     PEERS.peers.find(o => o.id === peerId).conn2.write(JSON.stringify(frankieCoin.getLatestBlock()));
                     pongBack = true;
                   }
