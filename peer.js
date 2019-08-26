@@ -1535,7 +1535,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
       console.log("1250 NOT VALID NEED TO PING AT TOP CASE ADDS ONE "+replyData+typeof(replyData+1)+" and chainstate issynching = "+chainState.isSynching);
       console.log("AND IN THIS CASE ARE WE STUCK? chainStateMonitor.isChainStuck: "+chainStateMonitor.isChainStuck+" chainState.chainWalkHeight "+chainState.chainWalkHeight);
-
+      if(replyData > 0){
+        myChainSyncTrigger+=1;
+      }
       if(parseInt(chainStateMonitor.wasChainStuck.split(":")[0]) == chainStateMonitor.isChainStuck){
         chainStateMonitor.wasChainStuck = chainStateMonitor.isChainStuck+":"+parseInt(parseInt(chainStateMonitor.wasChainStuck.split(":")[1])+1);
       }else{
@@ -2720,6 +2722,7 @@ var cbReset = async function(full = false){
                           }
 
                           console.log("calling brv line 2314");
+                          //NOTE: if you increment chainwalk height after mining a block it does not block range validate proerly
                           BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
 
                           //miner call
