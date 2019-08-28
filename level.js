@@ -880,7 +880,8 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
                 db.get("cs:"+parseInt(currentBlockToValidate-chainRiser)+":"+JSON.parse(riserAgo)["hash"],function (err, value) {
                   if(err){
                     //pushChainStateMonitor("isBlockRangeValidating",false)
-                    callback(false,parseInt(JSON.parse(currentBlockToValidate-chainRiser)["blockHeight"]-1),"");
+                    //callback(false,parseInt(JSON.parse(currentBlockToValidate-chainRiser)["blockHeight"]-1),"");
+                    callback(false,parseInt(JSON.parse(currentBlockToValidate-chainRiser)["blockHeight"]),"");
                   }else{
                     //console.log("--------------------------------------------------");
                     //console.log("Checkpoint Value Existed and is: "+value.toString());
@@ -905,7 +906,8 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
 
             }else{
               //pushChainStateMonitor("isBlockRangeValidating",false);
-              callback(false,parseInt(JSON.parse(isValidBlock)["blockHeight"]-1),"");
+              //callback(false,parseInt(JSON.parse(isValidBlock)["blockHeight"]-1),"");
+              callback(false,parseInt(JSON.parse(isValidBlock)["blockHeight"]),"");
             }
             currentBlockHash = JSON.parse(isValidBlock)["hash"];
             //console.log("VALIDATING BLOCK PREV HASH and NUMBER "+JSON.parse(isValidBlock)["blockHeight"]+JSON.parse(isValidBlock)["previousHash"]+JSON.parse(isValidBlock)["hash"]);
@@ -918,6 +920,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
         if(currentBlockToValidate == blockHeight){
           console.log("ping it "+currentBlockToValidate);
           pushChainStateMonitor("isBlockRangeValidating",false);
+          //callback(false,parseInt(parseInt(currentBlockToValidate)-1),"");
           callback(false,parseInt(parseInt(currentBlockToValidate)),"");
         }
         //pushChainStateMonitor("isBlockRangeValidating",false);
