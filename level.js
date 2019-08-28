@@ -919,7 +919,7 @@ var blockRangeValidate = function(blockHeight,riser,callback,blockHash,chainRise
           console.log("ping it "+currentBlockToValidate);
           pushChainStateMonitor("isBlockRangeValidating",false);
           //callback(false,parseInt(parseInt(currentBlockToValidate)-1),"");
-          callback(false,parseInt(parseInt(currentBlockToValidate)),"");
+          callback(false,parseInt(parseInt(currentBlockToValidate)-1),"");
         }
         //pushChainStateMonitor("isBlockRangeValidating",false);
         console.log(chalk.black.bgCyan("Block range validator data stream is complete at ")+chalk.bgMagenta(blockHeight));
