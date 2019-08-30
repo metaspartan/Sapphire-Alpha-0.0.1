@@ -4989,9 +4989,9 @@ var cbChainGrab = async function(data) {
 
                   console.log("4408 WE RESET and SEND NODE STATE PONG (not done yet) ");
 
-                  for(let id in peers){
-                    if(peers[id] && peers[id].conn != undefined){
-                      peers[id].conn.write(JSON.stringify(
+                  for(let id in PEERS.peers){
+                    if(PEERS.peers[id] && PEERS.peers[id].conn != undefined){
+                      PEERS.peers[id].conn.write(JSON.stringify(
                         {"nodeStatePong":{
                           Height:parseInt(chainState.synchronized),
                           MaxHeight:parseInt(chainState.synchronized),
