@@ -284,7 +284,6 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
     currentPeer.longPeerNonce = longPeerNonce;//where is this set
     //currentPeer.longPeerTxHeight = 0;//long peer txheight pulled from txhasharray
     currentPeer.peerMaxHeight = maxHeight;
-    //currentPeer.peerTxHeight = 0;
     currentPeer.peerChainStateHash = chainCPH;
     currentPeer.peerTxHeight = txHt;
     currentPeer.peerTxHash = txHsh;
@@ -323,7 +322,7 @@ var stuckPeerMonitor = function(id,incomingBlockHeight,chainStateHash){
     if(stPeer.count > 2){
       console.log("sending node state pong to stuck peer from monitor "+id);
       //var syncTrigger = {"syncTrigger":incomingBlockHeight,"submitCurrrentChainStateHash":chainStateHash,"peerCurrentBlockCheckPointHash":chainState.currentBlockCheckPointHash}//chainState.currentBlockCheckPointHash
-      if(PEERS.peers.find(o => o.id === id) && PEERS.peers.find(o => o.id === id).conn.write != undefined){
+      if(PEERS.peers.find(o => o.id === id) && PEERS.peers.find(o => o.id === id).conn.write){
         PEERS.peers.find(o => o.id === id).conn.write(JSON.stringify(
           {"nodeStatePong":{
               Height:parseInt(chainState.synchronized),
@@ -342,6 +341,7 @@ var stuckPeerMonitor = function(id,incomingBlockHeight,chainStateHash){
               utcTimeStamp:parseInt(new Date().getTime()/1000)
             }}
           ));
+        console.log("and stuck peer pong was succesful")
       }
 
       setTimeout(function(){
