@@ -769,7 +769,7 @@ var activePing = function(timer){
       var pingCaller = true;
       //for(aId in chainState.activeSynch.receive){
         //if(chainState.activeSynch.receive[aId].peer == id && chainState.activeSynch.receive[aId].nodeType > 1){
-        if(PEERS.peers[id].nodeType > 1){
+        //if(PEERS.peers[id].nodeType > 1){
           //console.log(chalk.bgCyan.black.bold("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType));
           setTimeout(function(){
             if(PEERS.peers[id] && PEERS.peers[id].conn.write){
@@ -793,7 +793,7 @@ var activePing = function(timer){
             }
           },timer)
           pingCaller = false;
-        }
+        //}
       //}
 
       if(pingCaller){
