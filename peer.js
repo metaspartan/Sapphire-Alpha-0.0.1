@@ -2288,9 +2288,11 @@ var cbReset = async function(full = false){
               }
               console.log(chalk.bgRed.white.bold(infoHost)+chalk.bgWhite.blue.bold("NODE STATE CHUNK "+chunk.toString()))
               if(PEERS.peers.find(o => o.id === peerId)){
+                console.log(chalk.bgRed.white.bold("already connected"))
                 PEERS.peers.find(o => o.id === peerId).conn = conn;
                 //then this peer is aleady in the line up
               }else if(PEERS.peers.find(o => o.ip === infoHost)){
+                console.log(chalk.bgRed.white.bold("updated conn"))
                 PEERS.peers.find(o => o.ip === infoHost).conn = conn;
               }else{
                 console.log(chalk.bgRed.white.bold("we would need to add this peer?"))
