@@ -2254,7 +2254,7 @@ var cbReset = async function(full = false){
           incomingBufferArray.push(chunk.toString());
 
           if(isJSON(chunk.toString() && chunk.toString().includes('{"nodeStatePing"'))){
-            //console.log(chalk.bgMagenta.white.bold("NODE STATE PING"));
+            console.log(chalk.bgMagenta.white.bold("NODE STATE PING"));
             showLog = false;
           }
 
@@ -2746,10 +2746,11 @@ var cbReset = async function(full = false){
 
 
             }else if(JSON.parse(data)["currentTransactionHeight"] != chainState.previousTxHeight){
-              console.log("this node sent in a treansaction height of "+JSON.parse(data)["currentTransactionHeight"]);
+              console.log("this node sent in a treansaction height of "+JSON.parse(data)["currentTransactionHeight"]+" and yours was "+chainState.previousTxHeight);
               console.log("one of you needs to sync your transactions I will trigger yours");
 
-              tranSynch();
+              activePing();
+              //tranSynch();
 
               //lets move this to a trnssync call THREE
               //transactionValidator(parseInt(startEnd),parseInt(topEnd));
