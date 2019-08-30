@@ -2279,7 +2279,7 @@ var cbReset = async function(full = false){
           }
 
           if(logTrail){
-            console.log(chalk.bgWhite.blue.bold("NODE STATE CHUNK "+chunk.toString()))
+            console.log(chalk.bgRed.white.bold(info.host)+chalk.bgWhite.blue.bold("NODE STATE CHUNK "+chunk.toString()))
           }
 
           if(
