@@ -772,7 +772,7 @@ var activePing = function(timer){
         if(PEERS.peers[id].nodeType > 1){
           //console.log(chalk.bgCyan.black.bold("do you exist yet ?? "+chainState.activeSynch.receive[aId].nodeType));
           setTimeout(function(){
-            if(PEERS.peers[id] && PEERS.peers[id].conn != undefined){
+            if(PEERS.peers[id] && PEERS.peers[id].conn.write){
               PEERS.peers[id].conn.write(JSON.stringify(
                 {"nodeStatePing":{
                   Height:parseInt(chainState.synchronized),
@@ -799,7 +799,7 @@ var activePing = function(timer){
       if(pingCaller){
         //console.log(chalk.bgCyan.black.bold("is this one ever firing? "));
         setTimeout(function(){
-          if(PEERS.peers[id] && PEERS.peers[id].conn != undefined){
+          if(PEERS.peers[id] && PEERS.peers[id].conn.write){
             PEERS.peers[id].conn.write(JSON.stringify(
               {"nodeStatePing":{
                 Height:parseInt(chainState.synchronized),
@@ -1424,7 +1424,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
       //}
       //var random = 0;//will randomize later
-      var randomizer = Object.keys(peers).length;
+      var randomizer = Object.keys(PEERS.peers).length;
       var random = getRandomInt(randomizer);
       var called = false;
       var i = 0;
