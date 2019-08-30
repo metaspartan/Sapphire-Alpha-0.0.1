@@ -264,13 +264,6 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
     chainState.activeSynch.receive = [];
   }
 
-  for(id in PEERS.peers){
-    if(PEERS.peers[id].conn2 == "{}"){
-      cbReset();
-      return;
-    }
-  }
-
   updatePeerTxHashArray(txHt,txHsh,1,false);
   //console.log("just before push "+peer)
   //console.log("oxHeight"+oxHt+"oxHash"+oxHsh)
@@ -281,7 +274,9 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
   if(currentPeer){
     currentPeer.timestamp = utcTS;
     currentPeer.nodeType = nodeType;//starts at 3 read only 2 is api and 1 is miner
-    currentPeer.longPeerNonce = longPeerNonce;//where is this set
+    if(currentPeer.longPeerNonce < longPeerNonce){
+      currentPeer.longPeerNonce = longPeerNonce;//where is this set
+    }
     //currentPeer.longPeerTxHeight = 0;//long peer txheight pulled from txhasharray
     currentPeer.peerMaxHeight = maxHeight;
     currentPeer.peerChainStateHash = chainCPH;
@@ -291,6 +286,13 @@ updatePeerState = function(peer,maxHeight,chainCPH,txHt,txHsh,longPeerNonce,node
     currentPeer.peerOXHash = oxHsh;
   }
 
+  for(id in PEERS.peers){
+    if(PEERS.peers[id].conn2 == "{}"){
+      console.log(chalk.bgWhite.red.bold("PEER "+PEERS.peers[id].ip+" connection 2 is being reset "))
+      cbReset();
+      return;
+    }
+  }
 
   ///////////////////////END THE NEW WAY PEERS ARE STORED AND UPDATED IN ONE OBJ
 
