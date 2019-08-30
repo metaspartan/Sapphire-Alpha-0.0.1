@@ -2254,7 +2254,7 @@ var cbReset = async function(full = false){
           incomingBufferArray.push(chunk.toString());
 
           if(isJSON(chunk.toString() && chunk.toString().includes('{"nodeStatePing"'))){
-            console.log(chalk.bgMagenta.white.bold("NODE STATE PING"));
+            console.log(chalk.bgMagenta.white.bold("NODE STATE PING "+PEERS.peers.find(o => o.id === peerId).ip));
             showLog = false;
           }
 
