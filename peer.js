@@ -2279,7 +2279,24 @@ var cbReset = async function(full = false){
           }
 
           if(logTrail){
-            console.log(chalk.bgRed.white.bold(info.host)+chalk.bgWhite.blue.bold("NODE STATE CHUNK "+chunk.toString()))
+            if(info.id != Buffer.from(chainState.nodePersistantId).toString('hex')){
+
+              var ipformat = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+              var infoHost = info.host;
+              if(!infoHost.match(ipformat)){
+                infoHost = infoHost.split(":")[3];
+              }
+              console.log(chalk.bgRed.white.bold(infoHost)+chalk.bgWhite.blue.bold("NODE STATE CHUNK "+chunk.toString()))
+              if(PEERS.peers.find(o => o.id === peerId)){
+                PEERS.peers.find(o => o.id === peerId).conn = conn;
+                //then this peer is aleady in the line up
+              }else if(PEERS.peers.find(o => o.ip === infoHost)){
+                PEERS.peers.find(o => o.ip === infoHost).conn = conn;
+              }else{
+                console.log(chalk.bgRed.white.bold("we would need to add this peer?"))
+              }
+            }
+
           }
 
           if(
