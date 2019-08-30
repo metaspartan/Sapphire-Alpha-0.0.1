@@ -2294,6 +2294,22 @@ var cbReset = async function(full = false){
               }else if(PEERS.peers.find(o => o.ip === infoHost)){
                 console.log(chalk.bgRed.white.bold("updated conn"))
                 PEERS.peers.find(o => o.ip === infoHost).conn = conn;
+                if(JSON.parse(chunk.toString())["nodeStatePing"]){
+                  updatePeerState(
+                    peerId,
+                    JSON.parse(chunk.toString())["nodeStatePing"]["MaxHeight"],
+                    JSON.parse(chunk.toString())["nodeStatePing"]["currentBlockCheckPointHash"],
+                    JSON.parse(chunk.toString())["nodeStatePing"]["transactionHeight"],
+                    JSON.parse(chunk.toString())["nodeStatePing"]["transactionRootHash"],
+                    JSON.parse(chunk.toString())["nodeStatePing"]["PeerNonce"],
+                    JSON.parse(chunk.toString())["nodeStatePing"]["NodeType"],
+                    JSON.parse(chunk.toString())["nodeStatePing"]["orderHeight"],
+                    JSON.parse(chunk.toString())["nodeStatePing"]["orderRootHash"],
+                    JSON.parse(chunk.toString())["nodeStatePing"]["utcTimeStamp"]
+                  )
+                  console.log(chalk.bgRed.white.bold("updated peer"))
+                }
+
               }else{
                 console.log(chalk.bgRed.white.bold("we would need to add this peer?"))
               }
