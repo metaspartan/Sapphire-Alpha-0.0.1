@@ -1410,11 +1410,11 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
     if(chainState.peerNonce > chainState.synchronized){
       console.log("PINGING IN THE NEW STATE AREA");
-      var peers2 = peers;//temp copy of peers
-      for (let id in peers2) {
-        for(peerNode in chainState.activeSynch.receive){
-          if(chainState.activeSynch.receive[peerNode].peer == id && chainState.activeSynch.receive[peerNode].peerMaxHeight < chainState.peerNonce){
-            console.log("deleting "+id+" because "+chainState.activeSynch.receive[peerNode].peer)
+      //var peers2 = peers;//temp copy of peers
+      //for (let id in peers2) {
+        for(peerNode in PEERS.peers){
+          if(PEERS.peers[peerNode].id == id && PEERS.peers[peerNode].peerMaxHeight < chainState.peerNonce){
+            console.log("deleting "+id+" because "+PEERS.peers[peerNode].id)
             chainStateMonitor.deletedPeers.push(id)
             //delete peers2[id];
           }else{
@@ -1422,7 +1422,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           }
         }
 
-      }
+      //}
       //var random = 0;//will randomize later
       var randomizer = Object.keys(peers).length;
       var random = getRandomInt(randomizer);
@@ -1432,7 +1432,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
       var oldChainStateActiveSync = chainState.activeSynch;
       var tempNodeCallBucket = [];
 
-      console.log("ln 1063 peers 2 length is "+Object.keys(peers2).length)
+      console.log("ln 1063 PEERS.peers length is "+Object.keys(PEERS.peers).length)
 
       for (let id in PEERS.peers) {
 
@@ -1495,9 +1495,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
           i++;
         }else{
           console.log(chalk.bgCyan.black("id "+id));
-          console.log("this peer conn 2 is undefined and it is probably your own connection");
-          console.log(chalk.bgCyan.black("peers2[id].conn "+peers2[id].conn+"peers2[id].conn2 "+peers2[id].conn2));
-          console.log(JSON.stringify(peers));
+          console.log("this PEERS.peers is undefined and it is probably your own connection");
+          console.log(chalk.bgCyan.black("PEERS.peers[id].conn "+PEERS.peers[id].conn+"PEERS.peers[id].conn2 "+PEERS.peers[id].conn2));
+          console.log(JSON.stringify(PEERS.peers));
         }
       }
       //tempNodeCallBucket.push = {"updated":"bottom 671"};
@@ -1573,7 +1573,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     }
 
     //var random = 0;//will randomize later
-    var randomizer = Object.keys(peers).length;
+    var randomizer = Object.keys(PEERS.peers).length;
     var random = getRandomInt(randomizer);
     var called = false;
     var i = 0;
@@ -1581,7 +1581,7 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
     var oldChainStateActiveSync = chainState.activeSynch;
     var tempNodeCallBucket = [];
 
-    console.log("ln 1195 peers 2 length is "+Object.keys(peers2).length)
+    console.log("ln 1195 PEERS.peers length is "+Object.keys(PEERS.peers).length)
 
     for (let id in PEERS.peers) {
       var localTempNode = {};
@@ -1659,9 +1659,9 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
               localTempNode.random = "no";
             }
           }else if(parseInt(replyData+1) == parseInt(chainState.synchronized)){
-            if(chainState.activeSynch.receive){
-              let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
-              if(rnod){
+
+              let rnod = PEERS.peers[id];
+              if(rnod && PEERS.peers[id].conn2.write){
                 if(rnod.nodeType > 1){
 
                   //this might not be needed but trying it out
@@ -1676,13 +1676,8 @@ var cbBlockChainValidator = function(isValid,replyData,replyHash){
                   called = true;
                   localTempNode.random = "no";
                 }
-              }else{
-                console.log(chalk.bgCyan.black("1270 well, we are calling bottom chainSyncPing with "+parseInt(replyData)+" and "+parseInt(chainState.synchronized)))
-                PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
-                called = true;
-                localTempNode.random = "no";
               }
-            }
+
           }else{
             console.log("1276 reply data +1 called")
             PEERS.peers[id].conn2.write(JSON.stringify({"ChainSyncPing":{Height:parseInt(replyData+1),MaxHeight:parseInt(chainState.synchronized),PeerNonce:chainState.peerNonce,GlobalHash:globalGenesisHash}}));
@@ -4527,7 +4522,7 @@ function cliGetInput(){
         }else{
           console.log("this peer is not in nodes")
         }
-        let rnod = chainState.activeSynch.receive.find(q => q.peer == id);
+        let rnod = PEERS.peers.find(q => q.id == id);
         if(rnod){
           console.log("node "+rnod.nodeType);
         }else{
