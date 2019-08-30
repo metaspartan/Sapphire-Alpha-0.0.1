@@ -837,9 +837,9 @@ var activePing = function(timer){
     console.log(chalk.red("peer stats indicate you are ahead of network or are starting up"));
     console.log(chalk.yellow("---------------------------------------------------------------"));
     //idk should I nodeStatePong?
-    for (let id in peers) {
-      if(peers[id].conn != undefined){
-        peers[id].conn.write(JSON.stringify(
+    for (let id in PEERS.peers) {
+      if(PEERS.peers[id].conn != undefined){
+        PEERS.peers[id].conn.write(JSON.stringify(
           {"nodeStatePong":{
               Height:parseInt(chainState.synchronized),
               MaxHeight:parseInt(chainState.synchronized),
@@ -5925,9 +5925,9 @@ var impcchild = function(childData,fbroadcastPeersBlock,sendOrderTXID,sendTXID,f
                     console.log("5226 WE RESET and SEND NODE STATE PONG (not done yet) ");
                     console.log(chalk.bgWhite.black(" thanks count is "+chainStateMonitor.thanksCount));
                     //send back nodeStatePong
-                    for(let id in peers){
-                      if(peers[id] && peers[id].conn != undefined){
-                        peers[id].conn.write(JSON.stringify(
+                    for(let id in PEERS.peers){
+                      if(PEERS.peers[id] && PEERS.peers[id].conn != undefined){
+                        PEERS.peers[id].conn.write(JSON.stringify(
                           {"nodeStatePong":{
                             Height:parseInt(chainState.synchronized),
                             MaxHeight:parseInt(chainState.synchronized),
