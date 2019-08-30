@@ -2249,23 +2249,37 @@ var cbReset = async function(full = false){
           //console.log(`Received ${chunk.length} bytes of data.`);
 
           var showLog = true;
+          var logTrail = false
 
           incomingStream+=chunk.toString()
           incomingBufferArray.push(chunk.toString());
 
           if(isJSON(chunk.toString() && chunk.toString().includes('{"nodeStatePing"'))){
+
             if(PEERS.peers.find(o => o.id === peerId)){
               console.log(chalk.bgMagenta.white.bold("NODE STATE PING "+PEERS.peers.find(o => o.id === peerId).ip));
+              logTrail = false;
             }else{
-              console.log("NODE STATE PING "+chunk.toString())
+              logTrail = true;
             }
 
             showLog = false;
           }
 
           if(isJSON(chunk.toString() && chunk.toString().includes('{"nodeStatePong"'))){
+
+            if(PEERS.peers.find(o => o.id === peerId)){
+              console.log(chalk.bgBlue.white.bold("NODE STATE PONG "+PEERS.peers.find(o => o.id === peerId).ip));
+              logTrail = false;
+            }else{
+              logTrail = true;
+            }
             //console.log(chalk.bgBlue.white.bold("NODE STATE PONG"));
             showLog = false;
+          }
+
+          if(logTrail){
+            console.log(chalk.bgWhite.blue.bold("NODE STATE CHUNK "+chunk.toString()))
           }
 
           if(
