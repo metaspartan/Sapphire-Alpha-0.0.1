@@ -2745,7 +2745,7 @@ var cbReset = async function(full = false){
                             }
                           };
 
-                          console.log(chalk.bgCyan.black.bold("THANKS "+thanksReply));
+                          console.log(chalk.bgCyan.black.bold("THANKS "+JSON.stringify(thanksReply)));
                           //must use the sendBackUncle function to reply in this area there is no access to conn or conn2
                           sendBackUncle(thanksReply,peerId);
 
@@ -3700,6 +3700,7 @@ var cbReset = async function(full = false){
         //log('Received Message from peer ' + peerId + '----> ' + data.toString() + '====> ' + data.length +" <--> "+ data);
         // callback returning verified uncles post processing probably needs a rename
         var sendBackUncle = function(msg,peerId){
+          console.log("sending a thanks or uncle")
           PEERS.peers.find(o => o.id === peerId).conn2.write(JSON.stringify(msg));
         }
 
@@ -4054,6 +4055,7 @@ var setWaiting = function(id,cb){
 var removeWaiting = async function(id){
   console.log("in the remove waiting call ..."+id)
   for(eachPeer in allWaiting){
+    console.log("peerid "+allWaiting[eachPeer].peerId+" removeid "+id)
     if(allWaiting[eachPeer].peerId == id){
       console.log("reply from peer "+id)
       await allWaiting.splice(id,1);
@@ -4084,7 +4086,7 @@ var broadcastPeers = function(message,waiting = null){
   for (let id in PEERS.peers){
     if(PEERS.peers[id] && PEERS.peers[id].conn != undefined && chainStateMonitor.deletedPeers.indexOf(id) < 0){
       if(waiting != null){
-        setWaiting(id,function(reply){console.log("reply")})
+        setWaiting(PEERS.peers[id].id,function(reply){console.log("reply")})
       }
       PEERS.peers[id].conn.write(message)
     }
