@@ -2301,20 +2301,44 @@ var cbReset = async function(full = false){
               }else if(PEERS.peers.find(o => o.ip === infoHost)){
                 console.log(chalk.bgRed.white.bold("updated conn"))
                 PEERS.peers.find(o => o.ip === infoHost).conn = conn;
-                if(JSON.parse(chunk.toString())["nodeStatePing"]){
-                  updatePeerState(
-                    peerId,
-                    JSON.parse(chunk.toString())["nodeStatePing"]["MaxHeight"],
-                    JSON.parse(chunk.toString())["nodeStatePing"]["currentBlockCheckPointHash"],
-                    JSON.parse(chunk.toString())["nodeStatePing"]["transactionHeight"],
-                    JSON.parse(chunk.toString())["nodeStatePing"]["transactionRootHash"],
-                    JSON.parse(chunk.toString())["nodeStatePing"]["PeerNonce"],
-                    JSON.parse(chunk.toString())["nodeStatePing"]["NodeType"],
-                    JSON.parse(chunk.toString())["nodeStatePing"]["orderHeight"],
-                    JSON.parse(chunk.toString())["nodeStatePing"]["orderRootHash"],
-                    JSON.parse(chunk.toString())["nodeStatePing"]["utcTimeStamp"]
-                  )
-                  console.log(chalk.bgRed.white.bold("updated peer"))
+                try{
+                  if(JSON.parse(chunk.toString())["nodeStatePing"]){
+                    updatePeerState(
+                      peerId,
+                      JSON.parse(chunk.toString())["nodeStatePing"]["MaxHeight"],
+                      JSON.parse(chunk.toString())["nodeStatePing"]["currentBlockCheckPointHash"],
+                      JSON.parse(chunk.toString())["nodeStatePing"]["transactionHeight"],
+                      JSON.parse(chunk.toString())["nodeStatePing"]["transactionRootHash"],
+                      JSON.parse(chunk.toString())["nodeStatePing"]["PeerNonce"],
+                      JSON.parse(chunk.toString())["nodeStatePing"]["NodeType"],
+                      JSON.parse(chunk.toString())["nodeStatePing"]["orderHeight"],
+                      JSON.parse(chunk.toString())["nodeStatePing"]["orderRootHash"],
+                      JSON.parse(chunk.toString())["nodeStatePing"]["utcTimeStamp"]
+                    )
+                    console.log(chalk.bgRed.white.bold("updated peer ping"))
+                  }
+                }catch(error){
+                  console.log("error on updated ping"+error)
+                }
+
+                try{
+                  if(JSON.parse(chunk.toString())["nodeStatePong"]){
+                    updatePeerState(
+                      peerId,
+                      JSON.parse(chunk.toString())["nodeStatePong"]["MaxHeight"],
+                      JSON.parse(chunk.toString())["nodeStatePong"]["currentBlockCheckPointHash"],
+                      JSON.parse(chunk.toString())["nodeStatePong"]["transactionHeight"],
+                      JSON.parse(chunk.toString())["nodeStatePong"]["transactionRootHash"],
+                      JSON.parse(chunk.toString())["nodeStatePong"]["PeerNonce"],
+                      JSON.parse(chunk.toString())["nodeStatePong"]["NodeType"],
+                      JSON.parse(chunk.toString())["nodeStatePong"]["orderHeight"],
+                      JSON.parse(chunk.toString())["nodeStatePong"]["orderRootHash"],
+                      JSON.parse(chunk.toString())["nodeStatePong"]["utcTimeStamp"]
+                    )
+                    console.log(chalk.bgRed.white.bold("updated peer pong"))
+                  }
+                }catch(error){
+                  console.log("error on updated pong"+error)
                 }
 
               }else{
