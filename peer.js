@@ -1311,6 +1311,8 @@ function getRandomInt(max) {
 //////////////////////////////////////////////////////////////////CHAIN VAIDATOR
 var cbBlockChainValidator = function(isValid,replyData,replyHash){
 
+  console.log("isValid "+isValid+"replyData "+replyData+" replyHash "+replyHash)
+
   if((chainState.peerNonce == chainState.synchronized == chainState.transactionHeight == chainStateMonitor.longPeerNonce) && (chainState.synchronized > 2)){
     chainState.isSynching = false;
     console.log("CHAIN IS SYNC");
