@@ -2293,7 +2293,7 @@ var cbReset = async function(full = false){
               if(!infoHost.match(ipformat)){
                 infoHost = infoHost.split(":")[3];
               }
-              console.log(chalk.bgRed.white.bold(infoHost)+chalk.bgWhite.blue.bold("NODE STATE CHUNK "+chunk.toString()))
+              console.log(chalk.bgRed.white.bold(infoHost)+chalk.bgWhite.blue.bold("NODE STATE CHUNK "+chunk.toString().substr(0,20)))
               if(PEERS.peers.find(o => o.id === peerId)){
                 console.log(chalk.bgRed.white.bold("already connected"))
                 PEERS.peers.find(o => o.id === peerId).conn = conn;
