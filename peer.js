@@ -2805,7 +2805,7 @@ var cbReset = async function(full = false){
 
                           console.log("calling brv line 2314");
                           //NOTE: if you increment chainwalk height after mining a block it does not block range validate proerly
-                          BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser+1),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
+                          BlkDB.blockRangeValidate(parseInt(chainState.chainWalkHeight),parseInt(chainState.chainWalkHeight+frankieCoin.chainRiser),cbBlockChainValidator,chainState.chainWalkHash,frankieCoin.chainRiser,1112);
 
                           //miner call
                           console.log("calling calculateCheckPoints 2488");
