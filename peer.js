@@ -2264,7 +2264,7 @@ var cbReset = async function(full = false){
           if(isJSON(chunk.toString() && chunk.toString().includes('{"nodeStatePing"'))){
 
             if(PEERS.peers.find(o => o.id === peerId)){
-              console.log(chalk.bgMagenta.white.bold("NODE STATE PING "+PEERS.peers.find(o => o.id === peerId).ip));
+              //console.log(chalk.bgMagenta.white.bold("NODE STATE PING "+PEERS.peers.find(o => o.id === peerId).ip));
               logTrail = false;
             }else{
               logTrail = true;
@@ -2276,7 +2276,7 @@ var cbReset = async function(full = false){
           if(isJSON(chunk.toString() && chunk.toString().includes('{"nodeStatePong"'))){
 
             if(PEERS.peers.find(o => o.id === peerId)){
-              console.log(chalk.bgBlue.white.bold("NODE STATE PONG "+PEERS.peers.find(o => o.id === peerId).ip));
+              //console.log(chalk.bgBlue.white.bold("NODE STATE PONG "+PEERS.peers.find(o => o.id === peerId).ip));
               logTrail = false;
             }else{
               logTrail = true;
@@ -2293,7 +2293,7 @@ var cbReset = async function(full = false){
               if(!infoHost.match(ipformat)){
                 infoHost = infoHost.split(":")[3];
               }
-              console.log(chalk.bgRed.white.bold(infoHost)+chalk.bgWhite.blue.bold("NODE STATE CHUNK "+chunk.toString().substr(0,20)))
+              console.log(chalk.bgRed.white.bold(infoHost)+chalk.bgWhite.blue.bold("NODE STATE CHUNK "+chunk.toString().substr(0,50)))
               if(PEERS.peers.find(o => o.id === peerId)){
                 console.log(chalk.bgRed.white.bold("already connected"))
                 PEERS.peers.find(o => o.id === peerId).conn = conn;
