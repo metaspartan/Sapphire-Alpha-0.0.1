@@ -2174,6 +2174,7 @@ var cbReset = async function(full = false){
         }else{
           console.log("peer connection "+peerId);
           var addingPeer = new sapphirechain.Peer(peerId,infoHost,info.port);
+          PEERS.cleanNodes(PEERS.peers,"id")
           PEERS.peers.push(addingPeer)
           addingPeer.conn = conn;
 
