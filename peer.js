@@ -4185,8 +4185,7 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput == "MM"){
       //BlkDB.deleteNodes();
-      sw.update();
-      //cbReset(true);//FULL TRUE DELETES NODE DATABASE
+      cbReset(true);//FULL TRUE DELETES NODE DATABASE
       cliGetInput();
     }else if(userInput == "MT"){
       //activePing();
