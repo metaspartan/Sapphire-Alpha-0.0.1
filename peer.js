@@ -1936,7 +1936,7 @@ var directMessage = function(secretMessage){
   //console.log("SECRET MESSAGE BEGINNINGS BRO "+secretPeerMSG);
   //for (let i in frankieCoin.nodes){
 
-    var remotePeerNode = frankieCoin.nodes.filter(function(nodeUp) {
+    var remotePeerNode = PEERS.peers.filter(function(nodeUp) {
        return nodeUp.index == secretPeerID;
     });
 
@@ -2173,13 +2173,13 @@ var cbReset = async function(full = false){
           PEERS.peers.find(o => o.ip === infoHost).conn = conn;
         }else{
           console.log("peer connection "+peerId);
-          var addingPeer = new sapphirechain.Peer(peerId,info.host,info.port);
+          var addingPeer = new sapphirechain.Peer(peerId,infoHost,info.port);
           PEERS.peers.push(addingPeer)
           addingPeer.conn = conn;
 
           /////this is the old stuff working it into new process
-          frankieCoin.registerNode(peerId,info.host,info.port,frankieCoin.length);
-          BlkDB.addNode("node:"+peerId+":connection",{"host":info.host,"port":info.port}).then(function(){
+          frankieCoin.registerNode(peerId,infoHost,info.port,frankieCoin.length);
+          BlkDB.addNode("node:"+peerId+":connection",{"host":infoHost,"port":info.port}).then(function(){
             //log(chalk.green("Incoming Peer Info: "+ chalk.red(JSON.stringify(info))));
             log(chalk.bgBlue('New Peer id: '+ chalk.bold(peerId)));
             var tempNodeCallerID = sapphirechain.ReDuex(peerId);
@@ -4185,7 +4185,8 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput == "MM"){
       //BlkDB.deleteNodes();
-      cbReset(true);//FULL TRUE DELETES NODE DATABASE
+      sw.update();
+      //cbReset(true);//FULL TRUE DELETES NODE DATABASE
       cliGetInput();
     }else if(userInput == "MT"){
       //activePing();
