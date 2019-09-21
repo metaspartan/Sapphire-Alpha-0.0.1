@@ -12,8 +12,6 @@ wss.on('connection', function connection(ws) {
   ws.send('something back');
 });
 
-
-
 var myclient = function(ip){
   const ws2 = new WebSocket('ws://'+ip+':9491');
 
@@ -26,12 +24,31 @@ var myclient = function(ip){
   });
 
   var send = function(msg){
+    console.log("yup we did send the msg ");
     ws2.send(msg);
+  }
+}
+
+peerComChannel = class peerComChannel{
+  constructor(ip){
+    var ws2 = new WebSocket('ws://'+ip+':9491');
+    ws2.on('open', function open() {
+      ws2.send('something');
+    });
+    ws2.on('message', function incoming(data) {
+      console.log("client"+data);
+    });
+    this.ws2 = ws2;
+    this.send = function(msg){
+      console.log("yup we did send the msg ");
+       this.ws2.send(msg);
+    }
   }
 }
 
 //setTimeout(function(){myclient()},1000);
 
 module.exports = {
+  peerComChannel:peerComChannel,
   myclient:myclient
 }
