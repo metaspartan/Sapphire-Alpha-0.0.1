@@ -2180,7 +2180,7 @@ var cbReset = async function(full = false){
           addingPeer.conn = conn;
 
           ///simple test
-          PEERS.peers.find(o => o.id === peerId).peernet = PEERNET.myclient(PEERS.peers.find(o => o.id === peerId).ip);
+          PEERS.peers.find(o => o.id === peerId).peernet = PEERCOM.myclient(PEERS.peers.find(o => o.id === peerId).ip);
 
           /////this is the old stuff working it into new process
           frankieCoin.registerNode(peerId,infoHost,info.port,frankieCoin.length);
