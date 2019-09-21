@@ -33,7 +33,8 @@ const chalk = require('chalk');
 const log = console.log;
 
 //////////////////////////////////////////////////this node private comm account
-const privateCom = require('./privateCom.js');
+//const privateCom = require('./privateCom.js');
+const PEERCOM = require('./peernet.js');
 
 ////////////////////////////////////////////////////calls the level db interface
 var BlkDB = require('./level.js');
@@ -2178,6 +2179,9 @@ var cbReset = async function(full = false){
           PEERS.peers.push(addingPeer)
           addingPeer.conn = conn;
 
+          ///simple test
+          PEERS.peers.find(o => o.id === peerId).peernet = PEERNET.myclient(PEERS.peers.find(o => o.id === peerId).ip);
+
           /////this is the old stuff working it into new process
           frankieCoin.registerNode(peerId,infoHost,info.port,frankieCoin.length);
           BlkDB.addNode("node:"+peerId+":connection",{"host":infoHost,"port":info.port}).then(function(){
@@ -4188,6 +4192,10 @@ function cliGetInput(){
       //BlkDB.deleteNodes();
       cbReset(true);//FULL TRUE DELETES NODE DATABASE
       cliGetInput();
+    }else if(userInput == "PeerCom"){
+      for(eapeer in PEERS.peers){
+        PEERS.peers[eapeer].PeerCom.send("howdy folks comm on peercom **************************** woot")
+      }
     }else if(userInput == "MT"){
       //activePing();
       console.log("Clearing /dist/ module cache from server")

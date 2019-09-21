@@ -39,7 +39,8 @@
     "socket.io-stream": "^0.9.1",
     "standard-ecies": "^1.0.0",
     "uninstall": "0.0.0",
-    "web3": "^1.0.0-beta.53"
+    "web3": "^1.0.0-beta.53",
+    "ws": "^7.1.2"
   },
   "description": "EGEM Sapphire Subchain Client",
   "main": "index.js",
