@@ -4194,7 +4194,7 @@ function cliGetInput(){
       cliGetInput();
     }else if(userInput == "PeerCom"){
       for(eapeer in PEERS.peers){
-        PEERS.peers[eapeer].PeerCom.send("howdy folks comm on peercom **************************** woot")
+        PEERS.peers[eapeer].peernet.send("howdy folks comm on peercom **************************** woot")
       }
     }else if(userInput == "MT"){
       //activePing();
