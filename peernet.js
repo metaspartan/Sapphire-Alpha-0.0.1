@@ -25,7 +25,11 @@ peerComChannel = class peerComChannel{
     this.ws2 = ws2;
     this.send = function(msg){
       console.log("yup we did send the msg ");
-       this.ws2.send(msg);
+      if (this.ws2.readyState !== WebSocket.OPEN) {
+        console.log("cant send readyState is "+this.ws2.readyState)
+      }else{
+        this.ws2.send(msg);
+      }
     }
   }
 }
