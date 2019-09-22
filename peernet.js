@@ -1,7 +1,5 @@
 const WebSocket = require('ws');
 
-
-
 const wss = new WebSocket.Server({ port: 9491 });
 
 wss.on('connection', function connection(ws) {
@@ -24,7 +22,7 @@ peerComChannel = class peerComChannel{
     this.ws2 = ws2;
     this.send = function(msg){
       console.log("yup we did send the msg ");
-       this.ws2.send(msg,function(error){
+       this.ws2.send(msg,{},function(error){
          // Do something in here here to clean things up (or don't do anything at all)
          console.log("the websicked errored "+error)
        });

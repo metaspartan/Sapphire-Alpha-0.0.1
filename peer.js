@@ -2169,11 +2169,10 @@ var cbReset = async function(full = false){
         }
         if(PEERS.peers.find(o => o.id === peerId)){
           PEERS.peers.find(o => o.id === peerId).conn = conn;
-          PEERS.peers.find(o => o.id === peerId).peernet = new PEERCOM.peerComChannel(PEERS.peers.find(o => o.id === peerId).ip);
+          //PEERS.peers.find(o => o.id === peerId).peernet = new PEERCOM.peerComChannel(PEERS.peers.find(o => o.id === peerId).ip);
           //then this peer is aleady in the line up
         }else if(PEERS.peers.find(o => o.ip === infoHost)){
           PEERS.peers.find(o => o.ip === infoHost).conn = conn;
-          PEERS.peers.find(o => o.id === peerId).peernet = new PEERCOM.peerComChannel(PEERS.peers.find(o => o.id === peerId).ip);
         }else{
           console.log("peer connection "+peerId);
           var addingPeer = new sapphirechain.Peer(peerId,infoHost,info.port);
