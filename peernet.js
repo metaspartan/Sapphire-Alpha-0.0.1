@@ -19,13 +19,13 @@ peerComChannel = class peerComChannel{
     ws2.on('message', function incoming(data) {
       console.log("client"+data);
     });
+    ws2.on('error', function(err){
+      console.log("error was "+err)
+    });
     this.ws2 = ws2;
     this.send = function(msg){
       console.log("yup we did send the msg ");
-       this.ws2.send(msg,{},function(error){
-         // Do something in here here to clean things up (or don't do anything at all)
-         console.log("the websicked errored "+error)
-       });
+       this.ws2.send(msg);
     }
   }
 }
